@@ -1,0 +1,18 @@
+\contentsline {section}{Introduction}{2}{section*.11}% 
+\contentsline {section}{\numberline {1}Overview of P2P lending}{4}{section.1}% 
+\contentsline {subsection}{\numberline {1.1}Definition}{4}{subsection.1.1}% 
+\contentsline {subsection}{\numberline {1.2}How P2P lending works}{5}{subsection.1.2}% 
+\contentsline {subsubsection}{\numberline {1.2.1}P2P lending as part of a wider context}{5}{subsubsection.1.2.1}% 
+\contentsline {subsubsection}{\numberline {1.2.2}Legal aspects of P2P lending}{6}{subsubsection.1.2.2}% 
+\contentsline {subsubsection}{\numberline {1.2.3}The process of interest rate determination}{7}{subsubsection.1.2.3}% 
+\contentsline {subsubsection}{\numberline {1.2.4}Lenders' possibilities of investment selection}{8}{subsubsection.1.2.4}% 
+\contentsline {subsubsection}{\numberline {1.2.5}Other variable characteristics of P2P lending platforms}{9}{subsubsection.1.2.5}% 
+\contentsline {subsection}{\numberline {1.3}Conventional Investment Products}{9}{subsection.1.3}% 
+\contentsline {subsubsection}{\numberline {1.3.1}Comparison with P2P lending}{10}{subsubsection.1.3.1}% 
+\contentsline {subsection}{\numberline {1.4}Importance of P2P lending}{11}{subsection.1.4}% 
+\contentsline {section}{\numberline {2}Czech market for P2P lending}{13}{section.2}% 
+\contentsline {section}{\numberline {3}Methodology and conceptual framework}{18}{section.3}% 
+\contentsline {subsection}{\numberline {3.1}Unfolding brackets method}{18}{subsection.3.1}% 
+\contentsline {section}{Conclusion}{20}{section*.12}% 
+\contentsline {section}{List of tables and figures}{21}{section*.13}% 
+\contentsline {section}{Appendix}{22}{section*.14}% 

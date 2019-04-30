@@ -1,0 +1,479 @@
+\begin{thebibliography}{69}
+% this bibliography was produced with the style dinat.bst v2.5
+\makeatletter
+\newcommand{\dinatlabel}[1]%
+{\ifNAT@numbers\else\NAT@biblabelnum{#1}\hspace{2\labelsep}\fi}
+\makeatother
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname url\endcsname\relax\def\url#1{\texttt{#1}}\fi
+
+\bibitem[Ashta and Assadi(2009)]{Ashta2009}
+\dinatlabel{Ashta and Assadi 2009} \textsc{Ashta}, Arvin~; \textsc{Assadi},
+  Djamchid:
+\newblock An Analysis of European Online Micro-Lending Websites.
+\newblock In: \emph{Cahiers du CEREN}
+\newblock 29 (2009), S.~147--160. --
+\newblock URL \url{https://ssrn.com/abstract=1518637}
+
+\bibitem[Bachmann et \,al.(2011)Bachmann, Becker, Buerckner, Hilker, Kock,
+  Lehmann, Tiburtius and Funk]{Bachmann2011}
+\dinatlabel{Bachmann et \,al. 2011} \textsc{Bachmann}, Alexander~;
+  \textsc{Becker}, Alexander~; \textsc{Buerckner}, Daniel~; \textsc{Hilker},
+  Michel~; \textsc{Kock}, Frank~; \textsc{Lehmann}, Mark~; \textsc{Tiburtius},
+  Phillip~; \textsc{Funk}, Burkhardt:
+\newblock Online Peer-to-Peer Lending–A Literature Review.
+\newblock In: \emph{Journal of Internet Banking and Commerce}
+\newblock 16 (2011)
+
+\bibitem[Bankerat({\natexlab{a}})]{BankeratJakToFunguje}
+\dinatlabel{Bankerat {\natexlab{a}}} \textsc{Bankerat}:
+\newblock \emph{Jak to funguje | Bankerat}. --
+\newblock URL \url{https://www.bankerat.cz/jak-to-funguje/}
+
+\bibitem[Bankerat({\natexlab{b}})]{BankeratPujcka}
+\dinatlabel{Bankerat {\natexlab{b}}} \textsc{Bankerat}:
+\newblock \emph{Půjčka | Bankerat}. --
+\newblock URL \url{https://www.bankerat.cz/pujcka/}
+
+\bibitem[Bankerat({\natexlab{c}})]{BankeratPoplatky}
+\dinatlabel{Bankerat {\natexlab{c}}} \textsc{Bankerat}:
+\newblock \emph{Poplatek věřitele | Bankerat}. --
+\newblock URL \url{https://www.bankerat.cz/investice/poplatek-veritele/}
+
+\bibitem[Bankerat({\natexlab{d}})]{BankeratTrziste}
+\dinatlabel{Bankerat {\natexlab{d}}} \textsc{Bankerat}:
+\newblock \emph{Seznam aukcí | Bankerat}. --
+\newblock URL \url{https://www.bankerat.cz/seznam-aukci/}
+
+\bibitem[Bankerat({\natexlab{e}})]{BankeratSmlouva}
+\dinatlabel{Bankerat {\natexlab{e}}} \textsc{Bankerat}:
+\newblock \emph{Smlouva o zápůjčce (Loan contract)}.
+\newblock URL
+  \url{https://www.bankerat.cz/web/data/file/0001/0067_ac208452e0.pdf?768745}
+
+\bibitem[Banking-Online({\natexlab{a}})]{BankingOnlineJakInvestovat}
+\dinatlabel{Banking-Online {\natexlab{a}}} \textsc{Banking-Online}:
+\newblock \emph{Jak investovat}. --
+\newblock URL
+  \url{https://www.banking-online.cz/jak-to-funguje/pro-investora/jak-investovat}
+
+\bibitem[Banking-Online({\natexlab{b}})]{BankingOnlineJakToFunguje}
+\dinatlabel{Banking-Online {\natexlab{b}}} \textsc{Banking-Online}:
+\newblock \emph{Princip Banking Online}. --
+\newblock URL \url{https://www.banking-online.cz/jak-to-funguje/banking-online}
+
+\bibitem[Banking-Online({\natexlab{c}})]{BankingOnlineSazebnik}
+\dinatlabel{Banking-Online {\natexlab{c}}} \textsc{Banking-Online}:
+\newblock \emph{Sazebník služeb}. --
+\newblock URL \url{https://www.banking-online.cz/sazebnik-odmen-a-poplatku}
+
+\bibitem[Banking-Online({\natexlab{d}})]{BankingOnlineSmlouva}
+\dinatlabel{Banking-Online {\natexlab{d}}} \textsc{Banking-Online}:
+\newblock \emph{SMLOUVA O ZÁPUJČCE (Loan Contract)}.
+\newblock URL
+  \url{https://www.banking-online.cz/dokumentace/smlouva-o-zapujcce}
+
+\bibitem[Banking-Online({\natexlab{e}})]{BankingOnlineZadatele}
+\dinatlabel{Banking-Online {\natexlab{e}}} \textsc{Banking-Online}:
+\newblock \emph{Založení aukce žadatele o půjčku}. --
+\newblock URL
+  \url{https://www.banking-online.cz/jak-to-funguje/pro-zadatele-o-pujcku/aukce-zadatele-o-pujcku}
+
+\bibitem[Bondster()]{BondsterSazInv}
+\dinatlabel{Bondster } \textsc{Bondster}:
+\newblock \emph{SAZEBNÍK INVESTORA (Investor's tariff)}.
+\newblock URL
+  \url{http://bondster.com/cz/ke-stazeni/zobrazit/556/sazebnik-investora.pdf}
+
+\bibitem[Bondster(2019{\natexlab{a}})]{BondsterTrziste}
+\dinatlabel{Bondster 2019{\natexlab{a}}} \textsc{Bondster}:
+\newblock \emph{Aktuální investice | Bondster}.
+\newblock 2019. --
+\newblock URL \url{https://www.bondster.com/cz/aktualni-investice}
+
+\bibitem[Bondster(2019{\natexlab{b}})]{BondsterFAQ}
+\dinatlabel{Bondster 2019{\natexlab{b}}} \textsc{Bondster}:
+\newblock \emph{Časté dotazy | Bondster}.
+\newblock 2019. --
+\newblock URL \url{https://bondster.com/cz/caste-dotazy}
+
+\bibitem[Bondster(2019{\natexlab{c}})]{BondsterPodminkyVystoupeni}
+\dinatlabel{Bondster 2019{\natexlab{c}}} \textsc{Bondster}:
+\newblock \emph{Podmínky pro „Pravidelné vystoupení z investice“ (Terms
+  and Conditions for "Regular Exit")}.
+\newblock URL
+  \url{http://bondster.com/cz/ke-stazeni/zobrazit/223/produktove-podminky-pravidelne-vystoupeni.pdf},
+  2019
+
+\bibitem[Bondster(2019{\natexlab{d}})]{BondsterPoskytovatele}
+\dinatlabel{Bondster 2019{\natexlab{d}}} \textsc{Bondster}:
+\newblock \emph{Poskytovatelé | Bondster}.
+\newblock 2019. --
+\newblock URL \url{https://bondster.com/cz/poskytovatele}
+
+\bibitem[Bondster(2019{\natexlab{e}})]{BondsterSmlouvaPostPoh}
+\dinatlabel{Bondster 2019{\natexlab{e}}} \textsc{Bondster}:
+\newblock \emph{SMLOUVA O POSTOUPENÍ POHLEDÁVKY (Contract for the assignment
+  of a claim)}.
+\newblock URL
+  \url{http://bondster.com/cz/ke-stazeni/zobrazit/553/smlouva-o-postoupeni-pohledavky.pdf},
+  2019
+
+\bibitem[Bondster(2019{\natexlab{f}})]{BondsterZajisteni}
+\dinatlabel{Bondster 2019{\natexlab{f}}} \textsc{Bondster}:
+\newblock \emph{Zajištění a likvidita | Bondster}.
+\newblock 2019. --
+\newblock URL \url{https://bondster.com/cz/o-investovani/zajisteni-a-likvidita}
+
+\bibitem[Chaffee and Rapp(2012)]{Chaffee2012}
+\dinatlabel{Chaffee and Rapp 2012} \textsc{Chaffee}, Eric~C.~; \textsc{Rapp},
+  Geoffrey~C.:
+\newblock Regulating Online Peer-to-Peer Lending in the Aftermath of
+  Dodd-Frank: In Search of an Evolving Regulatory Regime for an Evolving
+  Industry.
+\newblock In: \emph{Washington \& Lee Law Review}
+\newblock 69 (2012), Nr.~2, S.~485 -- 533. --
+\newblock URL
+  \url{https://search-ebscohost-com.ezproxy.is.cuni.cz/login.aspx?authtype=shib&custid=s1240919&profile=eds}.
+  --
+\newblock ISSN 00430463
+
+\bibitem[Duarte et \,al.(2012)Duarte, Siegel and Young]{Duarte2012}
+\dinatlabel{Duarte et \,al. 2012} \textsc{Duarte}, Jefferson~; \textsc{Siegel},
+  Stephan~; \textsc{Young}, Lance:
+\newblock {Trust and Credit: The Role of Appearance in Peer-to-peer Lending}.
+\newblock In: \emph{The Review of Financial Studies}
+\newblock 25 (2012), 08, Nr.~8, S.~2455--2484. --
+\newblock URL \url{https://dx.doi.org/10.1093/rfs/hhs071}. --
+\newblock ISSN 0893-9454
+
+\bibitem[ECrowd!(2017)]{ecrowd!2017}
+\dinatlabel{ECrowd! 2017} \textsc{ECrowd!}:
+\newblock \emph{P2B and P2P, Crowdfunding vs. Crowdlending, what's the
+  difference?}
+\newblock 2017. --
+\newblock URL \url{https://www.ecrowdinvest.com/blog/en/p2b-and-p2p/}
+
+\bibitem[Falk et \,al.(2016)Falk, Becker, Dohmen, Huffman and Sunde]{Falk2016}
+\dinatlabel{Falk et \,al. 2016} \textsc{Falk}, Armin~; \textsc{Becker}, Anke~;
+  \textsc{Dohmen}, Thomas~J.~; \textsc{Huffman}, David~; \textsc{Sunde}, Uwe:
+\newblock The Preference Survey Module: A Validated Instrument for Measuring
+  Risk, Time, and Social Preferences.
+\newblock In: \emph{SSRN Electronic Journal}
+\newblock (2016)
+
+\bibitem[FinBee({\natexlab{a}})]{FinbeeDohoda}
+\dinatlabel{FinBee {\natexlab{a}}} \textsc{FinBee}:
+\newblock \emph{DOHODA O UŽÍVÁNÍ PORTÁLU WWW.FINBEE.CZ (Agreement on the
+  use of the portal www.finbee.cz)}.
+\newblock URL
+  \url{https://www.finbee.cz/wp-content/uploads/2017/12/Dohoda_CZ.pdf}
+
+\bibitem[FinBee({\natexlab{b}})]{FinbeeFAQ}
+\dinatlabel{FinBee {\natexlab{b}}} \textsc{FinBee}:
+\newblock \emph{F.A.Q - FinBee}. --
+\newblock URL \url{https://www.finbee.cz/en/how-it-works/faq/}
+
+\bibitem[FinBee({\natexlab{c}})]{FinbeeTrziste}
+\dinatlabel{FinBee {\natexlab{c}}} \textsc{FinBee}:
+\newblock \emph{Loan list - FinBee}. --
+\newblock URL \url{https://www.finbee.cz/en/browse-loans/}
+
+\bibitem[Fong(2015)]{Fong2015}
+\dinatlabel{Fong 2015} \textsc{Fong}, Adrian:
+\newblock Regulation of peer-to-peer lending in Hong Kong: state of play.
+\newblock In: \emph{Law \& Financial Markets Review}
+\newblock 9 (2015), Nr.~4, S.~251 -- 259. --
+\newblock URL
+  \url{http://search.ebscohost.com.ezproxy.is.cuni.cz/login.aspx?direct=true&AuthType=ip,uid,url&db=a9h&AN=118223397&lang=cs&site=ehost-live}.
+  --
+\newblock ISSN 17521440
+
+\bibitem[FRED()]{FRED}
+\dinatlabel{FRED } \textsc{FRED}:
+\newblock \emph{Consumer Loans at All Commercial Banks}. --
+\newblock URL \url{https://fred.stlouisfed.org/series/CONSUMER#0}
+
+\bibitem[Guo et \,al.(2016)Guo, Zhou, Luo, Liu and Xiong]{Guo2016}
+\dinatlabel{Guo et \,al. 2016} \textsc{Guo}, Yanhong~; \textsc{Zhou}, Wenjun~;
+  \textsc{Luo}, Chunyu~; \textsc{Liu}, Chuanren~; \textsc{Xiong}, Hui:
+\newblock Instance-based credit risk assessment for investment decisions in P2P
+  lending.
+\newblock In: \emph{European Journal of Operational Research}
+\newblock 249 (2016), Nr.~2, S.~417 -- 426. --
+\newblock URL
+  \url{http://www.sciencedirect.com/science/article/pii/S0377221715004610}. --
+\newblock ISSN 0377-2217
+
+\bibitem[Herrero-Lopez(2009)]{Herrero-Lopez2009}
+\dinatlabel{Herrero-Lopez 2009} \textsc{Herrero-Lopez}, Sergio:
+\newblock Social interactions in P2P lending, 01 2009, S.~3
+
+\bibitem[Herzenstein et \,al.(2011)Herzenstein, Dholakia and
+  Andrews]{Herzenstein2011}
+\dinatlabel{Herzenstein et \,al. 2011} \textsc{Herzenstein}, Michal~;
+  \textsc{Dholakia}, Utpal~M.~; \textsc{Andrews}, Rick~L.:
+\newblock Strategic Herding Behavior in Peer-to-Peer Loan Auctions.
+\newblock In: \emph{Journal of Interactive Marketing}
+\newblock 25 (2011), Nr.~1, S.~27 -- 36. --
+\newblock URL
+  \url{http://www.sciencedirect.com/science/article/pii/S1094996810000435}. --
+\newblock ISSN 1094-9968
+
+\bibitem[Hudcová(2017)]{Hudcova2017}
+\dinatlabel{Hudcová 2017} \textsc{Hudcová}, Tereza:
+\newblock \emph{Analysis of Czech P2P lending investors' behaviour drivers.}
+\newblock URL
+  \url{https://search.ebscohost.com/login.aspx?authtype=shib&custid=s1240919&profile=eds},
+  2017
+
+\bibitem[Žigraiová(2010)]{Zigraiova2010}
+\dinatlabel{Žigraiová 2010} \textsc{Žigraiová}, Diana:
+\newblock \emph{Portfolio investment for individual investors : (portfolio
+  recommendations for three case studies).}
+\newblock URL
+  \url{https://search.ebscohost.com/login.aspx?authtype=shib&custid=s1240919&profile=eds},
+  2010
+
+\bibitem[Jorgensen(2018)]{Jorgensen2018}
+\dinatlabel{Jorgensen 2018} \textsc{Jorgensen}, Tanja:
+\newblock Peer-to-Peer Lending - A New Digital Intermediary, New Legal
+  Challenges.
+\newblock In: \emph{Nordic Journal of Commercial Law}
+\newblock (2018), Nr.~Issue 1, S.~231. --
+\newblock URL
+  \url{https://search.ebscohost.com/login.aspx?authtype=shib&custid=s1240919&profile=eds}.
+  --
+\newblock ISSN 1459-9686
+
+\bibitem[Kirby and Worner(2014)]{Kirby2014}
+\dinatlabel{Kirby and Worner 2014} \textsc{Kirby}, Eleanor~; \textsc{Worner},
+  Shane:
+\newblock {Crowd-funding: An Infant Industry Growing Fast}
+\newblock / IOSCO.
+\newblock URL
+  \url{http://www.iosco.org/research/pdf/swp/Crowd-funding-An-Infant-Industry-Growing-Fast.pdf},
+  Februar 2014.
+\newblock  -- Forschungsbericht
+
+\bibitem[LendingClub()]{LendingClub}
+\dinatlabel{LendingClub } \textsc{LendingClub}:
+\newblock \emph{LendingClub Statistics | LendingClub}. --
+\newblock URL \url{https://www.lendingclub.com/info/statistics.action}
+
+\bibitem[Lin et \,al.(2013)Lin, Prabhala and Viswanathan]{Lin2013}
+\dinatlabel{Lin et \,al. 2013} \textsc{Lin}, Mingfeng~; \textsc{Prabhala},
+  {Nagpurnanand R.}~; \textsc{Viswanathan}, Siva:
+\newblock Judging borrowers by the company they keep: Friendship networks and
+  information asymmetry in online peer-to-peer lending.
+\newblock In: \emph{Management Science}
+\newblock 59 (2013), 1, Nr.~1, S.~17--35. --
+\newblock ISSN 0025-1909
+
+\bibitem[Livingston(2012)]{Livingston2012}
+\dinatlabel{Livingston 2012} \textsc{Livingston}, Lynda~S.:
+\newblock {Could Peer-To-Peer Loans Substitute For Payday Loans?}
+\newblock In: \emph{Accounting \& Taxation}
+\newblock 4 (2012), Nr.~2, S.~77--94. --
+\newblock URL \url{https://ideas.repec.org/a/ibf/acttax/v4y2012i2p77-94.html}
+
+\bibitem[Mild et \,al.(2015)Mild, Waitz and Wöckl]{Mild2015}
+\dinatlabel{Mild et \,al. 2015} \textsc{Mild}, Andreas~; \textsc{Waitz},
+  Martin~; \textsc{Wöckl}, Jürgen:
+\newblock How low can you go? — Overcoming the inability of lenders to set
+  proper interest rates on unsecured peer-to-peer lending markets.
+\newblock In: \emph{Journal of Business Research}
+\newblock 68 (2015), Nr.~6, S.~1291 -- 1305. --
+\newblock URL
+  \url{http://www.sciencedirect.com/science/article/pii/S0148296314003750}. --
+\newblock ISSN 0148-2963
+
+\bibitem[P2Pforum()]{p2pforum}
+\dinatlabel{P2Pforum } \textsc{P2Pforum}:
+\newblock \emph{P2Pforum.cz - P2P půjčky, investice, fintech i sdílená
+  ekonomika}. --
+\newblock URL \url{https://www.p2pforum.cz/}
+
+\bibitem[Pierrakis and Collins(2013)]{Pierrakis2013}
+\dinatlabel{Pierrakis and Collins 2013} \textsc{Pierrakis}, Yannis~;
+  \textsc{Collins}, Liam:
+\newblock Banking on each other: peer-to-peer lending to business: evidence
+  from funding circle.
+\newblock In: \emph{Nesta}
+\newblock (2013), 04
+
+\bibitem[Prestito({\natexlab{a}})]{PrestitoPoplatky3}
+\dinatlabel{Prestito {\natexlab{a}}} \textsc{Prestito}:
+\newblock \emph{Ceník služeb - Prestito - online pujcky}. --
+\newblock URL \url{http://www.prestito.cz/stranka/15/cenik-sluzeb}
+
+\bibitem[Prestito({\natexlab{b}})]{PrestitoFAQInv}
+\dinatlabel{Prestito {\natexlab{b}}} \textsc{Prestito}:
+\newblock \emph{Investori - Prestito - online pujcky}. --
+\newblock URL \url{http://www.prestito.cz/stranka/54/investori}
+
+\bibitem[Prestito({\natexlab{c}})]{Prestito}
+\dinatlabel{Prestito {\natexlab{c}}} \textsc{Prestito}:
+\newblock \emph{P2P pujcky - Prestito.cz}. --
+\newblock URL \url{http://www.prestito.cz/}
+
+\bibitem[Prestito({\natexlab{d}})]{PrestitoPoplatky1}
+\dinatlabel{Prestito {\natexlab{d}}} \textsc{Prestito}:
+\newblock \emph{Poplatky - Prestito - online pujcky}. --
+\newblock URL \url{http://www.prestito.cz/stranka/31/poplatky}
+
+\bibitem[Prestito({\natexlab{e}})]{PrestitoPoplatky2}
+\dinatlabel{Prestito {\natexlab{e}}} \textsc{Prestito}:
+\newblock \emph{Poplatky - Prestito - online pujcky}. --
+\newblock URL \url{http://www.prestito.cz/stranka/25/poplatky}
+
+\bibitem[Prestito({\natexlab{f}})]{PrestitoTrziste}
+\dinatlabel{Prestito {\natexlab{f}}} \textsc{Prestito}:
+\newblock \emph{Prestito - online pujcky}. --
+\newblock URL \url{http://www.prestito.cz/prochazet-aukce/}
+
+\bibitem[Reilly and Brown(2000)]{Reilly2000}
+\dinatlabel{Reilly and Brown 2000} \textsc{Reilly}, Frank~K.~; \textsc{Brown},
+  Keith~C.:
+\newblock \emph{Investment analysis and portfolio management}.
+\newblock second.
+\newblock The Dryden Press, 2000
+
+\bibitem[Renton(2012)]{Renton2012}
+\dinatlabel{Renton 2012} \textsc{Renton}, Peter:
+\newblock \emph{Comparing Returns on Prosper Before and After the Auction Model
+  Ended - Lend Academy}.
+\newblock 2012. --
+\newblock URL
+  \url{https://www.lendacademy.com/comparing-returns-on-prosper-before-and-after-the-auction-model-ended/}
+
+\bibitem[de~Roure et \,al.(2016)de~Roure, Pelizzon and Tasca]{deRoure2016}
+\dinatlabel{de~Roure et \,al. 2016} \textsc{Roure}, Calebe de~;
+  \textsc{Pelizzon}, Loriana~; \textsc{Tasca}, Paolo:
+\newblock {How does P2P lending fit into the consumer credit market?}
+\newblock / Deutsche Bundesbank.
+\newblock URL \url{https://ideas.repec.org/p/zbw/bubdps/302016.html}, 2016
+\newblock (30/2016). -- Discussion Papers
+
+\bibitem[Vysušil(2016)]{Vysusil2016}
+\dinatlabel{Vysušil 2016} \textsc{Vysušil}, Tomáš:
+\newblock \emph{Peer-to-peer Lending: Proper interest rate}.
+\newblock 2016. --
+\newblock URL
+  \url{https://www.academia.edu/20311806/Peer-to-peer_Lending_Proper_interest_rate}
+
+\bibitem[wiseclerk(2013)]{wiseclerk2013}
+\dinatlabel{wiseclerk 2013} \textsc{wiseclerk}:
+\newblock \emph{P2P Lending: How are interest rates set? | P2P-Banking}.
+\newblock 2013. --
+\newblock URL
+  \url{https://www.p2p-banking.com/process-p2p-lending-how-are-interest-rates-set/}
+
+\bibitem[Ziegler et \,al.(2018)Ziegler, Shneor, Garvey, Wenzlaff, Yerolemou,
+  Zheng~Zhang and Hao]{Ziegler2018}
+\dinatlabel{Ziegler et \,al. 2018} \textsc{Ziegler}, Tania~; \textsc{Shneor},
+  Rotem~; \textsc{Garvey}, Kieran~; \textsc{Wenzlaff}, Karsten~;
+  \textsc{Yerolemou}, Nikos~; \textsc{Zheng~Zhang}, Bryan~; \textsc{Hao}, Rui:
+\newblock \emph{Expanding Horizons: The 3rd European Alternative Finance
+  Industry Report}.
+\newblock 01 2018
+
+\bibitem[Zlutymeloun({\natexlab{a}})]{ZlutymelounONas}
+\dinatlabel{Zlutymeloun {\natexlab{a}}} \textsc{Zlutymeloun}:
+\newblock \emph{Žlutý meloun}. --
+\newblock URL
+  \url{https://www.zlutymeloun.cz/co-je-zluty-meloun?language=cs_CS}
+
+\bibitem[Zlutymeloun({\natexlab{b}})]{ZlutymelounProdukty}
+\dinatlabel{Zlutymeloun {\natexlab{b}}} \textsc{Zlutymeloun}:
+\newblock \emph{Žlutý meloun}. --
+\newblock URL
+  \url{https://www.zlutymeloun.cz/investicni-produkty?language=cs_CS}
+
+\bibitem[Zlutymeloun({\natexlab{c}})]{ZlutymelounBezpecnost}
+\dinatlabel{Zlutymeloun {\natexlab{c}}} \textsc{Zlutymeloun}:
+\newblock \emph{Žlutý meloun}. --
+\newblock URL \url{https://www.zlutymeloun.cz/bezpecnost?language=cs_CS}
+
+\bibitem[Zlutymeloun({\natexlab{d}})]{ZlutymelounInvestovani}
+\dinatlabel{Zlutymeloun {\natexlab{d}}} \textsc{Zlutymeloun}:
+\newblock \emph{Žlutý meloun}. --
+\newblock URL
+  \url{https://www.zlutymeloun.cz/proces-investovani?language=cs_CS}
+
+\bibitem[Zlutymeloun({\natexlab{e}})]{ZlutymelounPoplatky}
+\dinatlabel{Zlutymeloun {\natexlab{e}}} \textsc{Zlutymeloun}:
+\newblock \emph{Žlutý meloun}. --
+\newblock URL
+  \url{https://www.zlutymeloun.cz/investicni-poplatky?language=cs_CS}
+
+\bibitem[Zlutymeloun({\natexlab{f}})]{ZlutymelounTrziste}
+\dinatlabel{Zlutymeloun {\natexlab{f}}} \textsc{Zlutymeloun}:
+\newblock \emph{Žlutý meloun}. --
+\newblock URL \url{https://www.zlutymeloun.cz/aukce}
+
+\bibitem[Zlutymeloun(2017)]{ZlutymelounSazebnik}
+\dinatlabel{Zlutymeloun 2017} \textsc{Zlutymeloun}:
+\newblock \emph{SAZEBNÍK POPLATKU INTERNETOVÉHO PORTÁLU www.zlutymeloun.cz
+  (Tariff for the Internet Portal www.zlutymeloun.cz)}.
+\newblock URL
+  \url{https://www.zlutymeloun.cz/doc/Sazebnik_poplatku_CR.pdf?40af5}, 2017
+
+\bibitem[Zlutymeloun(2019)]{ZlutymelounStatistika}
+\dinatlabel{Zlutymeloun 2019} \textsc{Zlutymeloun}:
+\newblock \emph{Žlutý meloun}.
+\newblock 2019. --
+\newblock URL \url{https://www.zlutymeloun.cz/statistika}
+
+\bibitem[Zonky(2018{\natexlab{a}})]{ZonkyOPParticipace}
+\dinatlabel{Zonky 2018{\natexlab{a}}} \textsc{Zonky}:
+\newblock \emph{OBCHODNÍ PODMÍNKY PARTICIPACE NA SPOTREBITELSKÝCH ÚVERECH
+  (Terms and Conditions of Participation on Consumer Loans)}.
+\newblock URL \url{https://zonky.cz/dokumenty#investori}, 2018
+
+\bibitem[Zonky(2018{\natexlab{b}})]{ZonkyParametryST}
+\dinatlabel{Zonky 2018{\natexlab{b}}} \textsc{Zonky}:
+\newblock \emph{PARAMETRY SEKUNDÁRNÍHO TRHU (Secondary market parameters)}.
+\newblock URL
+  \url{https://zonky.cz/downloads/Zonky_Parametry_sekundarniho_trhu.pdf?v=9615aae593630e00d21588ea61a921c8924e52b93c5beb5cf7a371d86e090fdb},
+  2018
+
+\bibitem[Zonky(2018{\natexlab{c}})]{ZonkySmlouvaHotUv}
+\dinatlabel{Zonky 2018{\natexlab{c}}} \textsc{Zonky}:
+\newblock \emph{SMLOUVA O HOTOVOSTNÍM ÚVERU (Cash loan agreament)}.
+\newblock URL
+  \url{https://zonky.cz/downloads/Zonky_Smlouva_o_hotovostnim_uveru.pdf?v=9615aae593630e00d21588ea61a921c8924e52b93c5beb5cf7a371d86e090fdb},
+  2018
+
+\bibitem[Zonky(2019{\natexlab{a}})]{ZonkySazI}
+\dinatlabel{Zonky 2019{\natexlab{a}}} \textsc{Zonky}:
+\newblock \emph{SAZEBNÍK INVESTORA (Investor's tariff)}.
+\newblock URL
+  \url{https://zonky.cz/downloads/Zonky_Sazebnik_investora.pdf?v=9615aae593630e00d21588ea61a921c8924e52b93c5beb5cf7a371d86e090fdb},
+  2019
+
+\bibitem[Zonky(2019{\natexlab{b}})]{ZonkyTrziste}
+\dinatlabel{Zonky 2019{\natexlab{b}}} \textsc{Zonky}:
+\newblock \emph{Tržiště - Nové příběhy}.
+\newblock 2019. --
+\newblock URL \url{https://app.zonky.cz}
+
+\bibitem[Zonky(2019{\natexlab{c}})]{ZonkyFAQ}
+\dinatlabel{Zonky 2019{\natexlab{c}}} \textsc{Zonky}:
+\newblock \emph{Zonky}.
+\newblock 2019. --
+\newblock URL \url{https://zonky.cz/otazky-a-odpovedi}
+
+\bibitem[Zonky(2019{\natexlab{d}})]{ZonkyFAQI}
+\dinatlabel{Zonky 2019{\natexlab{d}}} \textsc{Zonky}:
+\newblock \emph{Zonky}.
+\newblock 2019. --
+\newblock URL \url{https://zonky.cz/otazky-a-odpovedi-investor}
+
+\bibitem[Zonky(2019{\natexlab{e}})]{ZonkyPoj}
+\dinatlabel{Zonky 2019{\natexlab{e}}} \textsc{Zonky}:
+\newblock \emph{Zonkyho záchranná vesta (Zonky's safety vest)}.
+\newblock 2019. --
+\newblock URL \url{https://zonky.cz/pojisteni/}
+
+\end{thebibliography}
