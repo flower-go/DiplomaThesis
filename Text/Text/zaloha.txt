@@ -1,6 +1,0 @@
-@misc{Vysusil2016,
-title={Peer-to-peer Lending: Proper interest rate},
-url={https://www.academia.edu/20311806/Peer-to-peer_Lending_Proper_interest_rate},
-author={Vysu{\v{s}}?il, Tom{\'a}{\v{s}?}},
-year={2016}
-}
