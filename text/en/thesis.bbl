@@ -1,4 +1,4 @@
-\begin{thebibliography}{2}
+\begin{thebibliography}{3}
 % this bibliography was produced with the style dinat.bst v2.5
 \makeatletter
 \newcommand{\dinatlabel}[1]%
@@ -13,6 +13,15 @@
 \newblock Praha~: Matfyzpress, 2007
 \newblock (Druhé opravené vydání). --
 \newblock ISBN 80-7378-001-1
+
+\bibitem[Devlin et \,al.(2018)Devlin, Chang, Lee and Toutanova]{BERT_ORIG}
+\dinatlabel{Devlin et \,al. 2018} \textsc{Devlin}, Jacob~; \textsc{Chang},
+  Ming-Wei~; \textsc{Lee}, Kenton~; \textsc{Toutanova}, Kristina:
+\newblock BERT: Pre-training of Deep Bidirectional Transformers for Language
+  Understanding.
+\newblock
+\newblock (2018). --
+\newblock URL \url{https://arxiv.org/abs/1810.04805}
 
 \bibitem[Zonky(2018)]{ZonkyParametryST}
 \dinatlabel{Zonky 2018} \textsc{Zonky}:

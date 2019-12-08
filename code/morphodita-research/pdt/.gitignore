@@ -1,0 +1,10 @@
+/bert/
+/dictionary/
+/logs/
+/models/
+/pdt-3.0-dev.ori
+/pdt-3.0-dev.txt
+/pdt-3.0-test.ori
+/pdt-3.0-test.txt
+/pdt-3.0-train.txt
+/*.npz

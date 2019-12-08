@@ -7,7 +7,7 @@ import tensorflow as tf
 
 import morpho_dataset
 
-class Network:
+class Network:£
     def __init__(self, threads, seed=42):
         # Create an empty graph and a session
         graph = tf.Graph()
@@ -93,6 +93,7 @@ class Network:
             weights = tf.sequence_mask(self.sentence_lens, dtype=tf.float32)
             weights_sum = tf.reduce_sum(weights)
             self.predictions, self.prediction_probs = {}, {}
+
             for factor in args.factors:
                 factor_layer = hidden_layer
                 for _ in range(args.factor_layers):
