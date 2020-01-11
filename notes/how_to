@@ -1,0 +1,4 @@
+Tensorboard:
+- pustit u mě s ssh přepínačem D, aby to šlo zobrazit: ssh -D 2020 doubrap1@aic.ufal.mff.cuni.cz
+- pustit tensorboard na main stroji nebo nějakýjm cpu (s option bind)
+- u mě to najdu jako : http://aic.ufal.mff.cuni.cz:6060/#scalars&_smoothingWeight=0

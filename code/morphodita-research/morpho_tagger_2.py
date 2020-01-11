@@ -11,17 +11,7 @@ import morpho_dataset
 class Network:
     def __init__(self, args, num_words, num_chars, factor_words):
 
-        def create_metrics(factors_arg):
-            result = []
-            for factors in [["Lemmas"], ["Tags"], ["Lemmas", "Tags"]]:
-                for use_dict in ["Raw", "Dict"]:
-                    if all(factor in factors_arg for factor in factors):
-                        result.append("".join(factors) + use_dict)
-            return result
-
-        self.METRICS = create_metrics(args.factors)
-
-        # TODO .Model ???
+        self.factors = args.factors
 
         word_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
         charseq_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
@@ -84,18 +74,25 @@ class Network:
 
         self.model = tf.keras.Model(inputs=[word_ids, charseq_ids, charseqs], outputs=outputs)
 
-        # TODO global step
         self._optimizer = tfa.optimizers.LazyAdam(learning_rate=args.learning_rate, beta2=args.beta_2)
+        self._loss = tf.losses.SparseCategoricalCrossentropy()
+        self._metrics = {"loss": tf.metrics.Mean()}
+        for f in self.factors:
+            self._metrics[f] = tf.metrics.SparseCategoricalAccuracy()
+
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
     @tf.function(input_signature=[[tf.TensorSpec(shape=[None, None], dtype=tf.int32)] * 3,
                                   tf.TensorSpec(shape=[None, None, None], dtype=tf.int32)])
-    # TODO train for tags and lemmas
+
+
     def train_batch(self, inputs, factors):
-        tags_mask = tf.not_equal(factors[0], 0)  # TODO je to tady třeba?
+        tags_mask = tf.not_equal(factors[0], 0)
         with tf.GradientTape() as tape:
             probabilities = self.model(inputs, training=True)
-            loss = self._loss(tags, probabilities, tags_mask)
+            loss = 0
+            for i in range(len(self.factors)):
+                loss += self._loss(factors[i], probabilities[i], probabilities[i]._keras_mask)
         gradients = tape.gradient(loss, self.model.variables)
         self._optimizer.apply_gradients(zip(gradients, self.model.variables))
 
@@ -103,38 +100,48 @@ class Network:
         with self._writer.as_default():
             for name, metric in self._metrics.items():
                 metric.reset_states()
-                if name == "loss":
-                    metric(loss)
-                else:
-                    metric(tags, probabilities, tags_mask)
+            self._metrics["loss"](loss)
+            for i in range(len(self.factors)):
+                self._metrics[self.factors[i]](factors[i], probabilities[i], probabilities[i]._keras_mask)
+            for name, metric in self._metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
 
-    # TODO dodelat pro tags and lemmas
-    def train_epoch(self, dataset, args):
+
+    def train_epoch(self, dataset, args, learning_rate):
+        self._optimizer.learning_rate = learning_rate
         for batch in dataset.batches(args.batch_size):
+            factors = []
+            for f in self.factors:
+                factors.append(batch[dataset.FACTORS_MAP[f].word_ids])
             self.train_batch(
                 [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs],
-                batch[dataset.TAGS].word_ids)
+                factors)
 
     @tf.function(input_signature=[[tf.TensorSpec(shape=[None, None], dtype=tf.int32)] * 3,
-                                  tf.TensorSpec(shape=[None, None], dtype=tf.int32)])
-    def evaluate_batch(self, inputs, tags):
-        tags_mask = tf.not_equal(tags, 0)
+                                  tf.TensorSpec(shape=[None, None, None], dtype=tf.int32)])
+    def evaluate_batch(self, inputs, factors):
         probabilities = self.model(inputs, training=False)
-        loss = self._loss(tags, probabilities, tags_mask)
-        for name, metric in self._metrics.items():
-            if name == "loss":
-                metric(loss)
-            else:
-                metric(tags, probabilities, tags_mask)
+        loss = 0
+        for i in range(len(self.factors)):
+            loss += self._loss(factors[i], probabilities[i], probabilities[i]._keras_mask)
+
+        self._metrics["loss"](loss)
+        for i in range(len(self.factors)):
+            self._metrics[self.factors[i]](factors[i], probabilities[i], probabilities[i]._keras_mask)
+
 
     def evaluate(self, dataset, dataset_name, args):
         for metric in self._metrics.values():
             metric.reset_states()
         for batch in dataset.batches(args.batch_size):
+
+            factors = []
+            for f in self.factors:
+                factors.append(batch[dataset.FACTORS_MAP[f].word_ids])
+
             self.evaluate_batch(
                 [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs],
-                batch[dataset.TAGS].word_ids)
+                factors)
 
         metrics = {name: metric.result() for name, metric in self._metrics.items()}
         with self._writer.as_default():
@@ -257,8 +264,8 @@ if __name__ == "__main__":
                       num_words=len(train.factors[train.FORMS].words),
                       num_chars=len(train.factors[train.FORMS].alphabet),
                       factor_words=dict((factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors))
-    #TODO predict only? - asi ne, buď volám train nebo evaluate
 
+    #TODO predict only? - asi ne, buď volám train nebo evaluate
     #TODO ukladani nefunguje
     if args.predict:
         network.saver_inference.restore(network.session, "{}/checkpoint-inference".format(args.predict))
@@ -273,7 +280,7 @@ if __name__ == "__main__":
 
         for i, (epochs, learning_rate) in enumerate(args.epochs):
             for epoch in range(epochs):
-                network.train_epoch(train, args) #TODO bez learning rate, protoze to mam v tom optimazeru
+                network.train_epoch(train, args, learning_rate)
 
                 if dev:
                     metrics = network.evaluate(dev, "dev", args)
@@ -281,7 +288,7 @@ if __name__ == "__main__":
                     for f in [sys.stderr, log_file]:
                         print("Dev, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f, flush=True)
 
-        network.saver_inference.save(network.session, "{}/checkpoint-inference".format(args.logdir), write_meta_graph=False)
+        #network.saver_inference.save(network.session, "{}/checkpoint-inference".format(args.logdir), write_meta_graph=False)
         train.save_mappings("{}/mappings.pickle".format(args.logdir))
 
         if test:
