@@ -2,3 +2,6 @@ Tensorboard:
 - pustit u mě s ssh přepínačem D, aby to šlo zobrazit: ssh -D 2020 doubrap1@aic.ufal.mff.cuni.cz
 - pustit tensorboard na main stroji nebo nějakýjm cpu (s option bind)
 - u mě to najdu jako : http://aic.ufal.mff.cuni.cz:6060/#scalars&_smoothingWeight=0
+
+pustit tagger příkaz zatím:
+-  qsub -q gpu.q -l gpu=1,mem_free=16G,h_data=16G -pe smp 2 myenv/bin/python3 morpho_tagger.py ~straka/data/pdt/pdt-3.5 --embeddings ~straka/data/embeddings/cs_lindat4gw/forms.vectors-w5-d300-ns5.npz --threads 2

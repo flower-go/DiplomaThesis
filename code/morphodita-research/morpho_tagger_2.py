@@ -47,7 +47,10 @@ class Network:
         if args.elmo_size:
             inputs.append(elmo)
 
-        hidden = tf.keras.layers.Concatenate()(inputs)
+        if len(inputs) > 1:
+            hidden = tf.keras.layers.Concatenate()(inputs)
+        else:
+            hidden = inputs[0]
 
         # RNN cells
 
@@ -74,7 +77,7 @@ class Network:
 
         self.model = tf.keras.Model(inputs=[word_ids, charseq_ids, charseqs], outputs=outputs)
 
-        self._optimizer = tfa.optimizers.LazyAdam(learning_rate=args.learning_rate, beta2=args.beta_2)
+        self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
         self._loss = tf.losses.SparseCategoricalCrossentropy()
         self._metrics = {"loss": tf.metrics.Mean()}
         for f in self.factors:
@@ -92,7 +95,7 @@ class Network:
             probabilities = self.model(inputs, training=True)
             loss = 0
             for i in range(len(self.factors)):
-                loss += self._loss(factors[i], probabilities[i], probabilities[i]._keras_mask)
+                loss += self._loss(factors[i], probabilities[i], probabilities[i]._keras_mask) #TODO tensor nemá attribute mask
         gradients = tape.gradient(loss, self.model.variables)
         self._optimizer.apply_gradients(zip(gradients, self.model.variables))
 
@@ -109,13 +112,20 @@ class Network:
 
     def train_epoch(self, dataset, args, learning_rate):
         self._optimizer.learning_rate = learning_rate
-        for batch in dataset.batches(args.batch_size):
-            factors = []
-            for f in self.factors:
-                factors.append(batch[dataset.FACTORS_MAP[f].word_ids])
-            self.train_batch(
-                [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs],
-                factors)
+        batches, at_least_one_epoch = 0, False #TODO at least_one_epoch
+        while batches < args.min_epoch_batches:
+            while not train.epoch_finished():
+                _, batch = dataset.next_batch(args.batch_size)
+                factors = []
+                for f in self.factors:
+                    factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
+                self.train_batch(
+                    [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs],
+                    factors)
+                batch += 1
+                if at_least_one_epoch: break
+            at_least_one_epoch = True
+
 
     @tf.function(input_signature=[[tf.TensorSpec(shape=[None, None], dtype=tf.int32)] * 3,
                                   tf.TensorSpec(shape=[None, None, None], dtype=tf.int32)])
@@ -133,15 +143,22 @@ class Network:
     def evaluate(self, dataset, dataset_name, args):
         for metric in self._metrics.values():
             metric.reset_states()
-        for batch in dataset.batches(args.batch_size):
+        batches, at_least_one_epoch = 0, False
+        while batches < args.min_epoch_batches:
+            while not train.epoch_finished():
+                _, batch = dataset.next_batch(args.batch_size)
 
-            factors = []
-            for f in self.factors:
-                factors.append(batch[dataset.FACTORS_MAP[f].word_ids])
+                factors = []
+                for f in self.factors:
+                    factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
 
-            self.evaluate_batch(
-                [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs],
-                factors)
+                self.evaluate_batch(
+                    [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs],
+                    factors)
+                batches += 1
+                if at_least_one_epoch: break
+            at_least_one_epoch = True
+
 
         metrics = {name: metric.result() for name, metric in self._metrics.items()}
         with self._writer.as_default():
@@ -159,6 +176,7 @@ if __name__ == "__main__":
     import sys
     import re
 
+    print(os.getcwd())
     # Fix random seed
     np.random.seed(42)
     tf.random.set_seed(42)
@@ -175,9 +193,9 @@ if __name__ == "__main__":
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
     parser.add_argument("--elmo", default=None, type=str, help="External contextualized embeddings to use.")
     parser.add_argument("--embeddings", default=None, type=str, help="External embeddings to use.")
-    parser.add_argument("--epochs", default="40:1e-3,20:1e-4", type=str, help="Epochs and learning rates.")
+    parser.add_argument("--epochs", default="1:1e-3", type=str, help="Epochs and learning rates.")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
-    parser.add_argument("--factors", default="Lemmas,Tags", type=str, help="Factors to predict.")
+    parser.add_argument("--factors", default="Tags", type=str, help="Factors to predict.")
     parser.add_argument("--factor_layers", default=1, type=int, help="Per-factor layers.")
     parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
     parser.add_argument("--lemma_re_strip", default=r"(?<=.)(?:`|_|-[^0-9]).*$", type=str,
