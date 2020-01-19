@@ -95,8 +95,9 @@ class Network:
             probabilities = self.model(inputs, training=True)
             loss = 0
             for i in range(len(self.factors)):
-                loss += self._loss(factors[i], probabilities[i], probabilities[i]._keras_mask) #TODO tensor nemá attribute mask
-        gradients = tape.gradient(loss, self.model.variables)
+                loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], tags_mask) #TODO tensor nemá attribute mask
+
+        gradients = tape.gradient(loss, [tf.convert_to_tensor( factors[i]), probabilities[i], tags_mask])
         self._optimizer.apply_gradients(zip(gradients, self.model.variables))
 
         tf.summary.experimental.set_step(self._optimizer.iterations)
