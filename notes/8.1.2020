@@ -7,7 +7,6 @@ Bert pro analýzu sentimentu:
 SMO
 - SMO (M pošle linky). Stanford k tomu má učebnici a lecture
 
-
 Nemáme
 - zapojení slovníku
 
@@ -17,3 +16,27 @@ Chceme měřit:
 - fine tunning berta (tady je to průměrování - ono to rozseká na menší divný kusy a já je pak zprůměruju a strčim do toho,
 co už mám teď napsaný (to chce jen jedno to číslo) - tf.math.segment_mean) - k tomu potřebuju ještě vědět který kousky jsou
 k jakýmu slovu
+- jenom berta bez všech těch věcí
+
+text:
+
+    tagger, lemmatizace
+        - rnn,lstm -> embeddingy, (word2vec) -> bert (rozdíl proti předchozímu, nepotřebuju supervised data)
+    sentiment
+        - zase 3 výsledky (naměříme sami)
+        - knížka (Veselovská)
+    (syntax - spíš asi ne)
+        - 2 datasty - pdt, UD
+    NER
+        -
+
+    analýza chyb
+
+appka
+
+
+
+
+
+
+

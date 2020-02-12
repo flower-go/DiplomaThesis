@@ -30,7 +30,7 @@ class Network:
         cle = tf.keras.layers.Dropout(rate=args.dropout)(cle)
         cle = tf.keras.layers.Bidirectional(tf.keras.layers.GRU(args.cle_dim), merge_mode="concat")(cle)
         # cle = tf.keras.layers.Lambda(lambda args: tf.gather(*args))([cle, charseq_ids])
-        cle = tf.gather(cle, charseq_ids)
+        cle = tf.gather(1*cle, charseq_ids)
 
         # If CLE dim is half WE dim, we add them together, which gives
         # better results; otherwise we concatenate CLE and WE.

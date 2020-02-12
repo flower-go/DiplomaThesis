@@ -1,0 +1,12 @@
+- rnn,lstm -> embeddingy, (word2vec) -> bert (rozdíl proti předchozímu, nepotřebuju supervised data)
+
+Historie:
+- před neuronkama
+- rnn -> LSTM
+    - popis obou, rozdíly, vztahy, porovnání
+- mebeddingy
+    - kde se vzali, popis (word2vec)
+    - elmo (článek)
+- bert
+    - transofrmery - popis
+    - přenos učení mezi tasky (jako imagenet)
