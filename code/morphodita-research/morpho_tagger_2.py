@@ -75,7 +75,10 @@ class Network:
                 factor_layer = tf.keras.layers.Concatenate()([factor_layer, cle])
             outputs.append(tf.keras.layers.Dense(factor_words[factor], activation=tf.nn.softmax)(factor_layer))
 
-        self.model = tf.keras.Model(inputs=[word_ids, charseq_ids, charseqs], outputs=outputs)
+        inp = [word_ids, charseq_ids, charseqs]
+        if(args.embeddings):
+            inp.append(embeddings)
+        self.model = tf.keras.Model(inputs=inp, outputs=outputs)
 
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
         self._loss = tf.losses.SparseCategoricalCrossentropy()
