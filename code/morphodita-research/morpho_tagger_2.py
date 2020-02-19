@@ -116,7 +116,7 @@ class Network:
 
     def train_epoch(self, dataset, args, learning_rate):
         self._optimizer.learning_rate = learning_rate
-        batches, at_least_one_epoch = 0, False #TODO at least_one_epoch
+        batches, at_least_one_epoch = 0, False
         while batches < args.min_epoch_batches:
             while not train.epoch_finished():
                 _, batch = dataset.next_batch(args.batch_size)
@@ -124,7 +124,7 @@ class Network:
                 for f in self.factors:
                     factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
                 self.train_batch(
-                    [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs],
+                    [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs, batch[dataset.EMBEDDINGS].word_ids],
                     factors)
                 batch += 1
                 if at_least_one_epoch: break
@@ -287,7 +287,6 @@ if __name__ == "__main__":
                       num_chars=len(train.factors[train.FORMS].alphabet),
                       factor_words=dict((factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors))
 
-    #TODO predict only? - asi ne, buď volám train nebo evaluate
     #TODO ukladani nefunguje
     if args.predict:
         network.saver_inference.restore(network.session, "{}/checkpoint-inference".format(args.predict))
