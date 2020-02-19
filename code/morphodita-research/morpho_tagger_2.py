@@ -123,8 +123,11 @@ class Network:
                 factors = []
                 for f in self.factors:
                     factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
+                inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
+                if args.embeddings:
+                    inp.append(batch[dataset.EMBEDDINGS].word_ids)
                 self.train_batch(
-                    [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs, batch[dataset.EMBEDDINGS].word_ids],
+                    inp,
                     factors)
                 batch += 1
                 if at_least_one_epoch: break
