@@ -43,6 +43,8 @@ class Network:
         if args.embeddings:
             inputs.append(embeddings)
 
+        inputs.append(tf.keras.layers.Dropout(args.word_dropout, noise_shape=[None, None, 1])(inputs[-1]))
+
         # Contextualized embeddings
         if args.elmo_size:
             inputs.append(elmo)
@@ -51,6 +53,7 @@ class Network:
             hidden = tf.keras.layers.Concatenate()(inputs)
         else:
             hidden = inputs[0]
+
 
         # RNN cells
 
@@ -88,15 +91,17 @@ class Network:
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
+#TODO default parametr
     @tf.function(input_signature=[[tf.TensorSpec(shape=[None, None], dtype=tf.int32)] * 3,
+                                  tf.TensorSpec(shape=[None, None, None], dtype=tf.float32),
                                   tf.TensorSpec(shape=[None, None, None], dtype=tf.int32)])
-
-
-    def train_batch(self, inputs, factors):
+    def train_batch(self, inputs, embeddings, factors):
         tags_mask = tf.not_equal(factors[0], 0)
         with tf.GradientTape() as tape:
+            if embeddings:
+                inputs.append(embeddings)
             probabilities = self.model(inputs, training=True)
-            loss = 0
+            loss = 0.0
             for i in range(len(self.factors)):
                 loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], tags_mask) #TODO tensor nemá attribute mask
 
@@ -124,10 +129,13 @@ class Network:
                 for f in self.factors:
                     factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
                 inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
+                print('train epoch')
                 if args.embeddings:
-                    inp.append(batch[dataset.EMBEDDINGS].word_ids)
+                    embeddings = batch[dataset.EMBEDDINGS].word_ids
+                else:
+                    embeddings = None
                 self.train_batch(
-                    inp,
+                    inp,embeddings,
                     factors)
                 batch += 1
                 if at_least_one_epoch: break
