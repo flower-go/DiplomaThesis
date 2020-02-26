@@ -41,9 +41,7 @@ class Network:
 
         # Pretrained embeddings
         if args.embeddings:
-            inputs.append(embeddings)
-
-        inputs.append(tf.keras.layers.Dropout(args.word_dropout, noise_shape=[None, None, 1])(inputs[-1]))
+            inputs.append(tf.keras.layers.Dropout(args.word_dropout, noise_shape=[None, None, 1])(embeddings))
 
         # Contextualized embeddings
         if args.elmo_size:
@@ -96,17 +94,17 @@ class Network:
                                   tf.TensorSpec(shape=[None, None, None], dtype=tf.float32),
                                   tf.TensorSpec(shape=[None, None, None], dtype=tf.int32)])
     def train_batch(self, inputs, embeddings, factors):
-        tags_mask = tf.not_equal(factors[0], 0)
+        #tags_mask = tf.not_equal(factors[0], 0)
         with tf.GradientTape() as tape:
-            if embeddings:
-                inputs.append(embeddings)
-            probabilities = self.model(inputs, training=True)
+            probabilities = self.model(inputs + [embeddings], training=True)
+            if len(self.factors) == 1:
+                probabilities = [probabilities]
             loss = 0.0
             for i in range(len(self.factors)):
-                loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], tags_mask) #TODO tensor nemá attribute mask
+                loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
 
-        gradients = tape.gradient(loss, [tf.convert_to_tensor( factors[i]), probabilities[i], tags_mask])
-        self._optimizer.apply_gradients(zip(gradients, self.model.variables))
+        gradients = tape.gradient(loss, self.model.trainable_variables)
+        self._optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
 
         tf.summary.experimental.set_step(self._optimizer.iterations)
         with self._writer.as_default():
@@ -121,25 +119,26 @@ class Network:
 
     def train_epoch(self, dataset, args, learning_rate):
         self._optimizer.learning_rate = learning_rate
-        batches, at_least_one_epoch = 0, False
-        while batches < args.min_epoch_batches:
-            while not train.epoch_finished():
-                _, batch = dataset.next_batch(args.batch_size)
-                factors = []
-                for f in self.factors:
-                    factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
-                inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
-                print('train epoch')
-                if args.embeddings:
-                    embeddings = batch[dataset.EMBEDDINGS].word_ids
-                else:
-                    embeddings = None
-                self.train_batch(
-                    inp,embeddings,
-                    factors)
-                batch += 1
-                if at_least_one_epoch: break
-            at_least_one_epoch = True
+        while not train.epoch_finished():
+            _, batch = dataset.next_batch(args.batch_size)
+            factors = []
+            for f in self.factors:
+                factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
+            inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
+            print('train epoch')
+            if args.embeddings:
+                embeddings = np.zeros([batch[train.EMBEDDINGS].word_ids.shape[0],
+                                       batch[train.EMBEDDINGS].word_ids.shape[1],
+                                       args.embeddings_size])
+                for i in range(embeddings.shape[0]):
+                    for j in range(embeddings.shape[1]):
+                        if batch[train.EMBEDDINGS].word_ids[i, j]:
+                            embeddings[i, j] = args.embeddings_data[batch[train.EMBEDDINGS].word_ids[i, j] - 1]
+            else:
+                embeddings = None
+            self.train_batch(
+                inp,embeddings,
+                factors)
 
 
     @tf.function(input_signature=[[tf.TensorSpec(shape=[None, None], dtype=tf.int32)] * 3,
