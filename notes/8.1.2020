@@ -30,13 +30,11 @@ text:
     NER
         -
 
-    analýza chyb
+analýza chyb
 
 appka
 
+slovník - opíšu z toho starýho
 
-
-
-
-
-
+embedingy přidat do datasetu! a ukládat
+musí to být po batchích

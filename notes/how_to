@@ -15,5 +15,5 @@ qsub -cwd -o vystup.txt -e error.txt -q gpu.q -l gpu=1,mem_free=16G,h_data=16G -
 
 req:
 numpy
-tensorflow==2.1.0
-tensorflow addons
+tensorflow-gpu==2.1.0
+tensorflow-addons-0.6.0
