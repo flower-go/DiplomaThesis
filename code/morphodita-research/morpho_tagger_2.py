@@ -7,7 +7,6 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 import morpho_dataset
 
-
 class Network:
     def __init__(self, args, num_words, num_chars, factor_words):
 
@@ -90,13 +89,11 @@ class Network:
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
 #TODO default parametr
-    @tf.function(input_signature=[[tf.TensorSpec(shape=[None, None], dtype=tf.int32)] * 3,
-                                  tf.TensorSpec(shape=[None, None, None], dtype=tf.float32),
-                                  tf.TensorSpec(shape=[None, None, None], dtype=tf.int32)])
-    def train_batch(self, inputs, embeddings, factors):
+    @tf.function(experimental_relax_shapes=True)
+    def train_batch(self, inputs, factors):
         #tags_mask = tf.not_equal(factors[0], 0)
         with tf.GradientTape() as tape:
-            probabilities = self.model(inputs + [embeddings], training=True)
+            probabilities = self.model(inputs, training=True)
             if len(self.factors) == 1:
                 probabilities = [probabilities]
             loss = 0.0
@@ -134,17 +131,15 @@ class Network:
                     for j in range(embeddings.shape[1]):
                         if batch[train.EMBEDDINGS].word_ids[i, j]:
                             embeddings[i, j] = args.embeddings_data[batch[train.EMBEDDINGS].word_ids[i, j] - 1]
-            else:
-                embeddings = None
-            self.train_batch(
-                inp,embeddings,
-                factors)
+                inp.append(embeddings)
+            self.train_batch(inp, factors)
 
 
-    @tf.function(input_signature=[[tf.TensorSpec(shape=[None, None], dtype=tf.int32)] * 3,
-                                  tf.TensorSpec(shape=[None, None, None], dtype=tf.int32)])
+    @tf.function(experimental_relax_shapes=True)
     def evaluate_batch(self, inputs, factors):
         probabilities = self.model(inputs, training=False)
+        if len(self.factors) == 1:
+            probabilities = [probabilities]
         loss = 0
         for i in range(len(self.factors)):
             loss += self._loss(factors[i], probabilities[i], probabilities[i]._keras_mask)
@@ -157,22 +152,23 @@ class Network:
     def evaluate(self, dataset, dataset_name, args):
         for metric in self._metrics.values():
             metric.reset_states()
-        batches, at_least_one_epoch = 0, False
-        while batches < args.min_epoch_batches:
-            while not train.epoch_finished():
-                _, batch = dataset.next_batch(args.batch_size)
+        while not dataset.epoch_finished():
+            _, batch = dataset.next_batch(args.batch_size)
 
-                factors = []
-                for f in self.factors:
-                    factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
-
-                self.evaluate_batch(
-                    [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs],
-                    factors)
-                batches += 1
-                if at_least_one_epoch: break
-            at_least_one_epoch = True
-
+            factors = []
+            for f in self.factors:
+                factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
+            inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
+            if args.embeddings:
+                embeddings = np.zeros([batch[dataset.EMBEDDINGS].word_ids.shape[0],
+                                       batch[dataset.EMBEDDINGS].word_ids.shape[1],
+                                       args.embeddings_size])
+                for i in range(embeddings.shape[0]):
+                    for j in range(embeddings.shape[1]):
+                        if batch[dataset.EMBEDDINGS].word_ids[i, j]:
+                            embeddings[i, j] = args.embeddings_data[batch[dataset.EMBEDDINGS].word_ids[i, j] - 1]
+                inp.append(embeddings)
+            self.evaluate_batch(inp, factors)
 
         metrics = {name: metric.result() for name, metric in self._metrics.items()}
         with self._writer.as_default():
@@ -207,13 +203,12 @@ if __name__ == "__main__":
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
     parser.add_argument("--elmo", default=None, type=str, help="External contextualized embeddings to use.")
     parser.add_argument("--embeddings", default=None, type=str, help="External embeddings to use.")
-    parser.add_argument("--epochs", default="1:1e-3", type=str, help="Epochs and learning rates.")
+    parser.add_argument("--epochs", default="40:1e-3,20:1e-4", type=str, help="Epochs and learning rates.")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
     parser.add_argument("--factors", default="Tags", type=str, help="Factors to predict.")
     parser.add_argument("--factor_layers", default=1, type=int, help="Per-factor layers.")
     parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
-    parser.add_argument("--lemma_re_strip", default=r"(?<=.)(?:`|_|-[^0-9]).*$", type=str,
-                        help="RE suffix to strip from lemma.")
+    parser.add_argument("--lemma_re_strip", default=r"(?<=.)(?:`|_|-[^0-9]).*$", type=str, help="RE suffix to strip from lemma.")
     parser.add_argument("--lemma_rule_min", default=2, type=int, help="Minimum occurences to keep a lemma rule.")
     parser.add_argument("--min_epoch_batches", default=300, type=int, help="Minimum number of batches per epoch.")
     parser.add_argument("--predict", default=None, type=str, help="Predict using the passed model.")
