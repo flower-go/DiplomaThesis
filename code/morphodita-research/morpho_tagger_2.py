@@ -125,10 +125,9 @@ class Network:
             _, batch = dataset.next_batch(args.batch_size)
             factors = []
             for f in self.factors:
-
                 if args.label_smoothing:
-                    words = tf.one_hot(tf.convert_to_tensor(factors[i]), self.factor_words[factor]) * (
-                            1 - args.label_smoothing) + args.label_smoothing / self.factor_words[factor]
+                    words = tf.one_hot(self.factors[f], self.factor_words[f]) * (1 - args.label_smoothing) + \
+                            args.label_smoothing / self.factor_words[f]
                 else:
                     words = batch[dataset.FACTORS_MAP[f]].word_ids
                 factors.append(words)
