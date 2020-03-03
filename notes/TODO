@@ -1,0 +1,15 @@
+PHASE 1
+- pridat smoothing
+    - pridat k labelum
+        - v tom starem je to implementovano
+    X upravit loss function na CategoricalCrossentropy
+- pridat slovnik
+- pridat berta jen embeddingy + ukladat predpoctene
+
+PHASE 2
+- pridat berta poradne a prumerovat embeddingy :(
+- sentiment s bertem bez preprocessingu
+
+PHASE 3
+- sentiment s bertem nad UFAL obludou (kam az to chceme?)
+- naplanovat jak udelam NER

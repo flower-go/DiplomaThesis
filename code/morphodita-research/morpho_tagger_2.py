@@ -11,6 +11,7 @@ class Network:
     def __init__(self, args, num_words, num_chars, factor_words):
 
         self.factors = args.factors
+        self.factor_words = factor_words
 
         word_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
         charseq_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
@@ -81,7 +82,11 @@ class Network:
         self.model = tf.keras.Model(inputs=inp, outputs=outputs)
 
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
-        self._loss = tf.losses.SparseCategoricalCrossentropy()
+
+        if args.label_smoothing:
+            self._loss = tf.losses.CategoricalCrossentropy()
+        else:
+            self._loss = tf.losses.SparseCategoricalCrossentropy()
         self._metrics = {"loss": tf.metrics.Mean()}
         for f in self.factors:
             self._metrics[f] = tf.metrics.SparseCategoricalAccuracy()
@@ -120,7 +125,13 @@ class Network:
             _, batch = dataset.next_batch(args.batch_size)
             factors = []
             for f in self.factors:
-                factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
+
+                if args.label_smoothing:
+                    words = tf.one_hot(tf.convert_to_tensor(factors[i]), self.factor_words[factor]) * (
+                            1 - args.label_smoothing) + args.label_smoothing / self.factor_words[factor]
+                else:
+                    words = batch[dataset.FACTORS_MAP[f]].word_ids
+                factors.append(words)
             inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
             print('train epoch')
             if args.embeddings:
