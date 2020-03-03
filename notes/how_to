@@ -8,12 +8,11 @@ pustit tagger příkaz zatím:
 
 
 nově:
-qsub -q gpu.q -l gpu=1,mem_free=16G,h_data=16G -pe smp 2 myenv/bin/python3 morpho_tagger_2.py ~doubrap1/diplomka/code/morphodita-research/pdt/pdt-3.5 --embeddings ~doubrap1/diplomka/code/morphodita-research/embeddings/cs_lindat4gw/forms.vectors-w5-d300-ns5.npz --threads 2
-
 qsub -cwd -o vystup.txt -e error.txt -q gpu.q -l gpu=1,mem_free=16G,h_data=16G -pe smp 2 $HOME/env_diplomka/bin/python3 morpho_tagger_2.py ~doubrap1/pdt/pdt-3.5 --embeddings ~doubrap1/embeddings/cs_lindat4gw/forms.vectors-w5-d300-ns5.npz --threads 2
-
 
 req:
 numpy
 tensorflow-gpu==2.1.0
 tensorflow-addons-0.6.0
+
+
