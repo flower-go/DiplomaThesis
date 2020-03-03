@@ -103,7 +103,7 @@ class Network:
                 probabilities = [probabilities]
             loss = 0.0
             for i in range(len(self.factors)):
-                loss += self._loss(tf.one_hot(factors[i]), probabilities[i], probabilities[i]._keras_mask)
+                loss += self._loss(tf.one_hot(factors[i],self.factor_words[self.factors[i]]), probabilities[i], probabilities[i]._keras_mask)
 
         gradients = tape.gradient(loss, self.model.trainable_variables)
         self._optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
