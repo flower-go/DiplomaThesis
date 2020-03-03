@@ -84,7 +84,7 @@ class Network:
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
         if args.label_smoothing:
-            self._loss = tf.losses.CategoricalCrossentropy()
+            self._loss = tf.losses.CategoricalCrossentropy(label_smoothing = args.label_smoothing)
         else:
             self._loss = tf.losses.SparseCategoricalCrossentropy()
         self._metrics = {"loss": tf.metrics.Mean()}
@@ -103,7 +103,7 @@ class Network:
                 probabilities = [probabilities]
             loss = 0.0
             for i in range(len(self.factors)):
-                loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
+                loss += self._loss(tf.one_hot(factors[i]), probabilities[i], probabilities[i]._keras_mask)
 
         gradients = tape.gradient(loss, self.model.trainable_variables)
         self._optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
@@ -125,11 +125,7 @@ class Network:
             _, batch = dataset.next_batch(args.batch_size)
             factors = []
             for f in self.factors:
-                if args.label_smoothing:
-                    words = tf.one_hot(self.factors[f], self.factor_words[f]) * (1 - args.label_smoothing) + \
-                            args.label_smoothing / self.factor_words[f]
-                else:
-                    words = batch[dataset.FACTORS_MAP[f]].word_ids
+                words = batch[dataset.FACTORS_MAP[f]].word_ids
                 factors.append(words)
             inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
             print('train epoch')
