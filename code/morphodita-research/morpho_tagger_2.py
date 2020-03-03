@@ -125,6 +125,7 @@ class Network:
             _, batch = dataset.next_batch(args.batch_size)
             factors = []
             for f in self.factors:
+                print("what is f " + f)
                 if args.label_smoothing:
                     words = tf.one_hot(self.factors[f], self.factor_words[f]) * (1 - args.label_smoothing) + \
                             args.label_smoothing / self.factor_words[f]
