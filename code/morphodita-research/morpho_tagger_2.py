@@ -281,7 +281,7 @@ if __name__ == "__main__":
     else:
         # Load input data
         if args.debug_mode:
-            train_data_path = "{}-train_small.txt".format(args.data)
+            train_data_path = "{}-train-small.txt".format(args.data)
         else:
             train_data_path = "{}-train.txt".format(args.data)
         train = morpho_dataset.MorphoDataset(train_data_path,
