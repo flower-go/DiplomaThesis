@@ -229,6 +229,7 @@ if __name__ == "__main__":
     parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
+    parser.add_argument("--debug_mode", default=False, type=bool, help="debug on small dataset")
     args = parser.parse_args()
 
     tf.config.threading.set_inter_op_parallelism_threads(args.threads)
@@ -279,7 +280,11 @@ if __name__ == "__main__":
         predict = morpho_dataset.MorphoDataset(args.data, train=train, shuffle_batches=False, elmo=args.elmo)
     else:
         # Load input data
-        train = morpho_dataset.MorphoDataset("{}-train.txt".format(args.data),
+        if args.debug_mode:
+            train_data_path = "{}-train_small.txt".format(args.data)
+        else:
+            train_data_path = "{}-train.txt".format(args.data)
+        train = morpho_dataset.MorphoDataset(train_data_path,
                                              embeddings=args.embeddings_words if args.embeddings else None,
                                              elmo=re.sub("(?=,|$)", "-train.npz", args.elmo) if args.elmo else None,
                                              lemma_re_strip=args.lemma_re_strip,
