@@ -1,18 +1,26 @@
+================================================================================
 PHASE 1
+================================================================================
 X udelat maly trenovaci set
-- pridat smoothing
-    - pridat k labelum
+X pridat smoothing
+    X pridat k labelum
         X v tom starem je to implementovano
-        - potrebuju to mit vzdycky stejne pro ruzne batche (ten one hot) - udelat v morpho_dataset
-        - potrebuju mit v grafu spravnou velikost toho vysledku(?) asi ne
+        X potrebuju to mit vzdycky stejne pro ruzne batche (ten one hot) NE
+        X potrebuju mit v grafu spravnou velikost toho vysledku(?) NE
+        X upravit i v evaluate!
     X upravit loss function na CategoricalCrossentropy
+
 - pridat slovnik
 - pridat berta jen embeddingy + ukladat predpoctene
 
+================================================================================
 PHASE 2
+================================================================================
 - pridat berta poradne a prumerovat embeddingy :(
 - sentiment s bertem bez preprocessingu
 
+================================================================================
 PHASE 3
+================================================================================
 - sentiment s bertem nad UFAL obludou (kam az to chceme?)
 - naplanovat jak udelam NER
