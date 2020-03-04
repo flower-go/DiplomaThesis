@@ -106,6 +106,13 @@ class MorphoDataset:
                             factor.analyses_ids[-1].append(np.array([1 for _ in analysis], np.int32))
 
                             # Character-level information
+
+                            # factor.alphabet_map - kazde nove pismenko ma poradove cislo
+                            # factor.charseqs_map - kazde nove slovo ma poradove cislo
+                            # factor.charseqs - slovo reprezentovane cisly jednotlivych pismen
+                            #factor.charseq_ids - text reprezentovany cisly slov (?)
+
+                            # word_ids jsou id tagu (odpovedi) a nebo id slov (v pripade 0)
                             if factor.characters:
                                 if word not in factor.charseqs_map:
                                     factor.charseqs_map[word] = len(factor.charseqs)
