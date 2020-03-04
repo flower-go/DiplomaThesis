@@ -104,7 +104,7 @@ class Network:
             loss = 0.0
             for i in range(len(self.factors)):
                 if args.label_smoothing:
-                    loss += self._loss(tf.one_hot(factors[i],self.factor_words[self.factors[i]]), probabilities[i], probabilities[i]._keras_mask)
+                    loss += self._loss(tf.one_hot(factors[i],self.factor_words[self.factors[i]])* (1 - args.label_smoothing) + args.label_smoothing / factor_words[factor], probabilities[i], probabilities[i]._keras_mask)
                 else:
                     loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
         gradients = tape.gradient(loss, self.model.trainable_variables)
@@ -151,7 +151,7 @@ class Network:
         loss = 0
         for i in range(len(self.factors)):
             if args.label_smoothing:
-                loss += self._loss(tf.one_hot(factors[i],self.factor_words[self.factors[i]]), probabilities[i], probabilities[i]._keras_mask)
+                loss += self._loss(tf.one_hot(factors[i],self.factor_words[self.factors[i]])* (1 - args.label_smoothing) + args.label_smoothing / factor_words[factor], probabilities[i], probabilities[i]._keras_mask)
             else:
                 loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
 
@@ -229,8 +229,9 @@ if __name__ == "__main__":
     parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
-    parser.add_argument("--debug_mode", default=False, type=bool, help="debug on small dataset")
+    parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
     args = parser.parse_args()
+    args.debug_mode = args.debug_mode == 1
 
     tf.config.threading.set_inter_op_parallelism_threads(args.threads)
     tf.config.threading.set_intra_op_parallelism_threads(args.threads)
@@ -281,6 +282,7 @@ if __name__ == "__main__":
     else:
         # Load input data
         if args.debug_mode:
+            print("DEBUG MODE")
             train_data_path = "{}-train-small.txt".format(args.data)
         else:
             train_data_path = "{}-train.txt".format(args.data)
