@@ -150,7 +150,10 @@ class Network:
             probabilities = [probabilities]
         loss = 0
         for i in range(len(self.factors)):
-            loss += self._loss(factors[i], probabilities[i], probabilities[i]._keras_mask)
+            if args.label_smoothing:
+                loss += self._loss(tf.one_hot(factors[i],self.factor_words[self.factors[i]]), probabilities[i], probabilities[i]._keras_mask)
+            else:
+                loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
 
         self._metrics["loss"](loss)
         for i in range(len(self.factors)):
