@@ -191,9 +191,10 @@ class Network:
                 # TODO presunout jinam
                 for i in range(len(sentence_lens)):
                     for j in range(sentence_lens[i]):
-                        #TODO zmenit indexy !!!!
+                        print(i)
+                        print(j)
                         analysis_ids = [batch[dataset.FACTORS_MAP[factor]].analyses_ids[i][j] for factor in
-                                        range(len(self.factors))]
+                                        self.factors]
                         if not analysis_ids or len(analysis_ids[0]) == 0:
                             print("delka je nula")
                             continue
