@@ -89,7 +89,8 @@ class Network:
             self._loss = tf.losses.SparseCategoricalCrossentropy()
         self._metrics = {"loss": tf.metrics.Mean()}
         for f in self.factors:
-            self._metrics[f] = tf.metrics.SparseCategoricalAccuracy()
+            for use_dict in ["Raw", "Dict"]:
+                self._metrics[f + use_dict] = tf.metrics.SparseCategoricalAccuracy()
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
@@ -151,7 +152,7 @@ class Network:
         loss = 0
         for i in range(len(self.factors)):
             if args.label_smoothing:
-                loss += self._loss(tf.one_hot(factors[i],self.factor_words[self.factors[i]])* (1 - args.label_smoothing) + args.label_smoothing / factor_words[factor], probabilities[i], probabilities[i]._keras_mask)
+                loss += self._loss(tf.one_hot(factors[i],self.factor_words[self.factors[i]])* (1 - args.label_smoothing) + args.label_smoothing / self.factor_words[factor], probabilities[i], probabilities[i]._keras_mask)
             else:
                 loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
 
