@@ -89,7 +89,8 @@ class Network:
             self._loss = tf.losses.SparseCategoricalCrossentropy()
         self._metrics = {"loss": tf.metrics.Mean()}
         for f in self.factors:
-            self._metrics[f] = tf.metrics.SparseCategoricalAccuracy()
+            for use_dict in ["Raw", "Dict"]:
+                self._metrics[f + use_dict] = tf.metrics.SparseCategoricalAccuracy()
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 

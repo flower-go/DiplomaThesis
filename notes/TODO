@@ -10,7 +10,11 @@ X pridat smoothing
         X upravit i v evaluate!
     X upravit loss function na CategoricalCrossentropy
 
+(?) dodělat predikci
+(?) dodělat test
 - pridat slovnik
+    - pridat do metrik
+    (?) upravit v predikci (any_analysis)
 - pridat berta jen embeddingy + ukladat predpoctene
 
 ================================================================================
@@ -24,3 +28,4 @@ PHASE 3
 ================================================================================
 - sentiment s bertem nad UFAL obludou (kam az to chceme?)
 - naplanovat jak udelam NER
+
