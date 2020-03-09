@@ -84,7 +84,7 @@ class Network:
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
         if args.label_smoothing:
-            self._loss = tf.losses.CategoricalCrossentropy(label_smoothing = args.label_smoothing)
+            self._loss = tf.losses.CategoricalCrossentropy()
         else:
             self._loss = tf.losses.SparseCategoricalCrossentropy()
         self._metrics = {"loss": tf.metrics.Mean()}
@@ -104,7 +104,7 @@ class Network:
             loss = 0.0
             for i in range(len(self.factors)):
                 if args.label_smoothing:
-                    loss += self._loss(tf.one_hot(factors[i],self.factor_words[self.factors[i]])* (1 - args.label_smoothing) + args.label_smoothing / factor_words[factor], probabilities[i], probabilities[i]._keras_mask)
+                    loss += self._loss(tf.one_hot(factors[i],self.factor_words[self.factors[i]])* (1 - args.label_smoothing) + args.label_smoothing / self.factor_words[factor], probabilities[i], probabilities[i]._keras_mask)
                 else:
                     loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
         gradients = tape.gradient(loss, self.model.trainable_variables)
@@ -151,7 +151,7 @@ class Network:
         loss = 0
         for i in range(len(self.factors)):
             if args.label_smoothing:
-                loss += self._loss(tf.one_hot(factors[i],self.factor_words[self.factors[i]])* (1 - args.label_smoothing) + args.label_smoothing / factor_words[factor], probabilities[i], probabilities[i]._keras_mask)
+                loss += self._loss(tf.one_hot(factors[i],self.factor_words[self.factors[i]])* (1 - args.label_smoothing) + args.label_smoothing / self.factor_words[factor], probabilities[i], probabilities[i]._keras_mask)
             else:
                 loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
 
