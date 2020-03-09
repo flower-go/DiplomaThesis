@@ -191,29 +191,36 @@ class Network:
                 # TODO presunout jinam
                 for i in range(len(sentence_lens)):
                     for j in range(sentence_lens[i]):
+                        #TODO zmenit indexy !!!!
                         analysis_ids = [batch[dataset.FACTORS_MAP[factor]].analyses_ids[i][j] for factor in
                                         range(len(self.factors))]
                         if not analysis_ids or len(analysis_ids[0]) == 0:
+                            print("delka je nula")
                             continue
 
                         known_analysis = any(all(analysis_ids[f][a] != dataset.UNK for f in range(len(args.factors)))
                                              for a in range(len(analysis_ids[0])))
                         if not known_analysis:
+                            print("neznama analyza")
                             continue
 
                         # Compute probabilities of unknown analyses as minimum probability
                         # of a known analysis - 1e-3.
-                        analysis_probs = [probabilities[factor][i, j] for factor in self.factors]
+                        analysis_probs = [probabilities[factor][i, j].numpy() for factor in range(len(args.factors))]
+
                         for f in range(len(args.factors)):
                             min_probability = None
                             for analysis in analysis_ids[f]:
+                                print(analysis)
+                                print(f)
+                                print(type(analysis_probs[f][analysis]))
                                 if analysis != dataset.UNK and (min_probability is None or analysis_probs[f][
                                     analysis] - 1e-3 < min_probability):
                                     min_probability = analysis_probs[f][analysis] - 1e-3
                             analysis_probs[f][dataset.UNK] = min_probability
                             analysis_probs[f][dataset.PAD] = min_probability
 
-            self.evaluate_batch(inp, factors, sentence_lens)
+            self.evaluate_batch(inp, factors)
 
             for i in range(len(self.factors)):
                 self._metrics[self.factors[i] + "Dict"](factors[i], analysis_probs[i], probabilities[i]._keras_mask)
