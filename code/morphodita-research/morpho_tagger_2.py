@@ -223,8 +223,8 @@ class Network:
 
             self.evaluate_batch(inp, factors)
 
-            for i in range(len(self.factors)):
-                self._metrics[self.factors[i] + "Dict"](factors[i], analysis_probs[i], probabilities[i]._keras_mask)
+            for fc in range(len(self.factors)):
+                self._metrics[self.factors[fc] + "Dict"](factors[fc], analysis_probs[fc], probabilities[fc]._keras_mask)
 
         metrics = {name: metric.result() for name, metric in self._metrics.items()}
         with self._writer.as_default():
