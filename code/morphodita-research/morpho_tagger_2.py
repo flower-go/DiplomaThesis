@@ -285,15 +285,17 @@ if __name__ == "__main__":
         if args.debug_mode:
             print("DEBUG MODE")
             train_data_path = "{}-train-small.txt".format(args.data)
+            dev_data_path = "{}-dev-small.txt".format(args.data)
         else:
             train_data_path = "{}-train.txt".format(args.data)
+            dev_data_path = "{}-dev.txt".format(args.data)
         train = morpho_dataset.MorphoDataset(train_data_path,
                                              embeddings=args.embeddings_words if args.embeddings else None,
                                              elmo=re.sub("(?=,|$)", "-train.npz", args.elmo) if args.elmo else None,
                                              lemma_re_strip=args.lemma_re_strip,
                                              lemma_rule_min=args.lemma_rule_min)
-        if os.path.exists("{}-dev.txt".format(args.data)):
-            dev = morpho_dataset.MorphoDataset("{}-dev.txt".format(args.data), train=train, shuffle_batches=False,
+        if os.path.exists(dev_data_path):
+            dev = morpho_dataset.MorphoDataset(dev_data_path, train=train, shuffle_batches=False,
                                                elmo=re.sub("(?=,|$)", "-dev.npz", args.elmo) if args.elmo else None)
         else:
             dev = None
