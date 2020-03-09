@@ -117,7 +117,7 @@ class Network:
                 metric.reset_states()
             self._metrics["loss"](loss)
             for i in range(len(self.factors)):
-                self._metrics[self.factors[i]](factors[i], probabilities[i], probabilities[i]._keras_mask)
+                self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
             for name, metric in self._metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
 
@@ -158,7 +158,7 @@ class Network:
 
         self._metrics["loss"](loss)
         for i in range(len(self.factors)):
-            self._metrics[self.factors[i]](factors[i], probabilities[i], probabilities[i]._keras_mask)
+            self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
 
 
     def evaluate(self, dataset, dataset_name, args):
