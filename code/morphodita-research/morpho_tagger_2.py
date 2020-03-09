@@ -165,11 +165,12 @@ class Network:
         for metric in self._metrics.values():
             metric.reset_states()
         while not dataset.epoch_finished():
-            _, batch = dataset.next_batch(args.batch_size)
+            sentence_lens, batch = dataset.next_batch(args.batch_size)
 
             factors = []
             for f in self.factors:
                 factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
+            any_analyses = any(batch[train.FACTORS_MAP[factor]].analyses_ids for factor in self.factors)
             inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
             if args.embeddings:
                 embeddings = np.zeros([batch[dataset.EMBEDDINGS].word_ids.shape[0],
@@ -180,7 +181,42 @@ class Network:
                         if batch[dataset.EMBEDDINGS].word_ids[i, j]:
                             embeddings[i, j] = args.embeddings_data[batch[dataset.EMBEDDINGS].word_ids[i, j] - 1]
                 inp.append(embeddings)
-            self.evaluate_batch(inp, factors)
+
+            probabilities = self.model(inp, training=False)
+            if len(self.factors) == 1:
+                probabilities = [probabilities]
+
+            if any_analyses:
+                # TODO ziskat vektor pravdepodobnosti se slovnikem
+                # TODO presunout jinam
+                for i in range(len(sentence_lens)):
+                    for j in range(sentence_lens[i]):
+                        analysis_ids = [batch[dataset.FACTORS_MAP[factor]].analyses_ids[i][j] for factor in
+                                        self.factors]
+                        if not analysis_ids or len(analysis_ids[0]) == 0:
+                            continue
+
+                        known_analysis = any(all(analysis_ids[f][a] != dataset.UNK for f in range(len(args.factors)))
+                                             for a in range(len(analysis_ids[0])))
+                        if not known_analysis:
+                            continue
+
+                        # Compute probabilities of unknown analyses as minimum probability
+                        # of a known analysis - 1e-3.
+                        analysis_probs = [probabilities[factor][i, j] for factor in args.factors]
+                        for f in range(len(args.factors)):
+                            min_probability = None
+                            for analysis in analysis_ids[f]:
+                                if analysis != dataset.UNK and (min_probability is None or analysis_probs[f][
+                                    analysis] - 1e-3 < min_probability):
+                                    min_probability = analysis_probs[f][analysis] - 1e-3
+                            analysis_probs[f][dataset.UNK] = min_probability
+                            analysis_probs[f][dataset.PAD] = min_probability
+
+            self.evaluate_batch(inp, factors, sentence_lens)
+
+            for i in range(len(self.factors)):
+                self._metrics[self.factors[i] + "Dict"](factors[i], analysis_probs[i], probabilities[i]._keras_mask)
 
         metrics = {name: metric.result() for name, metric in self._metrics.items()}
         with self._writer.as_default():
@@ -314,6 +350,7 @@ if __name__ == "__main__":
                       factor_words=dict((factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors))
 
     #TODO ukladani nefunguje
+    #TODO nemame predikci
     if args.predict:
         network.saver_inference.restore(network.session, "{}/checkpoint-inference".format(args.predict))
         network.predict(predict, sys.stdout, args)
