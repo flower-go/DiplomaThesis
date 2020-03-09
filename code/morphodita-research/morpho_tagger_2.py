@@ -192,7 +192,7 @@ class Network:
                 for i in range(len(sentence_lens)):
                     for j in range(sentence_lens[i]):
                         analysis_ids = [batch[dataset.FACTORS_MAP[factor]].analyses_ids[i][j] for factor in
-                                        self.factors]
+                                        range(len(self.factors))]
                         if not analysis_ids or len(analysis_ids[0]) == 0:
                             continue
 
@@ -203,7 +203,7 @@ class Network:
 
                         # Compute probabilities of unknown analyses as minimum probability
                         # of a known analysis - 1e-3.
-                        analysis_probs = [probabilities[factor][i, j] for factor in args.factors]
+                        analysis_probs = [probabilities[factor][i, j] for factor in self.factors]
                         for f in range(len(args.factors)):
                             min_probability = None
                             for analysis in analysis_ids[f]:
