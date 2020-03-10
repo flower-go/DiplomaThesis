@@ -162,6 +162,8 @@ class Network:
         for i in range(len(self.factors)):
             self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
 
+        return probabilities
+
     def evaluate(self, dataset, dataset_name, args):
         for metric in self._metrics.values():
             metric.reset_states()
@@ -183,7 +185,7 @@ class Network:
                             embeddings[i, j] = args.embeddings_data[batch[dataset.EMBEDDINGS].word_ids[i, j] - 1]
                 inp.append(embeddings)
 
-            probabilities = self.model(inp, training=False)
+            probabilities = self.evaluate_batch(inp, factors)
             if len(self.factors) == 1:
                 probabilities = [probabilities]
 
@@ -230,7 +232,7 @@ class Network:
                                 predictions[f][i, j] = analysis_ids[f][
                                     best_index]
 
-            self.evaluate_batch(inp, factors)
+
 
             for fc in range(len(self.factors)):
                 self._metrics[self.factors[fc] + "Dict"](factors[fc] == predictions[fc],
