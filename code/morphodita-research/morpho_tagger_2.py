@@ -227,7 +227,7 @@ class Network:
                                 if best_index is None or prob > best_prob:
                                     best_index, best_prob = index, prob
                             for f in range(len(args.factors)):
-                                predictions[args.factors[f]][i, j] = analysis_ids[f][
+                                predictions[f][i, j] = analysis_ids[f][
                                     best_index]
 
             self.evaluate_batch(inp, factors)
