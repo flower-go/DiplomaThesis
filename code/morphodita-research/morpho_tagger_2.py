@@ -191,18 +191,17 @@ class Network:
                 # TODO presunout jinam
                 for i in range(len(sentence_lens)):
                     for j in range(sentence_lens[i]):
-                        print(i)
-                        print(j)
+                    
                         analysis_ids = [batch[dataset.FACTORS_MAP[factor]].analyses_ids[i][j] for factor in
                                         self.factors]
                         if not analysis_ids or len(analysis_ids[0]) == 0:
-                            print("delka je nula")
+                           
                             continue
 
                         known_analysis = any(all(analysis_ids[f][a] != dataset.UNK for f in range(len(args.factors)))
                                              for a in range(len(analysis_ids[0])))
                         if not known_analysis:
-                            print("neznama analyza")
+                     
                             continue
 
                         # Compute probabilities of unknown analyses as minimum probability
@@ -212,9 +211,7 @@ class Network:
                         for f in range(len(args.factors)):
                             min_probability = None
                             for analysis in analysis_ids[f]:
-                                print(analysis)
-                                print(f)
-                                print(type(analysis_probs[f][analysis]))
+      
                                 if analysis != dataset.UNK and (min_probability is None or analysis_probs[f][
                                     analysis] - 1e-3 < min_probability):
                                     min_probability = analysis_probs[f][analysis] - 1e-3
