@@ -11,10 +11,16 @@ X pridat smoothing
     X upravit loss function na CategoricalCrossentropy
 
 (?) dodělat predikci
-(?) dodělat test
-- pridat slovnik
-    - pridat do metrik
-    (?) upravit v predikci (any_analysis)
+(?) elmo
+
+X pridat slovnik
+    X pridat do metrik pole
+    X pridat do metrik vysledky
+    X pocitat vysledky se slovnikem - v evaluate batch
+    - opravit slovník
+        - prepsat do eval_batch
+        - opravit pocitani predikci
+
 - pridat berta jen embeddingy + ukladat predpoctene
 
 ================================================================================

@@ -7,6 +7,7 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 import morpho_dataset
 
+
 class Network:
     def __init__(self, args, num_words, num_chars, factor_words):
 
@@ -30,7 +31,7 @@ class Network:
         cle = tf.keras.layers.Dropout(rate=args.dropout)(cle)
         cle = tf.keras.layers.Bidirectional(tf.keras.layers.GRU(args.cle_dim), merge_mode="concat")(cle)
         # cle = tf.keras.layers.Lambda(lambda args: tf.gather(*args))([cle, charseq_ids])
-        cle = tf.gather(1*cle, charseq_ids)
+        cle = tf.gather(1 * cle, charseq_ids)
 
         # If CLE dim is half WE dim, we add them together, which gives
         # better results; otherwise we concatenate CLE and WE.
@@ -51,7 +52,6 @@ class Network:
             hidden = tf.keras.layers.Concatenate()(inputs)
         else:
             hidden = inputs[0]
-
 
         # RNN cells
 
@@ -77,10 +77,10 @@ class Network:
             outputs.append(tf.keras.layers.Dense(factor_words[factor], activation=tf.nn.softmax)(factor_layer))
 
         inp = [word_ids, charseq_ids, charseqs]
-        if(args.embeddings):
+        if (args.embeddings):
             inp.append(embeddings)
-        self.model = tf.keras.Model(inputs=inp, outputs=outputs)
 
+        self.model = tf.keras.Model(inputs=inp, outputs=outputs)
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
         if args.label_smoothing:
@@ -89,15 +89,15 @@ class Network:
             self._loss = tf.losses.SparseCategoricalCrossentropy()
         self._metrics = {"loss": tf.metrics.Mean()}
         for f in self.factors:
-            for use_dict in ["Raw", "Dict"]:
-                self._metrics[f + use_dict] = tf.metrics.SparseCategoricalAccuracy()
+            self._metrics[f + "Raw"] = tf.metrics.SparseCategoricalAccuracy()
+            self._metrics[f + "Dict"] = tf.metrics.Mean()
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
-#TODO default parametr
+    # TODO default parametr
     @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, factors):
-        #tags_mask = tf.not_equal(factors[0], 0)
+        # tags_mask = tf.not_equal(factors[0], 0)
         with tf.GradientTape() as tape:
             probabilities = self.model(inputs, training=True)
             if len(self.factors) == 1:
@@ -105,7 +105,10 @@ class Network:
             loss = 0.0
             for i in range(len(self.factors)):
                 if args.label_smoothing:
-                    loss += self._loss(tf.one_hot(factors[i],self.factor_words[self.factors[i]])* (1 - args.label_smoothing) + args.label_smoothing / self.factor_words[factor], probabilities[i], probabilities[i]._keras_mask)
+                    loss += self._loss(
+                        tf.one_hot(factors[i], self.factor_words[self.factors[i]]) * (1 - args.label_smoothing)
+                        + args.label_smoothing / self.factor_words[self.factors[i]], probabilities[i],
+                        probabilities[i]._keras_mask)
                 else:
                     loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
         gradients = tape.gradient(loss, self.model.trainable_variables)
@@ -120,7 +123,6 @@ class Network:
                 self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
             for name, metric in self._metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
-
 
     def train_epoch(self, dataset, args, learning_rate):
         self._optimizer.learning_rate = learning_rate
@@ -143,7 +145,6 @@ class Network:
                 inp.append(embeddings)
             self.train_batch(inp, factors)
 
-
     @tf.function(experimental_relax_shapes=True)
     def evaluate_batch(self, inputs, factors):
         probabilities = self.model(inputs, training=False)
@@ -152,14 +153,14 @@ class Network:
         loss = 0
         for i in range(len(self.factors)):
             if args.label_smoothing:
-                loss += self._loss(tf.one_hot(factors[i],self.factor_words[self.factors[i]])* (1 - args.label_smoothing) + args.label_smoothing / self.factor_words[factor], probabilities[i], probabilities[i]._keras_mask)
+                loss += self._loss(tf.one_hot(factors[i], self.factor_words[self.factors[i]]), probabilities[i],
+                                   probabilities[i]._keras_mask)
             else:
                 loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
 
         self._metrics["loss"](loss)
         for i in range(len(self.factors)):
             self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
-
 
     def evaluate(self, dataset, dataset_name, args):
         for metric in self._metrics.values():
@@ -192,39 +193,48 @@ class Network:
                     for j in range(sentence_lens[i]):
                         analysis_probs = [probabilities[factor][i, j].numpy() for factor in range(len(args.factors))]
 
+                predictions = [np.argmax(p, axis=2) for p in probabilities]
+
                 for i in range(len(sentence_lens)):
                     for j in range(sentence_lens[i]):
-                    
+
                         analysis_ids = [batch[dataset.FACTORS_MAP[factor]].analyses_ids[i][j] for factor in
                                         self.factors]
                         if not analysis_ids or len(analysis_ids[0]) == 0:
-                           
                             continue
 
                         known_analysis = any(all(analysis_ids[f][a] != dataset.UNK for f in range(len(args.factors)))
                                              for a in range(len(analysis_ids[0])))
                         if not known_analysis:
-                     
                             continue
 
                         # Compute probabilities of unknown analyses as minimum probability
                         # of a known analysis - 1e-3.
 
-
                         for f in range(len(args.factors)):
                             min_probability = None
                             for analysis in analysis_ids[f]:
-      
+
                                 if analysis != dataset.UNK and (min_probability is None or analysis_probs[f][
                                     analysis] - 1e-3 < min_probability):
                                     min_probability = analysis_probs[f][analysis] - 1e-3
                             analysis_probs[f][dataset.UNK] = min_probability
                             analysis_probs[f][dataset.PAD] = min_probability
 
+                            best_index, best_prob = None, None
+                            for index in range(len(analysis_ids[0])):
+                                prob = sum(analysis_probs[f][analysis_ids[f][index]] for f in range(len(args.factors)))
+                                if best_index is None or prob > best_prob:
+                                    best_index, best_prob = index, prob
+                            for f in range(len(args.factors)):
+                                predictions[args.factors[f]][i, j] = analysis_ids[f][
+                                    best_index]
+
             self.evaluate_batch(inp, factors)
 
             for fc in range(len(self.factors)):
-                self._metrics[self.factors[fc] + "Dict"](factors[fc], analysis_probs[fc], probabilities[fc]._keras_mask)
+                self._metrics[self.factors[fc] + "Dict"](factors[fc] == predictions[fc],
+                                                         probabilities[fc]._keras_mask)
 
         metrics = {name: metric.result() for name, metric in self._metrics.items()}
         with self._writer.as_default():
@@ -264,7 +274,8 @@ if __name__ == "__main__":
     parser.add_argument("--factors", default="Tags", type=str, help="Factors to predict.")
     parser.add_argument("--factor_layers", default=1, type=int, help="Per-factor layers.")
     parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
-    parser.add_argument("--lemma_re_strip", default=r"(?<=.)(?:`|_|-[^0-9]).*$", type=str, help="RE suffix to strip from lemma.")
+    parser.add_argument("--lemma_re_strip", default=r"(?<=.)(?:`|_|-[^0-9]).*$", type=str,
+                        help="RE suffix to strip from lemma.")
     parser.add_argument("--lemma_rule_min", default=2, type=int, help="Minimum occurences to keep a lemma rule.")
     parser.add_argument("--min_epoch_batches", default=300, type=int, help="Minimum number of batches per epoch.")
     parser.add_argument("--predict", default=None, type=str, help="Predict using the passed model.")
@@ -295,7 +306,8 @@ if __name__ == "__main__":
         do_not_log = {"exp", "lemma_re_strip", "predict", "threads"}
         args.logdir = "models/{}-{}".format(
             args.exp,
-            ",".join(("{}={}".format(re.sub("(.)[^_]*_?", r"\1", key), re.sub("[^,]*/", "", value) if type(value) == str else value)
+            ",".join(("{}={}".format(re.sub("(.)[^_]*_?", r"\1", key),
+                                     re.sub("[^,]*/", "", value) if type(value) == str else value)
                       for key, value in sorted(vars(args).items()) if key not in do_not_log))
         )
         if not os.path.exists("models"): os.mkdir("models")
@@ -305,12 +317,12 @@ if __name__ == "__main__":
         with open("{}/options.json".format(args.logdir), mode="w") as options_file:
             json.dump(vars(args), options_file, sort_keys=True)
 
-    #TODO write summaries using logdir
-
+    # TODO write summaries using logdir
 
     # Postprocess args
     args.factors = args.factors.split(",")
-    args.epochs = [(int(epochs), float(lr)) for epochs, lr in (epochs_lr.split(":") for epochs_lr in args.epochs.split(","))]
+    args.epochs = [(int(epochs), float(lr)) for epochs, lr in
+                   (epochs_lr.split(":") for epochs_lr in args.epochs.split(","))]
 
     # Load embeddings
     if args.embeddings:
@@ -346,7 +358,7 @@ if __name__ == "__main__":
 
         if os.path.exists("{}-test.txt".format(args.data)):
             test = morpho_dataset.MorphoDataset("{}-test.txt".format(args.data), train=train, shuffle_batches=False,
-                                               elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None)
+                                                elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None)
         else:
             test = None
     args.elmo_size = train.elmo_size
@@ -355,10 +367,11 @@ if __name__ == "__main__":
     network = Network(args=args,
                       num_words=len(train.factors[train.FORMS].words),
                       num_chars=len(train.factors[train.FORMS].alphabet),
-                      factor_words=dict((factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors))
+                      factor_words=dict(
+                          (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors))
 
-    #TODO ukladani nefunguje
-    #TODO nemame predikci
+    # TODO ukladani nefunguje
+    # TODO nemame predikci
     if args.predict:
         network.saver_inference.restore(network.session, "{}/checkpoint-inference".format(args.predict))
         network.predict(predict, sys.stdout, args)
@@ -366,7 +379,8 @@ if __name__ == "__main__":
     else:
         log_file = open("{}/log".format(args.logdir), "w")
         for factor in args.factors:
-            print("{}: {}".format(factor, len(train.factors[train.FACTORS_MAP[factor]].words)), file=log_file, flush=True)
+            print("{}: {}".format(factor, len(train.factors[train.FACTORS_MAP[factor]].words)), file=log_file,
+                  flush=True)
         print("Tagging with args:", "\n".join(("{}: {}".format(key, value) for key, value in sorted(vars(args).items())
                                                if key not in ["embeddings_data", "embeddings_words"])), flush=True)
 
@@ -378,9 +392,10 @@ if __name__ == "__main__":
                     metrics = network.evaluate(dev, "dev", args)
                     metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
                     for f in [sys.stderr, log_file]:
-                        print("Dev, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f, flush=True)
+                        print("Dev, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f,
+                              flush=True)
 
-        #network.saver_inference.save(network.session, "{}/checkpoint-inference".format(args.logdir), write_meta_graph=False)
+        # network.saver_inference.save(network.session, "{}/checkpoint-inference".format(args.logdir), write_meta_graph=False)
         train.save_mappings("{}/mappings.pickle".format(args.logdir))
 
         if test:
