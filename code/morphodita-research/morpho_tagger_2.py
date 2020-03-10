@@ -187,8 +187,11 @@ class Network:
                 probabilities = [probabilities]
 
             if any_analyses:
-                # TODO ziskat vektor pravdepodobnosti se slovnikem
                 # TODO presunout jinam
+                for i in range(len(sentence_lens)):
+                    for j in range(sentence_lens[i]):
+                        analysis_probs = [probabilities[factor][i, j].numpy() for factor in range(len(args.factors))]
+
                 for i in range(len(sentence_lens)):
                     for j in range(sentence_lens[i]):
                     
@@ -206,7 +209,7 @@ class Network:
 
                         # Compute probabilities of unknown analyses as minimum probability
                         # of a known analysis - 1e-3.
-                        analysis_probs = [probabilities[factor][i, j].numpy() for factor in range(len(args.factors))]
+
 
                         for f in range(len(args.factors)):
                             min_probability = None
