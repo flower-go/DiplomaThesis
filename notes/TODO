@@ -18,20 +18,26 @@ X pridat slovnik
     X pridat do metrik vysledky
     X pocitat vysledky se slovnikem - v evaluate batch
     - opravit slovník
-        - prepsat do eval_batch
-        - opravit pocitani predikci
+        X prepsat do eval_batch
+        X opravit pocitani predikci
 
 - pridat berta jen embeddingy + ukladat predpoctene
+    - vytvorit model a tokenizer - v dataset u pocitani
+    - vracet vysledky v morpho_dataset next batch
+    - predavat argument o bertu k datasetu
+    - pridat do inputu modelu stejne jako embeddings co tam jsou
 
 ================================================================================
 PHASE 2
 ================================================================================
 - pridat berta poradne a prumerovat embeddingy :(
-- sentiment s bertem bez preprocessingu
+- sentiment s bertem bez preprocessingu (ktrain?)
 
 ================================================================================
 PHASE 3
 ================================================================================
-- sentiment s bertem nad UFAL obludou (kam az to chceme?)
+- sentiment s bertem
+    (?) nad UFAL obludou (kam az to chceme?)
+
 - naplanovat jak udelam NER
 

@@ -162,7 +162,7 @@ class Network:
         for i in range(len(self.factors)):
             self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
 
-        return probabilities
+        return probabilities, [probabilities[f]._keras_mask for f in range(len(self.factors))]
 
     def evaluate(self, dataset, dataset_name, args):
         for metric in self._metrics.values():
@@ -185,12 +185,9 @@ class Network:
                             embeddings[i, j] = args.embeddings_data[batch[dataset.EMBEDDINGS].word_ids[i, j] - 1]
                 inp.append(embeddings)
 
-            probabilities = self.evaluate_batch(inp, factors)
-            if len(self.factors) == 1:
-                probabilities = [probabilities]
+            probabilities, mask = self.evaluate_batch(inp, factors)
 
             if any_analyses:
-                # TODO presunout jinam
                 for i in range(len(sentence_lens)):
                     for j in range(sentence_lens[i]):
                         analysis_probs = [probabilities[factor][i, j].numpy() for factor in range(len(args.factors))]
@@ -236,7 +233,7 @@ class Network:
 
             for fc in range(len(self.factors)):
                 self._metrics[self.factors[fc] + "Dict"](factors[fc] == predictions[fc],
-                                                         probabilities[fc]._keras_mask)
+                                                         mask[fc])
 
         metrics = {name: metric.result() for name, metric in self._metrics.items()}
         with self._writer.as_default():
@@ -288,6 +285,7 @@ if __name__ == "__main__":
     parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
     parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
+
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
 
