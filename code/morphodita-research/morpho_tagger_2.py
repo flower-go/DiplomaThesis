@@ -21,6 +21,7 @@ class Network:
             embeddings = tf.keras.layers.Input(shape=[None, args.embeddings_size], dtype=tf.float32)
         if args.elmo_size:
             elmo = tf.keras(shape=[None, args.elmo_size], dtype=tf.float32)
+        #TODO bert pridat
 
         # INPUTS - create all embeddings
         inputs = []
@@ -285,13 +286,13 @@ if __name__ == "__main__":
     parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
     parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
-
+    parser.add_argument("--bert", default="bert_embedd", type=str, help="Bert embeddings to use.")
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
 
-    tf.config.threading.set_inter_op_parallelism_threads(args.threads)
-    tf.config.threading.set_intra_op_parallelism_threads(args.threads)
-    tf.config.set_soft_device_placement(True)
+    #tf.config.threading.set_inter_op_parallelism_threads(args.threads)
+    #tf.config.threading.set_intra_op_parallelism_threads(args.threads)
+    #tf.config.set_soft_device_placement(True)
 
     if args.predict:
         # Load saved options from the model
@@ -331,6 +332,10 @@ if __name__ == "__main__":
             args.embeddings_data = embeddings_npz["embeddings"]
             args.embeddings_size = args.embeddings_data.shape[1]
 
+    #if args.bert:
+    #    ...
+    #TOOD pridelat berta - asi tady jen cesta nebo ze to tam neni
+
     if args.predict:
         # Load training dataset maps from the checkpoint
         train = morpho_dataset.MorphoDataset.load_mappings("{}/mappings.pickle".format(args.predict))
@@ -348,6 +353,7 @@ if __name__ == "__main__":
         train = morpho_dataset.MorphoDataset(train_data_path,
                                              embeddings=args.embeddings_words if args.embeddings else None,
                                              elmo=re.sub("(?=,|$)", "-train.npz", args.elmo) if args.elmo else None,
+                                             bert=args.bert if args.bert else None,
                                              lemma_re_strip=args.lemma_re_strip,
                                              lemma_rule_min=args.lemma_rule_min)
         if os.path.exists(dev_data_path):
