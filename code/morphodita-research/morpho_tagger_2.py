@@ -199,7 +199,7 @@ class Network:
                         if not analysis_ids or len(analysis_ids[0]) == 0:
                             continue
 
-                        known_analysis = any(all(analysis_ids[f][a] != dataset.UNK for f in range(len(args.factors)))
+                        known_analysis = any(all(analysis_ids[f][a] != dataset.UNK for f in range(len(self.factors)))
                                              for a in range(len(analysis_ids[0])))
                         if not known_analysis:
                             continue
@@ -207,23 +207,27 @@ class Network:
                         # Compute probabilities of unknown analyses as minimum probability
                         # of a known analysis - 1e-3.
 
+                        analysis_probs = [probabilities[factor][i, j].numpy() for factor in range(len(self.factors))]
+
                         for f in range(len(args.factors)):
                             min_probability = None
                             for analysis in analysis_ids[f]:
 
-                                if analysis != dataset.UNK and (min_probability is None or probabilities[f][
+                            #TODO spatny shape, probabilities f analysis je vektor
+                                if analysis != dataset.UNK and (min_probability is None or analysis_probs[f][
                                     analysis] - 1e-3 < min_probability):
-                                    min_probability = probabilities[f][analysis] - 1e-3
+                                    min_probability = analysis_probs[f][analysis] - 1e-3
+
+                            analysis_probs[f][dataset.UNK] = min_probability
+                            analysis_probs[f][dataset.PAD] = min_probability
 
                         best_index, best_prob = None, None
                         for index in range(len(analysis_ids[0])):
-                            prob = sum(min_probability if (analysis_ids[f][index] == dataset.UNK or analysis_ids[f][index] == dataset.PAD)
-                            else probabilities[f][analysis_ids[f][index]] for f in range(len(args.factors)))
+                            prob = sum(analysis_probs[f][analysis_ids[f][index]] for f in range(len(args.factors)))
                             if best_index is None or prob > best_prob:
                                 best_index, best_prob = index, prob
                         for f in range(len(args.factors)):
-                            predictions[f][i, j] = analysis_ids[f][
-                                best_index]
+                            predictions[f][i, j] = analysis_ids[f][best_index]
 
 
 
