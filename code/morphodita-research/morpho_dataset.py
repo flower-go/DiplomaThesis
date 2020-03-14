@@ -3,6 +3,9 @@ import pickle
 import re
 
 import numpy as np
+import os
+import transformers
+import tensorflow as tf
 
 class MorphoDataset:
     FORMS = 0
@@ -13,6 +16,7 @@ class MorphoDataset:
 
     EMBEDDINGS = 3
     ELMOS = 4
+    BERT = 5
 
     PAD = 0
     UNK = 1
@@ -42,7 +46,7 @@ class MorphoDataset:
             self.analyses_ids = analyses_ids
 
     def __init__(self, filename, embeddings=None, elmo=None, train=None, lemma_re_strip=None, lemma_rule_min=None,
-                 shuffle_batches=True, max_sentences=None):
+                 shuffle_batches=True, max_sentences=None, bert=None):
         # Create factors
         self._factors = []
         for f in range(self.FACTORS):
@@ -195,6 +199,38 @@ class MorphoDataset:
                 for i in range(sentences):
                     assert self._sentence_lens[i] == len(self._elmo[i])
 
+        if bert:
+            if os.path.exists(bert):
+                with np.load(bert, allow_pickle=True) as bert_embeddings:
+                    ... #TODO nekam to pricteme
+            else:
+                #TODO jaky model?
+                config = transformers.BertConfig.from_pretrained("bert-base-multilingual-uncased")
+                config.output_hidden_states = True
+                #TODO nastavit tokeny stejne (mask, unk atd.. ?)
+                tokenizer = transformers.BertTokenizer.from_pretrained("bert-base-multilingual-uncased")
+                #TODO predstahnout
+                model = transformers.TFBertModel.from_pretrained("bert-base-multilingual-uncased",
+                                                                                     config=config)
+
+                words = self._factors[self.FORMS].word_strings
+                bert_embeddings = [[0]*len(words[i]) for i in range(len(words))]
+                for i in range(sentences):
+                    for j in range(self._sentence_lens[i]):
+                        word = words[i][j]
+                        #TODO batch size
+                        #TODO iterovat pres spravnou vec
+                        segments = []
+                        w_subwords = tokenizer.encode(word)
+                        segments.append(len(w_subwords))
+                        word_tok = tf.convert_to_tensor(w_subwords)[None,:]
+                        #embeddings for one word (1,768)
+                        bert_embeddings_s = model(word_tok)[0][0][1:6]
+                        bert_embeddings[i][j] = (np.mean(bert_embeddings_s, axis=0))
+
+                #TODO ulozit embeddings
+
+
     @property
     def sentence_lens(self):
         return self._sentence_lens
@@ -253,6 +289,9 @@ class MorphoDataset:
             factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len, self.elmo_size], np.float32)))
             for i in range(batch_size):
                 factors[-1].word_ids[i, :len(self._elmo[batch_perm[i]])] = self._elmo[batch_perm[i]]
+
+        # BERT
+        #TODO bert tady spocitat pro batch (uz vypoctene pro cely dataset)
 
         # Character-level data
         for f, factor in enumerate(self._factors):
