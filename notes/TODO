@@ -22,10 +22,12 @@ X pridat slovnik
         X opravit pocitani predikci
 
 - pridat berta jen embeddingy + ukladat predpoctene
-    - vytvorit model a tokenizer - v dataset u pocitani
-    - vracet vysledky v morpho_dataset next batch
-    - predavat argument o bertu k datasetu
+    X vytvorit model a tokenizer - v dataset u pocitani
+    -  vracet vysledky v morpho_dataset next batch
+    - ulozit predpoctene vysledky
+    X predavat argument o bertu k datasetu
     - pridat do inputu modelu stejne jako embeddings co tam jsou
+    - predavat v metodach do grafu
 
 ================================================================================
 PHASE 2
