@@ -287,7 +287,7 @@ if __name__ == "__main__":
     parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
     parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
-    parser.add_argument("--bert", default="None", type=str, help="Bert embeddings to use.")
+    parser.add_argument("--bert", default="bert_emb", type=str, help="Bert embeddings to use.")
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
 
@@ -333,6 +333,13 @@ if __name__ == "__main__":
             args.embeddings_data = embeddings_npz["embeddings"]
             args.embeddings_size = args.embeddings_data.shape[1]
 
+    if args.bert:
+        if os.path.exists(args.bert):
+            with np.load(args.bert, allow_pickle=True) as bert_npz:
+                args.bert_words = bert_npz["words"]
+                args.bert_data = bert_npz["embeddings"]
+                args.bert_size = args.bert_data.shape[1]
+
     if args.predict:
         # Load training dataset maps from the checkpoint
         train = morpho_dataset.MorphoDataset.load_mappings("{}/mappings.pickle".format(args.predict))
@@ -350,6 +357,7 @@ if __name__ == "__main__":
         train = morpho_dataset.MorphoDataset(train_data_path,
                                              embeddings=args.embeddings_words if args.embeddings else None,
                                              elmo=re.sub("(?=,|$)", "-train.npz", args.elmo) if args.elmo else None,
+                                             bert_words = args.bert_words if args.bert_words else None,
                                              bert=args.bert if args.bert else None,
                                              lemma_re_strip=args.lemma_re_strip,
                                              lemma_rule_min=args.lemma_rule_min)
@@ -365,6 +373,8 @@ if __name__ == "__main__":
         else:
             test = None
     args.elmo_size = train.elmo_size
+
+    #TODO pridat berta i do test a dev
 
     # Construct the network
     network = Network(args=args,
