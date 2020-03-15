@@ -2,6 +2,7 @@
 import collections
 import json
 
+import transformers
 import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
@@ -286,7 +287,7 @@ if __name__ == "__main__":
     parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
     parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
-    parser.add_argument("--bert", default="bert_embedd", type=str, help="Bert embeddings to use.")
+    parser.add_argument("--bert", default="None", type=str, help="Bert embeddings to use.")
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
 
@@ -331,10 +332,6 @@ if __name__ == "__main__":
             args.embeddings_words = embeddings_npz["words"]
             args.embeddings_data = embeddings_npz["embeddings"]
             args.embeddings_size = args.embeddings_data.shape[1]
-
-    #if args.bert:
-    #    ...
-    #TOOD pridelat berta - asi tady jen cesta nebo ze to tam neni
 
     if args.predict:
         # Load training dataset maps from the checkpoint
