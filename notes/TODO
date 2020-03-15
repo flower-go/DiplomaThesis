@@ -17,9 +17,11 @@ X pridat slovnik
     X pridat do metrik pole
     X pridat do metrik vysledky
     X pocitat vysledky se slovnikem - v evaluate batch
-    - opravit slovník
+    X opravit slovník
         X prepsat do eval_batch
         X opravit pocitani predikci
+
+- pridat loss pro dvojice factors
 
 - pridat berta jen embeddingy + ukladat predpoctene
     - vytvorit model a tokenizer - v dataset u pocitani
