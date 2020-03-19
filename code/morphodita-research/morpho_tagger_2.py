@@ -7,6 +7,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
 import morpho_dataset
+import pickle
 
 
 class Network:
@@ -287,7 +288,7 @@ if __name__ == "__main__":
     parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
     parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
-    parser.add_argument("--bert", default="bert_emb", type=str, help="Bert embeddings to use.")
+    parser.add_argument("--bert", default="bert_emb", type=str, help="Bert embeddings path.")
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
 
@@ -333,12 +334,19 @@ if __name__ == "__main__":
             args.embeddings_data = embeddings_npz["embeddings"]
             args.embeddings_size = args.embeddings_data.shape[1]
 
+    args.compute_bert = False
     if args.bert:
-        if os.path.exists(args.bert):
-            with np.load(args.bert, allow_pickle=True) as bert_npz:
-                args.bert_words = bert_npz["words"]
-                args.bert_data = bert_npz["embeddings"]
-                args.bert_size = args.bert_data.shape[1]
+        bert_path = args.bert + ".pickle"
+        if os.path.exists(bert_path):
+            args.compute_bert = False
+            bert_pickle = np.load(bert_path, allow_pickle=True)
+            args.bert_words = bert_pickle[0]
+            args.bert_data = bert_pickle[1]
+            args.bert_size = len(args.bert_data[0])
+        else:
+            args.bert_words = None
+            args.compute_bert = True
+
 
     if args.predict:
         # Load training dataset maps from the checkpoint
@@ -354,27 +362,40 @@ if __name__ == "__main__":
         else:
             train_data_path = "{}-train.txt".format(args.data)
             dev_data_path = "{}-dev.txt".format(args.data)
+
+
         train = morpho_dataset.MorphoDataset(train_data_path,
                                              embeddings=args.embeddings_words if args.embeddings else None,
                                              elmo=re.sub("(?=,|$)", "-train.npz", args.elmo) if args.elmo else None,
-                                             bert_words = args.bert_words if args.bert_words else None,
+                                             bert_words=args.bert_words,
                                              bert=args.bert if args.bert else None,
+                                             compute_bert = args.compute_bert,
                                              lemma_re_strip=args.lemma_re_strip,
                                              lemma_rule_min=args.lemma_rule_min)
         if os.path.exists(dev_data_path):
             dev = morpho_dataset.MorphoDataset(dev_data_path, train=train, shuffle_batches=False,
+                                               bert_words=args.bert_words if args.bert_words else list(train._berts.keys()),
+                                               bert=args.bert if args.compute_bert else None,
+                                               compute_bert = args.compute_bert,
                                                elmo=re.sub("(?=,|$)", "-dev.npz", args.elmo) if args.elmo else None)
         else:
             dev = None
 
+        # TODO predavat pri pocitani bert_words z vypoctu
+
         if os.path.exists("{}-test.txt".format(args.data)):
             test = morpho_dataset.MorphoDataset("{}-test.txt".format(args.data), train=train, shuffle_batches=False,
-                                                elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None)
+                                                elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None,
+                                                bert_words=args.bert_words if args.bert_words is not None else (list(dev._berts.keys()) if dev else list(train._berts.keys())),
+                                                bert=args.bert if args.bert else None,
+                                                compute_bert = args.compute_bert
+                                                )
         else:
             test = None
     args.elmo_size = train.elmo_size
 
-    #TODO pridat berta i do test a dev
+
+    #TODO stejne potrebuju ty predchozi promenne
 
     # Construct the network
     network = Network(args=args,

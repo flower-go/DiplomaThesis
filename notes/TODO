@@ -28,6 +28,7 @@ X pridat slovnik
     X predavat argument o bertu k datasetu
     - pridat do inputu modelu stejne jako embeddings co tam jsou
     - predavat v metodach do grafu
+    - pridat bert do dev a test datasetu
 
 ================================================================================
 PHASE 2
