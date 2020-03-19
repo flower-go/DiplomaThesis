@@ -7,6 +7,7 @@ import os
 import transformers
 import tensorflow as tf
 
+
 class MorphoDataset:
     FORMS = 0
     LEMMAS = 1
@@ -31,7 +32,8 @@ class MorphoDataset:
             self.analyses_strings = []
             self.characters = characters
             if characters:
-                self.alphabet_map = train.alphabet_map if train else {'<pad>': MorphoDataset.PAD, '<unk>': MorphoDataset.UNK}
+                self.alphabet_map = train.alphabet_map if train else {'<pad>': MorphoDataset.PAD,
+                                                                      '<unk>': MorphoDataset.UNK}
                 self.alphabet = train.alphabet if train else ['<pad>', '<unk>']
                 self.charseqs_map = {'<pad>': MorphoDataset.PAD, '<unk>': MorphoDataset.UNK}
                 self.charseqs = [[MorphoDataset.PAD], [MorphoDataset.UNK]]
@@ -46,7 +48,7 @@ class MorphoDataset:
             self.analyses_ids = analyses_ids
 
     def __init__(self, filename, embeddings=None, elmo=None, train=None, lemma_re_strip=None, lemma_rule_min=None,
-                 shuffle_batches=True, max_sentences=None, bert=None):
+                 shuffle_batches=True, max_sentences=None, bert=None, bert_words=None, compute_bert=False):
         # Create factors
         self._factors = []
         for f in range(self.FACTORS):
@@ -54,6 +56,7 @@ class MorphoDataset:
 
         # Prepare embeddings
         self._embeddings = {}
+        # TODO doplnit pro BERTa
         if train:
             self._embeddings = train._embeddings
         elif embeddings is not None:
@@ -66,13 +69,16 @@ class MorphoDataset:
             for elmo_path in elmo.split(","):
                 with np.load(elmo_path, allow_pickle=True) as elmo_file:
                     for i, (_, value) in enumerate(elmo_file.items()):
-                        if i >= len(self._elmo): self._elmo.append(value)
-                        else: self._elmo[i] = np.concatenate([self._elmo[i], value], axis=1)
+                        if i >= len(self._elmo):
+                            self._elmo.append(value)
+                        else:
+                            self._elmo[i] = np.concatenate([self._elmo[i], value], axis=1)
                     assert i + 1 == len(self._elmo)
         self._elmo_size = train.elmo_size if train else self._elmo[0].shape[1] if self._elmo else 0
 
         # Initialize remma_re_strip
-        self._lemma_re_strip = train._lemma_re_strip if train else re.compile(lemma_re_strip) if lemma_re_strip else None
+        self._lemma_re_strip = train._lemma_re_strip if train else re.compile(
+            lemma_re_strip) if lemma_re_strip else None
 
         # Load the sentences
         lemma_rules = collections.defaultdict(lambda: 0)
@@ -114,7 +120,7 @@ class MorphoDataset:
                             # factor.alphabet_map - kazde nove pismenko ma poradove cislo
                             # factor.charseqs_map - kazde nove slovo ma poradove cislo
                             # factor.charseqs - slovo reprezentovane cisly jednotlivych pismen
-                            #factor.charseq_ids - text reprezentovany cisly slov (?)
+                            # factor.charseq_ids - text reprezentovany cisly slov (?)
 
                             # word_ids jsou id tagu (odpovedi) a nebo id slov (v pripade 0)
                             if factor.characters:
@@ -191,7 +197,8 @@ class MorphoDataset:
 
             # Shuffling initialization
             self._shuffle_batches = shuffle_batches
-            self._permutation = np.random.permutation(len(self._sentence_lens)) if self._shuffle_batches else np.arange(len(self._sentence_lens))
+            self._permutation = np.random.permutation(len(self._sentence_lens)) if self._shuffle_batches else np.arange(
+                len(self._sentence_lens))
 
             # Asserts
             if self._elmo:
@@ -199,37 +206,51 @@ class MorphoDataset:
                 for i in range(sentences):
                     assert self._sentence_lens[i] == len(self._elmo[i])
 
-        if bert:
-            if os.path.exists(bert):
-                with np.load(bert, allow_pickle=True) as bert_embeddings:
-                    ... #TODO nekam to pricteme
+        if compute_bert:
+
+            # TODO jaky model - cased nebo uncased
+            config = transformers.BertConfig.from_pretrained("bert-base-multilingual-uncased")
+            config.output_hidden_states = True
+            # TODO nastavit tokeny stejne (mask, unk atd.. ?)
+            tokenizer = transformers.BertTokenizer.from_pretrained("bert-base-multilingual-uncased")
+            # TODO predstahnout
+            model = transformers.TFBertModel.from_pretrained("bert-base-multilingual-uncased",
+                                                             config=config)
+
+            if not train:
+                forms_nonunique = self._factors[self.FORMS].words
             else:
-                #TODO jaky model?
-                config = transformers.BertConfig.from_pretrained("bert-base-multilingual-uncased")
-                config.output_hidden_states = True
-                #TODO nastavit tokeny stejne (mask, unk atd.. ?)
-                tokenizer = transformers.BertTokenizer.from_pretrained("bert-base-multilingual-uncased")
-                #TODO predstahnout
-                model = transformers.TFBertModel.from_pretrained("bert-base-multilingual-uncased",
-                                                                                     config=config)
+                forms_nonunique = [val for sublist in self.factors[0].word_strings for val in sublist]
 
-                words = self._factors[self.FORMS].word_strings
-                bert_embeddings = [[0]*len(words[i]) for i in range(len(words))]
-                for i in range(sentences):
-                    for j in range(self._sentence_lens[i]):
-                        word = words[i][j]
-                        #TODO batch size
-                        #TODO iterovat pres spravnou vec
-                        segments = []
-                        w_subwords = tokenizer.encode(word)
-                        segments.append(len(w_subwords))
-                        word_tok = tf.convert_to_tensor(w_subwords)[None,:]
-                        #embeddings for one word (1,768)
-                        bert_embeddings_s = model(word_tok)[0][0][1:6]
-                        bert_embeddings[i][j] = (np.mean(bert_embeddings_s, axis=0))
+            bert_words_new = np.unique(forms_nonunique)
 
-                #TODO ulozit embeddings
+            if bert_words:
+                bert_words_new = list(set(bert_words_new) - set(bert_words))
 
+            bert_embeddings = [np.zeros(768) for i in range(len(bert_words_new))]
+
+            for i in range(2, len(bert_words_new)):
+                # TODO batch size
+                word = bert_words_new[i].lower()
+                w_subwords = tokenizer.encode(word)
+                word_tok = tf.convert_to_tensor(w_subwords)[None, :]
+
+                # embeddings for one word (1,768)
+                bert_embeddings_tokens = model(word_tok)[0][0][1:6]
+                bert_embeddings[i] = np.mean(bert_embeddings_tokens, axis=0)
+            self._bert_emb = bert_embeddings
+            if bert_words:
+                bert_words.append(bert_words_new)
+            else:
+                bert_words = bert_words_new
+
+            if len(bert_embeddings):
+                self.save_bert(bert_words_new, bert_embeddings, bert + "_" + "_".join(filename.split("-")[-2:]))
+
+        if bert:
+            self._berts = {}
+            for i, word in enumerate(bert_words):
+                self._berts[word] = i + 1
 
     @property
     def sentence_lens(self):
@@ -247,6 +268,12 @@ class MorphoDataset:
         with open(path, mode="wb") as mappings_file:
             pickle.dump(MorphoDataset(None, train=self), mappings_file)
 
+    def save_bert(self,words, embeddings, file):
+        for_save = [words, embeddings]
+        with open(file + '.pickle', 'wb') as handle:
+            pickle.dump(for_save, handle)
+
+
     @staticmethod
     def load_mappings(path):
         with open(path, mode="rb") as mappings_file:
@@ -254,7 +281,8 @@ class MorphoDataset:
 
     def epoch_finished(self):
         if len(self._permutation) == 0:
-            self._permutation = np.random.permutation(len(self._sentence_lens)) if self._shuffle_batches else np.arange(len(self._sentence_lens))
+            self._permutation = np.random.permutation(len(self._sentence_lens)) if self._shuffle_batches else np.arange(
+                len(self._sentence_lens))
             return True
         return False
 
@@ -290,8 +318,16 @@ class MorphoDataset:
             for i in range(batch_size):
                 factors[-1].word_ids[i, :len(self._elmo[batch_perm[i]])] = self._elmo[batch_perm[i]]
 
-        # BERT
-        #TODO bert tady spocitat pro batch (uz vypoctene pro cely dataset)
+        # # BERT
+        # # TODO bert tady spocitat pro batch (uz vypoctene pro cely dataset)
+        # # TODO vytvorit promennou self, bert
+        # if self._bert:
+        #     factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
+        #     for i in range(batch_size):
+        #         for j, string in enumerate(forms.word_strings[batch_perm[i]]):
+        #             mapped = self._embeddings.get(string, 0)
+        #             if not mapped: mapped = self._bert.get(string.lower(), 0)
+        #             factors[-1].word_ids[i, j] = mapped
 
         # Character-level data
         for f, factor in enumerate(self._factors):
@@ -342,7 +378,8 @@ class MorphoDataset:
                 fields.append(field)
 
             # Analyses
-            assert len(self._factors[self.LEMMAS].analyses_strings[index][i]) == len(self._factors[self.TAGS].analyses_strings[index][i])
+            assert len(self._factors[self.LEMMAS].analyses_strings[index][i]) == len(
+                self._factors[self.TAGS].analyses_strings[index][i])
             for j in range(len(self._factors[self.LEMMAS].analyses_strings[index][i])):
                 for f in [self.LEMMAS, self.TAGS]:
                     fields.append(self._factors[f].analyses_strings[index][i][j])
@@ -358,10 +395,10 @@ class MorphoDataset:
                 if i == 0 and j == 0:
                     a[i][j] = (0, "")
                 else:
-                    if i and a[i-1][j][0] < a[i][j][0]:
-                        a[i][j] = (a[i-1][j][0] + 1, a[i-1][j][1] + "-")
-                    if j and a[i][j-1][0] < a[i][j][0]:
-                        a[i][j] = (a[i][j-1][0] + 1, a[i][j-1][1] + "+" + target[j - 1])
+                    if i and a[i - 1][j][0] < a[i][j][0]:
+                        a[i][j] = (a[i - 1][j][0] + 1, a[i - 1][j][1] + "-")
+                    if j and a[i][j - 1][0] < a[i][j][0]:
+                        a[i][j] = (a[i][j - 1][0] + 1, a[i][j - 1][1] + "+" + target[j - 1])
         return a[-1][-1][1]
 
     @staticmethod
@@ -373,7 +410,8 @@ class MorphoDataset:
         for i, c in enumerate(lemma):
             case = "↑" if c.lower() != c else "↓"
             if case != previous_case:
-                lemma_casing += "{}{}{}".format("¦" if lemma_casing else "", case, i if i <= len(lemma) // 2 else i - len(lemma))
+                lemma_casing += "{}{}{}".format("¦" if lemma_casing else "", case,
+                                                i if i <= len(lemma) // 2 else i - len(lemma))
             previous_case = case
         lemma = lemma.lower()
 
@@ -428,17 +466,17 @@ class MorphoDataset:
                         elif rules[i][j] == "-":
                             offset += 1
                         else:
-                            assert(rules[i][j] == "+")
+                            assert (rules[i][j] == "+")
                             lemma += rules[i][j + 1]
                             j += 1
                         j += 1
                     if i == 0:
-                        lemma += form[rule_sources[0] : len(form) - rule_sources[1]]
+                        lemma += form[rule_sources[0]: len(form) - rule_sources[1]]
             except:
                 lemma = form
 
         for rule in casing.split("¦"):
-            if rule == "↓0": continue # The lemma is lowercased initially
+            if rule == "↓0": continue  # The lemma is lowercased initially
             case, offset = rule[0], int(rule[1:])
             lemma = lemma[:offset] + (lemma[offset:].upper() if case == "↑" else lemma[offset:].lower())
 
