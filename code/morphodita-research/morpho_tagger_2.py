@@ -384,6 +384,7 @@ if __name__ == "__main__":
         # TODO predavat pri pocitani bert_words z vypoctu
 
         if os.path.exists("{}-test.txt".format(args.data)):
+            test_data_path = "{}-test.txt".format(args.data)
             test = morpho_dataset.MorphoDataset("{}-test.txt".format(args.data), train=train, shuffle_batches=False,
                                                 elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None,
                                                 bert_words=args.bert_words if args.bert_words is not None else (list(dev._berts.keys()) if dev else list(train._berts.keys())),
@@ -393,6 +394,24 @@ if __name__ == "__main__":
         else:
             test = None
     args.elmo_size = train.elmo_size
+
+    if args.compute_bert:
+        for name in [train_data_path, dev_data_path, test_data_path]:
+            name = args.bert + "_" + "_".join(name.split("-")[-2:])
+            args.bert_words = None
+            args.bert_data = None
+            if os.path.exists(name):
+                bert_pickle = np.load(name, allow_pickle=True)
+                if args.bert_words:
+                    args.bert_words.concatenate(bert_pickle[0])
+                    args.bert_data.concatenate(bert_pickle[1])
+                else:
+                    args.bert_words = bert_pickle[0]
+                    args.bert_data = bert_pickle[1]
+
+        for_save = [args.bert_words, args.bert_data]
+        with open(args.bert + '.pickle', 'wb') as handle:
+            pickle.dump(for_save, handle)
 
 
     #TODO stejne potrebuju ty predchozi promenne

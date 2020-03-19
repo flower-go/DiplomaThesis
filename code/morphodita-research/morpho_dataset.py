@@ -1,4 +1,5 @@
 import collections
+import math
 import pickle
 import re
 
@@ -6,6 +7,7 @@ import numpy as np
 import os
 import transformers
 import tensorflow as tf
+from IPython.core.display import Math
 
 
 class MorphoDataset:
@@ -212,7 +214,11 @@ class MorphoDataset:
             config = transformers.BertConfig.from_pretrained("bert-base-multilingual-uncased")
             config.output_hidden_states = True
             # TODO nastavit tokeny stejne (mask, unk atd.. ?)
-            tokenizer = transformers.BertTokenizer.from_pretrained("bert-base-multilingual-uncased")
+            tokenizer = transformers.BertTokenizer.from_pretrained("bert-base-multilingual-uncased"
+                                                                   # ,
+                                                                   # unk_token=self._factors[self.FORMS].words[self.UNK],
+                                                                   # pad_token=self._factors[self.FORMS].words[self.PAD]
+            )
             # TODO predstahnout
             model = transformers.TFBertModel.from_pretrained("bert-base-multilingual-uncased",
                                                              config=config)
@@ -227,18 +233,37 @@ class MorphoDataset:
             if bert_words:
                 bert_words_new = list(set(bert_words_new) - set(bert_words))
 
-            bert_embeddings = [np.zeros(768) for i in range(len(bert_words_new))]
+            #bert_embeddings = [np.zeros(768) for i in range(len(bert_words_new))]
 
-            for i in range(2, len(bert_words_new)):
-                # TODO batch size
-                word = bert_words_new[i].lower()
-                w_subwords = tokenizer.encode(word)
-                word_tok = tf.convert_to_tensor(w_subwords)[None, :]
+            batch_size_bert = 16
+            bert_embeddings_tokens = None
+            for i in range(0, math.ceil(len(bert_words_new) / batch_size_bert)):
+                batch_words = bert_words_new[i: min(i + 16, len(bert_words_new))]
+                w_subwords = [tokenizer.encode(w) for w in batch_words]
+                #max_len = len(max(w_subwords, key=len))
+                max_len = 15
+                padded =  [i + [0]*(max_len-len(i)) for i in w_subwords]
+                #word_tok = tf.convert_to_tensor([numb if numb is not None else 0 for numb in [x for x in w_subwords]])
+                word_tok = tf.convert_to_tensor(padded)
+                if bert_embeddings_tokens is None:
+                    bert_embeddings_tokens = model(word_tok)[0]
+                else:
+                    bert_embeddings_tokens = tf.concat([bert_embeddings_tokens, model(word_tok)[0]], axis = 0)
 
-                # embeddings for one word (1,768)
-                bert_embeddings_tokens = model(word_tok)[0][0][1:6]
-                bert_embeddings[i] = np.mean(bert_embeddings_tokens, axis=0)
-            self._bert_emb = bert_embeddings
+            bert_embeddings = np.mean(bert_embeddings_tokens, axis = 1)
+
+
+            # for i in range(0, len(bert_words_new)):
+            #     # TODO batch size
+            #     word = bert_words_new[i].lower()
+            #     w_subwords = tokenizer.encode(word)
+            #     word_tok = tf.convert_to_tensor(w_subwords)[None, :]
+            #
+            #     # embeddings for one word (1,768)
+            #     bert_embeddings_tokens = model(word_tok)[0][0][1:6]
+            #     bert_embeddings[i] = np.mean(bert_embeddings_tokens, axis=0)
+            # self._bert_emb = bert_embeddings
+
             if bert_words:
                 bert_words.append(bert_words_new)
             else:
@@ -268,11 +293,10 @@ class MorphoDataset:
         with open(path, mode="wb") as mappings_file:
             pickle.dump(MorphoDataset(None, train=self), mappings_file)
 
-    def save_bert(self,words, embeddings, file):
+    def save_bert(self, words, embeddings, file):
         for_save = [words, embeddings]
         with open(file + '.pickle', 'wb') as handle:
             pickle.dump(for_save, handle)
-
 
     @staticmethod
     def load_mappings(path):
