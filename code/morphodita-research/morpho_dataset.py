@@ -213,7 +213,7 @@ class MorphoDataset:
             # TODO jaky model - cased nebo uncased
             config = transformers.BertConfig.from_pretrained("bert-base-multilingual-uncased")
             config.output_hidden_states = True
-            # TODO nastavit tokeny stejne (mask, unk atd.. ?)
+            # TODO nastavit tokeny stejne (mask, unk atd.. ?) - nefungovalo
             tokenizer = transformers.BertTokenizer.from_pretrained("bert-base-multilingual-uncased"
                                                                    # ,
                                                                    # unk_token=self._factors[self.FORMS].words[self.UNK],
@@ -233,7 +233,6 @@ class MorphoDataset:
             if bert_words:
                 bert_words_new = list(set(bert_words_new) - set(bert_words))
 
-            #bert_embeddings = [np.zeros(768) for i in range(len(bert_words_new))]
 
             batch_size_bert = 16
             bert_embeddings_tokens = None
@@ -251,18 +250,6 @@ class MorphoDataset:
                     bert_embeddings_tokens = tf.concat([bert_embeddings_tokens, model(word_tok)[0]], axis = 0)
 
             bert_embeddings = np.mean(bert_embeddings_tokens, axis = 1)
-
-
-            # for i in range(0, len(bert_words_new)):
-            #     # TODO batch size
-            #     word = bert_words_new[i].lower()
-            #     w_subwords = tokenizer.encode(word)
-            #     word_tok = tf.convert_to_tensor(w_subwords)[None, :]
-            #
-            #     # embeddings for one word (1,768)
-            #     bert_embeddings_tokens = model(word_tok)[0][0][1:6]
-            #     bert_embeddings[i] = np.mean(bert_embeddings_tokens, axis=0)
-            # self._bert_emb = bert_embeddings
 
             if bert_words:
                 bert_words.append(bert_words_new)
@@ -342,16 +329,15 @@ class MorphoDataset:
             for i in range(batch_size):
                 factors[-1].word_ids[i, :len(self._elmo[batch_perm[i]])] = self._elmo[batch_perm[i]]
 
-        # # BERT
-        # # TODO bert tady spocitat pro batch (uz vypoctene pro cely dataset)
-        # # TODO vytvorit promennou self, bert
-        # if self._bert:
-        #     factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
-        #     for i in range(batch_size):
-        #         for j, string in enumerate(forms.word_strings[batch_perm[i]]):
-        #             mapped = self._embeddings.get(string, 0)
-        #             if not mapped: mapped = self._bert.get(string.lower(), 0)
-        #             factors[-1].word_ids[i, j] = mapped
+        # BERT
+        forms = self._factors[self.FORMS]
+        factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
+        if len(self._berts):
+            for i in range(batch_size):
+                for j, string in enumerate(forms.word_strings[batch_perm[i]]):
+                    mapped = self._berts.get(string, 0)
+                    if not mapped: mapped = self._berts.get(string.lower(), 0)
+                    factors[-1].word_ids[i, j] = mapped
 
         # Character-level data
         for f, factor in enumerate(self._factors):
