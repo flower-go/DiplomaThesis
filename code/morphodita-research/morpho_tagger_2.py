@@ -23,7 +23,8 @@ class Network:
             embeddings = tf.keras.layers.Input(shape=[None, args.embeddings_size], dtype=tf.float32)
         if args.elmo_size:
             elmo = tf.keras(shape=[None, args.elmo_size], dtype=tf.float32)
-        #TODO bert pridat
+        if args.bert:
+            bert_embeddings = tf.keras.layers.Input(shape=[None, args.bert_size], dtype=tf.float32)
 
         # INPUTS - create all embeddings
         inputs = []
@@ -50,6 +51,11 @@ class Network:
         # Contextualized embeddings
         if args.elmo_size:
             inputs.append(elmo)
+
+        # Bert embeddings
+        # TODO stejny dropout
+        if args.bert:
+            inputs.append(tf.keras.layers.Dropout(args.word_dropout, noise_shape=[None, None, 1])(bert_embeddings))
 
         if len(inputs) > 1:
             hidden = tf.keras.layers.Concatenate()(inputs)
@@ -82,6 +88,8 @@ class Network:
         inp = [word_ids, charseq_ids, charseqs]
         if (args.embeddings):
             inp.append(embeddings)
+        if args.bert:
+            inp.append(bert_embeddings)
 
         self.model = tf.keras.Model(inputs=inp, outputs=outputs)
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
@@ -97,7 +105,6 @@ class Network:
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
-    # TODO default parametr
     @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, factors):
         # tags_mask = tf.not_equal(factors[0], 0)
@@ -146,6 +153,17 @@ class Network:
                         if batch[train.EMBEDDINGS].word_ids[i, j]:
                             embeddings[i, j] = args.embeddings_data[batch[train.EMBEDDINGS].word_ids[i, j] - 1]
                 inp.append(embeddings)
+
+            if args.bert:
+                bert_embeddings = np.zeros([batch[train.BERT].word_ids.shape[0],
+                                       batch[train.BERT].word_ids.shape[1],
+                                       args.bert_size])
+                for i in range(bert_embeddings.shape[0]):
+                    for j in range(bert_embeddings.shape[1]):
+                        if batch[train.BERT].word_ids[i, j]:
+                            bert_embeddings[i, j] = args.bert_data[batch[train.BERT].word_ids[i, j] - 1]
+                inp.append(bert_embeddings)
+
             self.train_batch(inp, factors)
 
     @tf.function(experimental_relax_shapes=True)
@@ -187,6 +205,16 @@ class Network:
                         if batch[dataset.EMBEDDINGS].word_ids[i, j]:
                             embeddings[i, j] = args.embeddings_data[batch[dataset.EMBEDDINGS].word_ids[i, j] - 1]
                 inp.append(embeddings)
+
+            if args.bert:
+                bert_embeddings = np.zeros([batch[dataset.BERT].word_ids.shape[0],
+                                       batch[dataset.BERT].word_ids.shape[1],
+                                       args.bert_size])
+                for i in range(bert_embeddings.shape[0]):
+                    for j in range(bert_embeddings.shape[1]):
+                        if batch[dataset.BERT].word_ids[i, j]:
+                            bert_embeddings[i, j] = args.bert_data[batch[dataset.BERT].word_ids[i, j] - 1]
+                inp.append(bert_embeddings)
 
             probabilities, mask = self.evaluate_batch(inp, factors)
 
@@ -414,7 +442,7 @@ if __name__ == "__main__":
             pickle.dump(for_save, handle)
 
 
-    #TODO stejne potrebuju ty predchozi promenne
+    #TODO stejne potrebuju ty predchozi promenne - bert_words, bert_data - mam ulozene, bert_size zjistim
 
     # Construct the network
     network = Network(args=args,
