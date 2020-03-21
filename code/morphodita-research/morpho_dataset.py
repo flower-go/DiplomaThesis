@@ -7,7 +7,6 @@ import numpy as np
 import os
 import transformers
 import tensorflow as tf
-from IPython.core.display import Math
 
 
 class MorphoDataset:
@@ -252,7 +251,10 @@ class MorphoDataset:
             bert_embeddings = np.mean(bert_embeddings_tokens, axis = 1)
 
             if bert_words:
-                bert_words.append(bert_words_new)
+                print("nejaka slova uz byla")
+                print(bert_words)
+                bert_words = bert_words + bert_words_new
+                print(bert_words)
             else:
                 bert_words = bert_words_new
 
@@ -262,6 +264,8 @@ class MorphoDataset:
         if bert:
             self._berts = {}
             for i, word in enumerate(bert_words):
+                print("word")
+                print(word)
                 self._berts[word] = i + 1
 
     @property
