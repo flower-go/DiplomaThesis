@@ -366,6 +366,7 @@ if __name__ == "__main__":
     if args.bert:
         bert_path = args.bert + ".pickle"
         if os.path.exists(bert_path):
+            print("cesta existuje")
             args.compute_bert = False
             bert_pickle = np.load(bert_path, allow_pickle=True)
             args.bert_words = bert_pickle[0]
@@ -402,7 +403,7 @@ if __name__ == "__main__":
                                              lemma_rule_min=args.lemma_rule_min)
         if os.path.exists(dev_data_path):
             dev = morpho_dataset.MorphoDataset(dev_data_path, train=train, shuffle_batches=False,
-                                               bert_words=args.bert_words if args.bert_words else list(train._berts.keys()),
+                                               bert_words=args.bert_words if args.bert_words is not None else list(train._berts.keys()),
                                                bert=args.bert if args.compute_bert else None,
                                                compute_bert = args.compute_bert,
                                                elmo=re.sub("(?=,|$)", "-dev.npz", args.elmo) if args.elmo else None)
@@ -424,15 +425,17 @@ if __name__ == "__main__":
     args.elmo_size = train.elmo_size
 
     if args.compute_bert:
+        args.bert_words = None
+        args.bert_data = None
         for name in [train_data_path, dev_data_path, test_data_path]:
             name = args.bert + "_" + "_".join(name.split("-")[-2:])
-            args.bert_words = None
-            args.bert_data = None
+            name = name + ".pickle"
+            print(name)
             if os.path.exists(name):
                 bert_pickle = np.load(name, allow_pickle=True)
-                if args.bert_words:
-                    args.bert_words.concatenate(bert_pickle[0])
-                    args.bert_data.concatenate(bert_pickle[1])
+                if args.bert_words is not None:
+                    args.bert_words = np.concatenate([args.bert_words,bert_pickle[0]])
+                    args.bert_data = np.concatenate([args.bert_data,bert_pickle[1]])
                 else:
                     args.bert_words = bert_pickle[0]
                     args.bert_data = bert_pickle[1]
@@ -443,6 +446,7 @@ if __name__ == "__main__":
 
 
     #TODO stejne potrebuju ty predchozi promenne - bert_words, bert_data - mam ulozene, bert_size zjistim
+    args.bert_size = len(args.bert_data[0])
 
     # Construct the network
     network = Network(args=args,

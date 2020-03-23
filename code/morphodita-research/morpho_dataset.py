@@ -17,8 +17,8 @@ class MorphoDataset:
     FACTORS_MAP = {"Forms": FORMS, "Lemmas": LEMMAS, "Tags": TAGS}
 
     EMBEDDINGS = 3
-    ELMOS = 4
-    BERT = 5
+    ELMOS = 5
+    BERT = 4
 
     PAD = 0
     UNK = 1
@@ -51,6 +51,7 @@ class MorphoDataset:
     def __init__(self, filename, embeddings=None, elmo=None, train=None, lemma_re_strip=None, lemma_rule_min=None,
                  shuffle_batches=True, max_sentences=None, bert=None, bert_words=None, compute_bert=False):
         # Create factors
+        self.bert = bert
         self._factors = []
         for f in range(self.FACTORS):
             self._factors.append(self._Factor(f == self.FORMS, train._factors[f] if train else None))
@@ -251,10 +252,7 @@ class MorphoDataset:
             bert_embeddings = np.mean(bert_embeddings_tokens, axis = 1)
 
             if bert_words:
-                print("nejaka slova uz byla")
-                print(bert_words)
                 bert_words = bert_words + bert_words_new
-                print(bert_words)
             else:
                 bert_words = bert_words_new
 
@@ -336,7 +334,7 @@ class MorphoDataset:
         # BERT
         forms = self._factors[self.FORMS]
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
-        if len(self._berts):
+        if self.bert and len(self._berts):
             for i in range(batch_size):
                 for j, string in enumerate(forms.word_strings[batch_perm[i]]):
                     mapped = self._berts.get(string, 0)
