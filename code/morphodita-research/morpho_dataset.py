@@ -218,7 +218,7 @@ class MorphoDataset:
                                                                    # ,
                                                                    # unk_token=self._factors[self.FORMS].words[self.UNK],
                                                                    # pad_token=self._factors[self.FORMS].words[self.PAD]
-            )
+                                                                   )
             # TODO predstahnout
             model = transformers.TFBertModel.from_pretrained("bert-base-multilingual-uncased",
                                                              config=config)
@@ -230,31 +230,31 @@ class MorphoDataset:
 
             bert_words_new = np.unique(forms_nonunique)
 
-            if bert_words:
-                bert_words_new = list(set(bert_words_new) - set(bert_words))
-
+            # if bert_words:
+            #     bert_words_new = list(set(bert_words_new) - set(bert_words))
 
             batch_size_bert = 16
             bert_embeddings_tokens = None
             for i in range(0, math.ceil(len(bert_words_new) / batch_size_bert)):
                 batch_words = bert_words_new[i: min(i + 16, len(bert_words_new))]
                 w_subwords = [tokenizer.encode(w) for w in batch_words]
-                #max_len = len(max(w_subwords, key=len))
+                # max_len = len(max(w_subwords, key=len))
                 max_len = 15
-                padded =  [i + [0]*(max_len-len(i)) for i in w_subwords]
-                #word_tok = tf.convert_to_tensor([numb if numb is not None else 0 for numb in [x for x in w_subwords]])
+                padded = [i + [0] * (max_len - len(i)) for i in w_subwords]
+                # word_tok = tf.convert_to_tensor([numb if numb is not None else 0 for numb in [x for x in w_subwords]])
                 word_tok = tf.convert_to_tensor(padded)
                 if bert_embeddings_tokens is None:
-                    bert_embeddings_tokens = model(word_tok)[0]
+                    bert_embeddings_tokens = model(word_tok)[0].numpy()
                 else:
-                    bert_embeddings_tokens = tf.concat([bert_embeddings_tokens, model(word_tok)[0]], axis = 0)
+                    bert_embeddings_tokens = np.concatenate([bert_embeddings_tokens, model(word_tok)[0]].numpy())
 
-            bert_embeddings = np.mean(bert_embeddings_tokens, axis = 1)
+            bert_embeddings = np.mean(bert_embeddings_tokens, axis=1)
 
-            if bert_words:
-                bert_words = bert_words + bert_words_new
-            else:
-                bert_words = bert_words_new
+            # if bert_words:
+            #     bert_words = bert_words + bert_words_new
+            # else:
+            #     bert_words = bert_words_new
+            bert_words = bert_words_new
 
             if len(bert_embeddings):
                 self.save_bert(bert_words_new, bert_embeddings, bert + "_" + "_".join(filename.split("-")[-2:]))
