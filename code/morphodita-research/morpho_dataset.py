@@ -246,7 +246,7 @@ class MorphoDataset:
                 if bert_embeddings_tokens is None:
                     bert_embeddings_tokens = model(word_tok)[0].numpy()
                 else:
-                    bert_embeddings_tokens = np.concatenate([bert_embeddings_tokens, model(word_tok)[0]].numpy())
+                    bert_embeddings_tokens = np.concatenate((bert_embeddings_tokens, model(word_tok)[0].numpy()))
 
             bert_embeddings = np.mean(bert_embeddings_tokens, axis=1)
 
