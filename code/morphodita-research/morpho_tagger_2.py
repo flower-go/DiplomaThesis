@@ -162,6 +162,8 @@ class Network:
                     for j in range(bert_embeddings.shape[1]):
                         if batch[train.BERT].word_ids[i, j]:
                             bert_embeddings[i, j] = args.bert_data[batch[train.BERT].word_ids[i, j] - 1]
+                        else:
+                            print("not found")
                 inp.append(bert_embeddings)
 
             self.train_batch(inp, factors)
@@ -370,6 +372,8 @@ if __name__ == "__main__":
             args.compute_bert = False
             bert_pickle = np.load(bert_path, allow_pickle=True)
             args.bert_words = bert_pickle[0]
+            print("size of berts")
+            print(len(args.bert_words))
             args.bert_data = bert_pickle[1]
             args.bert_size = len(args.bert_data[0])
         else:
