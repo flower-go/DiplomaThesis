@@ -23,24 +23,32 @@ X pridat slovnik
 
 - pridat berta jen embeddingy + ukladat predpoctene
     X vytvorit model a tokenizer - v dataset u pocitani
-    -  vracet vysledky v morpho_dataset next batch
-    - ulozit predpoctene vysledky
+    X vracet vysledky v morpho_dataset next batch
+    X ulozit predpoctene vysledky
     X predavat argument o bertu k datasetu
-    - pridat do inputu modelu stejne jako embeddings co tam jsou
-    - predavat v metodach do grafu
-    - pridat bert do dev a test datasetu
+    X pridat do inputu modelu stejne jako embeddings co tam jsou
+    X predavat v metodach do grafu
+    X pridat bert do dev a test datasetu
+    - vyresit embeddings pro neznama slova
+        - bert - pridat unk a pad
 
 ================================================================================
 PHASE 2
 ================================================================================
 - pridat berta poradne a prumerovat embeddingy :(
 - sentiment s bertem bez preprocessingu (ktrain?)
+    - vytvorit model
+    - natrenovani code stejne jako u taggeru
 
 ================================================================================
 PHASE 3
 ================================================================================
-- sentiment s bertem
-    (?) nad UFAL obludou (kam az to chceme?)
-
-- naplanovat jak udelam NER
+- NER
+    - zapojit NER do taggeru
+        - pridat treti typ factors
+        - zaridit, ze to predpovida ty spravne veci pro spravna data
+        - namixovat data do batche z obou datasetu
+        - pridat do modelu vypocet
+        (?) jak bude vypadat loss?
+    - NER samostatne (z existujiciho kodu?)
 
