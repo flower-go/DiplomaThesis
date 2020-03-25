@@ -262,8 +262,6 @@ class MorphoDataset:
         if bert:
             self._berts = {}
             for i, word in enumerate(bert_words):
-                print("word")
-                print(word)
                 self._berts[word] = i + 1
 
     @property
