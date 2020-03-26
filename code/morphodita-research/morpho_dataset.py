@@ -210,15 +210,10 @@ class MorphoDataset:
 
         if compute_bert:
 
-            # TODO jaky model - cased nebo uncased
             config = transformers.BertConfig.from_pretrained("bert-base-multilingual-uncased")
             config.output_hidden_states = True
-            # TODO nastavit tokeny stejne (mask, unk atd.. ?) - nefungovalo
-            tokenizer = transformers.BertTokenizer.from_pretrained("bert-base-multilingual-uncased"
-                                                                   # ,
-                                                                   # unk_token=self._factors[self.FORMS].words[self.UNK],
-                                                                   # pad_token=self._factors[self.FORMS].words[self.PAD]
-                                                                   )
+
+            tokenizer = transformers.BertTokenizer.from_pretrained("bert-base-multilingual-uncased")
             # TODO predstahnout
             model = transformers.TFBertModel.from_pretrained("bert-base-multilingual-uncased",
                                                              config=config)
@@ -230,9 +225,6 @@ class MorphoDataset:
 
             bert_words_new = np.unique(forms_nonunique)
 
-            # if bert_words:
-            #     bert_words_new = list(set(bert_words_new) - set(bert_words))
-
             batch_size_bert = 16
             bert_embeddings_tokens = None
             for i in range(0, math.ceil(len(bert_words_new) / batch_size_bert)):
@@ -241,7 +233,6 @@ class MorphoDataset:
                 # max_len = len(max(w_subwords, key=len))
                 max_len = 15
                 padded = [i + [0] * (max_len - len(i)) for i in w_subwords]
-                # word_tok = tf.convert_to_tensor([numb if numb is not None else 0 for numb in [x for x in w_subwords]])
                 word_tok = tf.convert_to_tensor(padded)
                 if bert_embeddings_tokens is None:
                     bert_embeddings_tokens = model(word_tok)[0].numpy()

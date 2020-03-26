@@ -53,7 +53,6 @@ class Network:
             inputs.append(elmo)
 
         # Bert embeddings
-        # TODO stejny dropout
         if args.bert:
             inputs.append(tf.keras.layers.Dropout(args.word_dropout, noise_shape=[None, None, 1])(bert_embeddings))
 
@@ -414,7 +413,6 @@ if __name__ == "__main__":
         else:
             dev = None
 
-        # TODO predavat pri pocitani bert_words z vypoctu
 
         if os.path.exists("{}-test.txt".format(args.data)):
             test_data_path = "{}-test.txt".format(args.data)

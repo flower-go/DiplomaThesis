@@ -29,8 +29,10 @@ X pridat slovnik
     X pridat do inputu modelu stejne jako embeddings co tam jsou
     X predavat v metodach do grafu
     X pridat bert do dev a test datasetu
-    - vyresit embeddings pro neznama slova
-        - bert - pridat unk a pad
+    - pridat unk a pad
+        (?) kam?
+        - pridat
+    (?) jsou not found jen paddings a unknown? (asi ano!)
 
 ================================================================================
 PHASE 2
