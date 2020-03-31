@@ -173,6 +173,8 @@ class Network:
                 if batch[dataset.BERT].word_ids[i, j]:
                     bert_embeddings[i, j] = dataset.bert_embeddings[batch[dataset.BERT].word_ids[i, j] - 1]
 
+        return bert_embeddings
+
 
     @tf.function(experimental_relax_shapes=True)
     def evaluate_batch(self, inputs, factors):
@@ -391,16 +393,16 @@ if __name__ == "__main__":
             dev = None
 
 
-        if os.path.exists("{}-test.txt".format(args.data)):
-            test_data_path = "{}-test.txt".format(args.data)
-            test = morpho_dataset.MorphoDataset("{}-test.txt".format(args.data), train=train, shuffle_batches=False,
-                                                elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None,
-                                                bert=args.bert if args.bert else None
-                                                )
-        else:
-            test = None
-        # test_data_path = "djfha"
-        # test = None
+        # if os.path.exists("{}-test.txt".format(args.data)):
+        #     test_data_path = "{}-test.txt".format(args.data)
+        #     test = morpho_dataset.MorphoDataset("{}-test.txt".format(args.data), train=train, shuffle_batches=False,
+        #                                         elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None,
+        #                                         bert=args.bert if args.bert else None
+        #                                         )
+        # else:
+        #     test = None
+        test_data_path = "djfha"
+        test = None
     args.elmo_size = train.elmo_size
     args.bert_size = len(train.bert_embeddings[1])
 
