@@ -160,9 +160,8 @@ class Network:
                 for i in range(bert_embeddings.shape[0]):
                     for j in range(bert_embeddings.shape[1]):
                         if batch[train.BERT].word_ids[i, j]:
-                            bert_embeddings[i, j] = args.bert_data[batch[train.BERT].word_ids[i, j] - 1]
-                        else:
-                            print("not found")
+                            bert_embeddings[i, j] = train.bert_embeddings[batch[train.BERT].word_ids[i, j] - 1]
+
                 inp.append(bert_embeddings)
 
             self.train_batch(inp, factors)
@@ -317,10 +316,11 @@ if __name__ == "__main__":
     parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
     parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
-    parser.add_argument("--bert", default="bert_emb", type=str, help="Bert embeddings path.")
+    parser.add_argument("--bert", default="bert-base-multilingual-uncased", type=str, help="Bert model")
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
 
+    #TODO vyřešit
     #tf.config.threading.set_inter_op_parallelism_threads(args.threads)
     #tf.config.threading.set_intra_op_parallelism_threads(args.threads)
     #tf.config.set_soft_device_placement(True)
@@ -363,21 +363,22 @@ if __name__ == "__main__":
             args.embeddings_data = embeddings_npz["embeddings"]
             args.embeddings_size = args.embeddings_data.shape[1]
 
-    args.compute_bert = False
-    if args.bert:
-        bert_path = args.bert + ".pickle"
-        if os.path.exists(bert_path):
-            print("cesta existuje")
-            args.compute_bert = False
-            bert_pickle = np.load(bert_path, allow_pickle=True)
-            args.bert_words = bert_pickle[0]
-            print("size of berts")
-            print(len(args.bert_words))
-            args.bert_data = bert_pickle[1]
-            args.bert_size = len(args.bert_data[0])
-        else:
-            args.bert_words = None
-            args.compute_bert = True
+
+    # args.compute_bert = False
+    # if args.bert:
+    #     bert_path = args.bert + ".pickle"
+    #     if os.path.exists(bert_path):
+    #         print("cesta existuje")
+    #         args.compute_bert = False
+    #         bert_pickle = np.load(bert_path, allow_pickle=True)
+    #         args.bert_words = bert_pickle[0]
+    #         print("size of berts")
+    #         print(len(args.bert_words))
+    #         args.bert_data = bert_pickle[1]
+    #         args.bert_size = len(args.bert_data[0])
+    #     else:
+    #         args.bert_words = None
+    #         args.compute_bert = True
 
 
     if args.predict:
@@ -399,16 +400,13 @@ if __name__ == "__main__":
         train = morpho_dataset.MorphoDataset(train_data_path,
                                              embeddings=args.embeddings_words if args.embeddings else None,
                                              elmo=re.sub("(?=,|$)", "-train.npz", args.elmo) if args.elmo else None,
-                                             bert_words=args.bert_words,
                                              bert=args.bert if args.bert else None,
-                                             compute_bert = args.compute_bert,
                                              lemma_re_strip=args.lemma_re_strip,
                                              lemma_rule_min=args.lemma_rule_min)
+
         if os.path.exists(dev_data_path):
             dev = morpho_dataset.MorphoDataset(dev_data_path, train=train, shuffle_batches=False,
-                                               bert_words=args.bert_words if args.bert_words is not None else list(train._berts.keys()),
                                                bert=args.bert if args.compute_bert else None,
-                                               compute_bert = args.compute_bert,
                                                elmo=re.sub("(?=,|$)", "-dev.npz", args.elmo) if args.elmo else None)
         else:
             dev = None
@@ -418,37 +416,39 @@ if __name__ == "__main__":
             test_data_path = "{}-test.txt".format(args.data)
             test = morpho_dataset.MorphoDataset("{}-test.txt".format(args.data), train=train, shuffle_batches=False,
                                                 elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None,
-                                                bert_words=args.bert_words if args.bert_words is not None else (list(dev._berts.keys()) if dev else list(train._berts.keys())),
-                                                bert=args.bert if args.bert else None,
-                                                compute_bert = args.compute_bert
+                                                bert=args.bert if args.bert else None
                                                 )
         else:
             test = None
+        # test_data_path = "djfha"
+        # test = None
     args.elmo_size = train.elmo_size
+    args.bert_size = len(train.bert_embeddings[0])
 
-    if args.compute_bert:
-        args.bert_words = None
-        args.bert_data = None
-        for name in [train_data_path, dev_data_path, test_data_path]:
-            name = args.bert + "_" + "_".join(name.split("-")[-2:])
-            name = name + ".pickle"
-            print(name)
-            if os.path.exists(name):
-                bert_pickle = np.load(name, allow_pickle=True)
-                if args.bert_words is not None:
-                    args.bert_words = np.concatenate([args.bert_words,bert_pickle[0]])
-                    args.bert_data = np.concatenate([args.bert_data,bert_pickle[1]])
-                else:
-                    args.bert_words = bert_pickle[0]
-                    args.bert_data = bert_pickle[1]
-
-        for_save = [args.bert_words, args.bert_data]
-        with open(args.bert + '.pickle', 'wb') as handle:
-            pickle.dump(for_save, handle)
-
-
-    #TODO stejne potrebuju ty predchozi promenne - bert_words, bert_data - mam ulozene, bert_size zjistim
-    args.bert_size = len(args.bert_data[0])
+    # if args.compute_bert:
+    #     args.bert_words = None
+    #     args.bert_data = None
+    #     #TODO věci v listu by měly být unikátní
+    #     for name in [train_data_path, dev_data_path, test_data_path]:
+    #         name = args.bert + "_" + "_".join(name.split("-")[-2:])
+    #         name = name + ".pickle"
+    #         print(name)
+    #         if os.path.exists(name):
+    #             bert_pickle = np.load(name, allow_pickle=True)
+    #             if args.bert_words is not None:
+    #                 args.bert_words = np.concatenate([args.bert_words,bert_pickle[0]])
+    #                 args.bert_data = np.concatenate([args.bert_data,bert_pickle[1]])
+    #             else:
+    #                 args.bert_words = bert_pickle[0]
+    #                 args.bert_data = bert_pickle[1]
+    #
+    #     for_save = [args.bert_words, args.bert_data]
+    #     with open(args.bert + '.pickle', 'wb') as handle:
+    #         pickle.dump(for_save, handle)
+    #
+    #
+    # #TODO stejne potrebuju ty predchozi promenne - bert_words, bert_data - mam ulozene, bert_size zjistim
+    # args.bert_size = len(args.bert_data[0])
 
     # Construct the network
     network = Network(args=args,

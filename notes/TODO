@@ -29,10 +29,15 @@ X pridat slovnik
     X pridat do inputu modelu stejne jako embeddings co tam jsou
     X predavat v metodach do grafu
     X pridat bert do dev a test datasetu
-    - pridat unk a pad
-        (?) kam?
-        - pridat
-    (?) jsou not found jen paddings a unknown? (asi ano!)
+    X pridat unk a pad
+        X kam?
+        X pridat
+    X jsou not found jen paddings a unknown? (asi ano!)
+    - ukladat v datasetu primo embeddingy
+    - zajistit spravne indexovani
+    - zmenit train a evaluate
+    X do argumentu bert dát jmeno modelu
+    X prejmenovat soubory
 
 ================================================================================
 PHASE 2

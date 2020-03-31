@@ -49,7 +49,7 @@ class MorphoDataset:
             self.analyses_ids = analyses_ids
 
     def __init__(self, filename, embeddings=None, elmo=None, train=None, lemma_re_strip=None, lemma_rule_min=None,
-                 shuffle_batches=True, max_sentences=None, bert=None, bert_words=None, compute_bert=False):
+                 shuffle_batches=True, max_sentences=None, bert=None):
         # Create factors
         self.bert = bert
         self._factors = []
@@ -208,52 +208,65 @@ class MorphoDataset:
                 for i in range(sentences):
                     assert self._sentence_lens[i] == len(self._elmo[i])
 
-        if compute_bert:
-
-            config = transformers.BertConfig.from_pretrained("bert-base-multilingual-uncased")
-            config.output_hidden_states = True
-
-            tokenizer = transformers.BertTokenizer.from_pretrained("bert-base-multilingual-uncased")
-            # TODO predstahnout
-            model = transformers.TFBertModel.from_pretrained("bert-base-multilingual-uncased",
-                                                             config=config)
-
-            if not train:
-                forms_nonunique = self._factors[self.FORMS].words
-            else:
-                forms_nonunique = [val for sublist in self.factors[0].word_strings for val in sublist]
-
-            bert_words_new = np.unique(forms_nonunique)
-
-            batch_size_bert = 16
-            bert_embeddings_tokens = None
-            for i in range(0, math.ceil(len(bert_words_new) / batch_size_bert)):
-                batch_words = bert_words_new[i: min(i + 16, len(bert_words_new))]
-                w_subwords = [tokenizer.encode(w) for w in batch_words]
-                # max_len = len(max(w_subwords, key=len))
-                max_len = 15
-                padded = [i + [0] * (max_len - len(i)) for i in w_subwords]
-                word_tok = tf.convert_to_tensor(padded)
-                if bert_embeddings_tokens is None:
-                    bert_embeddings_tokens = model(word_tok)[0].numpy()
-                else:
-                    bert_embeddings_tokens = np.concatenate((bert_embeddings_tokens, model(word_tok)[0].numpy()))
-
-            bert_embeddings = np.mean(bert_embeddings_tokens, axis=1)
-
-            # if bert_words:
-            #     bert_words = bert_words + bert_words_new
-            # else:
-            #     bert_words = bert_words_new
-            bert_words = bert_words_new
-
-            if len(bert_embeddings):
-                self.save_bert(bert_words_new, bert_embeddings, bert + "_" + "_".join(filename.split("-")[-2:]))
-
         if bert:
-            self._berts = {}
-            for i, word in enumerate(bert_words):
-                self._berts[word] = i + 1
+
+            #load from existing file
+
+            bert_file_name = (".").join(filename.split("/")[-1].split(".")[0:-1]) + "." + bert
+            bert_path = bert_file_name + ".pickle"
+            if os.path.exists(bert_path):
+                bert_pickle = np.load(bert_path, allow_pickle=True)
+                bert_words = bert_pickle[0]
+                bert_embeddings = bert_pickle[1]
+
+            # precomputed does not exist, compute here
+            else:
+
+                model_name = bert
+                config = transformers.BertConfig.from_pretrained(model_name)
+                config.output_hidden_states = True
+
+                tokenizer = transformers.BertTokenizer.from_pretrained(model_name)
+                model = transformers.TFBertModel.from_pretrained(model_name,
+                                                                 config=config)
+
+                if not train:
+                    forms_nonunique = self._factors[self.FORMS].words
+                else:
+                    forms_nonunique = [val for sublist in self.factors[0].word_strings for val in sublist]
+
+                bert_words = np.unique(forms_nonunique)
+
+                batch_size_bert = 16
+                bert_embeddings_tokens = None
+                for i in range(0, math.ceil(len(bert_words) / batch_size_bert)):
+                    batch_words = bert_words[i: min(i + 16, len(bert_words))]
+
+                    #TODO stahnout noveji verzi a pouzit batch
+                    w_subwords = [tokenizer.encode(w) for w in batch_words]
+                    max_len = 15 #TODO nebylo by lepsi nejak jinak?
+
+                    #odstranim cls a sep, protoze to je jen po slovech
+                    padded = [w[1:-1] + [0] * (max_len - len(w[1:-1])) for w in w_subwords]
+                    word_tok = tf.convert_to_tensor(padded)
+                    #TODO zkontrolovat, ze beru spravnou vrstvu
+                    if bert_embeddings_tokens is None:
+                        bert_embeddings_tokens = model(word_tok)[0].numpy()
+                    else:
+                        bert_embeddings_tokens = np.concatenate((bert_embeddings_tokens, model(word_tok)[0].numpy()))
+
+                bert_embeddings = np.mean(bert_embeddings_tokens, axis=1)
+
+                if len(bert_embeddings):
+                    self.save_bert(bert_words, bert_embeddings, bert_file_name)
+
+            self.bert_embeddings = bert_embeddings
+
+            # # TODO potrebuju tohle?
+            if bert:
+                self.bert_words = {}
+                for i, word in enumerate(bert_words):
+                    self.bert_words[word] = i + 1
 
     @property
     def sentence_lens(self):
@@ -321,12 +334,13 @@ class MorphoDataset:
                 factors[-1].word_ids[i, :len(self._elmo[batch_perm[i]])] = self._elmo[batch_perm[i]]
 
         # BERT
+        #TODO zmenit
         forms = self._factors[self.FORMS]
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
-        if self.bert and len(self._berts):
+        if self.bert:
             for i in range(batch_size):
                 for j, string in enumerate(forms.word_strings[batch_perm[i]]):
-                    mapped = self._berts.get(string, 0)
+                    mapped = self.bert_words.get(string, 0)
                     if not mapped: mapped = self._berts.get(string.lower(), 0)
                     factors[-1].word_ids[i, j] = mapped
 
