@@ -144,27 +144,35 @@ class Network:
             inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
             print('train epoch')
             if args.embeddings:
-                embeddings = np.zeros([batch[train.EMBEDDINGS].word_ids.shape[0],
-                                       batch[train.EMBEDDINGS].word_ids.shape[1],
-                                       args.embeddings_size])
-                for i in range(embeddings.shape[0]):
-                    for j in range(embeddings.shape[1]):
-                        if batch[train.EMBEDDINGS].word_ids[i, j]:
-                            embeddings[i, j] = args.embeddings_data[batch[train.EMBEDDINGS].word_ids[i, j] - 1]
+                embeddings = self._compute_embeddings(batch, dataset)
                 inp.append(embeddings)
 
             if args.bert:
-                bert_embeddings = np.zeros([batch[train.BERT].word_ids.shape[0],
-                                       batch[train.BERT].word_ids.shape[1],
-                                       args.bert_size])
-                for i in range(bert_embeddings.shape[0]):
-                    for j in range(bert_embeddings.shape[1]):
-                        if batch[train.BERT].word_ids[i, j]:
-                            bert_embeddings[i, j] = train.bert_embeddings[batch[train.BERT].word_ids[i, j] - 1]
-
+                bert_embeddings = self._compute_bert_embeddings(batch, dataset)
                 inp.append(bert_embeddings)
 
             self.train_batch(inp, factors)
+
+    def _compute_embeddings(self, batch, dataset):
+        embeddings = np.zeros([batch[dataset.EMBEDDINGS].word_ids.shape[0],
+                               batch[dataset.EMBEDDINGS].word_ids.shape[1],
+                               args.embeddings_size])
+        for i in range(embeddings.shape[0]):
+            for j in range(embeddings.shape[1]):
+                if batch[dataset.EMBEDDINGS].word_ids[i, j]:
+                    embeddings[i, j] = args.embeddings_data[batch[dataset.EMBEDDINGS].word_ids[i, j] - 1]
+        return embeddings
+
+
+    def _compute_bert_embeddings(self, batch, dataset):
+        bert_embeddings = np.zeros([batch[dataset.BERT].word_ids.shape[0],
+                                    batch[dataset.BERT].word_ids.shape[1],
+                                    args.bert_size])
+        for i in range(bert_embeddings.shape[0]):
+            for j in range(bert_embeddings.shape[1]):
+                if batch[dataset.BERT].word_ids[i, j]:
+                    bert_embeddings[i, j] = dataset.bert_embeddings[batch[dataset.BERT].word_ids[i, j] - 1]
+
 
     @tf.function(experimental_relax_shapes=True)
     def evaluate_batch(self, inputs, factors):
@@ -197,23 +205,11 @@ class Network:
             any_analyses = any(batch[train.FACTORS_MAP[factor]].analyses_ids for factor in self.factors)
             inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
             if args.embeddings:
-                embeddings = np.zeros([batch[dataset.EMBEDDINGS].word_ids.shape[0],
-                                       batch[dataset.EMBEDDINGS].word_ids.shape[1],
-                                       args.embeddings_size])
-                for i in range(embeddings.shape[0]):
-                    for j in range(embeddings.shape[1]):
-                        if batch[dataset.EMBEDDINGS].word_ids[i, j]:
-                            embeddings[i, j] = train.bert_embeddings[batch[dataset.EMBEDDINGS].word_ids[i, j] - 1]
+                embeddings = self._compute_embeddings(batch, dataset)
                 inp.append(embeddings)
 
             if args.bert:
-                bert_embeddings = np.zeros([batch[dataset.BERT].word_ids.shape[0],
-                                       batch[dataset.BERT].word_ids.shape[1],
-                                       args.bert_size])
-                for i in range(bert_embeddings.shape[0]):
-                    for j in range(bert_embeddings.shape[1]):
-                        if batch[dataset.BERT].word_ids[i, j]:
-                            bert_embeddings[i, j] = args.bert_data[batch[dataset.BERT].word_ids[i, j] - 1]
+                bert_embeddings = self._compute_bert_embeddings(batch, dataset)
                 inp.append(bert_embeddings)
 
             probabilities, mask = self.evaluate_batch(inp, factors)
@@ -364,23 +360,6 @@ if __name__ == "__main__":
             args.embeddings_size = args.embeddings_data.shape[1]
 
 
-    # args.compute_bert = False
-    # if args.bert:
-    #     bert_path = args.bert + ".pickle"
-    #     if os.path.exists(bert_path):
-    #         print("cesta existuje")
-    #         args.compute_bert = False
-    #         bert_pickle = np.load(bert_path, allow_pickle=True)
-    #         args.bert_words = bert_pickle[0]
-    #         print("size of berts")
-    #         print(len(args.bert_words))
-    #         args.bert_data = bert_pickle[1]
-    #         args.bert_size = len(args.bert_data[0])
-    #     else:
-    #         args.bert_words = None
-    #         args.compute_bert = True
-
-
     if args.predict:
         # Load training dataset maps from the checkpoint
         train = morpho_dataset.MorphoDataset.load_mappings("{}/mappings.pickle".format(args.predict))
@@ -424,31 +403,6 @@ if __name__ == "__main__":
         # test = None
     args.elmo_size = train.elmo_size
     args.bert_size = len(train.bert_embeddings[1])
-
-    # if args.compute_bert:
-    #     args.bert_words = None
-    #     args.bert_data = None
-    #     #TODO věci v listu by měly být unikátní
-    #     for name in [train_data_path, dev_data_path, test_data_path]:
-    #         name = args.bert + "_" + "_".join(name.split("-")[-2:])
-    #         name = name + ".pickle"
-    #         print(name)
-    #         if os.path.exists(name):
-    #             bert_pickle = np.load(name, allow_pickle=True)
-    #             if args.bert_words is not None:
-    #                 args.bert_words = np.concatenate([args.bert_words,bert_pickle[0]])
-    #                 args.bert_data = np.concatenate([args.bert_data,bert_pickle[1]])
-    #             else:
-    #                 args.bert_words = bert_pickle[0]
-    #                 args.bert_data = bert_pickle[1]
-    #
-    #     for_save = [args.bert_words, args.bert_data]
-    #     with open(args.bert + '.pickle', 'wb') as handle:
-    #         pickle.dump(for_save, handle)
-    #
-    #
-    # #TODO stejne potrebuju ty predchozi promenne - bert_words, bert_data - mam ulozene, bert_size zjistim
-    # args.bert_size = len(args.bert_data[0])
 
     # Construct the network
     network = Network(args=args,
