@@ -203,7 +203,7 @@ class Network:
                 for i in range(embeddings.shape[0]):
                     for j in range(embeddings.shape[1]):
                         if batch[dataset.EMBEDDINGS].word_ids[i, j]:
-                            embeddings[i, j] = args.embeddings_data[batch[dataset.EMBEDDINGS].word_ids[i, j] - 1]
+                            embeddings[i, j] = train.bert_embeddings[batch[dataset.EMBEDDINGS].word_ids[i, j] - 1]
                 inp.append(embeddings)
 
             if args.bert:
@@ -406,7 +406,7 @@ if __name__ == "__main__":
 
         if os.path.exists(dev_data_path):
             dev = morpho_dataset.MorphoDataset(dev_data_path, train=train, shuffle_batches=False,
-                                               bert=args.bert if args.compute_bert else None,
+                                               bert=args.bert if args.bert else None,
                                                elmo=re.sub("(?=,|$)", "-dev.npz", args.elmo) if args.elmo else None)
         else:
             dev = None
@@ -423,7 +423,7 @@ if __name__ == "__main__":
         # test_data_path = "djfha"
         # test = None
     args.elmo_size = train.elmo_size
-    args.bert_size = len(train.bert_embeddings[0])
+    args.bert_size = len(train.bert_embeddings[1])
 
     # if args.compute_bert:
     #     args.bert_words = None
