@@ -210,14 +210,11 @@ class MorphoDataset:
 
         if bert:
 
-            #load from existing file
-
             bert_file_name = (".").join(filename.split("/")[-1].split(".")[0:-1]) + "." + bert
             bert_path = bert_file_name + ".pickle"
             if os.path.exists(bert_path):
                 bert_pickle = np.load(bert_path, allow_pickle=True)
-                bert_words = bert_pickle[0]
-                bert_embeddings = bert_pickle[1]
+                bert_embeddings = bert_pickle
 
             # precomputed does not exist, compute here
             else:
@@ -229,44 +226,45 @@ class MorphoDataset:
                 tokenizer = transformers.BertTokenizer.from_pretrained(model_name)
                 model = transformers.TFBertModel.from_pretrained(model_name,
                                                                  config=config)
+                #TODO model.eval()?
 
-                if not train:
-                    forms_nonunique = self._factors[self.FORMS].words
-                else:
-                    forms_nonunique = [val for sublist in self.factors[0].word_strings for val in sublist]
-
-                bert_words = np.unique(forms_nonunique)
+                #TODO overit proc tu byla podminka na train (!!!)
+                sentences_words = self._factors[self.FORMS].word_strings
 
                 batch_size_bert = 16
                 bert_embeddings_tokens = None
-                for i in range(0, math.ceil(len(bert_words) / batch_size_bert)):
-                    batch_words = bert_words[i: min(i + 16, len(bert_words))]
+                for i in range(0, math.ceil(len(sentences_words) / batch_size_bert)):
+                    batch_sentences = sentences_words[i: min(i + 16, len(sentences_words))]
+                    batch_sentences = [" ".join(batch_sentences[i]) for i in range(len(batch_sentences))]
 
-                    #TODO stahnout noveji verzi a pouzit batch
-                    w_subwords = [tokenizer.encode(w) for w in batch_words]
-                    max_len = 15 #TODO nebylo by lepsi nejak jinak?
+                    #TODO stahnout novejsi verzi a pouzit batch
+                    w_subwords = [tokenizer.encode(w) for w in batch_sentences]
+                    max_len = 256 #TODO nebylo by lepsi nejak jinak?
 
-                    #odstranim cls a sep, protoze to je jen po slovech
-                    padded = [w[1:-1] + [0] * (max_len - len(w[1:-1])) for w in w_subwords]
+                    padded = [w + [0] * (max_len - len(w)) for w in w_subwords]
                     word_tok = tf.convert_to_tensor(padded)
-                    #TODO zkontrolovat, ze beru spravnou vrstvu
+                    #TODO umi to i udelat padding a vratit tensor!!
+                    #TODO umi vratit i masku
+                    att_mask = np.array(padded) == 0
+
                     if bert_embeddings_tokens is None:
-                        bert_embeddings_tokens = model(word_tok)[0].numpy()
+                        bert_embeddings_tokens = model(word_tok, attention_mask=att_mask)[0].numpy()
                     else:
-                        bert_embeddings_tokens = np.concatenate((bert_embeddings_tokens, model(word_tok)[0].numpy()))
+                        bert_embeddings_tokens = np.concatenate((bert_embeddings_tokens, model(word_tok, attention_mask  = att_mask)[0].numpy()))
 
-                bert_embeddings = np.mean(bert_embeddings_tokens, axis=1)
+                bert_embeddings = bert_embeddings_tokens
 
+                #TODO jak ukládat, je treba slova?
                 if len(bert_embeddings):
-                    self.save_bert(bert_words, bert_embeddings, bert_file_name)
+                    self.save_bert(bert_embeddings, bert_file_name)
 
             self.bert_embeddings = bert_embeddings
 
             # # TODO potrebuju tohle?
-            if bert:
-                self.bert_words = {}
-                for i, word in enumerate(bert_words):
-                    self.bert_words[word] = i + 1
+            # if bert:
+            #     self.bert_words = {}
+            #     for i, word in enumerate(bert_words):
+            #         self.bert_words[word] = i + 1
 
     @property
     def sentence_lens(self):
@@ -284,8 +282,8 @@ class MorphoDataset:
         with open(path, mode="wb") as mappings_file:
             pickle.dump(MorphoDataset(None, train=self), mappings_file)
 
-    def save_bert(self, words, embeddings, file):
-        for_save = [words, embeddings]
+    def save_bert(self, embeddings, file):
+        for_save = embeddings
         with open(file + '.pickle', 'wb') as handle:
             pickle.dump(for_save, handle)
 
@@ -328,21 +326,17 @@ class MorphoDataset:
                     factors[-1].word_ids[i, j] = mapped
 
         # Contextualized embeddings
+        #TODO kdyby se to tady pripojovalo vzdy, tak by nebyl problem s indexama
         if self._elmo:
             factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len, self.elmo_size], np.float32)))
             for i in range(batch_size):
                 factors[-1].word_ids[i, :len(self._elmo[batch_perm[i]])] = self._elmo[batch_perm[i]]
 
         # BERT
-        #TODO zmenit
         forms = self._factors[self.FORMS]
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
         if self.bert:
-            for i in range(batch_size):
-                for j, string in enumerate(forms.word_strings[batch_perm[i]]):
-                    mapped = self.bert_words.get(string, 0)
-                    if not mapped: mapped = self._berts.get(string.lower(), 0)
-                    factors[-1].word_ids[i, j] = mapped
+            factors[-1].word_ids = self.bert_embeddings[batch_perm,0:max_sentence_len,:]
 
         # Character-level data
         for f, factor in enumerate(self._factors):

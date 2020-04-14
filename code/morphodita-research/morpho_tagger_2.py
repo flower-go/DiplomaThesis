@@ -136,7 +136,7 @@ class Network:
     def train_epoch(self, dataset, args, learning_rate):
         self._optimizer.learning_rate = learning_rate
         while not train.epoch_finished():
-            _, batch = dataset.next_batch(args.batch_size)
+            sentence_lens, batch = dataset.next_batch(args.batch_size)
             factors = []
             for f in self.factors:
                 words = batch[dataset.FACTORS_MAP[f]].word_ids
@@ -148,10 +148,15 @@ class Network:
                 inp.append(embeddings)
 
             if args.bert:
-                bert_embeddings = self._compute_bert_embeddings(batch, dataset)
+                bert_embeddings = self._compute_bert(batch, dataset, sentence_lens)
                 inp.append(bert_embeddings)
 
             self.train_batch(inp, factors)
+
+    def _compute_bert(self,batch, dataset, lenghts):
+
+        max_length = np.max(lenghts)
+        return batch[dataset.BERT].word_ids[:,0:max_length,:]
 
     def _compute_embeddings(self, batch, dataset):
         embeddings = np.zeros([batch[dataset.EMBEDDINGS].word_ids.shape[0],
@@ -164,6 +169,7 @@ class Network:
         return embeddings
 
 
+    #TODO predelat, kdyz uz to vraci rovnou embeddings
     def _compute_bert_embeddings(self, batch, dataset):
         bert_embeddings = np.zeros([batch[dataset.BERT].word_ids.shape[0],
                                     batch[dataset.BERT].word_ids.shape[1],
@@ -211,7 +217,7 @@ class Network:
                 inp.append(embeddings)
 
             if args.bert:
-                bert_embeddings = self._compute_bert_embeddings(batch, dataset)
+                bert_embeddings = self._compute_bert(batch, dataset, sentence_lens)
                 inp.append(bert_embeddings)
 
             probabilities, mask = self.evaluate_batch(inp, factors)
@@ -366,7 +372,8 @@ if __name__ == "__main__":
         # Load training dataset maps from the checkpoint
         train = morpho_dataset.MorphoDataset.load_mappings("{}/mappings.pickle".format(args.predict))
         # Load input data
-        predict = morpho_dataset.MorphoDataset(args.data, train=train, shuffle_batches=False, elmo=args.elmo)
+        predict = morpho_dataset.MorphoDataset(args.data, train=train, shuffle_batches=False, elmo=args.elmo,
+                                               bert=args.bert)
     else:
         # Load input data
         if args.debug_mode:
@@ -393,18 +400,21 @@ if __name__ == "__main__":
             dev = None
 
 
-        # if os.path.exists("{}-test.txt".format(args.data)):
-        #     test_data_path = "{}-test.txt".format(args.data)
-        #     test = morpho_dataset.MorphoDataset("{}-test.txt".format(args.data), train=train, shuffle_batches=False,
-        #                                         elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None,
-        #                                         bert=args.bert if args.bert else None
-        #                                         )
-        # else:
-        #     test = None
-        test_data_path = "djfha"
-        test = None
+        if os.path.exists("{}-test.txt".format(args.data)):
+            test_data_path = "{}-test.txt".format(args.data)
+            test = morpho_dataset.MorphoDataset("{}-test.txt".format(args.data), train=train, shuffle_batches=False,
+                                                elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None,
+                                                bert=args.bert if args.bert else None
+                                                )
+        else:
+            test = None
+
+        #test = None
+        #dev = None
+
+
     args.elmo_size = train.elmo_size
-    args.bert_size = len(train.bert_embeddings[1])
+    args.bert_size = train.bert_embeddings.shape[2]
 
     # Construct the network
     network = Network(args=args,
@@ -413,8 +423,7 @@ if __name__ == "__main__":
                       factor_words=dict(
                           (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors))
 
-    # TODO ukladani nefunguje
-    # TODO nemame predikci
+    # TODO nemame predikci !!!
     if args.predict:
         network.saver_inference.restore(network.session, "{}/checkpoint-inference".format(args.predict))
         network.predict(predict, sys.stdout, args)

@@ -36,10 +36,17 @@ X pridat slovnik
         X pridat
     X jsou not found jen paddings a unknown? (asi ano!)
     - ukladat v datasetu primo embeddingy
-    - zajistit spravne indexovani
-    - zmenit train a evaluate
+    X zajistit spravne indexovani
+    X zmenit train a evaluate
     X do argumentu bert dát jmeno modelu
     X prejmenovat soubory
+
+- oprava a provereni kodu
+    - opravit embeddings po vetach
+        - prepsat vypocet
+        - prepsat nacitani
+        - prepsat ukladani v tagger
+        - prepsat pouzivani train a evaluate
 
 ================================================================================
 PHASE 2
