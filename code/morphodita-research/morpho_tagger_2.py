@@ -413,6 +413,7 @@ if __name__ == "__main__":
         #dev = None
 
 
+
     args.elmo_size = train.elmo_size
     args.bert_size = train.bert_embeddings.shape[2]
 
