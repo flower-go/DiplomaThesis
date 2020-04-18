@@ -21,7 +21,7 @@ X pridat slovnik
         X prepsat do eval_batch
         X opravit pocitani predikci
 
-- pridat berta jen embeddingy + ukladat predpoctene
+X pridat berta jen embeddingy + ukladat predpoctene
     X vytvorit model a tokenizer - v dataset u pocitani
     X vracet vysledky v morpho_dataset next batch
     X ulozit predpoctene vysledky
@@ -33,7 +33,7 @@ X pridat slovnik
         X kam?
         X pridat
     X jsou not found jen paddings a unknown? (asi ano!)
-    - ukladat v datasetu primo embeddingy
+    X ukladat v datasetu primo embeddingy
     X zajistit spravne indexovani
     X zmenit train a evaluate
     X do argumentu bert dát jmeno modelu
@@ -41,10 +41,16 @@ X pridat slovnik
 
 - oprava a provereni kodu
     - opravit embeddings po vetach
-        - prepsat vypocet
-        - prepsat nacitani
-        - prepsat ukladani v tagger
-        - prepsat pouzivani train a evaluate
+        X prepsat vypocet
+        X prepsat nacitani
+        X prepsat ukladani
+        X prepsat pouzivani train a evaluate
+    - proverit:
+        (R) bez label smoothingu
+        (R) s label smoothingem
+        - verze před dictionary, kde bylo těch 96 (v commitu 394f125b43b25045945eb78df4f7ab852fa08e84 jsem opravovala loss function)
+        - s bertem bez label smoothingu
+        - s bertem a label smoothingem
 
 ================================================================================
 PHASE 2
