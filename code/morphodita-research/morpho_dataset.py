@@ -232,27 +232,28 @@ class MorphoDataset:
                 sentences_words = self._factors[self.FORMS].word_strings
 
                 batch_size_bert = 16
-                bert_embeddings_tokens = None
-                for i in range(0, math.ceil(len(sentences_words) / batch_size_bert)):
-                    batch_sentences = sentences_words[i: min(i + 16, len(sentences_words))]
+                max_len = 256  # TODO nebylo by lepsi nejak jinak dá se získat délka té vrstvy jako proměnná?
+                sentences_count = len(sentences_words)
+                bert_embeddings = np.zeros((sentences_count, max_len, 768))
+                cycle_len = math.ceil(sentences_count / batch_size_bert)
+                for i in range(0, cycle_len):
+                    batch_sentences = sentences_words[i: min(i + 16, sentences_count)]
                     batch_sentences = [" ".join(batch_sentences[i]) for i in range(len(batch_sentences))]
 
                     #TODO stahnout novejsi verzi a pouzit batch
                     w_subwords = [tokenizer.encode(w) for w in batch_sentences]
-                    max_len = 256 #TODO nebylo by lepsi nejak jinak?
+
 
                     padded = [w + [0] * (max_len - len(w)) for w in w_subwords]
                     word_tok = tf.convert_to_tensor(padded)
                     #TODO umi to i udelat padding a vratit tensor!!
                     #TODO umi vratit i masku
+                    #TODO alokovat předem
                     att_mask = np.array(padded) == 0
 
-                    if bert_embeddings_tokens is None:
-                        bert_embeddings_tokens = model(word_tok, attention_mask=att_mask)[0].numpy()
-                    else:
-                        bert_embeddings_tokens = np.concatenate((bert_embeddings_tokens, model(word_tok, attention_mask  = att_mask)[0].numpy()))
+                    bert_embeddings[cycle_len*i : len(batch_sentences)] = model(word_tok, attention_mask=att_mask)[0]\
+                        .numpy()
 
-                bert_embeddings = bert_embeddings_tokens
 
                 #TODO jak ukládat, je treba slova?
                 if len(bert_embeddings):
