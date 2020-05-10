@@ -155,8 +155,13 @@ class Network:
 
     def _compute_bert(self,batch, dataset, lenghts):
 
-        max_length = np.max(lenghts)
-        return batch[dataset.BERT].word_ids[:,0:max_length,:]
+        max_len = np.max(lenghts)
+        result = np.zeros((len(batch[dataset.BERT].word_ids),max_len,len(batch[dataset.BERT].word_ids[0][0])))
+        for sentence in range(len(batch[dataset.BERT].word_ids)):
+            result[sentence][0:len(batch[dataset.BERT].word_ids[sentence])] = batch[dataset.BERT].word_ids[sentence]
+
+        return result
+
 
     def _compute_embeddings(self, batch, dataset):
         embeddings = np.zeros([batch[dataset.EMBEDDINGS].word_ids.shape[0],
@@ -416,8 +421,7 @@ if __name__ == "__main__":
 
     args.elmo_size = train.elmo_size
     if args.bert:
-        args.bert_size = train.bert_embeddings.shape[2]
-
+        args.bert_size = len(train.bert_embeddings[0][0])
     # Construct the network
     network = Network(args=args,
                       num_words=len(train.factors[train.FORMS].words),
