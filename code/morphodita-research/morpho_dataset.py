@@ -233,20 +233,18 @@ class MorphoDataset:
                 max_len = 256  # TODO nebylo by lepsi nejak jinak dá se získat délka té vrstvy jako proměnná?
 
                 sentences_count = len(sentences_words)
-                print("delky vet pred vypoctem")
-                print(sentences_count)
-                print(self._sentence_lens)
 
                 bert_embeddings = []
                 cycle_len = math.ceil(sentences_count / batch_size_bert)
                 for i in range(0, cycle_len):
-                    batch_sentences_words = sentences_words[i: min(i + 16, sentences_count)]
+                    #TODO to je shit !!
+                    start = i*batch_size_bert
+                    batch_sentences_words = sentences_words[start: min(start + batch_size_bert, sentences_count)]
                     batch_sentences = [" ".join(batch_sentences_words[i]) for i in range(len(batch_sentences_words))]
 
                     #TODO stahnout novejsi verzi a pouzit batch
                     #w_subwords = tokenizer.batch_encode_plus(batch_sentences)
                     w_subwords = [tokenizer.encode(w) for w in batch_sentences]
-
 
                     padded = [w + [0] * (max_len - len(w)) for w in w_subwords]
                     word_tok = tf.convert_to_tensor(padded)
@@ -358,6 +356,7 @@ class MorphoDataset:
         forms = self._factors[self.FORMS]
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
         if self.bert:
+            #for i in range(batch_size):
             factors[-1].word_ids = np.array(self.bert_embeddings)[batch_perm]
 
         # Character-level data
