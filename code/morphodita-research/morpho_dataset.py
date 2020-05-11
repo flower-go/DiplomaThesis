@@ -237,7 +237,6 @@ class MorphoDataset:
                 bert_embeddings = []
                 cycle_len = math.ceil(sentences_count / batch_size_bert)
                 for i in range(0, cycle_len):
-                    #TODO to je shit !!
                     start = i*batch_size_bert
                     batch_sentences_words = sentences_words[start: min(start + batch_size_bert, sentences_count)]
                     batch_sentences = [" ".join(batch_sentences_words[i]) for i in range(len(batch_sentences_words))]
@@ -266,12 +265,8 @@ class MorphoDataset:
                     self.save_bert(bert_embeddings, bert_file_name)
 
             self.bert_embeddings = bert_embeddings
+            self.check_words(self._sentence_lens, self.bert_embeddings)
 
-            # # TODO potrebuju tohle?
-            # if bert:
-            #     self.bert_words = {}
-            #     for i, word in enumerate(bert_words):
-            #         self.bert_words[word] = i + 1
 
     @property
     def sentence_lens(self):
@@ -289,8 +284,12 @@ class MorphoDataset:
         with open(path, mode="wb") as mappings_file:
             pickle.dump(MorphoDataset(None, train=self), mappings_file)
 
+    def check_words(self,official, computed):
+        for i in range(len(official)):
+            if len(computed[i]) != official[i]:
+                print("ERROR V " + i + " delka je oficialne " + official[i] + " a je " +  len(computed[i]) )
+
     def mean_word_tokens(self, embeddings, sentences, tokenizer):
-        #TODO prumerovat
         result = []
         for s in range(len(sentences)):
             sentence = []
