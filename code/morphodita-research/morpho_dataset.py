@@ -227,14 +227,17 @@ class MorphoDataset:
                 model = transformers.TFBertModel.from_pretrained(model_name,
                                                                  config=config)
 
-                #TODO overit proc tu byla podminka na train (!!!)
                 sentences_words = self._factors[self.FORMS].word_strings
 
                 batch_size_bert = 16
                 max_len = 256  # TODO nebylo by lepsi nejak jinak dá se získat délka té vrstvy jako proměnná?
 
                 sentences_count = len(sentences_words)
-                bert_embeddings = [] #TODO to bude pole numpy arrays
+                print("delky vet pred vypoctem")
+                print(sentences_count)
+                print(self._sentence_lens)
+
+                bert_embeddings = []
                 cycle_len = math.ceil(sentences_count / batch_size_bert)
                 for i in range(0, cycle_len):
                     batch_sentences_words = sentences_words[i: min(i + 16, sentences_count)]
@@ -383,7 +386,7 @@ class MorphoDataset:
             for index in batch_perm:
                 factors[f].analyses_ids.append(self._factors[f].analyses_ids[index])
 
-        return self._sentence_lens[batch_perm], factors
+        return batch_sentence_lens, factors
 
     def write_sentence(self, output, index, overrides):
         for i in range(self._sentence_lens[index]):
