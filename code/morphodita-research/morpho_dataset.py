@@ -245,6 +245,7 @@ class MorphoDataset:
                     #w_subwords = tokenizer.batch_encode_plus(batch_sentences)
                     w_subwords = [tokenizer.encode(w) for w in batch_sentences]
 
+                    max_len = np.max([len(w) for w in w_subwords])
                     padded = [w + [0] * (max_len - len(w)) for w in w_subwords]
                     word_tok = tf.convert_to_tensor(padded)
                     #TODO umi to i udelat padding a vratit tensor!!
