@@ -155,9 +155,15 @@ class Network:
 
     def _compute_bert(self,batch, dataset, lenghts):
 
-        max_len = np.max(lenghts)
+        max_len = np.max([len(batch[dataset.BERT].word_ids[i]) for i in range(len(batch[dataset.BERT].word_ids))])
+        print("max len")
+        print(max_len)
+        max_len = batch[dataset.EMBEDDINGS].word_ids.shape[1]
+        print(max_len)
         result = np.zeros((len(batch[dataset.BERT].word_ids),max_len,len(batch[dataset.BERT].word_ids[0][0])))
         for sentence in range(len(batch[dataset.BERT].word_ids)):
+            print("delka")
+            print(len(batch[dataset.BERT].word_ids[sentence]))
             result[sentence][0:len(batch[dataset.BERT].word_ids[sentence])] = batch[dataset.BERT].word_ids[sentence]
 
         return result
