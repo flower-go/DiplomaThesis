@@ -155,11 +155,8 @@ class Network:
 
     def _compute_bert(self,batch, dataset, lenghts):
 
-        max_len = np.max([len(batch[dataset.BERT].word_ids[i]) for i in range(len(batch[dataset.BERT].word_ids))])
-        print("max len")
-        print(max_len)
+        #max_len = np.max([len(batch[dataset.BERT].word_ids[i]) for i in range(len(batch[dataset.BERT].word_ids))])
         max_len = batch[dataset.EMBEDDINGS].word_ids.shape[1]
-        print(max_len)
         result = np.zeros((len(batch[dataset.BERT].word_ids),max_len,len(batch[dataset.BERT].word_ids[0][0])))
         for sentence in range(len(batch[dataset.BERT].word_ids)):
             print("delka")
@@ -391,9 +388,11 @@ if __name__ == "__main__":
             print("DEBUG MODE")
             train_data_path = "{}-train-small.txt".format(args.data)
             dev_data_path = "{}-dev-small.txt".format(args.data)
+            test_data_path = "{}-test-small.txt".format(args.data)
         else:
             train_data_path = "{}-train.txt".format(args.data)
             dev_data_path = "{}-dev.txt".format(args.data)
+            test_data_path = "{}-test.txt".format(args.data)
 
 
         train = morpho_dataset.MorphoDataset(train_data_path,
@@ -413,7 +412,7 @@ if __name__ == "__main__":
 
         if os.path.exists("{}-test.txt".format(args.data)):
             test_data_path = "{}-test.txt".format(args.data)
-            test = morpho_dataset.MorphoDataset("{}-test.txt".format(args.data), train=train, shuffle_batches=False,
+            test = morpho_dataset.MorphoDataset(test_data_path, train=train, shuffle_batches=False,
                                                 elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None,
                                                 bert=args.bert if args.bert else None
                                                 )
