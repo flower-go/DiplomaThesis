@@ -213,8 +213,9 @@ class MorphoDataset:
             bert_file_name = (".").join(filename.split("/")[-1].split(".")[0:-1]) + "." + bert
             bert_path = bert_file_name + ".pickle"
             if os.path.exists(bert_path):
-                bert_pickle = np.load(bert_path, allow_pickle=True)
-                bert_embeddings = np.array(bert_pickle)
+                self.bert_embeddings, self.bert_subwords, self.bert_segments = \
+                    np.load(bert_path, allow_pickle=True)
+
 
             # precomputed does not exist, compute here
             else:
@@ -230,42 +231,58 @@ class MorphoDataset:
                 sentences_words = self._factors[self.FORMS].word_strings
 
                 batch_size_bert = 16
-                max_len = 256  # TODO nebylo by lepsi nejak jinak dá se získat délka té vrstvy jako proměnná?
 
                 sentences_count = len(sentences_words)
 
                 bert_embeddings = []
+                bert_subwords = []
+                bert_segments = []
                 cycle_len = math.ceil(sentences_count / batch_size_bert)
                 for i in range(0, cycle_len):
                     start = i*batch_size_bert
                     batch_sentences_words = sentences_words[start: min(start + batch_size_bert, sentences_count)]
-                    batch_sentences = [" ".join(batch_sentences_words[i]) for i in range(len(batch_sentences_words))]
 
                     #TODO stahnout novejsi verzi a pouzit batch
                     #w_subwords = tokenizer.batch_encode_plus(batch_sentences)
-                    w_subwords = [tokenizer.encode(w) for w in batch_sentences]
+                    for s in batch_sentences_words:
+                        bert_segments.append([])
+                        bert_subwords.append([])
+                        for i_w,w in enumerate(s):
+
+                            w_e = tokenizer.encode(w, add_special_tokens=False)
+                            bert_segments[-1].extend([i_w]*len(w_e))
+                            bert_subwords[-1].extend(w_e)
+
+                        bert_subwords[-1] = np.array(tokenizer.build_inputs_with_special_tokens(bert_subwords[-1]),
+                                                     dtype=np.int32)
+                        bert_segments[-1] = np.array(bert_segments[-1], dtype=np.int32)
+
+
+                    w_subwords = bert_subwords[start:]
 
                     max_len = np.max([len(w) for w in w_subwords])
                     padded = [w + [0] * (max_len - len(w)) for w in w_subwords]
                     word_tok = tf.convert_to_tensor(padded)
                     #TODO umi to i udelat padding a vratit tensor!!
                     #TODO umi vratit i masku
-                    att_mask = np.array(padded) == 0
+                    att_mask = np.array(padded) != 0
 
                     #TODO průměrovat zpět na slova
-                    model_output = model(word_tok, attention_mask=att_mask)[0].numpy()
-                    unpadded = [model_output[d][~att_mask[d]][1:-1] for d in range(len(batch_sentences))]
-                    unpadded = self.mean_word_tokens(unpadded, batch_sentences_words, tokenizer)
-                    bert_embeddings = bert_embeddings + unpadded
+                    model_output = tf.math.reduce_mean(model(word_tok, attention_mask=att_mask)[2][0:3], axis=0)
+                    for s_i, s in enumerate(batch_sentences_words):
+                        bert_embeddings.append(tf.math.segment_mean(
+                            model_output[s_i][1:len(bert_subwords[start + s_i])+1],bert_subwords[start + s_i]).numpy())
 
 
                 #TODO jak ukládat, je treba slova?
 
                 if len(bert_embeddings):
 
-                    self.save_bert(bert_embeddings, bert_file_name)
+                    self.save_bert([bert_embeddings,bert_subwords, bert_segments], bert_file_name)
 
             self.bert_embeddings = bert_embeddings
+            self.bert_segments = bert_segments
+            self.bert_subwords = bert_subwords
             self.check_words(self._sentence_lens, self.bert_embeddings)
 
 
@@ -289,18 +306,6 @@ class MorphoDataset:
         for i in range(len(official)):
             if len(computed[i]) != official[i]:
                 print("ERROR V " + i + " delka je oficialne " + official[i] + " a je " +  len(computed[i]) )
-
-    def mean_word_tokens(self, embeddings, sentences, tokenizer):
-        result = []
-        for s in range(len(sentences)):
-            sentence = []
-            start = 0
-            for w in range(len(sentences[s])):
-                l = len(tokenizer.tokenize(sentences[s][w]))
-                sentence.append(np.mean(embeddings[s][start:start + l], axis = 0))
-                start += l
-            result.append(sentence)
-        return result
 
     def save_bert(self, embeddings, file):
         for_save = embeddings
