@@ -93,6 +93,35 @@ class Network:
         self.model = tf.keras.Model(inputs=inp, outputs=outputs)
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
+        word_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+        charseq_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+        charseqs = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+        embeddings = tf.keras.layers.Input(shape=[None, args.embeddings_size], dtype=tf.float32)
+        inp = [word_ids, charseq_ids, charseqs]
+        if (args.embeddings):
+            inp.append(embeddings)
+
+        segments = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+        subwords = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+        inp.append(segments)
+        inp.append(subwords)
+
+        config = transformers.BertConfig.from_pretrained(args.bert)
+        config.output_hidden_states = True
+        self.bert = transformers.TFBertModel.from_pretrained(args.bert,
+                                                                 config=config)
+        bert_output = tf.math.reduce_mean(self.bert(subwords,attention_mask=tf.cast(subwords != 0,tf.float32))[2][0:3]
+                                          ,axis=0)[:,1:]
+
+        bert_output = tf.keras.layers.Lambda(
+            lambda subseq:
+                               tf.map_fn(lambda subseq :
+                                         tf.math.segment_mean(subseq[0],subseq[1]),subseq, dtype=tf.float32))([bert_output,segments])
+        bert_output = bert_output[:,:-1]
+
+
+        self.outer_model = tf.keras.Model(inputs=inp,outputs=self.model(inp[:-2] + [bert_output]))
+
         if args.label_smoothing:
             self._loss = tf.losses.CategoricalCrossentropy()
         else:

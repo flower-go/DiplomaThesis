@@ -17,8 +17,10 @@ class MorphoDataset:
     FACTORS_MAP = {"Forms": FORMS, "Lemmas": LEMMAS, "Tags": TAGS}
 
     EMBEDDINGS = 3
-    ELMOS = 5
     BERT = 4
+    SUBWORDS = 5
+    SEGMENTS = 6
+
 
     PAD = 0
     UNK = 1
@@ -255,14 +257,15 @@ class MorphoDataset:
 
                         bert_subwords[-1] = np.array(tokenizer.build_inputs_with_special_tokens(bert_subwords[-1]),
                                                      dtype=np.int32)
+
                         bert_segments[-1] = np.array(bert_segments[-1], dtype=np.int32)
 
 
                     w_subwords = bert_subwords[start:]
 
                     max_len = np.max([len(w) for w in w_subwords])
-                    padded = [w + [0] * (max_len - len(w)) for w in w_subwords]
-                    word_tok = tf.convert_to_tensor(padded)
+                    padded = [np.concatenate((w, [0] * (max_len - len(w)))) for w in w_subwords]
+                    word_tok = tf.convert_to_tensor(np.array(padded,np.int32),tf.int32)
                     #TODO umi to i udelat padding a vratit tensor!!
                     #TODO umi vratit i masku
                     att_mask = np.array(padded) != 0
@@ -270,8 +273,9 @@ class MorphoDataset:
                     #TODO průměrovat zpět na slova
                     model_output = tf.math.reduce_mean(model(word_tok, attention_mask=att_mask)[2][0:3], axis=0)
                     for s_i, s in enumerate(batch_sentences_words):
+                        last_segment = bert_segments[start + s_i][-1]
                         bert_embeddings.append(tf.math.segment_mean(
-                            model_output[s_i][1:len(bert_subwords[start + s_i])+1],bert_subwords[start + s_i]).numpy())
+                            model_output[s_i][1:len(bert_subwords[start + s_i])],np.concatenate((bert_segments[start + s_i] ,[last_segment]))).numpy())
 
 
                 #TODO jak ukládat, je treba slova?
@@ -280,10 +284,10 @@ class MorphoDataset:
 
                     self.save_bert([bert_embeddings,bert_subwords, bert_segments], bert_file_name)
 
-            self.bert_embeddings = bert_embeddings
-            self.bert_segments = bert_segments
-            self.bert_subwords = bert_subwords
-            self.check_words(self._sentence_lens, self.bert_embeddings)
+                self.bert_embeddings = bert_embeddings
+                self.bert_segments = bert_segments
+                self.bert_subwords = bert_subwords
+            #self.check_words(self._sentence_lens, self.bert_embeddings)
 
 
     @property
@@ -333,6 +337,7 @@ class MorphoDataset:
         batch_sentence_lens = self._sentence_lens[batch_perm]
         max_sentence_len = np.max(batch_sentence_lens)
 
+
         # Word-level data
         factors = []
         for factor in self._factors:
@@ -359,10 +364,22 @@ class MorphoDataset:
 
         # BERT
         forms = self._factors[self.FORMS]
-        factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
+        factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len,768], np.float)))
         if self.bert:
-            #for i in range(batch_size):
-            factors[-1].word_ids = np.array(self.bert_embeddings)[batch_perm]
+            for i in range(batch_size):
+                factors[-1].word_ids[i, :len(self.bert_embeddings[batch_perm[i]])] = self.bert_embeddings[batch_perm[i]]
+
+
+
+        max_subwords = max(len(self.bert_subwords[i]) for i in batch_perm)
+        factors.append(self.FactorBatch(np.zeros([batch_size, max_subwords], np.int32)))
+        factors.append(self.FactorBatch(np.full([batch_size, max_subwords - 1], max_sentence_len, np.int32)))
+        if self.bert:
+            for i in range(batch_size):
+                factors[-2].word_ids[i, :len(self.bert_subwords[batch_perm[i]])] = self.bert_subwords[batch_perm[i]]
+                factors[-1].word_ids[i, :len(self.bert_segments[batch_perm[i]])] = self.bert_segments[batch_perm[i]]
+
+
 
         # Character-level data
         for f, factor in enumerate(self._factors):

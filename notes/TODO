@@ -58,6 +58,8 @@ X pridat berta jen embeddingy + ukladat predpoctene
 PHASE 2
 ================================================================================
 - pridat berta poradne a prumerovat embeddingy :(
+
+
 - sentiment s bertem bez preprocessingu (ktrain?)
     - vytvorit model
     - natrenovani code stejne jako u taggeru
