@@ -355,7 +355,7 @@ if __name__ == "__main__":
     parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
     parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
-    parser.add_argument("--bert", default="bert-base-multilingual-uncased", type=str, help="Bert model")
+    parser.add_argument("--bert", default=None, type=str, help="Bert model")
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
 
