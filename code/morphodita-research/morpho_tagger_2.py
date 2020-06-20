@@ -106,9 +106,9 @@ class Network:
         inp.append(segments)
         inp.append(subwords)
 
-        config = transformers.BertConfig.from_pretrained(args.bert)
+        config = transformers.BertConfig.from_pretrained(args.bert_model)
         config.output_hidden_states = True
-        self.bert = transformers.TFBertModel.from_pretrained(args.bert,
+        self.bert = transformers.TFBertModel.from_pretrained(args.bert_model,
                                                                  config=config)
         bert_output = tf.math.reduce_mean(self.bert(subwords,attention_mask=tf.cast(subwords != 0,tf.float32))[2][0:3]
                                           ,axis=0)[:,1:]
