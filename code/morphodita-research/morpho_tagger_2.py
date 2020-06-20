@@ -8,6 +8,7 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 import morpho_dataset
 import pickle
+import warnings
 
 
 class Network:
@@ -19,14 +20,9 @@ class Network:
         word_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
         charseq_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
         charseqs = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-        if args.embeddings:
-            embeddings = tf.keras.layers.Input(shape=[None, args.embeddings_size], dtype=tf.float32)
-        if args.elmo_size:
-            elmo = tf.keras(shape=[None, args.elmo_size], dtype=tf.float32)
-        if args.bert:
-            bert_embeddings = tf.keras.layers.Input(shape=[None, args.bert_size], dtype=tf.float32)
 
         # INPUTS - create all embeddings
+        # ASK co to je?
         inputs = []
         if args.we_dim:
             inputs.append(tf.keras.layers.Embedding(num_words, args.we_dim, mask_zero=True)(word_ids))
@@ -34,26 +30,24 @@ class Network:
         cle = tf.keras.layers.Embedding(num_chars, args.cle_dim, mask_zero=True)(charseqs)
         cle = tf.keras.layers.Dropout(rate=args.dropout)(cle)
         cle = tf.keras.layers.Bidirectional(tf.keras.layers.GRU(args.cle_dim), merge_mode="concat")(cle)
-        # cle = tf.keras.layers.Lambda(lambda args: tf.gather(*args))([cle, charseq_ids])
         cle = tf.gather(1 * cle, charseq_ids)
 
         # If CLE dim is half WE dim, we add them together, which gives
         # better results; otherwise we concatenate CLE and WE.
+        # ASK proč?
         if 2 * args.cle_dim == args.we_dim:
             inputs[-1] = tf.keras.layers.Add()([inputs[-1], cle])
         else:
             inputs.append(cle)
 
-        # Pretrained embeddings
+        # func Pretrained embeddings
         if args.embeddings:
+            embeddings = tf.keras.layers.Input(shape=[None, args.embeddings_size], dtype=tf.float32)
             inputs.append(tf.keras.layers.Dropout(args.word_dropout, noise_shape=[None, None, 1])(embeddings))
 
-        # Contextualized embeddings
-        if args.elmo_size:
-            inputs.append(elmo)
-
-        # Bert embeddings
+        # func bert embeddings
         if args.bert:
+            bert_embeddings = tf.keras.layers.Input(shape=[None, args.bert_size], dtype=tf.float32)
             inputs.append(tf.keras.layers.Dropout(args.word_dropout, noise_shape=[None, None, 1])(bert_embeddings))
 
         if len(inputs) > 1:
@@ -61,7 +55,7 @@ class Network:
         else:
             hidden = inputs[0]
 
-        # RNN cells
+        # FUNC RNN cells
 
         hidden = tf.keras.layers.Dropout(rate=args.dropout)(hidden)
 
@@ -73,7 +67,8 @@ class Network:
             if i:
                 hidden = tf.keras.layers.Add()([previous, hidden])
 
-        # tagger
+        #FUNC outputs
+
         outputs = []
         for factor in args.factors:
             factor_layer = hidden
@@ -93,34 +88,41 @@ class Network:
         self.model = tf.keras.Model(inputs=inp, outputs=outputs)
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
-        word_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-        charseq_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-        charseqs = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-        embeddings = tf.keras.layers.Input(shape=[None, args.embeddings_size], dtype=tf.float32)
-        inp = [word_ids, charseq_ids, charseqs]
-        if (args.embeddings):
-            inp.append(embeddings)
+        if args.bert_model:
 
-        segments = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-        subwords = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-        inp.append(segments)
-        inp.append(subwords)
+            #FUNC nove vstupy
+            word_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+            charseq_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+            charseqs = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+            embeddings = tf.keras.layers.Input(shape=[None, args.embeddings_size], dtype=tf.float32)
 
-        config = transformers.BertConfig.from_pretrained(args.bert_model)
-        config.output_hidden_states = True
-        self.bert = transformers.TFBertModel.from_pretrained(args.bert_model,
+            inp = [word_ids, charseq_ids, charseqs]
+            if (args.embeddings):
+                inp.append(embeddings)
+
+            segments = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+            subwords = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+            inp.append(segments)
+            inp.append(subwords)
+
+            config = transformers.BertConfig.from_pretrained(args.bert_model)
+            config.output_hidden_states = True
+            self.bert = transformers.TFBertModel.from_pretrained(args.bert_model,
                                                                  config=config)
-        bert_output = tf.math.reduce_mean(self.bert(subwords,attention_mask=tf.cast(subwords != 0,tf.float32))[2][0:3]
-                                          ,axis=0)[:,1:]
+            bert_output = tf.math.reduce_mean(
+                self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2][0:3]
+                , axis=0)[:, 1:]
 
-        bert_output = tf.keras.layers.Lambda(
-            lambda subseq:
-                               tf.map_fn(lambda subseq :
-                                         tf.math.segment_mean(subseq[0],subseq[1]),subseq, dtype=tf.float32))([bert_output,segments])
-        bert_output = bert_output[:,:-1]
+            bert_output = tf.keras.layers.Lambda(
+                lambda subseq:
+                tf.map_fn(lambda subseq:
+                          tf.math.segment_mean(subseq[0], subseq[1]), subseq, dtype=tf.float32))(
+                [bert_output, segments])
+            bert_output = bert_output[:, :-1]
 
-
-        self.outer_model = tf.keras.Model(inputs=inp,outputs=self.model(inp[:-2] + [bert_output]))
+            self.outer_model = tf.keras.Model(inputs=inp, outputs=self.model(inp[:-2] + [bert_output]))
+        else:
+            self.outer_model = self.model
 
         if args.label_smoothing:
             self._loss = tf.losses.CategoricalCrossentropy()
@@ -135,9 +137,8 @@ class Network:
 
     @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, factors):
-        # tags_mask = tf.not_equal(factors[0], 0)
         with tf.GradientTape() as tape:
-            probabilities = self.model(inputs, training=True)
+            probabilities = self.outer_model(inputs, training=True)
             if len(self.factors) == 1:
                 probabilities = [probabilities]
             loss = 0.0
@@ -149,8 +150,8 @@ class Network:
                         probabilities[i]._keras_mask)
                 else:
                     loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
-        gradients = tape.gradient(loss, self.model.trainable_variables)
-        self._optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
+        gradients = tape.gradient(loss, self.outer_model.trainable_variables)
+        self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
 
         tf.summary.experimental.set_step(self._optimizer.iterations)
         with self._writer.as_default():
@@ -182,16 +183,15 @@ class Network:
 
             self.train_batch(inp, factors)
 
-    def _compute_bert(self,batch, dataset, lenghts):
+    def _compute_bert(self, batch, dataset, lenghts):
 
-        #max_len = np.max([len(batch[dataset.BERT].word_ids[i]) for i in range(len(batch[dataset.BERT].word_ids))])
+        # max_len = np.max([len(batch[dataset.BERT].word_ids[i]) for i in range(len(batch[dataset.BERT].word_ids))])
         max_len = batch[dataset.EMBEDDINGS].word_ids.shape[1]
-        result = np.zeros((len(batch[dataset.BERT].word_ids),max_len,len(batch[dataset.BERT].word_ids[0][0])))
+        result = np.zeros((len(batch[dataset.BERT].word_ids), max_len, len(batch[dataset.BERT].word_ids[0][0])))
         for sentence in range(len(batch[dataset.BERT].word_ids)):
             result[sentence][0:len(batch[dataset.BERT].word_ids[sentence])] = batch[dataset.BERT].word_ids[sentence]
 
         return result
-
 
     def _compute_embeddings(self, batch, dataset):
         embeddings = np.zeros([batch[dataset.EMBEDDINGS].word_ids.shape[0],
@@ -203,8 +203,7 @@ class Network:
                     embeddings[i, j] = args.embeddings_data[batch[dataset.EMBEDDINGS].word_ids[i, j] - 1]
         return embeddings
 
-
-    #TODO predelat, kdyz uz to vraci rovnou embeddings
+    # TODO predelat, kdyz uz to vraci rovnou embeddings
     def _compute_bert_embeddings(self, batch, dataset):
         bert_embeddings = np.zeros([batch[dataset.BERT].word_ids.shape[0],
                                     batch[dataset.BERT].word_ids.shape[1],
@@ -216,10 +215,9 @@ class Network:
 
         return bert_embeddings
 
-
     @tf.function(experimental_relax_shapes=True)
     def evaluate_batch(self, inputs, factors):
-        probabilities = self.model(inputs, training=False)
+        probabilities = self.outer_model(inputs, training=False)
         if len(self.factors) == 1:
             probabilities = [probabilities]
         loss = 0
@@ -257,7 +255,6 @@ class Network:
 
             probabilities, mask = self.evaluate_batch(inp, factors)
 
-
             if any_analyses:
                 predictions = [np.argmax(p, axis=2) for p in probabilities]
 
@@ -283,7 +280,7 @@ class Network:
                             min_probability = None
                             for analysis in analysis_ids[f]:
 
-                            #TODO spatny shape, probabilities f analysis je vektor
+                                # TODO spatny shape, probabilities f analysis je vektor
                                 if analysis != dataset.UNK and (min_probability is None or analysis_probs[f][
                                     analysis] - 1e-3 < min_probability):
                                     min_probability = analysis_probs[f][analysis] - 1e-3
@@ -298,8 +295,6 @@ class Network:
                                 best_index, best_prob = index, prob
                         for f in range(len(args.factors)):
                             predictions[f][i, j] = analysis_ids[f][best_index]
-
-
 
             for fc in range(len(self.factors)):
                 self._metrics[self.factors[fc] + "Dict"](factors[fc] == predictions[fc],
@@ -360,10 +355,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
 
-    #TODO vyřešit
-    #tf.config.threading.set_inter_op_parallelism_threads(args.threads)
-    #tf.config.threading.set_intra_op_parallelism_threads(args.threads)
-    #tf.config.set_soft_device_placement(True)
+    # TODO vyřešit
+    # tf.config.threading.set_inter_op_parallelism_threads(args.threads)
+    # tf.config.threading.set_intra_op_parallelism_threads(args.threads)
+    # tf.config.set_soft_device_placement(True)
 
     if args.predict:
         # Load saved options from the model
@@ -403,7 +398,6 @@ if __name__ == "__main__":
             args.embeddings_data = embeddings_npz["embeddings"]
             args.embeddings_size = args.embeddings_data.shape[1]
 
-
     if args.predict:
         # Load training dataset maps from the checkpoint
         train = morpho_dataset.MorphoDataset.load_mappings("{}/mappings.pickle".format(args.predict))
@@ -422,6 +416,9 @@ if __name__ == "__main__":
             dev_data_path = "{}-dev.txt".format(args.data)
             test_data_path = "{}-test.txt".format(args.data)
 
+        # Nechceme to vsechno dohromady
+        if args.bert and args.bert_model:
+            warnings.warn("embeddings and whole bert model training are both selected.")
 
         train = morpho_dataset.MorphoDataset(train_data_path,
                                              embeddings=args.embeddings_words if args.embeddings else None,
@@ -437,7 +434,6 @@ if __name__ == "__main__":
         else:
             dev = None
 
-
         if os.path.exists("{}-test.txt".format(args.data)):
             test_data_path = "{}-test.txt".format(args.data)
             test = morpho_dataset.MorphoDataset(test_data_path, train=train, shuffle_batches=False,
@@ -447,10 +443,8 @@ if __name__ == "__main__":
         else:
             test = None
 
-        #test = None
-        #dev = None
-
-
+        # test = None
+        # dev = None
 
     args.elmo_size = train.elmo_size
     if args.bert:
