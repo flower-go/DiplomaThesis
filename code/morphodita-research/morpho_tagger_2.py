@@ -96,14 +96,14 @@ class Network:
             charseqs2 = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
             embeddings2 = tf.keras.layers.Input(shape=[None, args.embeddings_size], dtype=tf.float32)
 
-            inp = [word_ids2, charseq_ids2, charseqs2]
+            inp2 = [word_ids2, charseq_ids2, charseqs2]
             if (args.embeddings):
-                inp.append(embeddings2)
+                inp2.append(embeddings2)
 
             segments = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
             subwords = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-            inp.append(segments)
-            inp.append(subwords)
+            inp2.append(segments)
+            inp2.append(subwords)
 
             config = transformers.BertConfig.from_pretrained(args.bert_model)
             config.output_hidden_states = True
@@ -121,7 +121,7 @@ class Network:
             bert_output = bert_output[:, :-1]
 
             #TODO model ma 4 vstupy ale jeste pridavam ten bert_output --> treba predelat
-            self.outer_model = tf.keras.Model(inputs=inp, outputs=self.model(inp[:-2] + [bert_output]).outputs)
+            self.outer_model = tf.keras.Model(inputs=inp2, outputs=self.model(inp2[:-2] + [bert_output]))
         else:
             self.outer_model = self.model
 
