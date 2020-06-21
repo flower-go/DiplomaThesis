@@ -448,8 +448,9 @@ if __name__ == "__main__":
         # dev = None
 
     args.elmo_size = train.elmo_size
-    if args.bert:
-        args.bert_size = len(train.bert_embeddings[0][0])
+    #if args.bert:
+    #args.bert_size = len(train.bert_embeddings[0][0])
+    args.bert_size = 768
     # Construct the network
     network = Network(args=args,
                       num_words=len(train.factors[train.FORMS].words),
