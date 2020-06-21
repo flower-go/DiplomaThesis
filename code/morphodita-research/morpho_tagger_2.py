@@ -136,6 +136,7 @@ class Network:
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
+
     @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, factors):
         with tf.GradientTape() as tape:
@@ -182,11 +183,16 @@ class Network:
                 bert_embeddings = self._compute_bert(batch, dataset, sentence_lens)
                 inp.append(bert_embeddings)
 
+            if args.bert_model:
+                inp.append(batch[dataset.SUBWORDS].word_ids)
+                inp.append(batch[dataset.SEGMENTS].word_ids)
+
             self.train_batch(inp, factors)
 
     def _compute_bert(self, batch, dataset, lenghts):
 
         # max_len = np.max([len(batch[dataset.BERT].word_ids[i]) for i in range(len(batch[dataset.BERT].word_ids))])
+        #FIXME DATASET.BERT
         max_len = batch[dataset.EMBEDDINGS].word_ids.shape[1]
         result = np.zeros((len(batch[dataset.BERT].word_ids), max_len, len(batch[dataset.BERT].word_ids[0][0])))
         for sentence in range(len(batch[dataset.BERT].word_ids)):
