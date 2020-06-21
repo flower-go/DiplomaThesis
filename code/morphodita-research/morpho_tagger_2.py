@@ -46,7 +46,7 @@ class Network:
             inputs.append(tf.keras.layers.Dropout(args.word_dropout, noise_shape=[None, None, 1])(embeddings))
 
         # func bert embeddings
-        if args.bert:
+        if args.bert or args.bert_model:
             bert_embeddings = tf.keras.layers.Input(shape=[None, args.bert_size], dtype=tf.float32)
             inputs.append(tf.keras.layers.Dropout(args.word_dropout, noise_shape=[None, None, 1])(bert_embeddings))
 
@@ -120,6 +120,7 @@ class Network:
                 [bert_output, segments])
             bert_output = bert_output[:, :-1]
 
+            #TODO model ma 4 vstupy ale jeste pridavam ten bert_output --> treba predelat
             self.outer_model = tf.keras.Model(inputs=inp, outputs=self.model(inp[:-2] + [bert_output]))
         else:
             self.outer_model = self.model
