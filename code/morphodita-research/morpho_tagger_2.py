@@ -432,12 +432,15 @@ if __name__ == "__main__":
                                              elmo=re.sub("(?=,|$)", "-train.npz", args.elmo) if args.elmo else None,
                                              bert=args.bert if args.bert else None,
                                              lemma_re_strip=args.lemma_re_strip,
-                                             lemma_rule_min=args.lemma_rule_min)
+                                             lemma_rule_min=args.lemma_rule_min,
+                                             bert_model =args.bert_model if args.bert_model else None )
 
         if os.path.exists(dev_data_path):
             dev = morpho_dataset.MorphoDataset(dev_data_path, train=train, shuffle_batches=False,
                                                bert=args.bert if args.bert else None,
-                                               elmo=re.sub("(?=,|$)", "-dev.npz", args.elmo) if args.elmo else None)
+                                               elmo=re.sub("(?=,|$)", "-dev.npz", args.elmo) if args.elmo else None,
+                                               bert_model=args.bert_model if args.bert_model else None
+                                               )
         else:
             dev = None
 
@@ -445,7 +448,8 @@ if __name__ == "__main__":
             test_data_path = "{}-test.txt".format(args.data)
             test = morpho_dataset.MorphoDataset(test_data_path, train=train, shuffle_batches=False,
                                                 elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None,
-                                                bert=args.bert if args.bert else None
+                                                bert=args.bert if args.bert else None,
+                                                bert_model=args.bert_model if args.bert_model else None
                                                 )
         else:
             test = None
