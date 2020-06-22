@@ -82,7 +82,7 @@ class Network:
         inp = [word_ids, charseq_ids, charseqs]
         if (args.embeddings):
             inp.append(embeddings)
-        if args.bert:
+        if args.bert or args.bert_model:
             inp.append(bert_embeddings)
 
         self.model = tf.keras.Model(inputs=inp, outputs=outputs)
