@@ -51,9 +51,10 @@ class MorphoDataset:
             self.analyses_ids = analyses_ids
 
     def __init__(self, filename, embeddings=None, elmo=None, train=None, lemma_re_strip=None, lemma_rule_min=None,
-                 shuffle_batches=True, max_sentences=None, bert=None):
+                 shuffle_batches=True, max_sentences=None, bert=None, bert_model=None):
         # Create factors
         self.bert = bert
+        self.bert_model = bert_model
         self._factors = []
         for f in range(self.FACTORS):
             self._factors.append(self._Factor(f == self.FORMS, train._factors[f] if train else None))
