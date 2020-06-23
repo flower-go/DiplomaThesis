@@ -212,8 +212,12 @@ class MorphoDataset:
                     assert self._sentence_lens[i] == len(self._elmo[i])
 
         if bert or bert_model:
+            if bert:
+                name = bert
+            else:
+                name = bert_model
 
-            bert_file_name = (".").join(filename.split("/")[-1].split(".")[0:-1]) + "." + bert
+            bert_file_name = (".").join(filename.split("/")[-1].split(".")[0:-1]) + "." + name
             bert_path = bert_file_name + ".pickle"
             if os.path.exists(bert_path):
                 self.bert_embeddings, self.bert_subwords, self.bert_segments = \
