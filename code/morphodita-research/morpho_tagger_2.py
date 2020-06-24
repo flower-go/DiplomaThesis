@@ -67,7 +67,7 @@ class Network:
             if i:
                 hidden = tf.keras.layers.Add()([previous, hidden])
 
-        #FUNC outputs
+        # FUNC outputs
 
         outputs = []
         for factor in args.factors:
@@ -90,7 +90,7 @@ class Network:
 
         if args.bert_model:
 
-            #FUNC nove vstupy
+            # FUNC nove vstupy
             word_ids2 = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
             charseq_ids2 = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
             charseqs2 = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
@@ -108,19 +108,22 @@ class Network:
             config = transformers.BertConfig.from_pretrained(args.bert_model)
             config.output_hidden_states = True
             self.bert = transformers.TFBertModel.from_pretrained(args.bert_model,
-                                                                 config=config)
+                                               config=config)
+            model_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2][0:3]
             bert_output = tf.math.reduce_mean(
-                self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2][0:3]
-                , axis=0)[:, 1:]
+                model_output
+                , axis=0) # prumerovani vrstev
 
+            bert_output = tf.slice(bert_output, [0,1, 0], [-1,-1, -1]) #odeberu prvni sloupec
             bert_output = tf.keras.layers.Lambda(
                 lambda subseq:
                 tf.map_fn(lambda subseq:
                           tf.math.segment_mean(subseq[0], subseq[1]), subseq, dtype=tf.float32))(
                 [bert_output, segments])
-            bert_output = bert_output[:, :-1]
 
-            #TODO model ma 4 vstupy ale jeste pridavam ten bert_output --> treba predelat
+            bert_output = bert_output[:, :-1] # tady se dava pryc sep
+
+            # TODO model ma 4 vstupy ale jeste pridavam ten bert_output --> treba predelat
             self.outer_model = tf.keras.Model(inputs=inp2, outputs=self.model(inp2[:-2] + [bert_output]))
         else:
             self.outer_model = self.model
@@ -135,7 +138,6 @@ class Network:
             self._metrics[f + "Dict"] = tf.metrics.Mean()
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
-
 
     @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, factors):
@@ -192,7 +194,7 @@ class Network:
     def _compute_bert(self, batch, dataset, lenghts):
 
         # max_len = np.max([len(batch[dataset.BERT].word_ids[i]) for i in range(len(batch[dataset.BERT].word_ids))])
-        #FIXME DATASET.BERT
+        # FIXME DATASET.BERT
         max_len = batch[dataset.EMBEDDINGS].word_ids.shape[1]
         result = np.zeros((len(batch[dataset.BERT].word_ids), max_len, len(batch[dataset.BERT].word_ids[0][0])))
         for sentence in range(len(batch[dataset.BERT].word_ids)):
@@ -433,7 +435,7 @@ if __name__ == "__main__":
                                              bert=args.bert if args.bert else None,
                                              lemma_re_strip=args.lemma_re_strip,
                                              lemma_rule_min=args.lemma_rule_min,
-                                             bert_model =args.bert_model if args.bert_model else None )
+                                             bert_model=args.bert_model if args.bert_model else None)
 
         if os.path.exists(dev_data_path):
             dev = morpho_dataset.MorphoDataset(dev_data_path, train=train, shuffle_batches=False,

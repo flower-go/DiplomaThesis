@@ -227,7 +227,7 @@ class MorphoDataset:
             # precomputed does not exist, compute here
             else:
 
-                model_name = bert
+                model_name = name
                 config = transformers.BertConfig.from_pretrained(model_name)
                 config.output_hidden_states = True
 
@@ -266,7 +266,7 @@ class MorphoDataset:
                         bert_segments[-1] = np.array(bert_segments[-1], dtype=np.int32)
 
 
-                    if bert:
+                    if bert :
                         w_subwords = bert_subwords[start:]
 
                         max_len = np.max([len(w) for w in w_subwords])
@@ -279,7 +279,7 @@ class MorphoDataset:
                         #TODO průměrovat zpět na slova
                         model_output = tf.math.reduce_mean(model(word_tok, attention_mask=att_mask)[2][0:3], axis=0)
                         for s_i, s in enumerate(batch_sentences_words):
-                            last_segment = bert_segments[start + s_i][-1]
+                            last_segment = bert_segments[start + s_i][-1] + 1
                             bert_embeddings.append(tf.math.segment_mean(
                                 model_output[s_i][1:len(bert_subwords[start + s_i])],np.concatenate((bert_segments[start + s_i] ,[last_segment]))).numpy())
 
@@ -379,7 +379,7 @@ class MorphoDataset:
 
         max_subwords = max(len(self.bert_subwords[i]) for i in batch_perm)
         factors.append(self.FactorBatch(np.zeros([batch_size, max_subwords], np.int32)))
-        factors.append(self.FactorBatch(np.full([batch_size, max_subwords - 1], max_sentence_len, np.int32)))
+        factors.append(self.FactorBatch(np.full([batch_size, max_subwords - 1], max_sentence_len, np.int32))) #rpotoze odebereme prvni token
         if self.bert or self.bert_model:
             for i in range(batch_size):
                 factors[-2].word_ids[i, :len(self.bert_subwords[batch_perm[i]])] = self.bert_subwords[batch_perm[i]]
