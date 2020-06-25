@@ -277,7 +277,7 @@ class MorphoDataset:
                         att_mask = np.array(padded) != 0
 
                         #TODO průměrovat zpět na slova
-                        model_output = tf.math.reduce_mean(model(word_tok, attention_mask=att_mask)[2][0:3], axis=0)
+                        model_output = tf.math.reduce_mean(model(word_tok, attention_mask=att_mask)[2][-4:], axis=0)
                         for s_i, s in enumerate(batch_sentences_words):
                             last_segment = bert_segments[start + s_i][-1] + 1
                             bert_embeddings.append(tf.math.segment_mean(

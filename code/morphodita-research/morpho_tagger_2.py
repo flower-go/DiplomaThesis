@@ -109,7 +109,7 @@ class Network:
             config.output_hidden_states = True
             self.bert = transformers.TFBertModel.from_pretrained(args.bert_model,
                                                config=config)
-            model_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2][0:3]
+            model_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2][-4:]
             bert_output = tf.math.reduce_mean(
                 model_output
                 , axis=0) # prumerovani vrstev
@@ -186,8 +186,8 @@ class Network:
                 inp.append(bert_embeddings)
 
             if args.bert_model:
-                inp.append(batch[dataset.SUBWORDS].word_ids)
                 inp.append(batch[dataset.SEGMENTS].word_ids)
+                inp.append(batch[dataset.SUBWORDS].word_ids)
 
             self.train_batch(inp, factors)
 
@@ -261,6 +261,11 @@ class Network:
             if args.bert:
                 bert_embeddings = self._compute_bert(batch, dataset, sentence_lens)
                 inp.append(bert_embeddings)
+
+            if args.bert_model:
+                inp.append(batch[dataset.SEGMENTS].word_ids)
+                inp.append(batch[dataset.SUBWORDS].word_ids)
+
 
             probabilities, mask = self.evaluate_batch(inp, factors)
 
