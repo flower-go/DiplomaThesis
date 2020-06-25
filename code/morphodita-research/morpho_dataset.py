@@ -377,10 +377,12 @@ class MorphoDataset:
 
 
 
-        max_subwords = max(len(self.bert_subwords[i]) for i in batch_perm)
-        factors.append(self.FactorBatch(np.zeros([batch_size, max_subwords], np.int32)))
-        factors.append(self.FactorBatch(np.full([batch_size, max_subwords - 1], max_sentence_len, np.int32))) #rpotoze odebereme prvni token
+
         if self.bert or self.bert_model:
+            max_subwords = max(len(self.bert_subwords[i]) for i in batch_perm)
+            factors.append(self.FactorBatch(np.zeros([batch_size, max_subwords], np.int32)))
+            factors.append(self.FactorBatch(
+                np.full([batch_size, max_subwords - 1], max_sentence_len, np.int32)))  # rpotoze odebereme prvni token
             for i in range(batch_size):
                 factors[-2].word_ids[i, :len(self.bert_subwords[batch_perm[i]])] = self.bert_subwords[batch_perm[i]]
                 factors[-1].word_ids[i, :len(self.bert_segments[batch_perm[i]])] = self.bert_segments[batch_perm[i]]
