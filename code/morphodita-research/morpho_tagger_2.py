@@ -177,7 +177,6 @@ class Network:
         return embeddings
 
 
-    #TODO predelat, kdyz uz to vraci rovnou embeddings
     def _compute_bert_embeddings(self, batch, dataset):
         bert_embeddings = np.zeros([batch[dataset.BERT].word_ids.shape[0],
                                     batch[dataset.BERT].word_ids.shape[1],
