@@ -61,15 +61,14 @@ class Network:
                 network.train_epoch(omr.train, args)
                 metrics = network.evaluate(omr.dev, "dev", args)
 
-        raise NotImplementedError()
 
     def predict(self, dataset, args):
         # TODO: Predict method should return a list/np.ndarray of the
         # predicted label indices (no probabilities/distributions).
-        raise NotImplementedError()
+        return self.model.predict(dataset)
 
     def evaluate(self):
-        raise NotImplementedError()
+        return self.model.evaluate()
 
 
 if __name__ == "__main__":

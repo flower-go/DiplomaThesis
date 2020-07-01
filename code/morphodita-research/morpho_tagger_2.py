@@ -16,7 +16,7 @@ from keras.models import load_model
 class Network:
     def __init__(self, args, num_words, num_chars, factor_words):
 
-        if os.path.exists(args.bert_model):
+        if args.bert_model and os.path.exists(args.bert_model):
             self.model = load_model(args.bert_model)
         else:
             self.factors = args.factors
