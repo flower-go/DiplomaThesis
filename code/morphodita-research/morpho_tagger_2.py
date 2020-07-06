@@ -13,8 +13,19 @@ import warnings
 from keras.models import load_model
 
 
+class BertModel:
+    def __init__(self, name, args):
+        self.name = name
+        self.config = transformers.BertConfig.from_pretrained(name)
+        self.config.output_hidden_states = True
+        self.tokenizer = transformers.BertTokenizer.from_pretrained(name)
+        self.model = transformers.TFBertModel.from_pretrained(name,
+                                                              config=self.config)
+        self.embeddings_only=True if args.bert else False
+
+
 class Network:
-    def __init__(self, args, num_words, num_chars, factor_words):
+    def __init__(self, args, num_words, num_chars, factor_words, model):
 
         if args.bert_model and os.path.exists(args.bert_model):
             self.model = load_model(args.bert_model)
@@ -109,10 +120,7 @@ class Network:
             inp2.append(segments)
             inp2.append(subwords)
 
-            config = transformers.BertConfig.from_pretrained(args.bert_model)
-            config.output_hidden_states = True
-            self.bert = transformers.TFBertModel.from_pretrained(args.bert_model,
-                                               config=config)
+            self.bert = model.model
             model_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2][-4:]
             bert_output = tf.math.reduce_mean(
                 model_output
@@ -426,60 +434,53 @@ if __name__ == "__main__":
                                                bert=args.bert)
     else:
         # Load input data
+        data_paths = [None] * 3
         if args.debug_mode:
             print("DEBUG MODE")
-            train_data_path = "{}-train-small.txt".format(args.data)
-            dev_data_path = "{}-dev-small.txt".format(args.data)
-            test_data_path = "{}-test-small.txt".format(args.data)
+            data_paths[0] = "{}-train-small.txt".format(args.data)
+            data_paths[1] = "{}-dev-small.txt".format(args.data)
+            data_paths[2] = "{}-test-small.txt".format(args.data)
         else:
-            train_data_path = "{}-train.txt".format(args.data)
-            dev_data_path = "{}-dev.txt".format(args.data)
-            test_data_path = "{}-test.txt".format(args.data)
+            data_paths[0] = "{}-train.txt".format(args.data)
+            data_paths[1] = "{}-dev.txt".format(args.data)
+            data_paths[2] = "{}-test.txt".format(args.data)
 
         # Nechceme to vsechno dohromady
         if args.bert and args.bert_model:
             warnings.warn("embeddings and whole bert model training are both selected.")
 
-        train = morpho_dataset.MorphoDataset(train_data_path,
+        model_bert = None
+        if args.bert or args.bert_model:
+            if args.bert:
+                name = args.bert
+            else:
+                name = args.bert_model
+            model_bert = BertModel(name, args)
+
+        #TODO udelat cyklus
+        #TODO udelat jeden objekt na ten model a jmeno atd...
+        datasets = [None] * 3
+        for i,d in enumerate(["train", "dev","test"]):
+            if os.path.exists(data_paths[i]):
+                datasets[i] = morpho_dataset.MorphoDataset(data_paths[i],
                                              embeddings=args.embeddings_words if args.embeddings else None,
-                                             elmo=re.sub("(?=,|$)", "-train.npz", args.elmo) if args.elmo else None,
-                                             bert=args.bert if args.bert else None,
+                                             elmo=re.sub("(?=,|$)", "-" + d + ".npz", args.elmo) if args.elmo else None,
                                              lemma_re_strip=args.lemma_re_strip,
                                              lemma_rule_min=args.lemma_rule_min,
-                                             bert_model=args.bert_model if args.bert_model else None)
+                                             bert=model_bert)
 
-        if os.path.exists(dev_data_path):
-            dev = morpho_dataset.MorphoDataset(dev_data_path, train=train, shuffle_batches=False,
-                                               bert=args.bert if args.bert else None,
-                                               elmo=re.sub("(?=,|$)", "-dev.npz", args.elmo) if args.elmo else None,
-                                               bert_model=args.bert_model if args.bert_model else None
-                                               )
-        else:
-            dev = None
-
-        if os.path.exists("{}-test.txt".format(args.data)):
-            test_data_path = "{}-test.txt".format(args.data)
-            test = morpho_dataset.MorphoDataset(test_data_path, train=train, shuffle_batches=False,
-                                                elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None,
-                                                bert=args.bert if args.bert else None,
-                                                bert_model=args.bert_model if args.bert_model else None
-                                                )
-        else:
-            test = None
-
-        # test = None
-        # dev = None
-
+    train = datasets[0]
     args.elmo_size = train.elmo_size
-    #if args.bert:
-    #args.bert_size = len(train.bert_embeddings[0][0])
+
+    #TODO nacitat velikost
     args.bert_size = 768
     # Construct the network
     network = Network(args=args,
                       num_words=len(train.factors[train.FORMS].words),
                       num_chars=len(train.factors[train.FORMS].alphabet),
                       factor_words=dict(
-                          (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors))
+                          (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors),
+                      model=model_bert)
 
     # TODO nemame predikci !!!
     if args.predict:
@@ -498,7 +499,8 @@ if __name__ == "__main__":
             for epoch in range(epochs):
                 network.train_epoch(train, args, learning_rate)
 
-                if dev:
+                if datasets[1]:
+                    dev = datasets[1]
                     metrics = network.evaluate(dev, "dev", args)
                     metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
                     for f in [sys.stderr, log_file]:
@@ -509,7 +511,8 @@ if __name__ == "__main__":
         train.save_mappings("{}/mappings.pickle".format(args.logdir))
         network.outer_model.save(args.logdir + "/saved_model")
 
-        if test:
+        if datasets[2]:
+            test = datasets[2]
             metrics = network.evaluate(test, "test", args)
             metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
             for f in [sys.stderr, log_file]:

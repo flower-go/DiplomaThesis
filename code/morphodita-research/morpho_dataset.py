@@ -51,10 +51,9 @@ class MorphoDataset:
             self.analyses_ids = analyses_ids
 
     def __init__(self, filename, embeddings=None, elmo=None, train=None, lemma_re_strip=None, lemma_rule_min=None,
-                 shuffle_batches=True, max_sentences=None, bert=None, bert_model=None):
+                 shuffle_batches=True, max_sentences=None, bert=None):
         # Create factors
-        self.bert = bert
-        self.bert_model = bert_model
+        self.bert=bert
         self._factors = []
         for f in range(self.FACTORS):
             self._factors.append(self._Factor(f == self.FORMS, train._factors[f] if train else None))
@@ -211,13 +210,9 @@ class MorphoDataset:
                 for i in range(sentences):
                     assert self._sentence_lens[i] == len(self._elmo[i])
 
-        if bert or bert_model:
-            if bert:
-                name = bert
-            else:
-                name = bert_model
+        if bert:
 
-            bert_file_name = (".").join(filename.split("/")[-1].split(".")[0:-1]) + "." + name
+            bert_file_name = (".").join(filename.split("/")[-1].split(".")[0:-1]) + "." + bert.name
             bert_path = bert_file_name + ".pickle"
             if os.path.exists(bert_path):
                 self.bert_embeddings, self.bert_subwords, self.bert_segments = \
@@ -226,14 +221,8 @@ class MorphoDataset:
 
             # precomputed does not exist, compute here
             else:
-
-                model_name = name
-                config = transformers.BertConfig.from_pretrained(model_name)
-                config.output_hidden_states = True
-
-                tokenizer = transformers.BertTokenizer.from_pretrained(model_name)
-                model = transformers.TFBertModel.from_pretrained(model_name,
-                                                                 config=config)
+                tokenizer = bert.tokenizer
+                model = bert.model
 
                 sentences_words = self._factors[self.FORMS].word_strings
 
@@ -266,7 +255,7 @@ class MorphoDataset:
                         bert_segments[-1] = np.array(bert_segments[-1], dtype=np.int32)
 
 
-                    if bert :
+                    if bert.embeddings_only :
                         w_subwords = bert_subwords[start:]
 
                         max_len = np.max([len(w) for w in w_subwords])
@@ -369,16 +358,15 @@ class MorphoDataset:
                 factors[-1].word_ids[i, :len(self._elmo[batch_perm[i]])] = self._elmo[batch_perm[i]]
 
         # BERT
-        forms = self._factors[self.FORMS]
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len,768], np.float)))
-        if self.bert:
+        if self.bert.embeddings_only:
             for i in range(batch_size):
                 factors[-1].word_ids[i, :len(self.bert_embeddings[batch_perm[i]])] = self.bert_embeddings[batch_perm[i]]
 
 
 
 
-        if self.bert or self.bert_model:
+        if self.bert:
             max_subwords = max(len(self.bert_subwords[i]) for i in batch_perm)
             factors.append(self.FactorBatch(np.zeros([batch_size, max_subwords], np.int32)))
             factors.append(self.FactorBatch(
