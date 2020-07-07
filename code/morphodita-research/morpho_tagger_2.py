@@ -203,6 +203,8 @@ class Network:
 
             self.train_batch(inp, factors)
 
+    #TODO create inputs jako jednu metodu pro train i evaluate!
+    #TODO vytvareni modelu jako jedna metoda pro outer i inner model
     def _compute_bert(self, batch, dataset, lenghts):
 
         # max_len = np.max([len(batch[dataset.BERT].word_ids[i]) for i in range(len(batch[dataset.BERT].word_ids))])
@@ -500,6 +502,7 @@ if __name__ == "__main__":
                 network.train_epoch(train, args, learning_rate)
 
                 if datasets[1]:
+                    print("evaluate")
                     dev = datasets[1]
                     metrics = network.evaluate(dev, "dev", args)
                     metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))

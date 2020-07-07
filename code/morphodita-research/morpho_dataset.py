@@ -270,7 +270,7 @@ class MorphoDataset:
                         for s_i, s in enumerate(batch_sentences_words):
                             last_segment = bert_segments[start + s_i][-1] + 1
                             bert_embeddings.append(tf.math.segment_mean(
-                                model_output[s_i][1:len(bert_subwords[start + s_i])],np.concatenate((bert_segments[start + s_i] ,[last_segment]))).numpy())
+                                model_output[s_i][1:len(bert_subwords[start + s_i])-1],bert_segments[start + s_i],[last_segment]).numpy())
 
 
                 #TODO jak ukládat, je treba slova?
