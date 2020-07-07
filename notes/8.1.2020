@@ -12,11 +12,11 @@ Nemáme
 
 Chceme měřit:
 - bez slovníku/se slovníkem
-- s bertem (jen embeddingy co lezou z Berta - jako elmo)
+- s bertem (jen embeddingy co lezou z Berta - jako elmo) = self.model
 - fine tunning berta (tady je to průměrování - ono to rozseká na menší divný kusy a já je pak zprůměruju a strčim do toho,
 co už mám teď napsaný (to chce jen jedno to číslo) - tf.math.segment_mean) - k tomu potřebuju ještě vědět který kousky jsou
-k jakýmu slovu
-- jenom berta bez všech těch věcí
+k jakýmu slovu = self.outer_model (1 epocha, malý learning rate)
+- jenom berta bez všech těch věcí (je třeba k tomu dát character level embeddingy <- ty už se počítaj (připojim k tomu co vypadne z toho berta) )
 
 text:
 
@@ -38,3 +38,4 @@ slovník - opíšu z toho starýho
 
 embedingy přidat do datasetu! a ukládat
 musí to být po batchích
+

@@ -22,24 +22,57 @@ X pridat slovnik
         X opravit pocitani predikci
 
 - pridat loss pro dvojice factors
+X pridat berta jen embeddingy + ukladat predpoctene
 
-- pridat berta jen embeddingy + ukladat predpoctene
-    - vytvorit model a tokenizer - v dataset u pocitani
-    - vracet vysledky v morpho_dataset next batch
-    - predavat argument o bertu k datasetu
-    - pridat do inputu modelu stejne jako embeddings co tam jsou
+    X vytvorit model a tokenizer - v dataset u pocitani
+    X vracet vysledky v morpho_dataset next batch
+    X ulozit predpoctene vysledky
+    X predavat argument o bertu k datasetu
+    X pridat do inputu modelu stejne jako embeddings co tam jsou
+    X predavat v metodach do grafu
+    X pridat bert do dev a test datasetu
+    X pridat unk a pad
+        X kam?
+        X pridat
+    X jsou not found jen paddings a unknown? (asi ano!)
+    X ukladat v datasetu primo embeddingy
+    X zajistit spravne indexovani
+    X zmenit train a evaluate
+    X do argumentu bert dát jmeno modelu
+    X prejmenovat soubory
+
+- oprava a provereni kodu
+    - opravit embeddings po vetach
+        X prepsat vypocet
+        X prepsat nacitani
+        X prepsat ukladani
+        X prepsat pouzivani train a evaluate
+    - proverit:
+        (R) bez label smoothingu
+        (R) s label smoothingem
+        - verze před dictionary, kde bylo těch 96 (v commitu 394f125b43b25045945eb78df4f7ab852fa08e84 jsem opravovala loss function)
+        - s bertem bez label smoothingu
+        - s bertem a label smoothingem
 
 ================================================================================
 PHASE 2
 ================================================================================
 - pridat berta poradne a prumerovat embeddingy :(
+
+
 - sentiment s bertem bez preprocessingu (ktrain?)
+    - vytvorit model
+    - natrenovani code stejne jako u taggeru
 
 ================================================================================
 PHASE 3
 ================================================================================
-- sentiment s bertem
-    (?) nad UFAL obludou (kam az to chceme?)
-
-- naplanovat jak udelam NER
+- NER
+    - zapojit NER do taggeru
+        - pridat treti typ factors
+        - zaridit, ze to predpovida ty spravne veci pro spravna data
+        - namixovat data do batche z obou datasetu
+        - pridat do modelu vypocet
+        (?) jak bude vypadat loss?
+    - NER samostatne (z existujiciho kodu?)
 
