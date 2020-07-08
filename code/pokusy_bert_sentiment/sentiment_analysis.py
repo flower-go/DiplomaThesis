@@ -59,7 +59,7 @@ class Network:
             b.set_value(self.model.optimizer.learning_rate, lr)
             for i in range(e):
                 network.train_epoch(omr.train, args)
-                metrics = network.evaluate()
+                metrics = network.evaluate(omr.dev, "dev", args)
 
 
     def predict(self, dataset, args):
@@ -67,8 +67,8 @@ class Network:
         # predicted label indices (no probabilities/distributions).
         return self.model.predict(dataset)
 
-    def evaluate(self):
-        return self.model.evaluate()
+    def evaluate(self, dataset, name, args):
+        return self.model.evaluate(dataset.data["tokens"], dataset.data["labels"])
 
 
 if __name__ == "__main__":
@@ -111,6 +111,7 @@ if __name__ == "__main__":
     facebook = TextClassificationDataset("czech_facebook", tokenizer=tokenizer.encode)
     facebook.train._data["labels"] = facebook.train._data["labels"][:10]
     facebook.train._data["tokens"] = facebook.train._data["tokens"][:10]
+    facebook.train._size = len(facebook.train._data["tokens"])
 
     # Create the network and train
     network = Network(args, len(facebook.train.LABELS))
