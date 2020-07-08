@@ -59,7 +59,7 @@ class Network:
             b.set_value(self.model.optimizer.learning_rate, lr)
             for i in range(e):
                 network.train_epoch(omr.train, args)
-                metrics = network.evaluate(omr.dev, "dev", args)
+                metrics = network.evaluate()
 
 
     def predict(self, dataset, args):
