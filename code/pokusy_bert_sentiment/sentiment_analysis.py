@@ -109,6 +109,8 @@ if __name__ == "__main__":
     # should be a callable that given a sentence in a string produces
     # a list/np.ndarray of token integers.
     facebook = TextClassificationDataset("czech_facebook", tokenizer=tokenizer.encode)
+    facebook.train._data["labels"] = facebook.train._data["labels"][:10]
+    facebook.train._data["tokens"] = facebook.train._data["tokens"][:10]
 
     # Create the network and train
     network = Network(args, len(facebook.train.LABELS))
