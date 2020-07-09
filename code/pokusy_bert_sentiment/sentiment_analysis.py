@@ -68,7 +68,8 @@ class Network:
         return self.model.predict(dataset)
 
     def evaluate(self, dataset, name, args):
-        return self.model.evaluate(dataset.data["tokens"], dataset.data["labels"])
+        #zarovnat na stejnou delku a nacpat jako tensor nebo array
+        return self.model.evaluate(np.asarray(dataset.data["tokens"]), np.asarray(dataset.data["labels"]))
 
 
 if __name__ == "__main__":
