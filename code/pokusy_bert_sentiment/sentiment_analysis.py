@@ -69,7 +69,14 @@ class Network:
 
     def evaluate(self, dataset, name, args):
         #zarovnat na stejnou delku a nacpat jako tensor nebo array
-        return self.model.evaluate(np.asarray(dataset.data["tokens"]), np.asarray(dataset.data["labels"]))
+        data = self._tranform_dataset(dataset.data["tokens"])
+        return self.model.evaluate(self._tranform_dataset(dataset.data["tokens"]), np.asarray(dataset.data["labels"]), 16)
+
+    def _tranform_dataset(self, dataset):
+        max_len = max(len(a) for a in dataset)
+        dataset = [i + [0]*(max_len - len(i)) for i in dataset]
+        return np.asarray(dataset)
+
 
 
 if __name__ == "__main__":
