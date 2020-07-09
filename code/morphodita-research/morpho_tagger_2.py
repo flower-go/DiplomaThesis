@@ -460,18 +460,29 @@ if __name__ == "__main__":
             model_bert = BertModel(name, args)
 
         #TODO udelat cyklus
-        #TODO udelat jeden objekt na ten model a jmeno atd...
-        datasets = [None] * 3
-        for i,d in enumerate(["train", "dev","test"]):
-            if os.path.exists(data_paths[i]):
-                datasets[i] = morpho_dataset.MorphoDataset(data_paths[i],
+        train = morpho_dataset.MorphoDataset(data_paths[0],
                                              embeddings=args.embeddings_words if args.embeddings else None,
-                                             elmo=re.sub("(?=,|$)", "-" + d + ".npz", args.elmo) if args.elmo else None,
+                                             elmo=re.sub("(?=,|$)", "-train.npz", args.elmo) if args.elmo else None,
+                                             bert=args.bert if args.bert else None,
                                              lemma_re_strip=args.lemma_re_strip,
-                                             lemma_rule_min=args.lemma_rule_min,
-                                             bert=model_bert)
+                                             lemma_rule_min=args.lemma_rule_min)
 
-    train = datasets[0]
+        if os.path.exists(data_paths[1]):
+            dev = morpho_dataset.MorphoDataset(data_paths[1], train=train, shuffle_batches=False,
+                                               bert=args.bert if args.bert else None,
+                                               elmo=re.sub("(?=,|$)", "-dev.npz", args.elmo) if args.elmo else None)
+        else:
+            dev = None
+
+
+        if os.path.exists(data_paths[2]):
+            test = morpho_dataset.MorphoDataset(data_paths[2], train=train, shuffle_batches=False,
+                                                elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None,
+                                                bert=args.bert if args.bert else None
+                                                )
+        else:
+            test = None
+
     args.elmo_size = train.elmo_size
 
     #TODO nacitat velikost
@@ -501,9 +512,8 @@ if __name__ == "__main__":
             for epoch in range(epochs):
                 network.train_epoch(train, args, learning_rate)
 
-                if datasets[1]:
+                if dev:
                     print("evaluate")
-                    dev = datasets[1]
                     metrics = network.evaluate(dev, "dev", args)
                     metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
                     for f in [sys.stderr, log_file]:
@@ -514,8 +524,7 @@ if __name__ == "__main__":
         train.save_mappings("{}/mappings.pickle".format(args.logdir))
         network.outer_model.save(args.logdir + "/saved_model")
 
-        if datasets[2]:
-            test = datasets[2]
+        if test:
             metrics = network.evaluate(test, "test", args)
             metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
             for f in [sys.stderr, log_file]:
