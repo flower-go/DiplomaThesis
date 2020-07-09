@@ -65,7 +65,7 @@ class Network:
     def predict(self, dataset, args):
         # TODO: Predict method should return a list/np.ndarray of the
         # predicted label indices (no probabilities/distributions).
-        return self.model.predict(dataset)
+        return self.model.predict(self._tranform_dataset(dataset), batch_size=16)
 
     def evaluate(self, dataset, name, args):
         #zarovnat na stejnou delku a nacpat jako tensor nebo array
