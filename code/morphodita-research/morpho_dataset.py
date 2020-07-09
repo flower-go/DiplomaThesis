@@ -359,7 +359,7 @@ class MorphoDataset:
 
         # BERT
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len,768], np.float)))
-        if self.bert.embeddings_only:
+        if self.bert and self.bert.embeddings_only:
             for i in range(batch_size):
                 factors[-1].word_ids[i, :len(self.bert_embeddings[batch_perm[i]])] = self.bert_embeddings[batch_perm[i]]
 
