@@ -65,14 +65,13 @@ class Network:
     def predict(self, dataset, args):
         # TODO: Predict method should return a list/np.ndarray of the
         # predicted label indices (no probabilities/distributions).
-        return self.model.predict(self._tranform_dataset(dataset), batch_size=16)
+        return self.model.predict(self._transform_dataset(dataset.data["tokens"]), batch_size=16)
 
     def evaluate(self, dataset, name, args):
         #zarovnat na stejnou delku a nacpat jako tensor nebo array
-        data = self._tranform_dataset(dataset.data["tokens"])
-        return self.model.evaluate(self._tranform_dataset(dataset.data["tokens"]), np.asarray(dataset.data["labels"]), 16)
+        return self.model.evaluate(self._transform_dataset(dataset.data["tokens"]), np.asarray(dataset.data["labels"]), 16)
 
-    def _tranform_dataset(self, dataset):
+    def _transform_dataset(self, dataset):
         max_len = max(len(a) for a in dataset)
         dataset = [i + [0]*(max_len - len(i)) for i in dataset]
         return np.asarray(dataset)
@@ -117,9 +116,9 @@ if __name__ == "__main__":
     # should be a callable that given a sentence in a string produces
     # a list/np.ndarray of token integers.
     facebook = TextClassificationDataset("czech_facebook", tokenizer=tokenizer.encode)
-    facebook.train._data["labels"] = facebook.train._data["labels"][:10]
-    facebook.train._data["tokens"] = facebook.train._data["tokens"][:10]
-    facebook.train._size = len(facebook.train._data["tokens"])
+    #facebook.train._data["labels"] = facebook.train._data["labels"][:10]
+    #facebook.train._data["tokens"] = facebook.train._data["tokens"][:10]
+    #facebook.train._size = len(facebook.train._data["tokens"])
 
     # Create the network and train
     network = Network(args, len(facebook.train.LABELS))
@@ -133,4 +132,5 @@ if __name__ == "__main__":
     if os.path.isdir(args.logdir): out_path = os.path.join(args.logdir, out_path)
     with open(out_path, "w", encoding="utf-8") as out_file:
         for label in network.predict(facebook.test, args):
+            label = np.argmax(label)
             print(facebook.test.LABELS[label], file=out_file)
