@@ -462,23 +462,21 @@ if __name__ == "__main__":
         #TODO udelat cyklus
         train = morpho_dataset.MorphoDataset(data_paths[0],
                                              embeddings=args.embeddings_words if args.embeddings else None,
-                                             elmo=re.sub("(?=,|$)", "-train.npz", args.elmo) if args.elmo else None,
-                                             bert=args.bert if args.bert else None,
+                                             bert=model_bert,
                                              lemma_re_strip=args.lemma_re_strip,
                                              lemma_rule_min=args.lemma_rule_min)
 
         if os.path.exists(data_paths[1]):
             dev = morpho_dataset.MorphoDataset(data_paths[1], train=train, shuffle_batches=False,
-                                               bert=args.bert if args.bert else None,
-                                               elmo=re.sub("(?=,|$)", "-dev.npz", args.elmo) if args.elmo else None)
+                                               bert=model_bert
+                                               )
         else:
             dev = None
 
 
         if os.path.exists(data_paths[2]):
             test = morpho_dataset.MorphoDataset(data_paths[2], train=train, shuffle_batches=False,
-                                                elmo=re.sub("(?=,|$)", "-test.npz", args.elmo) if args.elmo else None,
-                                                bert=args.bert if args.bert else None
+                                                bert=model_bert
                                                 )
         else:
             test = None
