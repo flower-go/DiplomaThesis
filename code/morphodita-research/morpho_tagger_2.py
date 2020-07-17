@@ -453,7 +453,9 @@ if __name__ == "__main__":
 
         model_bert = None
         if args.bert or args.bert_model:
-            if args.bert:
+            if args.bert_model and os.path.exists(args.bert_model):
+                name = "bert-base-multilingual-uncased"
+            elif args.bert:
                 name = args.bert
             else:
                 name = args.bert_model
