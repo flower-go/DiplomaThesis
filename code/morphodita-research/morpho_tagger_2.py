@@ -27,11 +27,12 @@ class BertModel:
 class Network:
     def __init__(self, args, num_words, num_chars, factor_words, model):
 
+        self.factors = args.factors
+        self.factor_words = factor_words
         if args.bert_model and os.path.exists(args.bert_model):
             self.model = load_model(args.bert_model)
         else:
-            self.factors = args.factors
-            self.factor_words = factor_words
+
 
             word_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
             charseq_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
