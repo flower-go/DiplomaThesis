@@ -29,6 +29,7 @@ class Network:
 
         self.factors = args.factors
         self.factor_words = factor_words
+        self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
         if args.bert_model and os.path.exists(args.bert_model):
             self.model = load_model(args.bert_model)
         else:
@@ -103,7 +104,7 @@ class Network:
                 inp.append(bert_embeddings)
 
             self.model = tf.keras.Model(inputs=inp, outputs=outputs)
-            self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
+
 
         if args.bert_model:
             # FUNC nove vstupy
