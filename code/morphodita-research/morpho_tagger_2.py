@@ -30,6 +30,8 @@ class Network:
         self.factors = args.factors
         self.factor_words = factor_words
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
+        if args.cont:
+            self.outer_model = load_model(args.model)
         if args.bert_model and os.path.exists(args.bert_model):
             self.model = load_model(args.bert_model)
         else:
@@ -382,8 +384,10 @@ if __name__ == "__main__":
     parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
     parser.add_argument("--bert", default=None, type=str, help="Bert model for embeddings")
     parser.add_argument("--bert_model", default=None, type=str, help="Bert model for training")
+    parser.add_argument("--cont", default=0, type=int, help="load finetuned model and continue training?")
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
+    args.cont = args.cont == 1
 
     # TODO vyřešit
     # tf.config.threading.set_inter_op_parallelism_threads(args.threads)
