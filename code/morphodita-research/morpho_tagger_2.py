@@ -31,7 +31,7 @@ class Network:
         self.factor_words = factor_words
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
         if args.cont:
-            self.outer_model = load_model(args.model)
+            self.outer_model = load_model(args.bert_model)
         if args.bert_model and os.path.exists(args.bert_model):
             self.model = load_model(args.bert_model)
         else:
