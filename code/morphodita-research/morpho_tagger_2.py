@@ -30,8 +30,6 @@ class Network:
         self.factors = args.factors
         self.factor_words = factor_words
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
-        if args.cont:
-            self.outer_model = load_model(args.bert_model)
         if args.bert_model and os.path.exists(args.bert_model):
             self.model = load_model(args.bert_model)
         else:
@@ -514,6 +512,13 @@ if __name__ == "__main__":
         print("Tagging with args:", "\n".join(("{}: {}".format(key, value) for key, value in sorted(vars(args).items())
                                                if key not in ["embeddings_data", "embeddings_words"])), flush=True)
 
+
+        def test_eval():
+            metrics = network.evaluate(test, "test", args)
+            metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
+            for f in [sys.stderr, log_file]:
+                print("Test, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f, flush=True)
+
         for i, (epochs, learning_rate) in enumerate(args.epochs):
             for epoch in range(epochs):
                 network.train_epoch(train, args, learning_rate)
@@ -526,12 +531,12 @@ if __name__ == "__main__":
                         print("Dev, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f,
                               flush=True)
 
+                if args.cont and test:
+                    test_eval()
+
         # network.saver_inference.save(network.session, "{}/checkpoint-inference".format(args.logdir), write_meta_graph=False)
         train.save_mappings("{}/mappings.pickle".format(args.logdir))
         network.outer_model.save(args.logdir + "/saved_model")
 
         if test:
-            metrics = network.evaluate(test, "test", args)
-            metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
-            for f in [sys.stderr, log_file]:
-                print("Test, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f, flush=True)
+            test_eval()
