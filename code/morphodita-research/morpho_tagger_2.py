@@ -169,20 +169,12 @@ class Network:
                 else:
                     loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
         gradients = tape.gradient(loss, self.outer_model.trainable_variables)
-        self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
+        return gradients, probabilities, loss
 
-        tf.summary.experimental.set_step(self._optimizer.iterations)
-        with self._writer.as_default():
-            for name, metric in self._metrics.items():
-                metric.reset_states()
-            self._metrics["loss"](loss)
-            for i in range(len(self.factors)):
-                self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
-            for name, metric in self._metrics.items():
-                tf.summary.scalar("train/{}".format(name), metric.result())
 
     def train_epoch(self, dataset, args, learning_rate):
         self._optimizer.learning_rate = learning_rate
+        aggregate = False
         while not train.epoch_finished():
             sentence_lens, batch = dataset.next_batch(args.batch_size)
             factors = []
@@ -203,7 +195,35 @@ class Network:
                 inp.append(batch[dataset.SEGMENTS].word_ids)
                 inp.append(batch[dataset.SUBWORDS].word_ids)
 
-            self.train_batch(inp, factors)
+
+            g, p, l = self.train_batch(inp, factors)
+            gradients = None
+            probabilities = None
+            loss =None
+
+            if aggregate:
+                gradients = gradients + g
+                probabilities = probabilities.concatenate(p)
+                loss = loss + l
+                self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
+
+                tf.summary.experimental.set_step(self._optimizer.iterations)
+                with self._writer.as_default():
+                    for name, metric in self._metrics.items():
+                        metric.reset_states()
+                    self._metrics["loss"](loss)
+                    for i in range(len(self.factors)):
+                        self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
+                    for name, metric in self._metrics.items():
+                        tf.summary.scalar("train/{}".format(name), metric.result())
+                aggregate = False
+            else:
+                gradients = g
+                probabilities = p
+                loss = l
+                aggregate = True
+
+
 
     #TODO create inputs jako jednu metodu pro train i evaluate!
     #TODO vytvareni modelu jako jedna metoda pro outer i inner model
