@@ -175,6 +175,9 @@ class Network:
     def train_epoch(self, dataset, args, learning_rate):
         self._optimizer.learning_rate = learning_rate
         aggregate = False
+        gradients = None
+        probabilities = None
+        loss = None
         while not train.epoch_finished():
             sentence_lens, batch = dataset.next_batch(args.batch_size)
             factors = []
@@ -197,13 +200,15 @@ class Network:
 
 
             g, p, l = self.train_batch(inp, factors)
-            gradients = None
-            probabilities = None
-            loss =None
+
 
             if aggregate:
-                gradients = gradients + g
-                probabilities = probabilities.concatenate(p)
+                for i in range(len(g)):
+                    if isinstance(g[i],tf.IndexedSlices):
+                        gradients[i] = tf.concat((gradients[i],g[i]), axis=0)
+                    else:
+                        gradients[i] = gradients[i] + g[i]
+                probabilities = probabilities + p
                 loss = loss + l
                 self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
 
