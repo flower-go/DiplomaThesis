@@ -178,6 +178,7 @@ class Network:
                 self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
             for name, metric in self._metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
+        print(len(gradients))
         return gradients
 
 
@@ -185,8 +186,7 @@ class Network:
         self._optimizer.learning_rate = learning_rate
         aggregate = False
         gradients = None
-        probabilities = None
-        loss = None
+
         while not train.epoch_finished():
             sentence_lens, batch = dataset.next_batch(args.batch_size)
             factors = []
@@ -213,10 +213,12 @@ class Network:
 
 
             if aggregate:
+                print(len(g))
                 for i in range(len(g)):
                     if isinstance(g[i],tf.IndexedSlices):
                         gradients[i] = tf.concat((gradients[i],g[i]), axis=0)
-                    else:
+                    elif g[i] !=  None:
+                        print(g[i])
                         gradients[i] = gradients[i] + g[i]
                 self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
 
