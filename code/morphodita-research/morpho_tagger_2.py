@@ -169,7 +169,16 @@ class Network:
                 else:
                     loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
         gradients = tape.gradient(loss, self.outer_model.trainable_variables)
-        return gradients, probabilities, loss
+        tf.summary.experimental.set_step(self._optimizer.iterations)
+        with self._writer.as_default():
+            for name, metric in self._metrics.items():
+                metric.reset_states()
+            self._metrics["loss"](loss)
+            for i in range(len(self.factors)):
+                self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
+            for name, metric in self._metrics.items():
+                tf.summary.scalar("train/{}".format(name), metric.result())
+        return gradients
 
 
     def train_epoch(self, dataset, args, learning_rate):
@@ -199,7 +208,7 @@ class Network:
                 inp.append(batch[dataset.SUBWORDS].word_ids)
 
 
-            g, p, l = self.train_batch(inp, factors)
+            g = self.train_batch(inp, factors)
             print(len(g))
 
 
@@ -209,24 +218,12 @@ class Network:
                         gradients[i] = tf.concat((gradients[i],g[i]), axis=0)
                     else:
                         gradients[i] = gradients[i] + g[i]
-                probabilities = probabilities + p
-                loss = loss + l
                 self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
 
-                tf.summary.experimental.set_step(self._optimizer.iterations)
-                with self._writer.as_default():
-                    for name, metric in self._metrics.items():
-                        metric.reset_states()
-                    self._metrics["loss"](loss)
-                    for i in range(len(self.factors)):
-                        self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
-                    for name, metric in self._metrics.items():
-                        tf.summary.scalar("train/{}".format(name), metric.result())
+
                 aggregate = False
             else:
                 gradients = g
-                probabilities = p
-                loss = l
                 aggregate = True
 
 
