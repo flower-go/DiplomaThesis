@@ -200,6 +200,7 @@ class Network:
 
 
             g, p, l = self.train_batch(inp, factors)
+            print(len(g))
 
 
             if aggregate:
