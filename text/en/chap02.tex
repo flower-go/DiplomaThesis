@@ -1,5 +1,33 @@
-\chapter{Title of the second chapter}
+\chapter{Implementation analysis}
+\label{chap:impl}
+This chapter describes implemented linguistic models. As mentioned before, this work implements models for three Czech NLP tasks: tagging, lemmatization and sentiment analysis. Common model for first two tasks develops on the paper by \cite[]{straka2019czech} focused on application of contextual embeddings produced by language models as Bert %todo cite
+ or Flair. %todo cite. 
+ Third task, sentiment analysis, is perfomed by adding only one fully-connected layer at the top of bert model. So in the opposite to previous tasks, no sophisticated handcrafted pipeline is built and model relies only on the network powers.
+Code for all models is available as an attachement of the thesis.
+ \section{POS tagging and lemmatization model}
+As mentioned earlier, model for this part is build upon a model (and a code) for previous work on Czech NLP processing with contextual embeddings \cite[]{straka2019czech}. Data preparation %todo trida s odkazem do github
+pipeline - tokenization and sentence segmentation is taken over from the paper as well as base structure of lemmatizer and tagger network. 
 
-\section{Title of the first subchapter of the second chapter}
 
-\section{Title of the second subchapter of the second chapter}
+%obrazek site - UDPipe 2.0 - vrstvy, optimizer
+   %POS tagging a lemma jako classification (viz Milanův článek)
+   %POS tagging a lemmata in one join network
+   %embeddings - pretrained we - jaké to jsou?, trained we, character embeddings, bert jako prumerovani 
+   %dictionary
+
+
+
+
+
+%jak ten model vypada 
+%bert embeddings - vdlijost
+%bert model
+%na cem se to evaluje - PDT popsat, sentment analysis data popsat
+
+
+%obrazek berta
+%implementace pokusneho kodu 
+%použité knihovny - transformers
+
+
+

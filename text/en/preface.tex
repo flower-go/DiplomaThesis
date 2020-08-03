@@ -1,3 +1,34 @@
 \chapter*{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
 
+
+This work aim to improve some natural language processing (NLP) tasks for Czech \todo{seznam zkratek} with the use of recently published artificial intelligence (AI) state-of-the-art techniques. In Deep Learning book \cite, NLP is
+defined as "...the use of human languages, such as English or French, by a computer." \cite[]{Goodfellow-et-al-2016}. NLP offers a variety of problems to solve from oral--written language conversion, machine translation, syntax analysis used for automatic grammar correction as well as it serve as a base for further linguistic processing. Semantic analysis includes in addition to already mentioned machine translation tasks like sentiment analysis, natural language text generation or recognition
+of homonymy or polysemy of given words. It could solve sophisticated assignments as answering questions about the input text document.
+
+\cite{BERT_ORIG}
+\section*{Tasks definition}
+\todo{obrazky k taskum s priklady}
+This work aims to apply the most successful NLP methods of recent years to Czech NLP task - namely tagging, lemmatization and sentiment analysis. Tagging and lemmatization represents syntax analysis, in contrast with sentiment analysis which represents semantic type of tasks. \todo{dát priklady jinych tasku}
+The practical part of this work is focused on these tasks:
+\begin{itemize}
+\item POS tagging \\
+\textit{input}: a word \\
+\textit{output}: part-of-speech tags -- as noun, pronoun, punctuation mark etc.
+\item lemmatization \\
+\textit{input:} a word \\
+\textit{output:} lemma -- a base form of a given words, meaning for example nominative of singular for nouns or infinitive for verbs. 
+\item sentiment analysis \\
+\textit{input:} a sentence or a sequence of sentences \\
+\textit{output:} prevailing sentiment of the input from categories: neutral, positive, negative.
+\todo{doplnit diskuzi o ruzných možnostech definice}
+\end{itemize}.
+
+These tasks were chosen to show how pre-trained multilingual language models can help with different types of NLP tasks in one of trained langugages. 
+
+\section*{Text structure}
+Theoretical background in NLP and used AI methods and related work is provided in the \hyperref[chap:theandme]{following chapter}.
+
+Implementation documentation in chapter \ref{chap:impl} is followed by discussion about used methods and experiment results in chapter \ref{chap:diss} Result models are accessible to user exploration as described in chapter \ref{chap:userdoc} and text is closed by \hyperref[chap:concl]{conclusion} with future work proposals.
+
+
