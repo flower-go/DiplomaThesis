@@ -157,6 +157,8 @@ class Network:
     def train_batch(self, inputs, factors):
         with tf.GradientTape() as tape:
             probabilities = self.outer_model(inputs, training=True)
+            tvs = self.outer_model.trainable_variables
+
             if len(self.factors) == 1:
                 probabilities = [probabilities]
             loss = 0.0
@@ -168,7 +170,10 @@ class Network:
                         probabilities[i]._keras_mask)
                 else:
                     loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
-        gradients = tape.gradient(loss, self.outer_model.trainable_variables)
+
+
+        gradients = tape.gradient(loss, tvs)
+
         tf.summary.experimental.set_step(self._optimizer.iterations)
         with self._writer.as_default():
             for name, metric in self._metrics.items():
@@ -178,14 +183,16 @@ class Network:
                 self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
             for name, metric in self._metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
-        print(len(gradients))
         return gradients
 
 
     def train_epoch(self, dataset, args, learning_rate):
         self._optimizer.learning_rate = learning_rate
         aggregate = False
-        gradients = None
+        accum_vars = None
+        tvs = self.outer_model.trainable_variables
+        accum_vars = [tf.Variable(tf.zeros_like(tv.initialized_value()), trainable=False) for tv in tvs]
+        zero_ops = [tv.assign(tf.zeros_like(tv)) for tv in accum_vars]
 
         while not train.epoch_finished():
             sentence_lens, batch = dataset.next_batch(args.batch_size)
@@ -209,23 +216,14 @@ class Network:
 
 
             g = self.train_batch(inp, factors)
-            print(len(g))
-
 
             if aggregate:
-                print(len(g))
-                for i in range(len(g)):
-                    if isinstance(g[i],tf.IndexedSlices):
-                        gradients[i] = tf.concat((gradients[i],g[i]), axis=0)
-                    elif g[i] !=  None:
-                        print(g[i])
-                        gradients[i] = gradients[i] + g[i]
-                self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
-
+                accum_ops = [accum_vars[i].assign_add(grad) if grad != None else accum_vars[i] for i, grad in enumerate(g)]
+                self._optimizer.apply_gradients(zip(accum_ops, self.outer_model.trainable_variables))
 
                 aggregate = False
             else:
-                gradients = g
+                zero_ops = [tv.assign(tf.zeros_like(tv)) for tv in accum_vars]
                 aggregate = True
 
 
