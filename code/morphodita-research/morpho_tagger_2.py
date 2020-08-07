@@ -188,6 +188,8 @@ class Network:
 
     def train_epoch(self, dataset, args, learning_rate):
         self._optimizer.learning_rate = learning_rate
+
+
         aggregate = False
         accum_vars = None
         tvs = self.outer_model.trainable_variables
@@ -219,12 +221,15 @@ class Network:
 
             if aggregate:
                 accum_ops = [accum_vars[i].assign_add(grad) if grad != None else accum_vars[i] for i, grad in enumerate(g)]
-                self._optimizer.apply_gradients(zip(accum_ops, self.outer_model.trainable_variables))
+                self._optimizer.apply_gradients(zip(accum_ops, tvs))
 
                 aggregate = False
             else:
-                zero_ops = [tv.assign(tf.zeros_like(tv)) for tv in accum_vars]
-                aggregate = True
+                if not args.accu:
+                    self._optimizer.apply_gradients(zip(g, tvs))
+                else:
+                    zero_ops = [tv.assign(tf.zeros_like(tv)) for tv in accum_vars]
+                    aggregate = True
 
 
 
@@ -406,9 +411,11 @@ if __name__ == "__main__":
     parser.add_argument("--bert", default=None, type=str, help="Bert model for embeddings")
     parser.add_argument("--bert_model", default=None, type=str, help="Bert model for training")
     parser.add_argument("--cont", default=0, type=int, help="load finetuned model and continue training?")
+    parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
     args.cont = args.cont == 1
+    args.accu = args.accu == 1
 
     # TODO vyřešit
     # tf.config.threading.set_inter_op_parallelism_threads(args.threads)
