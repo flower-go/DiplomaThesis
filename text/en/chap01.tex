@@ -1,5 +1,7 @@
-\chapter{Theory and metodology}
+\chapter{Theory and related work}
 \label{chap:theandme}
+This chapter is divided into two parts. In the first part, general deep learning and natural language processing introduction is presented. Second part of this chapter offers more detailed explanation of methods relevant to this work.
+
 %NLP ... cíle, tasky
 %vývoj neuronek
 %přehled k bertovi podrobněji
@@ -9,3 +11,36 @@
 %embeddings
 %contextual embeddings - elmo, bert, flair
 %transformers(?)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Relevant methods
+\section{BERT explanation}
+This work mainly relies on Bidirectional Encoder Representations from Transformers (BERT)%todo zdroj
+, so this section describes and explains main mechanisms of this model. 
+The core of BERT algorithm is based on these three features -- two unsupervised task for pretraining, input and its embeddings, transformers encoder %todo ref
+architecture.
+
+\subsection{Input embeddings}
+%todo obrazek
+BERT uses concatenation of three types of embeddings as an input representation -- token embeddings, position embeddings and segment embeddings. %todo figura z berta
+
+\subsubsection*{Token embeddings}
+Input of BERT model can be one or two word sequences (not necessarily two sentences, but e.g. also paragraphs). All words are split into tokens and converted into embeddings with a use of pretrained embeddings model. One word can be tokenized into more tokens as WordPieces %todo zdroj
+embeddings are used. WordPiece pretrained embedding algorithm was originaly created for task of Google voice search for Asian languages and is designed to minimize occurence of unknown word tokens. This model was not pretrained as a part of BERT paper experiments, but represents quite interesting solution, so I will briefly explain the idea. In the first iteration of training, the model creates embeddings only for basic characters. In every other iteration, some existing model words are concatenated together in the way that cause the highest likelihood of input text. As a result of this method, some words will be embedded as one word and some will be split into more tokens as can be seen on figure. %todo obrazek
+\par
+There are three other tokens which are added after this step -- CLS, END, SEP. 
+CLS token is added at the beginning of the input and is used as first sequence embedding for classification tasks (as sentence analysis). SEP token separates both sequences and END token is appended at the end. Whole input transformation can be seen on figure %todo dodat obrazek.
+
+\subsubsection*{Position embeddings}
+All input tokens are processed simultaneously, so there is no information about order of tokens. However, nature of the language is sequential, bunch of words without an order has no language meaning so there are position embeddings for this. They have same shape as token embeddings (and also as segment embeddings), so concatenation with two other types is easy.
+
+\subsubsection*{Segment embeddings}
+These emebddings just indicates whether the token belongs to first or second part of input. It has same dimension as position and token embeddings.
+
+\subsection{Pretraining tasks}
+%todo narozdil od jinych modelu co jsou trenovane jednosmerne blabla...
+BERT is pretrained on two unsupervised tasks -- Next Sentence Prediction (NSP) and Masked LM (MLM). These two tasks were chosen specifically because BERT's authors belief they can force language model to learn general and useful knowledge about language. 
+
+\subsubsection*{Next Sentence Prediction}
+Input of the BERT model for this task are two sentences A ans B. In 50\% of cases, sentence B is sentence which really follows sentence A in the text. Otherwise it is random sentence from the text. A goal of the task is decision whether sentence B is following or random, i.e. binary classification.
+
+

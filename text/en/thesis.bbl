@@ -7,13 +7,6 @@
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \expandafter\ifx\csname url\endcsname\relax\def\url#1{\texttt{#1}}\fi
 
-\bibitem[Anděl(2007)]{Andel07}
-\dinatlabel{Anděl 2007} \textsc{Anděl}, J.:
-\newblock \emph{Základy matematické statistiky}.
-\newblock Praha~: Matfyzpress, 2007
-\newblock (Druhé opravené vydání). --
-\newblock ISBN 80-7378-001-1
-
 \bibitem[Devlin et \,al.(2018)Devlin, Chang, Lee and Toutanova]{BERT_ORIG}
 \dinatlabel{Devlin et \,al. 2018} \textsc{Devlin}, Jacob~; \textsc{Chang},
   Ming-Wei~; \textsc{Lee}, Kenton~; \textsc{Toutanova}, Kristina:
@@ -23,11 +16,21 @@
 \newblock (2018). --
 \newblock URL \url{https://arxiv.org/abs/1810.04805}
 
-\bibitem[Zonky(2018)]{ZonkyParametryST}
-\dinatlabel{Zonky 2018} \textsc{Zonky}:
-\newblock \emph{PARAMETRY~SEKUNDÁRNÍHO~TRHU (Secondary market parameters)}.
-\newblock URL
-  \url{https://zonky.cz/downloads/Zonky_Parametry_sekundarniho_trhu.pdf?v=9615aae593630e00d21588ea61a921c8924e52b93c5beb5cf7a371d86e090fdb},
-  2018
+\bibitem[Goodfellow et \,al.(2016)Goodfellow, Bengio and
+  Courville]{Goodfellow-et-al-2016}
+\dinatlabel{Goodfellow et \,al. 2016} \textsc{Goodfellow}, Ian~;
+  \textsc{Bengio}, Yoshua~; \textsc{Courville}, Aaron:
+\newblock \emph{Deep Learning}.
+\newblock MIT Press, 2016. --
+\newblock \url{http://www.deeplearningbook.org}
+
+\bibitem[Straka et \,al.(2019)Straka, Strakov{\'a} and
+  Haji{\v{c}}]{straka2019czech}
+\dinatlabel{Straka et \,al. 2019} \textsc{Straka}, Milan~;
+  \textsc{Strakov{\'a}}, Jana~; \textsc{Haji{\v{c}}}, Jan:
+\newblock Czech Text Processing with Contextual Embeddings: POS Tagging,
+  Lemmatization, Parsing and NER.
+\newblock In: \emph{International Conference on Text, Speech, and Dialogue}
+\newblock Springer (Veranst.), 2019, S.~137--150
 
 \end{thebibliography}
