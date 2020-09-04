@@ -1,4 +1,18 @@
 \chapter{Implementation analysis}
+%co delam a jak to delam
+The practical part of this work is focused on these tasks:
+\begin{itemize}
+\item POS tagging \\
+\textit{input}: a word \\
+\textit{output}: part-of-speech tags -- as noun, pronoun, punctuation mark etc.
+\item lemmatization \\
+\textit{input:} a word \\
+\textit{output:} lemma -- a base form of a given words, meaning for example nominative of singular for nouns or infinitive for verbs. 
+\item sentiment analysis \\
+\textit{input:} a sentence or a sequence of sentences \\
+\textit{output:} prevailing sentiment of the input from categories: neutral, positive, negative.
+\todo{doplnit diskuzi o ruzných možnostech definice}
+\end{itemize}.
 \label{chap:impl}
 This chapter describes implemented linguistic models. As mentioned before, this work implements models for three Czech NLP tasks: tagging, lemmatization and sentiment analysis. Common model for first two tasks develops on the paper by \cite[]{straka2019czech} focused on application of contextual embeddings produced by language models as Bert %todo cite
  or Flair. %todo cite. 
