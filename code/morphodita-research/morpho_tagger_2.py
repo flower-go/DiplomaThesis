@@ -190,11 +190,7 @@ class Network:
         self._optimizer.learning_rate = learning_rate
 
 
-        aggregate = False
-        accum_vars = None
-        tvs = self.outer_model.trainable_variables
-        accum_vars = [tf.Variable(tf.zeros_like(tv.initialized_value()), trainable=False) for tv in tvs]
-        zero_ops = [tv.assign(tf.zeros_like(tv)) for tv in accum_vars]
+        num_gradients = 0
 
         while not train.epoch_finished():
             sentence_lens, batch = dataset.next_batch(args.batch_size)
@@ -217,19 +213,25 @@ class Network:
                 inp.append(batch[dataset.SUBWORDS].word_ids)
 
 
-            g = self.train_batch(inp, factors)
+            tg = self.train_batch(inp, factors)
 
-            if aggregate:
-                accum_ops = [accum_vars[i].assign_add(grad) if grad != None else accum_vars[i] for i, grad in enumerate(g)]
-                self._optimizer.apply_gradients(zip(accum_ops, tvs))
-
-                aggregate = False
+            if num_gradients == 0:
+                gradients = [
+                    g.numpy() if not isinstance(g, tf.IndexedSlices) else [(g.values.numpy(), g.indices.numpy())] for g
+                    in tg]
             else:
-                if not args.accu:
-                    self._optimizer.apply_gradients(zip(g, tvs))
-                else:
-                    zero_ops = [tv.assign(tf.zeros_like(tv)) for tv in accum_vars]
-                    aggregate = True
+                for g, ng in zip(gradients, tg):
+                    if isinstance(g, list):
+                        g.append((ng.values.numpy(), ng.indices.numpy()))
+                    else:
+                        g += ng.numpy()
+            num_gradients += 1
+            if num_gradients == 4 or len(train._permutation) == 0:
+                gradients = [tf.IndexedSlices(*map(np.concatenate, zip(*g))) if isinstance(g, list) else g for g in
+                             gradients]
+                self.optimizer.apply_gradients(zip(gradients, self.layers.trainable_variables))
+                num_gradients = 0
+
 
 
 
@@ -395,7 +397,7 @@ if __name__ == "__main__":
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
     parser.add_argument("--factors", default="Tags", type=str, help="Factors to predict.")
     parser.add_argument("--factor_layers", default=1, type=int, help="Per-factor layers.")
-    parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
+    parser.add_argument("--label_smoothing", default=0.00, type=float, help="Label smoothing.")
     parser.add_argument("--lemma_re_strip", default=r"(?<=.)(?:`|_|-[^0-9]).*$", type=str,
                         help="RE suffix to strip from lemma.")
     parser.add_argument("--lemma_rule_min", default=2, type=int, help="Minimum occurences to keep a lemma rule.")
