@@ -397,7 +397,7 @@ if __name__ == "__main__":
     parser.add_argument("--embeddings", default=None, type=str, help="External embeddings to use.")
     parser.add_argument("--epochs", default="40:1e-3,20:1e-4", type=str, help="Epochs and learning rates.")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
-    parser.add_argument("--factors", default="Tags", type=str, help="Factors to predict.")
+    parser.add_argument("--factors", default="Lemmas,Tags", type=str, help="Factors to predict.")
     parser.add_argument("--factor_layers", default=1, type=int, help="Per-factor layers.")
     parser.add_argument("--label_smoothing", default=0.00, type=float, help="Label smoothing.")
     parser.add_argument("--lemma_re_strip", default=r"(?<=.)(?:`|_|-[^0-9]).*$", type=str,
