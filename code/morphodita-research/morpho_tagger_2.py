@@ -212,25 +212,28 @@ class Network:
                 inp.append(batch[dataset.SEGMENTS].word_ids)
                 inp.append(batch[dataset.SUBWORDS].word_ids)
 
-
+            #TODO opravit kdyz neni accu
             tg = self.train_batch(inp, factors)
 
-            if num_gradients == 0:
-                gradients = [
-                    g.numpy() if not isinstance(g, tf.IndexedSlices) else [(g.values.numpy(), g.indices.numpy())] for g
-                    in tg]
+            if not args.accu:
+                self._optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables))
             else:
-                for g, ng in zip(gradients, tg):
-                    if isinstance(g, list):
-                        g.append((ng.values.numpy(), ng.indices.numpy()))
-                    else:
-                        g += ng.numpy()
-            num_gradients += 1
-            if num_gradients == 4 or len(train._permutation) == 0:
-                gradients = [tf.IndexedSlices(*map(np.concatenate, zip(*g))) if isinstance(g, list) else g for g in
-                             gradients]
-                self.optimizer.apply_gradients(zip(gradients, self.layers.trainable_variables))
-                num_gradients = 0
+                if num_gradients == 0:
+                    gradients = [
+                        g.numpy() if not isinstance(g, tf.IndexedSlices) else [(g.values.numpy(), g.indices.numpy())] for g
+                        in tg]
+                else:
+                    for g, ng in zip(gradients, tg):
+                        if isinstance(g, list):
+                            g.append((ng.values.numpy(), ng.indices.numpy()))
+                        else:
+                            g += ng.numpy()
+                num_gradients += 1
+                if num_gradients == 4 or len(train._permutation) == 0:
+                    gradients = [tf.IndexedSlices(*map(np.concatenate, zip(*g))) if isinstance(g, list) else g for g in
+                                 gradients]
+                    self.optimizer.apply_gradients(zip(gradients, self.layers.trainable_variables))
+                    num_gradients = 0
 
 
 
@@ -391,7 +394,6 @@ if __name__ == "__main__":
     parser.add_argument("--char_dropout", default=0, type=float, help="Character dropout")
     parser.add_argument("--cle_dim", default=256, type=int, help="Character-level embedding dimension.")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
-    parser.add_argument("--elmo", default=None, type=str, help="External contextualized embeddings to use.")
     parser.add_argument("--embeddings", default=None, type=str, help="External embeddings to use.")
     parser.add_argument("--epochs", default="40:1e-3,20:1e-4", type=str, help="Epochs and learning rates.")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
@@ -468,7 +470,7 @@ if __name__ == "__main__":
         # Load training dataset maps from the checkpoint
         train = morpho_dataset.MorphoDataset.load_mappings("{}/mappings.pickle".format(args.predict))
         # Load input data
-        predict = morpho_dataset.MorphoDataset(args.data, train=train, shuffle_batches=False, elmo=args.elmo,
+        predict = morpho_dataset.MorphoDataset(args.data, train=train, shuffle_batches=False,
                                                bert=args.bert)
     else:
         # Load input data
@@ -519,7 +521,6 @@ if __name__ == "__main__":
         else:
             test = None
 
-    args.elmo_size = train.elmo_size
 
     #TODO nacitat velikost
     args.bert_size = 768

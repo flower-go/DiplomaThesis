@@ -5,7 +5,6 @@ import re
 
 import numpy as np
 import os
-import transformers
 import tensorflow as tf
 
 
@@ -20,7 +19,6 @@ class MorphoDataset:
     BERT = 4
     SUBWORDS = 5
     SEGMENTS = 6
-
 
     PAD = 0
     UNK = 1
@@ -53,7 +51,7 @@ class MorphoDataset:
     def __init__(self, filename, embeddings=None, elmo=None, train=None, lemma_re_strip=None, lemma_rule_min=None,
                  shuffle_batches=True, max_sentences=None, bert=None):
         # Create factors
-        self.bert=bert
+        self.bert = bert
         self._factors = []
         for f in range(self.FACTORS):
             self._factors.append(self._Factor(f == self.FORMS, train._factors[f] if train else None))
@@ -67,20 +65,7 @@ class MorphoDataset:
             for i, word in enumerate(embeddings):
                 self._embeddings[word] = i + 1
 
-        # Load contextualized embeddings
-        self._elmo = []
-        if elmo:
-            for elmo_path in elmo.split(","):
-                with np.load(elmo_path, allow_pickle=True) as elmo_file:
-                    for i, (_, value) in enumerate(elmo_file.items()):
-                        if i >= len(self._elmo):
-                            self._elmo.append(value)
-                        else:
-                            self._elmo[i] = np.concatenate([self._elmo[i], value], axis=1)
-                    assert i + 1 == len(self._elmo)
-        self._elmo_size = train.elmo_size if train else self._elmo[0].shape[1] if self._elmo else 0
-
-        # Initialize remma_re_strip
+        # Initialize lemma_re_strip
         self._lemma_re_strip = train._lemma_re_strip if train else re.compile(
             lemma_re_strip) if lemma_re_strip else None
 
@@ -124,7 +109,7 @@ class MorphoDataset:
                             # factor.alphabet_map - kazde nove pismenko ma poradove cislo
                             # factor.charseqs_map - kazde nove slovo ma poradove cislo
                             # factor.charseqs - slovo reprezentovane cisly jednotlivych pismen
-                            # factor.charseq_ids - text reprezentovany cisly slov (?)
+                            # factor.charseq_ids - text reprezentovany cisly slov
 
                             # word_ids jsou id tagu (odpovedi) a nebo id slov (v pripade 0)
                             if factor.characters:
@@ -187,6 +172,8 @@ class MorphoDataset:
                             lemmas.word_ids[i][j] = lemmas.words_map[word]
 
             # Map analyses
+            # ask analysis?
+            # ask lemma rules?
             for f in [self.LEMMAS, self.TAGS]:
                 factor = self._factors[f]
                 for i in range(sentences):
@@ -204,49 +191,41 @@ class MorphoDataset:
             self._permutation = np.random.permutation(len(self._sentence_lens)) if self._shuffle_batches else np.arange(
                 len(self._sentence_lens))
 
-            # Asserts
-            if self._elmo:
-                assert sentences == len(self._elmo)
-                for i in range(sentences):
-                    assert self._sentence_lens[i] == len(self._elmo[i])
-
         if bert:
 
             bert_file_name = (".").join(filename.split("/")[-1].split(".")[0:-1]) + "." + bert.name
             bert_path = bert_file_name + ".pickle"
+
+            # if BERT embeddings are precomputed
             if os.path.exists(bert_path):
                 self.bert_embeddings, self.bert_subwords, self.bert_segments = \
                     np.load(bert_path, allow_pickle=True)
 
-
-            # precomputed does not exist, compute here
+            # else precomputed does not exist, compute here
             else:
+                batch_size_bert = 16
                 tokenizer = bert.tokenizer
                 model = bert.model
-
                 sentences_words = self._factors[self.FORMS].word_strings
-
-                batch_size_bert = 16
-
                 sentences_count = len(sentences_words)
 
                 bert_embeddings = []
                 bert_subwords = []
                 bert_segments = []
                 cycle_len = math.ceil(sentences_count / batch_size_bert)
+
                 for i in range(0, cycle_len):
-                    start = i*batch_size_bert
+                    start = i * batch_size_bert
                     batch_sentences_words = sentences_words[start: min(start + batch_size_bert, sentences_count)]
 
-                    #TODO stahnout novejsi verzi a pouzit batch
-                    #w_subwords = tokenizer.batch_encode_plus(batch_sentences)
+                    # TODO stahnout novejsi verzi a pouzit batch
+                    # w_subwords = tokenizer.batch_encode_plus(batch_sentences)
                     for s in batch_sentences_words:
                         bert_segments.append([])
                         bert_subwords.append([])
-                        for i_w,w in enumerate(s):
-
+                        for i_w, w in enumerate(s):
                             w_e = tokenizer.encode(w, add_special_tokens=False)
-                            bert_segments[-1].extend([i_w]*len(w_e))
+                            bert_segments[-1].extend([i_w] * len(w_e))
                             bert_subwords[-1].extend(w_e)
 
                         bert_subwords[-1] = np.array(tokenizer.build_inputs_with_special_tokens(bert_subwords[-1]),
@@ -254,36 +233,28 @@ class MorphoDataset:
 
                         bert_segments[-1] = np.array(bert_segments[-1], dtype=np.int32)
 
-
-                    if bert.embeddings_only :
+                    if bert.embeddings_only:
                         w_subwords = bert_subwords[start:]
 
                         max_len = np.max([len(w) for w in w_subwords])
                         padded = [np.concatenate((w, [0] * (max_len - len(w)))) for w in w_subwords]
-                        word_tok = tf.convert_to_tensor(np.array(padded,np.int32),tf.int32)
-                        #TODO umi to i udelat padding a vratit tensor!!
-                        #TODO umi vratit i masku
+                        word_tok = tf.convert_to_tensor(np.array(padded, np.int32), tf.int32)
+                        # TODO umi to i udelat padding a vratit tensor!!
+                        # TODO umi vratit i masku
                         att_mask = np.array(padded) != 0
 
-                        #TODO průměrovat zpět na slova
                         model_output = tf.math.reduce_mean(model(word_tok, attention_mask=att_mask)[2][-4:], axis=0)
                         for s_i, s in enumerate(batch_sentences_words):
-                            last_segment = bert_segments[start + s_i][-1] + 1
                             bert_embeddings.append(tf.math.segment_mean(
-                                model_output[s_i][1:len(bert_subwords[start + s_i])-1],bert_segments[start + s_i]).numpy())
-
-
-                #TODO jak ukládat, je treba slova?
+                                model_output[s_i][1:len(bert_subwords[start + s_i]) - 1],
+                                bert_segments[start + s_i]).numpy())
 
                 if len(bert_embeddings):
-
-                    self.save_bert([bert_embeddings,bert_subwords, bert_segments], bert_file_name)
+                    self.save_bert([bert_embeddings, bert_subwords, bert_segments], bert_file_name)
 
                 self.bert_embeddings = bert_embeddings
                 self.bert_segments = bert_segments
                 self.bert_subwords = bert_subwords
-            #self.check_words(self._sentence_lens, self.bert_embeddings)
-
 
     @property
     def sentence_lens(self):
@@ -300,11 +271,6 @@ class MorphoDataset:
     def save_mappings(self, path):
         with open(path, mode="wb") as mappings_file:
             pickle.dump(MorphoDataset(None, train=self), mappings_file)
-
-    def check_words(self,official, computed):
-        for i in range(len(official)):
-            if len(computed[i]) != official[i]:
-                print("ERROR V " + i + " delka je oficialne " + official[i] + " a je " +  len(computed[i]) )
 
     def save_bert(self, embeddings, file):
         for_save = embeddings
@@ -332,7 +298,6 @@ class MorphoDataset:
         batch_sentence_lens = self._sentence_lens[batch_perm]
         max_sentence_len = np.max(batch_sentence_lens)
 
-
         # Word-level data
         factors = []
         for factor in self._factors:
@@ -350,32 +315,20 @@ class MorphoDataset:
                     if not mapped: mapped = self._embeddings.get(string.lower(), 0)
                     factors[-1].word_ids[i, j] = mapped
 
-        # Contextualized embeddings
-        #TODO kdyby se to tady pripojovalo vzdy, tak by nebyl problem s indexama
-        if self._elmo:
-            factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len, self.elmo_size], np.float32)))
-            for i in range(batch_size):
-                factors[-1].word_ids[i, :len(self._elmo[batch_perm[i]])] = self._elmo[batch_perm[i]]
-
         # BERT
-        factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len,768], np.float)))
+        factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len, 768], np.float)))
         if self.bert and self.bert.embeddings_only:
             for i in range(batch_size):
                 factors[-1].word_ids[i, :len(self.bert_embeddings[batch_perm[i]])] = self.bert_embeddings[batch_perm[i]]
-
-
-
 
         if self.bert:
             max_subwords = max(len(self.bert_subwords[i]) for i in batch_perm)
             factors.append(self.FactorBatch(np.zeros([batch_size, max_subwords], np.int32)))
             factors.append(self.FactorBatch(
-                np.full([batch_size, max_subwords - 1], max_sentence_len, np.int32)))  # rpotoze odebereme prvni token
+                np.full([batch_size, max_subwords - 1], max_sentence_len, np.int32)))  # because first token is deleted
             for i in range(batch_size):
                 factors[-2].word_ids[i, :len(self.bert_subwords[batch_perm[i]])] = self.bert_subwords[batch_perm[i]]
                 factors[-1].word_ids[i, :len(self.bert_segments[batch_perm[i]])] = self.bert_segments[batch_perm[i]]
-
-
 
         # Character-level data
         for f, factor in enumerate(self._factors):
@@ -449,6 +402,7 @@ class MorphoDataset:
                         a[i][j] = (a[i][j - 1][0] + 1, a[i][j - 1][1] + "+" + target[j - 1])
         return a[-1][-1][1]
 
+    # ASK co to dělá?
     @staticmethod
     def _gen_lemma_rule(form, lemma):
         form = form.lower()
