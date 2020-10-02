@@ -436,7 +436,7 @@ if __name__ == "__main__":
         if args.exp is None:
             args.exp = "{}-{}".format(os.path.basename(__file__), datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S"))
 
-        do_not_log = {"exp", "lemma_re_strip", "predict", "threads", "bert_model"}
+        do_not_log = {"exp", "legtomma_re_strip", "predict", "threads", "bert_model", "bert"}
         args.logdir = "models/{}-{}".format(
             args.exp,
             ",".join(("{}={}".format(re.sub("(.)[^_]*_?", r"\1", key),
