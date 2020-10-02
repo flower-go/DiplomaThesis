@@ -437,11 +437,11 @@ if __name__ == "__main__":
             args.exp = "{}-{}".format(os.path.basename(__file__), datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S"))
 
         do_not_log = {"exp", "legtomma_re_strip", "predict", "threads", "bert_model", "bert"}
-        args.logdir = "models/{}-{}".format(
-            args.exp,
-            ",".join(("{}={}".format(re.sub("(.)[^_]*_?", r"\1", key),
-                                     re.sub("[^,]*/", "", value) if type(value) == str else value)
-                      for key, value in sorted(vars(args).items()) if key not in do_not_log))
+        args.logdir = "models/{}".format(
+            args.exp
+            # ",".join(("{}={}".format(re.sub("(.)[^_]*_?", r"\1", key),
+            #                          re.sub("[^,]*/", "", value) if type(value) == str else value)
+            #           for key, value in sorted(vars(args).items()) if key not in do_not_log))
         )
         if not os.path.exists("models"): os.mkdir("models")
         if not os.path.exists(args.logdir): os.mkdir(args.logdir)
