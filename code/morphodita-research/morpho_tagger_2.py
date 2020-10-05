@@ -32,7 +32,7 @@ class Network:
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
         if args.test_only:
-            self.outer_model = args.test_only
+            self.outer_model = load_model(args.test_only)
         else:
             if args.bert_model and os.path.exists(args.bert_model):
                 self.model = load_model(args.bert_model)
