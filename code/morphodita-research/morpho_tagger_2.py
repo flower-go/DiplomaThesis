@@ -500,11 +500,13 @@ if __name__ == "__main__":
             warnings.warn("embeddings and whole bert model training are both selected.")
 
         model_bert = None
-        if args.bert or args.bert_model:
+        if args.bert or args.bert_model or args.test_only:
             if args.bert_model and os.path.exists(args.bert_model):
                 name = "bert-base-multilingual-uncased"
             elif args.bert:
                 name = args.bert
+            elif args.test_only:
+                name = "bert-base-multilingual-uncased"
             else:
                 name = args.bert_model
             model_bert = BertModel(name, args)
