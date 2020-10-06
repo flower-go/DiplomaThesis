@@ -32,7 +32,7 @@ class Network:
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
         if args.test_only:
-            self.outer_model = load_model(args.test_only)
+            self.outer_model.load_weights(args.test_only)
         else:
             if args.bert_model and os.path.exists(args.bert_model):
                 self.model = load_model(args.bert_model)
@@ -580,7 +580,8 @@ if __name__ == "__main__":
 
             # network.saver_inference.save(network.session, "{}/checkpoint-inference".format(args.logdir), write_meta_graph=False)
             train.save_mappings("{}/mappings.pickle".format(args.logdir))
-            network.outer_model.save(args.logdir + "/saved_model")
+            #network.outer_model.save(args.logdir + "/saved_model")
+            network.outer_model.save_weights('./checkpoints/' + args.logdir.split("/")[1])
 
         if test:
             test_eval()
