@@ -107,6 +107,8 @@ class Network:
                 inp.append(bert_embeddings)
 
             self.model = tf.keras.Model(inputs=inp, outputs=outputs)
+            if args.test_only:
+                self.model.load_weights(args.test_only)
 
 
             if args.bert_model or args.test_only:
@@ -145,8 +147,7 @@ class Network:
             else:
                 self.outer_model = self.model
 
-            if args.test_only:
-                self.outer_model.load_weights(args.test_only)
+
 
 
 
