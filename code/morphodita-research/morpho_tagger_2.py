@@ -31,9 +31,8 @@ class Network:
         self.factor_words = factor_words
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
-
-
-        if args.bert_model and os.path.exists(args.bert_model):
+        #TODO co tohle udělá?
+        if args.bert_model and os.path.exists(args.bert_model) and False:
             self.model = load_model(args.bert_model)
         else:
 
@@ -111,7 +110,7 @@ class Network:
                 self.model.load_weights(args.test_only)
 
 
-            if args.bert_model and args.test_only:
+            if args.bert_model:
                 # FUNC nove vstupy
                 word_ids2 = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
                 charseq_ids2 = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
