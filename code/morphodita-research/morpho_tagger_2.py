@@ -111,7 +111,7 @@ class Network:
                 self.model.load_weights(args.test_only)
 
 
-            if args.bert_model or args.test_only:
+            if args.bert_model and args.test_only:
                 # FUNC nove vstupy
                 word_ids2 = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
                 charseq_ids2 = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
@@ -568,10 +568,11 @@ if __name__ == "__main__":
 
 
 
-        if not args.test_only:
+        if not args.test_only or True:
 
             for i, (epochs, learning_rate) in enumerate(args.epochs):
                 for epoch in range(epochs):
+
                     network.train_epoch(train, args, learning_rate)
 
                     if dev:
