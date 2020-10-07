@@ -589,6 +589,7 @@ if __name__ == "__main__":
             train.save_mappings("{}/mappings.pickle".format(args.logdir))
             #network.outer_model.save(args.logdir + "/saved_model")
             network.outer_model.save_weights('./checkpoints/' + args.logdir.split("/")[1])
+            print(args.logdir.split("/")[1])
 
         if test:
             test_eval()
