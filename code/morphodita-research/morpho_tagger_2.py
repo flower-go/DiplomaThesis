@@ -31,8 +31,7 @@ class Network:
         self.factor_words = factor_words
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
-        #TODO co tohle udělá?
-        if args.bert_model and os.path.exists(args.bert_model) and False:
+        if args.bert_model and os.path.exists(args.bert_model):
             self.model = load_model(args.bert_model)
         else:
 
@@ -142,7 +141,8 @@ class Network:
                 bert_output = bert_output[:, :-1] # tady se dava pryc sep
 
                 # TODO model ma 4 vstupy ale jeste pridavam ten bert_output --> treba predelat
-                self.outer_model = tf.keras.Model(inputs=inp2, outputs=self.model(inp2[:-2] + [bert_output]))
+                #self.outer_model = tf.keras.Model(inputs=inp2, outputs=self.model(inp2[:-2] + [bert_output]))
+                self.outer_model = self.model
             else:
                 self.outer_model = self.model
 
@@ -499,6 +499,8 @@ if __name__ == "__main__":
         if args.bert and args.bert_model:
             warnings.warn("embeddings and whole bert model training are both selected.")
 
+
+        #TODO model musi byt dva aprametry - na ten vnoreny a vnejsi. Respektive na bert model a adresa toho ulozeneho
         model_bert = None
         if args.bert or args.bert_model or args.test_only:
             if args.bert_model and os.path.exists(args.bert_model):
@@ -509,6 +511,7 @@ if __name__ == "__main__":
                 name = "bert-base-multilingual-uncased"
             else:
                 name = args.bert_model
+            print("model: " + name)
             model_bert = BertModel(name, args)
 
         #TODO udelat cyklus
