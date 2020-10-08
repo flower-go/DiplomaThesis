@@ -107,6 +107,7 @@ class Network:
             self.model = tf.keras.Model(inputs=inp, outputs=outputs)
             if args.test_only:
                 self.model.load_weights(args.test_only)
+                print("model inputs:  "+ self.model._feed_input_names)
 
 
             if args.bert_model:
@@ -140,9 +141,8 @@ class Network:
 
                 bert_output = bert_output[:, :-1] # tady se dava pryc sep
 
-                # TODO model ma 4 vstupy ale jeste pridavam ten bert_output --> treba predelat
-                #self.outer_model = tf.keras.Model(inputs=inp2, outputs=self.model(inp2[:-2] + [bert_output]))
-                self.outer_model = self.model
+                print("model len: " + len(inp2[:-2] + [bert_output]))
+                self.outer_model = tf.keras.Model(inputs=inp2, outputs=self.model(inp2[:-2] + [bert_output]))
             else:
                 self.outer_model = self.model
 
