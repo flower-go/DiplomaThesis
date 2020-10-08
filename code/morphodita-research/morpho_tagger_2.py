@@ -105,9 +105,13 @@ class Network:
                 inp.append(bert_embeddings)
 
             self.model = tf.keras.Model(inputs=inp, outputs=outputs)
+
+            print(str(self.model.weights[0][6][1]))
             if args.test_only:
                 self.model.load_weights(args.test_only)
                 print("model inputs:  "+ str(self.model._feed_input_names))
+
+                print(str(self.model.weights[0][6][1]))
 
 
             if args.bert_model:
