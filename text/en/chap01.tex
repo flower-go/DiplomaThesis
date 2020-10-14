@@ -1,11 +1,14 @@
-\chapter{Theory and related work}
+
+
+\chapter{Theory}
 \label{chap:theandme}
-This chapter is divided into two parts. In the first part, general deep learning and natural language processing introduction is presented, with this work focus in mind. Second part of this chapter offers more detailed explanation of methods relevant to this work.
+This chapter is divided into two parts. First part explains general deep learning and natural language processing basics, with a focus of this work in mind. Second part of this chapter offers more detailed explanation of methods relevant to this work.
 
 \section{General Background}
-A history of neural networks started in 1940s %todo deep learning book. 
-Perceptron, found in 1957, is the simplest neural network with just one layer serving for binary classification. There also exist multi-class version for general classification. Problem of this perceptron was inability to classify data which are not linearly separable (see picture %todo picture)). 
-\textit{Deep} neural networks era started in 2007 with bigger datasets and greater computational resources. These to new features opened possibility of neural network learning without expert handcrafted parameters tuning with good results.
+A history of neural networks started in 1940s \citep{Goodfellow-et-al-2016}.
+Perceptron, found in 1957, is the simplest neural network with just one layer serving for binary classification. There also exist multi-class version for general classification. Problem of this perceptron was inability to classify data which are not linearly separable (see picture %TODO picture)). 
+
+\textit{Deep} neural networks era started in 2007 with bigger datasets and greater computational resources. These two new features opened possibility of neural network learning without expert handcrafted parameters tuning with good results.
 Some now frequently used ideas are quite old, like the perceptron or a back-propagation algorithm and are combined with better choose of activation functions, some ideas appeared in last two decades like convolutional neural networks or encoders.
 %label smoothing - nekam k vystuum spolu s activation functions
 %NLP ... cíle, tasky
@@ -15,9 +18,10 @@ Different types of NN differs by number and shape of layers, activation function
 Some of key ideas for (not only) NLP and specifically BERT, are presented in the following subsections.
 %v dalsi casti vysvetlim nektere nove vylepseni z poslednich let, ktere vedly k vyraznemu improvementu (nejen) v oblasti NLP.
 \subsection{Label smoothing}
+Supervised machine learning problems can be distinguished by the desired outcome as classification or regression. Classification means that we want to sort data into one of predefined classes, meanwhile regression is some numerical result. In the case of multi-class classification, true results (labels) can be in one of following forms -  text or number mark or one-hot vector. If there are more than two classes presented, one-hot vector has length equal to number of classes and consist of zeros on every indices but target class index, where is one. %TODO see picture
 Label smoothing is an idea applicable to every classification problem, therefore is not limited to a NLP only. %todo zdroj
-In vanilla classification task, training data contains labels of the correct classes. In binary classification or one-hot encoded labels, correct class is denoted by 1 and incorrect class(es) by 0. Instead of this, label smoothing applies following formula: 
-$$y_{new} = (1 - \epsilon) * y + \alpha / K$$, where $K$ is number of classes. That was for equation, but more important is the reason why to use it. Label smoothing is used as a cure for overfitting and overconfidence in the case of softmax 
+In any classification task, training data contains labels of the correct classes. In binary classification or one-hot encoded labels, correct class is denoted by 1 and incorrect class(es) by 0. Instead of this, label smoothing applies following formula: 
+$$y_{new} = (1 - \epsilon) * y + \alpha / K$$, where $K$ is number of classes. Label smoothing is used as a cure for overfitting and overconfidence in the case of use of a softmax 
  as output activation function. Loss function for softmax classification is: 
  $$ loss = -\sum_{i=1}^{n} \sum_{y=1}^{K} p(y \mid x_i) log \, q_{\theta} ( y_i \mid x_i ) $$
  and after substitution of label smoothing\footnote{Taken from: https://leimao.github.io/blog/Label-Smoothing/}:
@@ -29,26 +33,32 @@ which gaves after multiplication\footnote{Taken from: https://leimao.github.io/b
  loss_{ls}= \sum_{i=1}^{n} {(1- \epsilon)[- \sum_{y=1}^{K} p(y\mid x_i) log \, q\theta(y \mid x_i)]+\epsilon [- \sum_{y=1}^{K} u(y \mid x_i)log \, q\theta (y\mid x_i)]}
  \end{equation}
  
-From equation \ref{eq:lsloss} can be seen, than if the network is very confidential about some prediction, second part of loss function is very large, so this works as a regularization of overconfidence.
+From equation \ref{eq:lsloss} can be seen, than if the network is very confidential about some prediction, second part of loss function is very large, so label smoothing works as a regularization of overconfidence.
 
 
 \subsection{Attention mechanism}
 \label{sub:attention}
 %používá se i v grafice
 Attention mechanism is widely used in NLP as a tool for extracting relevant informations from word sequences. For example when generating translation of some sentence, each word in target language corresponds to just few words in source sentence, not to a whole sentence. Attention gives weights to the words, which represents this connections. When the task is a question answering %todo zdroj, 
-attention can help a model to focus on relevant part in the text, where the answer is allocated. For example see picture %todo obrazek.
-In Transformers architecture %todo zdroj
-, which is relevant to this work, self-attention mechanism is used. This variant of attention do not connect one part of text (like question) to other different part of text (like answer), but only models relationships inside one sentence. %todo obrazek z videa
+attention can help a model to focus on relevant part in the text, where the answer is allocated. For example see picture %TODO obrazek.
+Modification to this concept, called self-attention, deals with relationships inside one part of text (like a sentence). This variant of attention do not connect one part of text (like question) to other different part of text (like answer), but only models relationships inside one sentence. %TODO obrazek z videa a poradne vysvetlit
 Attention has three inputs -- key, value and query, all vectors. The output is weighted sum of values and the weights are computed with respect to key-query pair. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%GRU, LSTM, Transformers
 \subsection{Recurrent Neural Networks}
-Language has a sequence nature. Word and sentences ordering is an important part of text and lack of it can make text absolutely nonsense. This places hard demands on NN, because it is different from most of other NN applications, where input samples are independent and ordering does not matter. Problem with vanishing/exploding gradient %todo ref
-is even more fundamental, because text sequences can be very long and information from more distant words, which is relevant for given word, can vanish very easy. %todo obrázek s příkladem věty
+Human language has a sequential nature. Word and sentences ordering is an important part of text and lack of it can make text absolutely nonsense. This places hard demands on neural networks, because such data structure differs from most of other NN applications, where input samples are independent and ordering does not matter. Second problem connected to such sequential processing is vanishing/exploding gradient. %TODO vysvetlit
+Text sequences can be very long and information from more distant words, which is relevant for given word, can vanish or explode very easy. %todo obrázek s příkladem věty
 
-The construction of such networks,  which are able to capture natural language structure requires solving two problems -- input should be understood by network as a sequence and there must be a possibility to use information from other parts of sentence (or text). First problem was solved by simple Recurrent Neural Networks (RNN) %todo picture with explanation
-, while the latter problem needed more complicated approach. There are basically three attempts to solve this \textit{short memory} of RNN cells -- Gated Recurrent Unit (GRU), Long Short Term Memory (LSTM) and Transformers architecture with attention mechanism. Both LSTM and GRU uses an idea of gating. Gates works as weights for previous informations and new input. They help to decide which information should be remembered and which should be forgotten. %todo obrazek gates 
+The construction of such networks, which are able to capture natural language structure requires solving two problems:
+\begin{itemize}
+\item input should be understood by network as a sequence,
+\item there must be a possibility to use information from other parts of sentence (or text).
+\end{itemize}
+ First problem was solved by simple Recurrent Neural Networks (RNN) %todo picture with explanation
+, while the latter problem needed more complicated approach. There are basically three attempts to solve this \textit{short memory} of RNN cells -- Gated Recurrent Unit (GRU), Long Short Term Memory (LSTM) and Transformers architecture with attention mechanism.
+\par
+Both LSTM and GRU uses an idea of gating. Gates works as weights for previous informations and new input. They help to decide which information should be remembered and which should be forgotten. %todo obrazek gates 
 %vysvetlit detailne
 \subsubsection*{LSTM} LSTM cell uses input, output and forget gate. Every gate is composed by sigmoid function with actual input and previous hidden state as inputs. %see picture 
 %see picture with gates and equations!
@@ -64,7 +74,7 @@ and essentially depends on textbf{attention} mechanism (see subsection \ref{sub:
 Tranforems uses encoder-decoder architecture, which was simultaniously proposed in 2014 by two papers. The basic idea behind this architecture is following: encoder and decoder are connected by some middle layer of fixed size which aims to be good representation of an input. Encoder reads its input and tries to learn such weights, that encoder's final representation of the input contains all important information. Decoder has this representation as its input and tries to produce best results. It was first use for machine translation, so the output of the encoder in this case is a sentence in the target language with same semantics as original input. %todo obrazek s popisem ze to je sekvence
 Transformers are novelty in the manner that there are no LSTM cells computing hidden states.%pravda?
 Picture %todo z clanku 
-describes design of one layer. Both encoder and decoder are built by many blocks of respective type. Self-attention mechanism which is supposed to select most important words to be focused on is used on many places -- for input of  every encoder layer, input of every decoder layer (although masked) and also between encoder and decoder. On the decoder side, self-attention layer is masked so the decoder can "see" just previous words (there are $-inf$ values in the positions on the right side). For representation of word position in the sentence (as it is not RNN cell and it can process all words simultaneously) Transformers uses position embeddings, which are trained to represent the ordering in the sentence.
+describes design of one layer. Both encoder and decoder are built by many blocks of respective type. Self-attention mechanism which is supposed to select most important words to be focused on is used on many places -- for input of every encoder layer, input of every decoder layer (although masked) and also between encoder and decoder. On the decoder side, self-attention layer is masked so the decoder can "see" just previous words (there are $-inf$ values in the positions on the right side). For representation of word position in the sentence (as it is not RNN cell and it can process all words simultaneously) Transformers uses position embeddings, which are trained to represent the ordering in the sentence.
 %fixed length vector
 %recurrent and shortuct links,normalization
 
@@ -75,7 +85,7 @@ Good performance of NLP models relies on text representation. What is hypothetic
  Such vector is long as a number of distinct words in a dictionary, so it could be quite wide. Most important problem is that in this representation, every two words has same distance to each other. This is not true in linguistics. Words can have similar meanings, be opposite to each other etc.
 \par
 Better solution than one-hot encoding are embeddings. Embedding is a fixed-size vector, which represent input word. These embedding are not hand crafted by humans, they are learned by NN. They can be learned for every specific task from scratch or it is possible to use good pretrained embeddings. Before contextualized embeddings appeared, such pretrained embeddings were created mainly by Word2Vec, specifically by its two variants: CBOW and SkipGram model. %todo obrazek
-CBOW model's objective is to predict a word from its context and SkipGram does exaty the oppposite - predicting context of a given word. These predicting objectives serves just as a tool for forcing a network to learn useful word representation. There is an embedding layer at the beggining of the network with size $number\_of\_words   \times embedding\_size$. Word2Vec-like embeddings uses just few context words and they does not use explicitly information about statistics in whole dataset. GloVe %todo zdroj
+CBOW model's objective is to predict a word from its context and SkipGram does exaty the oppposite - predicting context of a given word. These predicting objectives serves just as a tool for forcing a network to learn useful word representation. There is an embedding layer at the beggining of the network with size $number\_of\_words \times embedding\_size$. Word2Vec-like embeddings uses just few context words and they does not use explicitly information about statistics in whole dataset. GloVe %todo zdroj
 embeddings on the other hand, uses information about frequencies of pairs of words in a whole dataset and are designed to project word vectors into meaningful vector space. 
 \\
 Embeddings of previously described types though uses context of the word -- it is in fact how they are meant to work. Similar words are supposed to appear frequently in similar context. Problem of such embedding is that a word has always same embedding independently of a context. This is definitely a problem in the case of homonyms, but contextualized embeddings showed to be generally better than traditional embeddings. %todo zdroje
@@ -132,7 +142,7 @@ Actually, BERT uses this encoder architecture for each layer,
  \subsection{Why is BERT so special?}
  \label{sub:specialBert}
  %napsat ze je special a proc -- vysledky, asi v teorii a odkaz dát sem
-For deep learning architectures, it is quite common that reason why they work (especially why they work so well in comparison with other posibilities) is not visible at first sight. Authors offers following explanation. In contrast to other SOTA  league language models, BERT uses both bidirectional context of words. In the figure %todo obrazek z berta
+For deep learning architectures, it is quite common that reason why they work (especially why they work so well in comparison with other posibilities) is not visible at first sight. Authors offers following explanation. In contrast to other SOTA league language models, BERT uses both bidirectional context of words. In the figure %todo obrazek z berta
 is a comaprison of two other such models - ELMo and GTP %todo zdroje
 . GTP is also based on Transformers architecture, but unlike BERT, it uses decoder part of Transformer. 
 GTP uses just left context of the word, as a sentence is proceeded sequentially. ELMo uses LSTM %todo odkaz

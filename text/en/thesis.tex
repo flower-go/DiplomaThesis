@@ -55,7 +55,13 @@
 \usepackage{booktabs}       % improved horizontal lines in tables
 \usepackage{paralist}       % improved enumerate and itemize
 %\usepackage[usenames]{xcolor}  % typesetting in color
+
+\usepackage[automake,toc]{glossaries} %for list of abbreviations
+\makeglossaries
+\setacronymstyle{long-short}
+\loadglsentries{defns}
 %%% Basic information on the thesis
+
 
 % Thesis title in English (exactly as in the formal assignment)
 \def\ThesisTitle{Czech NLP Processing with Contextualized Embeddings}
@@ -72,7 +78,7 @@
 \def\Department{Institute of Formal and Applied Linguistics}
 
 % Is it a department (katedra), or an institute (ústav)?
-\def\DeptType{Institute}
+\def\DeptType{Institute} 
 
 % Thesis supervisor: name, surname and titles
 \def\Supervisor{RNDr. Milan Straka, Ph.D.}
@@ -141,7 +147,8 @@ Most of the evaluation have been carried out on English. However, several of the
 
 %%% Abbreviations used in the thesis, if any, including their explanation
 %%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.
-\chapwithtoc{List of Abbreviations}
+%\chapwithtoc{List of Abbreviations}
+\printglossary[title=List of Abbreviations]
 
 %%% Attachments to the master thesis, if any. Each attachment must be
 %%% referred to at least once from the text of the thesis. Attachments
