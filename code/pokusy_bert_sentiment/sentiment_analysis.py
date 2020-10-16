@@ -8,6 +8,7 @@ import numpy as np
 import tensorflow as tf
 import transformers
 from keras import backend as b
+from sklearn.metrics import accuracy_score
 
 from text_classification_dataset import TextClassificationDataset
 
@@ -129,8 +130,15 @@ if __name__ == "__main__":
     # Generate test set annotations, but to allow parallel execution, create it
     # in in args.logdir if it exists.
     out_path = "sentiment_analysis_test.txt"
+    test_prediction = []
     if os.path.isdir(args.logdir): out_path = os.path.join(args.logdir, out_path)
     with open(out_path, "w", encoding="utf-8") as out_file:
         for label in network.predict(facebook.test, args):
             label = np.argmax(label)
+            test_prediction.append(label)
             print(facebook.test.LABELS[label], file=out_file)
+
+    if facebook.test.data["labels"][27] != -1:
+        acc = accuracy_score(facebook.test.data["labels"],test_prediction)
+        print("Test accuracy: " + str(acc))
+
