@@ -8,7 +8,7 @@ import numpy as np
 import tensorflow as tf
 import transformers
 from keras import backend as b
-from sklearn.metrics import accuracy_score
+#from sklearn.metrics import accuracy_score
 
 from text_classification_dataset import TextClassificationDataset
 
@@ -117,8 +117,8 @@ if __name__ == "__main__":
     # should be a callable that given a sentence in a string produces
     # a list/np.ndarray of token integers.
     facebook = TextClassificationDataset("czech_facebook", tokenizer=tokenizer.encode)
-    #facebook.train._data["labels"] = facebook.train._data["labels"][:10]
-    #facebook.train._data["tokens"] = facebook.train._data["tokens"][:10]
+    facebook.train._data["labels"] = facebook.train._data["labels"][:10]
+    facebook.train._data["tokens"] = facebook.train._data["tokens"][:10]
     #facebook.train._size = len(facebook.train._data["tokens"])
 
     # Create the network and train
@@ -139,6 +139,7 @@ if __name__ == "__main__":
             print(facebook.test.LABELS[label], file=out_file)
 
     if facebook.test.data["labels"][27] != -1:
-        acc = accuracy_score(facebook.test.data["labels"],test_prediction)
+        acc = (facebook.test.data["labels"] == test_prediction)
+        acc = acc.sum()/len(acc)
         print("Test accuracy: " + str(acc))
 
