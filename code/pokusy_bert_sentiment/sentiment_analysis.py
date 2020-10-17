@@ -139,7 +139,9 @@ if __name__ == "__main__":
             print(facebook.test.LABELS[label], file=out_file)
 
     if facebook.test.data["labels"][27] != -1:
+        print("delka " + str(len(test_prediction)))
         acc = (facebook.test.data["labels"] == test_prediction)
-        acc = acc.sum()/len(acc)
+        print("delka acc" + str(len(acc)))
+        acc = sum(acc)/len(acc)
         print("Test accuracy: " + str(acc))
 
