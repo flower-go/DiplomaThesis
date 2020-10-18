@@ -8,9 +8,10 @@ import numpy as np
 import tensorflow as tf
 import transformers
 from keras import backend as b
-#from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 
 from text_classification_dataset import TextClassificationDataset
+import tensorflow_datasets as tfds
 
 
 class Network:
@@ -116,9 +117,40 @@ if __name__ == "__main__":
     # TODO: Load the data, using a correct `tokenizer` argument, which
     # should be a callable that given a sentence in a string produces
     # a list/np.ndarray of token integers.
+
+    def imdb_covertion(data):
+        for i in range(len(data)):
+            if len(data[i]) > 512:
+                data[i] = data[i][0:512]
+            data[i] = tokenizer.encode(data[i].decode("utf-8"))
+        return data
+
     facebook = TextClassificationDataset("czech_facebook", tokenizer=tokenizer.encode)
-    facebook.train._data["labels"] = facebook.train._data["labels"][:10]
-    facebook.train._data["tokens"] = facebook.train._data["tokens"][:10]
+    train_data, test_data = tfds.load(name="imdb_reviews", split=["train", "test"],
+                                      batch_size=-1, as_supervised=True)
+
+    train_examples, train_labels = tfds.as_numpy(train_data)
+    #train_examples = train_examples[:10]
+    #train_labels = train_labels[:10]
+    test_examples, test_labels = tfds.as_numpy(test_data)
+    #(x_train, y_train), (x_test, y_test) = tf.keras.datasets.imdb.load_data()
+
+    train_examples = imdb_covertion(train_examples)
+    test_examples = imdb_covertion(test_examples)
+    train_ex,dev_ex, train_l, dev_l = train_test_split(train_examples, stratify=train_labels, train_size=0.6)
+
+
+    facebook.train._data["tokens"].append(train_ex)
+    facebook.train._data["labels"].append(train_l)
+    facebook.dev._data["tokens"].append(dev_ex)
+    facebook.dev._data["labels"].append(dev_l)
+    facebook.test._data["tokens"].append(test_examples)
+    facebook.test._data["labels"].append(test_labels)
+
+
+
+    #facebook.train._data["labels"] = facebook.train._data["labels"][:10]
+    #facebook.train._data["tokens"] = facebook.train._data["tokens"][:10]
     #facebook.train._size = len(facebook.train._data["tokens"])
 
     # Create the network and train
