@@ -75,8 +75,14 @@ class Network:
 
     def _transform_dataset(self, dataset):
         max_len = max(len(a) for a in dataset)
-        dataset = [i + [0]*(max_len - len(i)) for i in dataset]
-        return np.asarray(dataset)
+        print(str(max_len))
+        data = []
+        for i in dataset:
+            max_l = max_len - len(i)
+
+            data.append(i + [0]*max_l)
+        
+        return np.asarray(data)
 
 
 
@@ -120,32 +126,35 @@ if __name__ == "__main__":
 
     def imdb_covertion(data):
         for i in range(len(data)):
+
             if len(data[i]) > 512:
                 data[i] = data[i][0:512]
-            data[i] = tokenizer.encode(data[i].decode("utf-8"))
+
+            data[i] = tokenizer.encode(data[i].decode('latin1'))
         return data
 
     facebook = TextClassificationDataset("czech_facebook", tokenizer=tokenizer.encode)
-    train_data, test_data = tfds.load(name="imdb_reviews", split=["train", "test"],
+    train_data, train_labels = tfds.load(name="imdb_reviews", split="train",
                                       batch_size=-1, as_supervised=True)
 
-    train_examples, train_labels = tfds.as_numpy(train_data)
+    train_examples = tfds.as_numpy(train_data)
     #train_examples = train_examples[:10]
     #train_labels = train_labels[:10]
-    test_examples, test_labels = tfds.as_numpy(test_data)
+    #test_examples, test_labels = tfds.as_numpy(test_data)
     #(x_train, y_train), (x_test, y_test) = tf.keras.datasets.imdb.load_data()
 
     train_examples = imdb_covertion(train_examples)
-    test_examples = imdb_covertion(test_examples)
-    train_ex,dev_ex, train_l, dev_l = train_test_split(train_examples, stratify=train_labels, train_size=0.6)
+    print("test")
+    #test_examples = imdb_covertion(test_examples)
+    #train_ex,dev_ex, train_l, dev_l = train_test_split(train_examples,train_labels, stratify=train_labels, train_size=0.6)
 
 
-    facebook.train._data["tokens"].append(train_ex)
-    facebook.train._data["labels"].append(train_l)
-    facebook.dev._data["tokens"].append(dev_ex)
-    facebook.dev._data["labels"].append(dev_l)
-    facebook.test._data["tokens"].append(test_examples)
-    facebook.test._data["labels"].append(test_labels)
+    facebook.train._data["tokens"].append(train_examples)
+    facebook.train._data["labels"].append(train_labels)
+   #facebook.dev._data["tokens"].append(dev_ex)
+    #facebook.dev._data["labels"].append(dev_l)
+    #facebook.test._data["tokens"].append(test_examples)
+    #facebook.test._data["labels"].append(test_labels)
 
 
 
@@ -164,16 +173,15 @@ if __name__ == "__main__":
     out_path = "sentiment_analysis_test.txt"
     test_prediction = []
     if os.path.isdir(args.logdir): out_path = os.path.join(args.logdir, out_path)
-    with open(out_path, "w", encoding="utf-8") as out_file:
+    with open(out_path, "w", encoding="ascii") as out_file:
         for label in network.predict(facebook.test, args):
             label = np.argmax(label)
             test_prediction.append(label)
             print(facebook.test.LABELS[label], file=out_file)
 
     if facebook.test.data["labels"][27] != -1:
-        print("delka " + str(len(test_prediction)))
-        acc = (facebook.test.data["labels"] == test_prediction)
-        print("delka acc" + str(len(acc)))
+        acc = (np.array(facebook.test.data["labels"]) == np.array(test_prediction))
         acc = sum(acc)/len(acc)
         print("Test accuracy: " + str(acc))
+
 
