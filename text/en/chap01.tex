@@ -2,20 +2,86 @@
 
 \chapter{Theory}
 \label{chap:theandme}
-This chapter is divided into two parts. First part explains general deep learning and natural language processing basics, with a focus of this work in mind. Second part of this chapter offers more detailed explanation of methods relevant to this work.
+This chapter is divided into two parts. The first part explains general deep learning and natural language processing basics, with a focus of this work in mind. The second part of this chapter offers a more detailed explanation of methods relevant to this work.
 
 \section{General Background}
-A history of neural networks started in 1940s \citep{Goodfellow-et-al-2016}.
-Perceptron, found in 1957, is the simplest neural network with just one layer serving for binary classification. There also exist multi-class version for general classification. Problem of this perceptron was inability to classify data which are not linearly separable (see picture %TODO picture)). 
 
-\textit{Deep} neural networks era started in 2007 with bigger datasets and greater computational resources. These two new features opened possibility of neural network learning without expert handcrafted parameters tuning with good results.
-Some now frequently used ideas are quite old, like the perceptron or a back-propagation algorithm and are combined with better choose of activation functions, some ideas appeared in last two decades like convolutional neural networks or encoders.
-%label smoothing - nekam k vystuum spolu s activation functions
-%NLP ... cíle, tasky
-Basic type of DNN is multilayer perceptron (see picture %todo picture).
-It is combined of neurons, every neuron has an activation function, which is applied its input. Input to every, but first layer is weighted combination of (possibly selection of) previous layer neurons. 
-Different types of NN differs by number and shape of layers, activation functions and connections between neurons. (see %todo picture).
-Some of key ideas for (not only) NLP and specifically BERT, are presented in the following subsections.
+
+\subsection{Linguistics and Natural Language Processing}
+
+%začni větou Historie počítačoví lingvistiky se datuje v..... hlavně se zabývali překladem a vyhledáváním v textu. V současné době
+Linguistics is a science which describes language and its focus can be divided into following sub-fields:
+\begin{itemize}
+\item phonetics
+\item phonology
+\item  morphology
+\item syntax
+\item semantics
+\item pragmatics
+\end{itemize}
+
+%ZDROJ jirka hana
+This work is focused on task belonging into morphology, syntax and semantics. 
+
+\textbf{Morphology} studies internal structures of words. Basic building block of a word is a morpheme and such morphemes can represent semantics (meaning) or grammatical role of the world. %TODO příklad
+One word can occur many forms created via inflection. %todo like apple - apples, 
+Such a set of all possible forms is called lexeme. Morphology is eldest lingusitical field %TODO zdroj, 
+early automated models for morphological language processing focused on generating forms from lemmas %TODO zdroj, Two level morphology
+Czech morphology developement is dated from 1989 %TODO zdroj Hajič.
+and in description uses 15-places morphological tags. %TODO obrázek 
+Morphology is used for many tasks, which can be divided into generation and analysis. Results of a morphological analysis is a set of possible lemmas and tags for given word form. This set can be further narrowed by lemmatization (selection of one "right" lemma), morphological tagging (selection of one right tag in given context), partitional disambiguation (removes all tags and lemmas, which can be reliably removed). Morphology can be also used for tasks like automatic spell check, text searching, key words tagging %TODO system asimut, mosaica %TODO nebo?
+Lemmatization task consist of finding a \textit{lemma} - lemma is one chosen form of a word, selected to represent whole lexeme set. It is chosen by a convention -- (i.e. noun it is nominative of singular, for verb its infinitive). Czech is synthetic mostly fusional language (?).
+
+\textbf{Syntactic analysis} goes beyond the boders of words and studies sentence structure. %TODO obrazek stromů
+Different word classes play different roles in a sentences. For example noun can be object %TODO 
+or subject, verb is typically %TODO přísudek
+, but can serve as a %TODO podmět.
+Sentence structure can be describe using various combinations of trees, generatig rules and sets of tags. %TODO obrazky a příklady
+Part of speech %TODO
+Syntactic analysis is used for text generation, machine translation, grammatical checks. %TODO další
+
+Historical development of computer linguistics was significantly affected by machine translation. First attempts started in 1933 by patents for machien translation %TODO zdroje!!!
+which leaded to big boom in the 50s and 60s and than to a slowdown after ALPAC report in 1966. %TODO zdroje
+In current times, not only machine translation systems but many other linguistic taks solving by machine learning methods, which often leads to better results with less need of expert knowledge in comparison to complicated sets of rules used before. %TODO zdroj?
+\par
+%korpusy - k čemu to je, jak to navazuje na to předchozí
+Useful tools for the study of languages are corpuses. A corpus is a large collection of texts, which aims to be in some way representative sample of a language (this is of course not fully possible, but can help). In addition to 
+
+\par
+
+The history of learning algorithms inspired by a human brain started in the 1940s under the name \textit{cybernetics} \citep{Goodfellow-et-al-2016} \citep{McCulloch}.
+Perceptron \citep{Rosenblatt1958}, found in 1957, is the simplest neural network with just one layer serving for binary classification (see Fig. \ref{pic:perceptron}).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.8\columnwidth]{../img/perceptron}
+\caption{A one-layer perceptron architecture. The result is formed by the application of activation function on a weighted sum of inputs. Weights are updated during training till it returns satisfactory results. }
+\label{pic:perceptron}
+\end{figure}
+There also exists a multi-class version for the general classification. The problem of this perceptron was the inability to classify data that are not linearly separable \citep{Minsky2017} (see Fig. \ref{pic:xor}), which led to a lack of interest in deep networks for some period.
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1\columnwidth]{../img/xor}
+\caption{This picture illustrates XOR problem. Perception can find the correct solution only if the data are linearly separable. It means, that they can be divided by a hyperplane. An example of such two-dimensional data can be seen in picture A). The dotted line shows a possible border for separation. Picture B) shows XOR problem. XOR is a logical operation on two boolean variables, which returns true if one variable is True (1) and the other one is False (0), and returns False otherwise. Such data cannot be separated by one hyperplane. Linearly non-separable data can be for example separated by a circle (pic. C)}
+\label{pic:xor}
+\end{figure}
+\par
+\textit{Deep} neural networks era started in 2007 with bigger datasets and greater computational resources. These two new features opened the possibility of neural network learning without expertly handcrafted parameters tuning with good results.
+Some now frequently used ideas are quite old, like the perceptron or a back-propagation algorithm, and are combined with better choice of activation functions, some ideas appeared in the last two decades -- like convolutional neural networks or encoders.
+\par
+%TODO NLP ... cíle, tasky
+The basic type of DNN is a multilayer perceptron (see picture %todo picture).
+It is combined with neurons, every neuron has an activation function, which is applied to its input. Input to every, but the first layer is a weighted combination of (possibly selection of) previous layer neurons. 
+Different types of NN differs by number and shape of layers, activation functions and connections between neurons. (see Fig. \ref{pic:multilayer}).
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1\columnwidth]{../img/multilayer}
+\caption{Multilayer perceptron (or feed-forward neural network) is formed input and outpu layer and variable number of hidden layers with different sizes. In every layer, chosen application function is applied to a weighted sum of inputs from previous layer.}
+\label{pic:multilayer}
+\end{figure}
+
+Some of the key ideas for (not only) NLP and specifically for BERT, are presented in the following subsections.
+
 %v dalsi casti vysvetlim nektere nove vylepseni z poslednich let, ktere vedly k vyraznemu improvementu (nejen) v oblasti NLP.
 \subsection{Label smoothing}
 Supervised machine learning problems can be distinguished by the desired outcome as classification or regression. Classification means that we want to sort data into one of predefined classes, meanwhile regression is some numerical result. In the case of multi-class classification, true results (labels) can be in one of following forms -  text or number mark or one-hot vector. If there are more than two classes presented, one-hot vector has length equal to number of classes and consist of zeros on every indices but target class index, where is one. %TODO see picture
