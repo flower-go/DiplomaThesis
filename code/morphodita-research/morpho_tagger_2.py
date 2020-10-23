@@ -231,21 +231,26 @@ class Network:
                 self._optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables))
             else:
                 if num_gradients == 0:
-                    num_gradients = []
+                    gradients = []
                     for index ,g in enumerate(tg):
                         if not isinstance(g, tf.IndexedSlices):
                             if g == None:
-                                print("None on position: " + index + " variable " + self.outer_model.trainable_variables[index].name)
-                            num_gradients.append(g.numpy())
+                                print("None on position: " + str(index) + " variable " + str(self.outer_model.trainable_variables[index].name))
+                            else:
+                                gradients.append(g.numpy())
                         else:
-                            num_gradients.append([(g.values.numpy(), g.indices.numpy())])
+                            if g == None:
+                                print("None on position: " + str(index) + " variable " + str(self.outer_model.trainable_variables[index].name))
+                            else:
+                                gradients.append([(g.values.numpy(), g.indices.numpy())])
                     #gradients = [
                      #   g.numpy() if not isinstance(g, tf.IndexedSlices) else [(g.values.numpy(), g.indices.numpy())] for g
                      #   in tg]
                 else:
                     for g, ng in zip(gradients, tg):
                         if isinstance(g, list):
-                            g.append((ng.values.numpy(), ng.indices.numpy()))
+                            if ng != None:
+                                g.append((ng.values.numpy(), ng.indices.numpy()))
                         else:
                             g += ng.numpy()
                 num_gradients += 1
