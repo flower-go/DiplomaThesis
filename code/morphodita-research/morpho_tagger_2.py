@@ -11,6 +11,8 @@ import pickle
 import warnings
 
 from keras.models import load_model
+import warnings
+warnings.filterwarnings("ignore")
 
 
 class BertModel:
@@ -233,31 +235,31 @@ class Network:
                 if num_gradients == 0:
                     gradients = []
                     for index ,g in enumerate(tg):
-                        if not isinstance(g, tf.IndexedSlices):
-                            if g == None:
-                                print("None on position: " + str(index) + " variable " + str(self.outer_model.trainable_variables[index].name))
-                            else:
-                                gradients.append(g.numpy())
+                        if g == None:
+                            gradients.append(None)
+                        elif not isinstance(g, tf.IndexedSlices):
+                            gradients.append(g.numpy())
                         else:
-                            if g == None:
-                                print("None on position: " + str(index) + " variable " + str(self.outer_model.trainable_variables[index].name))
-                            else:
-                                gradients.append([(g.values.numpy(), g.indices.numpy())])
+                            gradients.append([(g.values.numpy(), g.indices.numpy())])
+                            print("Indexed slice: " + str(index) + "is list " + str(isinstance(gradients[-1],list)))
                     #gradients = [
                      #   g.numpy() if not isinstance(g, tf.IndexedSlices) else [(g.values.numpy(), g.indices.numpy())] for g
                      #   in tg]
                 else:
-                    for g, ng in zip(gradients, tg):
-                        if isinstance(g, list):
-                            if ng != None:
+                    
+                    for g,ng in zip(gradients,tg):
+                        if ng != None:
+                            if isinstance(g, list):
+                                print("Slice: " + str(index))
                                 g.append((ng.values.numpy(), ng.indices.numpy()))
-                        else:
-                            g += ng.numpy()
+                            else:
+                                print("numpy " +str(index))
+                                g += ng.numpy()
                 num_gradients += 1
                 if num_gradients == 4 or len(train._permutation) == 0:
                     gradients = [tf.IndexedSlices(*map(np.concatenate, zip(*g))) if isinstance(g, list) else g for g in
                                  gradients]
-                    self.optimizer.apply_gradients(zip(gradients, self.layers.trainable_variables))
+                    self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
                     num_gradients = 0
 
 
