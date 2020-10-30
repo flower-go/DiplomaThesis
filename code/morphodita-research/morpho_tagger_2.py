@@ -226,7 +226,6 @@ class Network:
                 inp.append(batch[dataset.SEGMENTS].word_ids)
                 inp.append(batch[dataset.SUBWORDS].word_ids)
 
-            #TODO opravit kdyz neni accu
             tg = self.train_batch(inp, factors)
 
             if not args.accu:
@@ -256,7 +255,7 @@ class Network:
                                 print("numpy " +str(index))
                                 g += ng.numpy()
                 num_gradients += 1
-                if num_gradients == 4 or len(train._permutation) == 0:
+                if num_gradients == args.accu or len(train._permutation) == 0:
                     gradients = [tf.IndexedSlices(*map(np.concatenate, zip(*g))) if isinstance(g, list) else g for g in
                                  gradients]
                     self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
@@ -447,7 +446,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
     args.cont = args.cont == 1
-    args.accu = args.accu == 1
+    #args.accu = args.accu == 1
 
 
     # TODO vyřešit
@@ -589,23 +588,22 @@ if __name__ == "__main__":
 
 
 
-        if not args.test_only or True:
 
-            for i, (epochs, learning_rate) in enumerate(args.epochs):
-                for epoch in range(epochs):
+        for i, (epochs, learning_rate) in enumerate(args.epochs):
+            for epoch in range(epochs):
 
-                    network.train_epoch(train, args, learning_rate)
+                network.train_epoch(train, args, learning_rate)
 
-                    if dev:
-                        print("evaluate")
-                        metrics = network.evaluate(dev, "dev", args)
-                        metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
-                        for f in [sys.stderr, log_file]:
-                            print("Dev, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f,
-                                  flush=True)
+                if dev:
+                    print("evaluate")
+                    metrics = network.evaluate(dev, "dev", args)
+                    metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
+                    for f in [sys.stderr, log_file]:
+                        print("Dev, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f,
+                              flush=True)
 
-                    if args.cont and test:
-                        test_eval()
+                if args.cont and test:
+                    test_eval()
 
             # network.saver_inference.save(network.session, "{}/checkpoint-inference".format(args.logdir), write_meta_graph=False)
             train.save_mappings("{}/mappings.pickle".format(args.logdir))
