@@ -262,9 +262,6 @@ class Network:
                                  gradients]
                     self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
                     if args.fine_lr > 0:
-                        print("model variables:")
-                        print(str(len(self.model.trainable_variables)))
-                        print(str(len(self.outer_model.trainable_variables)))
                         self._fine_optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables))
                     num_gradients = 0
 
@@ -572,6 +569,11 @@ if __name__ == "__main__":
                       factor_words=dict(
                           (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors),
                       model=model_bert)
+
+    print("model variables:")
+    print(str(network.model.trainable_variables))
+    print("outer model variables:")
+    print(str(network.outer_model.trainable_variables))
 
     # TODO nemame predikci !!!
     if args.predict:
