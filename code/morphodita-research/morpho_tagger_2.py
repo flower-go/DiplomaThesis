@@ -233,6 +233,9 @@ class Network:
             if not args.accu:
                 self._optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables))
                 if args.fine_lr > 0:
+                    print("model variables:")
+                    print(str(len(self.model.trainable_variables)))
+                    print(str(len(self.outer_model.trainable_variables)))
                     self._fine_optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables)) #TODO treba vybrat promenne!!!
             else:
                 if num_gradients == 0:
@@ -244,7 +247,7 @@ class Network:
                             gradients.append(g.numpy())
                         else:
                             gradients.append([(g.values.numpy(), g.indices.numpy())])
-                            print("Indexed slice: " + str(index) + "is list " + str(isinstance(gradients[-1],list)))
+
                     #gradients = [
                      #   g.numpy() if not isinstance(g, tf.IndexedSlices) else [(g.values.numpy(), g.indices.numpy())] for g
                      #   in tg]
@@ -253,10 +256,8 @@ class Network:
                     for g,ng in zip(gradients,tg):
                         if ng != None:
                             if isinstance(g, list):
-                                print("Slice: " + str(index))
                                 g.append((ng.values.numpy(), ng.indices.numpy()))
                             else:
-                                print("numpy " +str(index))
                                 g += ng.numpy()
                 num_gradients += 1
                 if num_gradients == args.accu or len(train._permutation) == 0:
