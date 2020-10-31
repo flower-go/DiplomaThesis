@@ -450,7 +450,7 @@ if __name__ == "__main__":
     parser.add_argument("--cont", default=0, type=int, help="load finetuned model and continue training?")
     parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
     parser.add_argument("--test_only", default=None, type=str, help="Only test evaluation")
-    parser.add_argument("--fine_lr", default=0, type=int, help="Learning rate for bert layers")
+    parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
     args.cont = args.cont == 1
