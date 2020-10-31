@@ -233,9 +233,6 @@ class Network:
             if not args.accu:
                 self._optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables))
                 if args.fine_lr > 0:
-                    print("model variables:")
-                    print(str(len(self.model.trainable_variables)))
-                    print(str(len(self.outer_model.trainable_variables)))
                     self._fine_optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables)) #TODO treba vybrat promenne!!!
             else:
                 if num_gradients == 0:
@@ -265,6 +262,9 @@ class Network:
                                  gradients]
                     self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
                     if args.fine_lr > 0:
+                        print("model variables:")
+                        print(str(len(self.model.trainable_variables)))
+                        print(str(len(self.outer_model.trainable_variables)))
                         self._fine_optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables))
                     num_gradients = 0
 
