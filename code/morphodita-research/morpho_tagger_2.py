@@ -231,9 +231,18 @@ class Network:
             tg = self.train_batch(inp, factors)
 
             if not args.accu:
-                self._optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables))
+
                 if args.fine_lr > 0:
-                    self._fine_optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables)) #TODO treba vybrat promenne!!!
+                    variables = self.outer_model.trainable_variables
+                    var1 = variables[0: args.lr_split]
+                    var2 = variables[args.lr_split:]
+                    tg1 = tg[0: args.lr_split]
+                    tg2 = tg[args.lr_split:]
+
+                    self._optimizer.apply_gradients(zip(tg2, var2))
+                    self._fine_optimizer.apply_gradients(zip(tg1, var1))
+                else:
+                    self._optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables))
             else:
                 if num_gradients == 0:
                     gradients = []
@@ -260,9 +269,17 @@ class Network:
                 if num_gradients == args.accu or len(train._permutation) == 0:
                     gradients = [tf.IndexedSlices(*map(np.concatenate, zip(*g))) if isinstance(g, list) else g for g in
                                  gradients]
-                    self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
                     if args.fine_lr > 0:
-                        self._fine_optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables))
+                        variables = self.outer_model.trainable_variables
+                        var1 = variables[0: args.lr_split]
+                        var2 = variables[args.lr_split:]
+                        tg1 = gradients[0: args.lr_split]
+                        tg2 = gradients[args.lr_split:]
+
+                        self._optimizer.apply_gradients(zip(tg2, var2))
+                        self._fine_optimizer.apply_gradients(zip(tg1, var1))
+                    else:
+                        self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
                     num_gradients = 0
 
 
@@ -570,10 +587,13 @@ if __name__ == "__main__":
                           (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors),
                       model=model_bert)
 
-    print("model variables:")
-    print(str(network.model.trainable_variables))
-    print("outer model variables:")
-    print(str(network.outer_model.trainable_variables))
+    if args.fine_lr > 0:
+        args.lr_split = len(network.outer_model.trainable_variables) - len(network.model.trainable_variables)
+
+    # print("model variables:")
+    # print(str(network.model.trainable_variables))
+    # print("outer model variables:")
+    # print(str(network.outer_model.trainable_variables))
 
     # TODO nemame predikci !!!
     if args.predict:
