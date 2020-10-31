@@ -11,8 +11,6 @@ import pickle
 import warnings
 
 from keras.models import load_model
-import warnings
-warnings.filterwarnings("ignore")
 
 
 class BertModel:
@@ -32,6 +30,8 @@ class Network:
         self.factors = args.factors
         self.factor_words = factor_words
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
+        if args.fine_lr > 0:
+            self._fine_optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
         if args.bert_model and os.path.exists(args.bert_model):
             self.model = load_model(args.bert_model)
@@ -188,7 +188,7 @@ class Network:
 
         gradients = tape.gradient(loss, tvs)
 
-        tf.summary.experimental.set_step(self._optimizer.iterations)
+        tf.summary.experimental.set_step(self._optimizer.iterations) #TODO  co to je?
         with self._writer.as_default():
             for name, metric in self._metrics.items():
                 metric.reset_states()
@@ -202,6 +202,8 @@ class Network:
 
     def train_epoch(self, dataset, args, learning_rate):
         self._optimizer.learning_rate = learning_rate
+        if args.fine_lr > 0:
+            self._fine_optimizer.learning_rate = args.fine_lr
 
 
         num_gradients = 0
@@ -229,7 +231,18 @@ class Network:
             tg = self.train_batch(inp, factors)
 
             if not args.accu:
-                self._optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables))
+
+                if args.fine_lr > 0:
+                    variables = self.outer_model.trainable_variables
+                    var1 = variables[0: args.lr_split]
+                    var2 = variables[args.lr_split:]
+                    tg1 = tg[0: args.lr_split]
+                    tg2 = tg[args.lr_split:]
+
+                    self._optimizer.apply_gradients(zip(tg2, var2))
+                    self._fine_optimizer.apply_gradients(zip(tg1, var1))
+                else:
+                    self._optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables))
             else:
                 if num_gradients == 0:
                     gradients = []
@@ -240,7 +253,7 @@ class Network:
                             gradients.append(g.numpy())
                         else:
                             gradients.append([(g.values.numpy(), g.indices.numpy())])
-                            print("Indexed slice: " + str(index) + "is list " + str(isinstance(gradients[-1],list)))
+
                     #gradients = [
                      #   g.numpy() if not isinstance(g, tf.IndexedSlices) else [(g.values.numpy(), g.indices.numpy())] for g
                      #   in tg]
@@ -249,16 +262,24 @@ class Network:
                     for g,ng in zip(gradients,tg):
                         if ng != None:
                             if isinstance(g, list):
-                                print("Slice: " + str(index))
                                 g.append((ng.values.numpy(), ng.indices.numpy()))
                             else:
-                                print("numpy " +str(index))
                                 g += ng.numpy()
                 num_gradients += 1
                 if num_gradients == args.accu or len(train._permutation) == 0:
                     gradients = [tf.IndexedSlices(*map(np.concatenate, zip(*g))) if isinstance(g, list) else g for g in
                                  gradients]
-                    self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
+                    if args.fine_lr > 0:
+                        variables = self.outer_model.trainable_variables
+                        var1 = variables[0: args.lr_split]
+                        var2 = variables[args.lr_split:]
+                        tg1 = gradients[0: args.lr_split]
+                        tg2 = gradients[args.lr_split:]
+
+                        self._optimizer.apply_gradients(zip(tg2, var2))
+                        self._fine_optimizer.apply_gradients(zip(tg1, var1))
+                    else:
+                        self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
                     num_gradients = 0
 
 
@@ -443,6 +464,7 @@ if __name__ == "__main__":
     parser.add_argument("--cont", default=0, type=int, help="load finetuned model and continue training?")
     parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
     parser.add_argument("--test_only", default=None, type=str, help="Only test evaluation")
+    parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
     args.cont = args.cont == 1
@@ -564,6 +586,14 @@ if __name__ == "__main__":
                       factor_words=dict(
                           (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors),
                       model=model_bert)
+
+    if args.fine_lr > 0:
+        args.lr_split = len(network.outer_model.trainable_variables) - len(network.model.trainable_variables)
+
+    # print("model variables:")
+    # print(str(network.model.trainable_variables))
+    # print("outer model variables:")
+    # print(str(network.outer_model.trainable_variables))
 
     # TODO nemame predikci !!!
     if args.predict:
