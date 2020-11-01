@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import collections
 import json
+import math
 
 import transformers
 import numpy as np
@@ -11,6 +12,8 @@ import pickle
 import warnings
 
 from keras.models import load_model
+
+from transformers.src.transformers import WarmUp
 
 
 class BertModel:
@@ -30,6 +33,9 @@ class Network:
         self.factors = args.factors
         self.factor_words = factor_words
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
+        if args.warmup_decay > 0:
+            self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],warmup_steps=args.warmup_decay,
+                                                   decay_schedule_fn=lambda step: 1 / math.sqrt(step))
         if args.fine_lr > 0:
             self._fine_optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
@@ -201,7 +207,8 @@ class Network:
 
 
     def train_epoch(self, dataset, args, learning_rate):
-        self._optimizer.learning_rate = learning_rate
+        if args.warmup_decay == 0:
+            self._optimizer.learning_rate = learning_rate
         if args.fine_lr > 0:
             self._fine_optimizer.learning_rate = args.fine_lr
 
@@ -465,6 +472,7 @@ if __name__ == "__main__":
     parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
     parser.add_argument("--test_only", default=None, type=str, help="Only test evaluation")
     parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
+    parser.add_argument("--warmup_decay", default=0, type=int, help="Number of warmup steps, than will be applied inverse square root decay")
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
     args.cont = args.cont == 1
