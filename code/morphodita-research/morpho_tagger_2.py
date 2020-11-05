@@ -13,7 +13,7 @@ import warnings
 
 from keras.models import load_model
 
-from transformers.src.transformers import WarmUp
+from transformers import WarmUp
 
 
 class BertModel:
