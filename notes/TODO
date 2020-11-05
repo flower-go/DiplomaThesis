@@ -10,8 +10,8 @@ X pridat smoothing
         X upravit i v evaluate!
     X upravit loss function na CategoricalCrossentropy
 
-(?) dodělat predikci
-(?) elmo
+X dodělat predikci
+X elmo
 
 X pridat slovnik
     X pridat do metrik pole
@@ -21,7 +21,7 @@ X pridat slovnik
         X prepsat do eval_batch
         X opravit pocitani predikci
 
-- pridat loss pro dvojice factors
+- pridat accuracy pro dvojice factors
 X pridat berta jen embeddingy + ukladat predpoctene
 
     X vytvorit model a tokenizer - v dataset u pocitani
@@ -41,28 +41,27 @@ X pridat berta jen embeddingy + ukladat predpoctene
     X do argumentu bert dát jmeno modelu
     X prejmenovat soubory
 
-- oprava a provereni kodu
-    - opravit embeddings po vetach
+X oprava a provereni kodu
+    X opravit embeddings po vetach
         X prepsat vypocet
         X prepsat nacitani
         X prepsat ukladani
         X prepsat pouzivani train a evaluate
-    - proverit:
-        (R) bez label smoothingu
-        (R) s label smoothingem
-        - verze před dictionary, kde bylo těch 96 (v commitu 394f125b43b25045945eb78df4f7ab852fa08e84 jsem opravovala loss function)
-        - s bertem bez label smoothingu
-        - s bertem a label smoothingem
+    X proverit:
+        X bez label smoothingu
+        X s label smoothingem
+        X verze před dictionary, kde bylo těch 96 (v commitu 394f125b43b25045945eb78df4f7ab852fa08e84 jsem opravovala loss function)
+        X s bertem bez label smoothingu
+        X s bertem a label smoothingem
 
 ================================================================================
 PHASE 2
 ================================================================================
-- pridat berta poradne a prumerovat embeddingy :(
+X pridat berta poradne a prumerovat embeddingy :(
 
 
-- sentiment s bertem bez preprocessingu (ktrain?)
-    - vytvorit model
-    - natrenovani code stejne jako u taggeru
+X sentiment s bertem bez preprocessingu
+    X vytvorit model
 
 ================================================================================
 PHASE 3
@@ -105,9 +104,9 @@ X text
         - BERT český, electra česká
     - bert bez pipeline
         ? na všech modelech
-        - je třeba k tomu dát character level embeddingy (CLS)
-        - samotný kód
-
+        - lr warmup a decay
+        - brát skoro všechny vrstvy x 4 vrstvy x prumeorovat ci konkatenovat
+        - vše pustit na roberta, bert, distillbert, slavicbert, BERT český
 - electra
     X napsat samostatný tokenizer na trénování
     - rozbalit data
