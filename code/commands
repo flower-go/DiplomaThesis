@@ -97,7 +97,7 @@ def generate_id(expe):
     output.append('"' + "all" + '"')
 
     # print("fi=`ls -t outputs | head -1`")
-    start = "grep  '^Test' $fi | awk -F'[ ,]' 'BEGIN{OFS=" + '"\\t";} {print ' + ",".join(
+    start = "grep  '^Test' outputs/$fi | awk -F'[ ,]' 'BEGIN{OFS=" + '"\\t";} {print ' + ",".join(
         output) + "," + "$4, $13, $16, $19, $22;}' >> final_results"
 
     print(start)
@@ -110,20 +110,21 @@ print(" ".join(generate_LS()))
 generate_id('"ls"')
 for m in models:
     model = m
-    generate_id('"embed"')
     print(" ".join(generate_bertemb(models[0])))
+    generate_id('"embed"')
     rescheck = checkp - 1
 
     batch = 4
     for l in lr_list:
         lr = l
-        generate_id('"fine"')
         print(" ".join(generate_bertfine()))
+        generate_id('"fine"')
 
 fine_lr = 8e-6
 lr = "5e-3"
-generate_id('"fine"')
+
 print(" ".join(generate_bertfine()))
+generate_id('"fine"')
 
 
 arr = ["2e-5", "3e-5", "4e-5", "5e-5"]
@@ -132,5 +133,6 @@ fine_lr = 0
 for l in arr:
     lr = l
     warmup = 1
-    generate_id('"fine"')
+
     print(" ".join(generate_bertfine()))
+    generate_id('"fine"')
