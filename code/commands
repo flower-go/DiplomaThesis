@@ -1,0 +1,136 @@
+from datetime import datetime
+
+models = ['"bert-base-multilingual-uncased"', '"xlm-roberta-base"', '"DeepPavlov/bert-base-bg-cs-pl-ru-cased"']
+ls = "0.03"
+lr = "5e-5"
+lr_list = ["5e-5", "3e-5", "2e-5", "8e-6", "1e-6"]
+debug = True
+test = True
+model = '"bert-base-multilingual-uncased"'
+batch = 64
+fine_lr = 0
+warmup = 0
+checkp = 0
+rescheck = None
+
+s1 = "qsub -cwd"
+s2 = "-q gpu.q -l gpu=1,mem_free=16G,h_data=16G -pe smp 2 $HOME/env_diplomka/bin/python3 morpho_tagger_2.py ~doubrap1/pdt/pdt-3.5 --embeddings ~doubrap1/embeddings/cs_lindat4gw/forms.vectors-w5-d300-ns5.npz --threads 2"
+
+
+class Experiment:
+    def __init__(self, name):
+        now = datetime.now()
+        timestr = now.strftime("%m%d_%H%M%S")
+        self.name = "outputs/$(date +%m%d-%H%M)" + "_" + name
+
+
+def generate(name):
+    e = Experiment(name)
+    global checkp
+    output = [s1]
+    output.append("-o " + e.name + "_o")
+    output.append("-e " + e.name + "_e")
+
+    output.append(s2)
+
+    if debug:
+        output.append("--debug_mode 1")
+
+    output.append("--checkp " + '"ch' + str(checkp) + '"')
+    checkp = checkp + 1
+    return output
+
+
+def generate_baseline():
+    name = "baseline"
+    return generate(name)
+
+
+def generate_LS():
+    name = "base_ls"
+    output = generate(name)
+    output.append("--label_smoothing " + ls)
+
+    return output
+
+
+def generate_bertemb(model):
+    name = "embed"
+    output = generate(name)
+    output.append("--label_smoothing " + ls)
+    output.append("--bert " + '"' + model + '"')
+
+    return output
+
+
+def generate_bertfine():
+    name = "bertfine"
+    output = generate(name)
+    output.append("--label_smoothing " + ls)
+    output.append("--bert_model " + '"bert-base-multilingual-uncased"')
+    output.append("--cont " + "1")
+    output.append('--epochs "4:' + lr + '"')
+    output.append("--accu " + "16")
+    output.append("--batch_size " + str(batch))
+    if test:
+        output.append('--test_only "checkpoints/ch' + str(rescheck) + '"')
+    if fine_lr > 0:
+        output.append("--fine_lr " + str(fine_lr))
+
+    return output
+
+
+def generate_id(expe):
+    output = []
+    ####name
+    if model == models[0]:
+        output.append('"mBERT"')
+    elif model == models[1]:
+        output.append('"roBERTa"')
+
+    ###expe
+    output.append(expe)
+
+    output.append('"base"')
+    output.append('"' + str(lr) + '"')
+    output.append('"' + str(batch) + '"')
+    output.append('"' + "all" + '"')
+
+    # print("fi=`ls -t outputs | head -1`")
+    start = "grep  '^Test' $fi | awk -F'[ ,]' 'BEGIN{OFS=" + '"\\t";} {print ' + ",".join(
+        output) + "," + "$4, $13, $16, $19, $22;}' >> final_results"
+
+    print(start)
+
+# TODO checkpoints jen u bertfine a ty správné!!
+
+print(" ".join(generate_baseline()))
+generate_id('"base"')
+print(" ".join(generate_LS()))
+generate_id('"ls"')
+for m in models:
+    model = m
+    generate_id('"embed"')
+    print(" ".join(generate_bertemb(models[0])))
+    rescheck = checkp - 1
+
+    batch = 4
+    for l in lr_list:
+        lr = l
+        generate_id('"fine"')
+        print(" ".join(generate_bertfine()))
+
+fine_lr = 8e-6
+lr = "5e-3"
+generate_id('"fine"')
+print(" ".join(generate_bertfine()))
+
+
+arr = ["2e-5", "3e-5", "4e-5", "5e-5"]
+fine_lr = 0
+
+for l in arr:
+    lr = l
+    warmup = 1
+    generate_id('"fine"')
+    print(" ".join(generate_bertfine()))

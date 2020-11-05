@@ -111,7 +111,7 @@ class Network:
             print(str(self.model.weights[0][6][1]))
             if args.test_only:
                 self.model.load_weights(args.test_only)
-                print("model inputs:  "+ str(self.model._feed_input_names))
+                print("model inputs:  " + str(self.model._feed_input_names))
 
                 print(str(self.model.weights[0][6][1]))
 
@@ -465,6 +465,7 @@ if __name__ == "__main__":
     parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
     parser.add_argument("--test_only", default=None, type=str, help="Only test evaluation")
     parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
+    parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
     args.cont = args.cont == 1
@@ -543,14 +544,14 @@ if __name__ == "__main__":
         #TODO model musi byt dva aprametry - na ten vnoreny a vnejsi. Respektive na bert model a adresa toho ulozeneho
         model_bert = None
         if args.bert or args.bert_model or args.test_only:
-            if args.bert_model and os.path.exists(args.bert_model):
-                name = "bert-base-multilingual-uncased"
+            if args.bert_model:
+                name = args.bert_model
             elif args.bert:
                 name = args.bert
-            elif args.test_only:
-                name = "bert-base-multilingual-uncased"
-            else:
-                name = args.bert_model
+            #elif args.test_only:
+                #name = "bert-base-multilingual-uncased"
+            #else:
+               # name = args.bert_model
             print("model: " + name)
             model_bert = BertModel(name, args)
 
@@ -635,10 +636,12 @@ if __name__ == "__main__":
                 if args.cont and test:
                     test_eval()
 
-            # network.saver_inference.save(network.session, "{}/checkpoint-inference".format(args.logdir), write_meta_graph=False)
-            train.save_mappings("{}/mappings.pickle".format(args.logdir))
-            #network.outer_model.save(args.logdir + "/saved_model")
-            network.outer_model.save_weights('./checkpoints/' + args.logdir.split("/")[1])
+            train.save_mappings("{}/mappings.pickle".format(args.logdir)) #TODO
+            if args.checkp:
+                checkp = args.checkp
+            else:
+                checkp = args.logdir.split("/")[1]
+            network.outer_model.save_weights('./checkpoints/' + checkp)
             print(args.logdir.split("/")[1])
 
         if test:

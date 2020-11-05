@@ -67,6 +67,72 @@ PHASE 2
 ================================================================================
 PHASE 3
 ================================================================================
+X text
+    X nastudovat vše do Milana
+    X doplnit historii NLP
+    - dopsat plán do mindenote
+        - pro část experimenty
+        - pro diskuzi rozhodnutí - lze už teď připravit minimálně otázky
+        - dopsat implementaci
+- kód
+    X zprovoznit i finetunning
+    - připravit skript na experimenty dle poznámek
+        - sentiment
+        - tag+lemma
+            - v sloupcích budou tagraw, taglemma atd..
+                i vygrepování
+                i v řádcích jednotlivé modely nějak smysluplně seřazené a pojemnované bertmodel, lr type, epocha, ktere vrstvy
+                i oddělené tabulátorem
+                - pridat do souboru
+                i osetrit ze sude radky je ten vypis
+    i upravit vypisovani vysledku aby bylo tak hezké jak chci
+    - připravit skript co načte model a pak bude interaktivně vracet odpovědi
+        - sentiment
+        - tag+lemma
+
+- experimenty tagging a lemmatizace
+    i baseline bez ls
+    i baseline s ls
+    i embeddingy
+    - finetunning
+        i 5 lr x 1-4 epochy (5e-5 3e-5 2e-5 8e-6 1e-6)
+            i batch až 64
+            i batch 16
+        i různé lr pro berta a vrstvy nad ním
+        i lr warmup a decay
+        ? brát skoro všechny vrstvy x 4 vrstvy x prumeorovat ci konkatenovat
+        i vše pustit na roberta, bert, slavicbert,
+        - BERT český, electra česká
+    - bert bez pipeline
+        ? na všech modelech
+        - je třeba k tomu dát character level embeddingy (CLS)
+        - samotný kód
+
+- electra
+    X napsat samostatný tokenizer na trénování
+    - rozbalit data
+    - projit všechny argumenty na trenovani
+    - precist elektra jestli resi ktery tokenizer pouzit
+    X prikaz na spusteni tokenizeru
+    - tokenizer encoding
+
+- sentiment - kód
+    - prozkoumat data - poměry neutral/positive/negative
+    - vyřešit že airlines nemá neutrál
+    - počítat F1, precision, recall (pro jednotlivé třídy)
+    - české SOTA výsledky
+    - zapracovat ještě mall a csfd
+    - zkusit překlad do angličtiny
+    - vše pustit na roberta, bert, distillbert, slavicbert, BERT czech
+    - s angličtinou:
+        - Zero-shot
+        - monolingual,
+        - multilingual training
+        - bez trénování jen embeddingy
+
+================================================================================
+spíš ne
+================================================================================
 - NER
     - zapojit NER do taggeru
         - pridat treti typ factors

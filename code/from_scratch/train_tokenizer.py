@@ -3,7 +3,7 @@ from tokenizers import BertWordPieceTokenizer
 
 def train(data):
     tokenizer = BertWordPieceTokenizer()
-    tokenizer.train(files=[data], vocab_size=52_000, min_frequency=2)
+    tokenizer.train(files=data, vocab_size=52_000, min_frequency=2)
     return tokenizer
 
 

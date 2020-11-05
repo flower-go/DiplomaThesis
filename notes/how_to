@@ -3,16 +3,10 @@ Tensorboard:
 - pustit tensorboard na main stroji nebo nějakýjm cpu (s option bind)
 - u mě to najdu jako : http://aic.ufal.mff.cuni.cz:6060/#scalars&_smoothingWeight=0
 
-pustit tagger příkaz zatím:
--  qsub -q gpu.q -l gpu=1,mem_free=16G,h_data=16G -pe smp 2 myenv/bin/python3 morpho_tagger.py ~straka/data/pdt/pdt-3.5 --embeddings ~straka/data/embeddings/cs_lindat4gw/forms.vectors-w5-d300-ns5.npz --threads 2
 
 
-nově:
-qsub -cwd -o vystup.txt -e error.txt -q gpu.q -l gpu=1,mem_free=16G,h_data=16G -pe smp 2 $HOME/env_diplomka/bin/python3 morpho_tagger_2.py ~doubrap1/pdt/pdt-3.5 --embeddings ~doubrap1/embeddings/cs_lindat4gw/forms.vectors-w5-d300-ns5.npz --threads 2
+qsub -cwd -o outputs/$(date +%m%d-%H%M)_tokenizer_o -e outputs/$(date +%m%d-%H%M)_tokenizer_e -q gpu.q -l gpu=1,mem_free=16G,h_data=16G -pe smp 2 $HOME/env_electra/bin/python3 train_tokenizer.py --output_dir_name "." --train_data "/home/straka/data/cs_lindat5gw/input.txt"
 
-req:
-numpy
-tensorflow-gpu==2.1.0
-tensorflow-addons-0.6.0
 
+qsub -cwd -o outputs/$(date +%m%d-%H%M)_tokenizer_o -e outputs/$(date +%m%d-%H%M)_tokenizer_e -q gpu.q -l gpu=1,mem_free=16G,h_data=16G -pe smp 2 $HOME/env_electra/bin/python3 build_pretraining_dataset.py --corpus-dir "/home/straka/data/cs_lindat5gw" --vocab-file "/home/doubrap1/electra/data/vocab.txt" --output-dir "../examples" --num-processes 2 --max-seq-length 512
 
