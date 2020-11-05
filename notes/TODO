@@ -10,8 +10,8 @@ X pridat smoothing
         X upravit i v evaluate!
     X upravit loss function na CategoricalCrossentropy
 
-(?) dodělat predikci
-(?) elmo
+X dodělat predikci
+X elmo
 
 X pridat slovnik
     X pridat do metrik pole
@@ -21,7 +21,7 @@ X pridat slovnik
         X prepsat do eval_batch
         X opravit pocitani predikci
 
-- pridat loss pro dvojice factors
+- pridat accuracy pro dvojice factors
 X pridat berta jen embeddingy + ukladat predpoctene
 
     X vytvorit model a tokenizer - v dataset u pocitani
@@ -41,31 +41,102 @@ X pridat berta jen embeddingy + ukladat predpoctene
     X do argumentu bert dát jmeno modelu
     X prejmenovat soubory
 
-- oprava a provereni kodu
-    - opravit embeddings po vetach
+X oprava a provereni kodu
+    X opravit embeddings po vetach
         X prepsat vypocet
         X prepsat nacitani
         X prepsat ukladani
         X prepsat pouzivani train a evaluate
-    - proverit:
-        (R) bez label smoothingu
-        (R) s label smoothingem
-        - verze před dictionary, kde bylo těch 96 (v commitu 394f125b43b25045945eb78df4f7ab852fa08e84 jsem opravovala loss function)
-        - s bertem bez label smoothingu
-        - s bertem a label smoothingem
+    X proverit:
+        X bez label smoothingu
+        X s label smoothingem
+        X verze před dictionary, kde bylo těch 96 (v commitu 394f125b43b25045945eb78df4f7ab852fa08e84 jsem opravovala loss function)
+        X s bertem bez label smoothingu
+        X s bertem a label smoothingem
 
 ================================================================================
 PHASE 2
 ================================================================================
-- pridat berta poradne a prumerovat embeddingy :(
+X pridat berta poradne a prumerovat embeddingy :(
 
 
-- sentiment s bertem bez preprocessingu (ktrain?)
-    - vytvorit model
-    - natrenovani code stejne jako u taggeru
+X sentiment s bertem bez preprocessingu
+    X vytvorit model
 
 ================================================================================
 PHASE 3
+================================================================================
+X text
+    X nastudovat vše do Milana
+    X doplnit historii NLP
+    - dopsat plán do mindenote
+        - pro část experimenty
+        - pro diskuzi rozhodnutí - lze už teď připravit minimálně otázky
+        - dopsat implementaci
+- kód
+    X zprovoznit i finetunning
+    - připravit skript na experimenty dle poznámek
+        - sentiment
+        - tag+lemma
+            - v sloupcích budou tagraw, taglemma atd..
+            - v řádcích jednotlivé modely nějak smysluplně seřazené a pojemnované
+                - bertmodel, lr type, epocha, ktere vrstvy
+            - oddělené tabulátorem
+    - upravit vypisovani vysledku aby bylo tak hezké jak chci
+    - připravit skript co načte model a pak bude interaktivně vracet odpovědi
+        - sentiment
+        - tag+lemma
+
+- experimenty tagging a lemmatizace
+    i baseline bez ls
+    i baseline s ls
+    i embeddingy
+    - finetunning
+        i 5 lr x 1-4 epochy (5e-5 3e-5 2e-5 8e-6 1e-6)
+            i batch až 64
+            i batch 16
+        i různé lr pro berta a vrstvy nad ním
+        - lr warmup a decay
+        - brát skoro všechny vrstvy x 4 vrstvy x prumeorovat ci konkatenovat
+        - vše pustit na roberta, bert, distillbert, slavicbert, BERT český
+    - bert bez pipeline
+        - na všech modelech
+        - je třeba k tomu dát character level embeddingy (CLS)
+        - samotný kód
+
+- electra
+    X napsat samostatný tokenizer na trénování
+    - rozbalit data
+    - projit všechny argumenty na trenovani
+    - precist elektra jestli resi ktery tokenizer pouzit
+    X prikaz na spusteni tokenizeru
+    - tokenizer encoding
+
+- sentiment - kód
+    - prozkoumat data - poměry neutral/positive/negative
+    - vyřešit že airlines nemá neutrál
+    - počítat F1, precision, recall (pro jednotlivé třídy)
+    - české SOTA výsledky
+    - zapracovat ještě mall a csfd
+    - zkusit překlad do angličtiny
+    - vše pustit na roberta, bert, distillbert, slavicbert, BERTiczech
+    - s angličtinou:
+        - Zero-shot
+        - monolingual,
+        - multilingual training
+        - bez trénování jen embeddingy
+
+
+
+
+
+
+
+
+
+
+================================================================================
+spíš ne
 ================================================================================
 - NER
     - zapojit NER do taggeru
