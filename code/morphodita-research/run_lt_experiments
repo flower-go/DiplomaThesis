@@ -1,0 +1,24 @@
+#!/bin/bash                                                                                                                    #!/bin/bash
+
+sleep_time=30 # seconds; don't make this too short! don't want to tax system with excessive qstat calls
+
+me=`whoami`
+alias myqstat='qstat | grep $me'
+i=1
+while read p; do
+  #echo "$p"
+
+    stdout=`eval $p` # call the command and capture the stdout
+    
+    id=`echo $stdout | awk -F' ' '{print $3}'` # get the jobid
+    status=`myqstat | grep $id` # check to see if job is running
+    echo $status
+    i=$((i+1))
+    while [ -n "$status" ] # while $status is not empty
+        do
+            sleep $sleep_time
+            status=`myqstat | grep $id`
+        done
+    fi=`ls -t outputs | head -1`
+
+done < commands
