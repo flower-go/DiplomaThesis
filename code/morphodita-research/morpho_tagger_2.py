@@ -587,6 +587,8 @@ if __name__ == "__main__":
 
     #TODO nacitat velikost
     args.bert_size = 768
+    if args.warmup_decay > 0:
+        args.warmup_decay = math.floor(len(train.factors[1].word_strings)/args.batch_size)
     # Construct the network
     network = Network(args=args,
                       num_words=len(train.factors[train.FORMS].words),
