@@ -17,7 +17,7 @@ if __name__ == "__main__":
     # Parse arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("--train_data", type=str, help="Path to training data")
-    parser.add_argument("--test_data", type=str, help="Path to training data")
+    parser.add_argument("--test_data", type=str, help="Path to test data")
     parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
     parser.add_argument("--accu_step", default=64, type=int, help="Gradient acccumulation number of steps")
     parser.add_argument("--epochs", default=1, type=int, help="Number of epochs")
