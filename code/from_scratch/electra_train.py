@@ -26,7 +26,8 @@ if __name__ == "__main__":
     parser.add_argument("--warmup_steps", default=10000, type=int, help="Number of warmup steps.")
     parser.add_argument("--eval_steps", default=76000, type=int, help="Evaluation step after n steps")
     parser.add_argument("--gpu", default=1, type=int, help="Number of GPUs")
-    parser.add_argument("--tokenizer", type=str, help="Path to tokenizer")
+    parser.add_argument("--tokenizer",default=None, type=str, help="Path to tokenizer")
+    parser.add_argument("--tok_data", default=None, type=str, help="Path to training data for tokenizer")
 
     args = parser.parse_args()
 
@@ -49,7 +50,7 @@ if __name__ == "__main__":
         "warmup_steps": args.warmup_steps,
         # ? muzu to mit v upper case?
         "do_lower_case": True,
-
+        "output_dir": "./results",
         "evaluate_during_training": True,
         "evaluate_during_training_steps": args.eval_steps,
         "save_eval_checkpoints": True,
@@ -65,17 +66,19 @@ if __name__ == "__main__":
         "early_stopping_delta": 0,
         "early_stopping_metric": "eval_loss",
         "early_stopping_metric_minimize": True,
+        "overwrite_output_dir": True,
 
         "manual_seed": None,
         "encoding": None,
         "dataset_type": "simple",
         "tokenizer_name": args.tokenizer,
-        "wandb_project": "Esperanto - ELECTRA",
-        "wandb_kwargs": {"name": "Electra-BASE"},
         "evaluate_during_training_verbose": True,
         "use_cached_eval_features": True,
         "sliding_window": True,
         "vocab_size": 52000,
+        "config": {
+            "vocab_size": 52000,
+        },
         "generator_config": {
             "embedding_size": 768,
             "hidden_size": 768,
@@ -94,8 +97,11 @@ if __name__ == "__main__":
     model = LanguageModelingModel(
         "electra",
         None,
-        args=train_args
+        args=train_args,
+        use_cuda=False,
+        train_files=args.tok_data
     )
+    print(str(model.tokenizer))
 
     model.train_model(
         args.train_data, eval_file=args.test_data,
@@ -105,3 +111,4 @@ if __name__ == "__main__":
 
 
 
+        
