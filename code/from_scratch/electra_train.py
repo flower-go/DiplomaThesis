@@ -19,7 +19,7 @@ if __name__ == "__main__":
     parser.add_argument("--train_data", type=str, help="Path to training data")
     parser.add_argument("--test_data", type=str, help="Path to training data")
     parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
-    parser.add_argument("--accu_step", default=64, type=int, help="Gradient acccumulation number of steps")
+    parser.add_argument("--accu_step", default=1, type=int, help="Gradient acccumulation number of steps")
     parser.add_argument("--epochs", default=1, type=int, help="Number of epochs")
     parser.add_argument("--lr", default=2e-4, type=int, help="Learning rate")
     parser.add_argument("--adam_lr", default=1e-6, type=int, help="Adam epsilon")
@@ -75,20 +75,8 @@ if __name__ == "__main__":
         "evaluate_during_training_verbose": True,
         "use_cached_eval_features": True,
         "sliding_window": True,
-        "vocab_size": 52000,
-        "config": {
-            "vocab_size": 52000,
-        },
-        "generator_config": {
-            "embedding_size": 768,
-            "hidden_size": 768,
-            "num_hidden_layers": 3,
-        },
-        "discriminator_config": {
-            "embedding_size": 768,
-            "hidden_size": 768,
-            "num_attention_heads": 12,
-        },
+        "vocab_size": 52000
+
     }
 
     train_file = "data/train_all.txt"
