@@ -6,7 +6,6 @@ from simpletransformers.language_modeling import LanguageModelingModel
 import logging
 
 
-
 if __name__ == "__main__":
     import argparse
     import sys
@@ -55,7 +54,7 @@ if __name__ == "__main__":
         "evaluate_during_training_steps": args.eval_steps,
         "save_eval_checkpoints": True,
 
-        "reprocess_input_data": False,
+        "reprocess_input_data": True,
 
         # ? "process_count": cpu_count() - 2 if cpu_count() > 2 else 1
         "n_gpu": args.gpu,
@@ -91,9 +90,6 @@ if __name__ == "__main__":
         },
     }
 
-    train_file = "data/train_all.txt"
-    test_file = "data/test.txt"
-
     model = LanguageModelingModel(
         "electra",
         None,
@@ -101,13 +97,12 @@ if __name__ == "__main__":
         use_cuda=False,
         train_files=args.tok_data
     )
-    print(str(model.tokenizer))
 
     model.train_model(
         args.train_data, eval_file=args.test_data,
     )
 
-    model.eval_model(test_file)
+    model.eval_model(args.test_data)
 
 
 
