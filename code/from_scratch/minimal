@@ -1,0 +1,36 @@
+import logging
+
+from simpletransformers.language_modeling import (
+    LanguageModelingModel,
+    LanguageModelingArgs,
+)
+
+
+logging.basicConfig(level=logging.INFO)
+transformers_logger = logging.getLogger("transformers")
+transformers_logger.setLevel(logging.WARNING)
+
+model_args = LanguageModelingArgs()
+model_args.reprocess_input_data = True
+model_args.overwrite_output_dir = True
+model_args.num_train_epochs = 1
+model_args.dataset_type = "simple"
+model_args.vocab_size = 30000
+
+
+train_file = "train_small"
+test_file = "test_small"
+
+model = LanguageModelingModel(
+    "electra",
+    None,
+    args=model_args,
+    train_files=train_file,
+    use_cuda=False
+)
+
+# Train the model
+model.train_model(train_file, eval_file=test_file)
+
+# Evaluate the model
+result = model.eval_model(test_file)
