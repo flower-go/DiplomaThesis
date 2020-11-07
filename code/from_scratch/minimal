@@ -22,7 +22,7 @@ if __name__ == "__main__":
     parser.add_argument("--train_data", type=str, help="Path to training data")
     parser.add_argument("--test_data", type=str, help="Path to test data")
     parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
-    parser.add_argument("--accu_step", default=2, type=int, help="Gradient acccumulation number of steps")
+    parser.add_argument("--accu_step", default=16, type=int, help="Gradient acccumulation number of steps")
     parser.add_argument("--epochs", default=1, type=int, help="Number of epochs")
     parser.add_argument("--lr", default=2e-4, type=int, help="Learning rate")
     parser.add_argument("--adam_lr", default=1e-6, type=int, help="Adam epsilon")
@@ -35,37 +35,34 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     model_args = LanguageModelingArgs()
-    model_args.reprocess_input_data = True
-    model_args.overwrite_output_dir = True
-    model_args.num_train_epochs = 1
+
+    model_args.adam_epsilon= args.adam_lr
     model_args.dataset_type = "simple"
-    model_args.vocab_size = 30000
-    model_args.max_seq_length: 512  
-    model_args.train_batch_size = args.batch_size
-    model_args.gradient_accumulation_steps = args.accu_step
-    model_args.num_train_epochs = args.epochs
-    model_args.warmup_steps = args.warmup_steps
     model_args.do_lower_case =  True
-    model_args.output_dir= "./results"
-    model_args.evaluate_during_training= True
-    model_args.evaluate_during_training_steps= 100
-    model_args.save_eval_checkpoints= True
-    model_args.reprocess_input_data= True
-    model_args.n_gpu= args.gpu
-    model_args.use_multiprocessing= True
-    model_args.use_early_stopping= True
-    model_args.early_stopping_patience= 3
     model_args.early_stopping_delta= 0
     model_args.early_stopping_metric= "eval_loss"
     model_args.early_stopping_metric_minimize= True
-    model_args.overwrite_output_dir= True
-
-    model_args.learning_rate= args.lr
-    model_args.adam_epsilon= args.adam_lr
-    model_args.manual_seed= None
+    model_args.early_stopping_patience = 3
     model_args.encoding= None
-    model_args.sliding_window= True
-    model_args.use_cached_eval_features= True
+    model_args.evaluate_during_training = True
+    model_args.evaluate_during_training_steps = 1000
+    model_args.gradient_accumulation_steps = args.accu_step
+    model_args.learning_rate = args.lr
+    model_args.manual_seed = None
+    model_args.max_seq_length: 512
+    model_args.n_gpu = args.gpu
+    model_args.num_train_epochs = 1
+    model_args.num_train_epochs = args.epochs
+    model_args.output_dir = "./results"
+    model_args.overwrite_output_dir = True
+    model_args.save_eval_checkpoints = True
+    model_args.sliding_window = True #TODO?
+    model_args.train_batch_size = args.batch_size
+    model_args.use_cached_eval_features = True
+    model_args.use_early_stopping = True
+    model_args.use_multiprocessing = True
+    model_args.vocab_size = 30000
+    model_args.warmup_steps = args.warmup_steps
     
 
 
@@ -82,11 +79,11 @@ if __name__ == "__main__":
 
 
     model = LanguageModelingModel(
-	"electra",
-	None,
-	args=model_args,
-	train_files=args.tok_data,
-	use_cuda=False
+        "electra",
+        None,
+        args=model_args,
+        train_files=args.tok_data,
+        use_cuda=False
     )
     
     print(str(model.discriminator_config))
