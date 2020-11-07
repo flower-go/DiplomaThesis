@@ -60,6 +60,8 @@ if __name__ == "__main__":
     model_args.early_stopping_metric_minimize: True
     model_args.overwrite_output_dir: True
 
+    model_args.learning_rate: args.lr
+    model_args.adam_epsilon: args.adam_lr
     model_args.manual_seed: None
     model_args.encoding: None
     model_args.sliding_window: True
