@@ -67,6 +67,17 @@ if __name__ == "__main__":
     model_args.sliding_window: True
     model_args.use_cached_eval_features: True
 
+    generator_config = {
+            "embedding_size": 768,
+            "hidden_size": 768,
+            "num_hidden_layers": 3,
+        }
+    discriminator_config = {
+            "embedding_size": 768,
+            "hidden_size": 768,
+            "num_attention_heads": 12,
+        }
+
     model = LanguageModelingModel(
 	"electra",
 	None,
