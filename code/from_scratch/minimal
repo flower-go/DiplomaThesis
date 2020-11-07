@@ -24,10 +24,10 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
     parser.add_argument("--accu_step", default=64, type=int, help="Gradient acccumulation number of steps")
     parser.add_argument("--epochs", default=1, type=int, help="Number of epochs")
-    parser.add_argument("--lr", default=2e-4, type=int, help="Learning rate")
+    parser.add_argument("--lr", default=5e-4, type=int, help="Learning rate")
     parser.add_argument("--adam_lr", default=1e-6, type=int, help="Adam epsilon")
     parser.add_argument("--warmup_steps", default=10000, type=int, help="Number of warmup steps.")
-    parser.add_argument("--eval_steps", default=76000, type=int, help="Evaluation step after n steps")
+    parser.add_argument("--eval_steps", default=10000, type=int, help="Evaluation step after n steps")
     parser.add_argument("--gpu", default=1, type=int, help="Number of GPUs")
     #parser.add_argument("--tokenizer",default=None, type=str, help="Path to tokenizer")
     parser.add_argument("--tok_data", default=None, type=str, help="Path to training data for tokenizer")
@@ -55,6 +55,7 @@ if __name__ == "__main__":
     model_args.num_train_epochs = args.epochs
     model_args.output_dir = "./results"
     model_args.overwrite_output_dir = True
+    model_args.silent = True
     model_args.save_eval_checkpoints = True
     model_args.sliding_window = True #TODO?
     model_args.train_batch_size = args.batch_size
