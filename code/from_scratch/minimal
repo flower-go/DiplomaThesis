@@ -22,14 +22,14 @@ if __name__ == "__main__":
     parser.add_argument("--train_data", type=str, help="Path to training data")
     parser.add_argument("--test_data", type=str, help="Path to test data")
     parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
-    parser.add_argument("--accu_step", default=64, type=int, help="Gradient acccumulation number of steps")
+    parser.add_argument("--accu_step", default=2, type=int, help="Gradient acccumulation number of steps")
     parser.add_argument("--epochs", default=1, type=int, help="Number of epochs")
     parser.add_argument("--lr", default=2e-4, type=int, help="Learning rate")
     parser.add_argument("--adam_lr", default=1e-6, type=int, help="Adam epsilon")
     parser.add_argument("--warmup_steps", default=10000, type=int, help="Number of warmup steps.")
     parser.add_argument("--eval_steps", default=76000, type=int, help="Evaluation step after n steps")
     parser.add_argument("--gpu", default=1, type=int, help="Number of GPUs")
-    parser.add_argument("--tokenizer",default=None, type=str, help="Path to tokenizer")
+    #parser.add_argument("--tokenizer",default=None, type=str, help="Path to tokenizer")
     parser.add_argument("--tok_data", default=None, type=str, help="Path to training data for tokenizer")
 
     args = parser.parse_args()
@@ -41,17 +41,17 @@ if __name__ == "__main__":
     model_args.dataset_type = "simple"
     model_args.vocab_size = 30000
     model_args.max_seq_length: 512  
-    model_args.train_batch_size: 4 
-    model_args.gradient_accumulation_steps: 2
-    model_args.num_train_epochs: 1
-    model_args.warmup_steps: 10
+    model_args.train_batch_size: args.batch_size
+    model_args.gradient_accumulation_steps: args.accu_step
+    model_args.num_train_epochs: args.epochs
+    model_args.warmup_steps: args.warmup_steps
     model_args.do_lower_case: True
     model_args.output_dir: "./results"
     model_args.evaluate_during_training: True
     model_args.evaluate_during_training_steps: 100
     model_args.save_eval_checkpoints: True
     model_args.reprocess_input_data: True
-    model_args.n_gpu: 1
+    model_args.n_gpu: args.gpu
     model_args.use_multiprocessing: True
     model_args.use_early_stopping: True
     model_args.early_stopping_patience: 3
@@ -65,19 +65,16 @@ if __name__ == "__main__":
     model_args.sliding_window: True
     model_args.use_cached_eval_features: True
 
-    train_file = "train_small"
-    test_file = "test_small"
-
     model = LanguageModelingModel(
 	"electra",
 	None,
 	args=model_args,
-	train_files=train_file,
+	train_files=args.tok_data,
 	use_cuda=False
     )
 
     # Train the model
-    model.train_model(train_file, eval_file=test_file)
+    model.train_model(args.train_data, eval_file=args.test_data)
 
     # Evaluate the model
-    result = model.eval_model(test_file)
+    result = model.eval_model(args.test_data)
