@@ -66,17 +66,20 @@ if __name__ == "__main__":
     model_args.encoding: None
     model_args.sliding_window: True
     model_args.use_cached_eval_features: True
+    
 
-    generator_config = {
+
+    model_args.generator_config = {
             "embedding_size": 768,
             "hidden_size": 768,
             "num_hidden_layers": 3,
         }
-    discriminator_config = {
+    model_args.discriminator_config = {
             "embedding_size": 768,
             "hidden_size": 768,
             "num_attention_heads": 12,
         }
+
 
     model = LanguageModelingModel(
 	"electra",
@@ -85,6 +88,8 @@ if __name__ == "__main__":
 	train_files=args.tok_data,
 	use_cuda=False
     )
+    
+    print(str(model.discriminator_config))
 
     # Train the model
     model.train_model(args.train_data, eval_file=args.test_data)
