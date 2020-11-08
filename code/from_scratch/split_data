@@ -5,15 +5,20 @@ print(os.getcwd())
 
 file="/home/straka/data/cs_lindat5gw/input.txt"
 
-file1 = open(file, 'r') 
+file1 = open(file, 'r')
 X = file1.readlines()
 
 
 train, test = train_test_split(X, test_size=0.3, random_state=42)
-with open("./train.txt", "w") as f:
+test, eval = train_test_split(test, test_size=0.5, random_state=42)
+with open("train1.txt", "w") as f:
     for line in train:
-        f.write(line + "\n")
+        f.write(line)
 
-with open("./test.txt", "w") as f:
+with open("test1.txt", "w") as f:
     for line in test:
-        f.write(line + "\n")
+        f.write(line)
+
+with open("eval1.txt", "w") as f:
+    for line in eval:
+        f.write(line )
