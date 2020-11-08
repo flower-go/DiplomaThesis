@@ -1,0 +1,19 @@
+from sklearn.model_selection import train_test_split
+import os
+
+print(os.getcwd())
+
+file="/home/straka/data/cs_lindat5gw/input.txt"
+
+file1 = open(file, 'r') 
+X = file1.readlines()
+
+
+train, test = train_test_split(X, test_size=0.3, random_state=42)
+with open("./train.txt", "w") as f:
+    for line in train:
+        f.write(line + "\n")
+
+with open("./test.txt", "w") as f:
+    for line in test:
+        f.write(line + "\n")
