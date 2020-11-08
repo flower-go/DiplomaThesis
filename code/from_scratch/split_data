@@ -3,8 +3,8 @@ import os
 
 print(os.getcwd())
 
-file="/home/straka/data/cs_lindat5gw/input.txt"
-
+#file="/home/straka/data/cs_lindat5gw/input.txt"
+file = "./test_small"
 file1 = open(file, 'r')
 X = file1.readlines()
 

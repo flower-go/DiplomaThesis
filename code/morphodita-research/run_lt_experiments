@@ -1,12 +1,13 @@
 #!/bin/bash                                                                                                                    #!/bin/bash
 
 sleep_time=30 # seconds; don't make this too short! don't want to tax system with excessive qstat calls
-
+shopt -s expand_aliases
 me=`whoami`
 alias myqstat='qstat | grep $me'
 i=1
-while read p; do
-  #echo "$p"
+while read -r p; do
+    echo "$p"
+    echo $i
 
     stdout=`eval $p` # call the command and capture the stdout
     
