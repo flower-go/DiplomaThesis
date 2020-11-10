@@ -91,8 +91,6 @@ class Network:
     def train_epoch(self, dataset, args, learning_rate):
         if args.warmup_decay == 0:
             self._optimizer.learning_rate = learning_rate
-        if args.fine_lr > 0:
-            self._fine_optimizer.learning_rate = args.fine_lr
 
         num_gradients = 0
 
@@ -102,35 +100,14 @@ class Network:
             for f in self.factors:
                 words = batch[dataset.FACTORS_MAP[f]].word_ids
                 factors.append(words)
-            inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
+            inp = batch[dataset.FORMS].word_ids
             print('train epoch')
-            if args.embeddings:
-                embeddings = self._compute_embeddings(batch, dataset)
-                inp.append(embeddings)
-
-            if args.bert:
-                bert_embeddings = self._compute_bert(batch, dataset, sentence_lens)
-                inp.append(bert_embeddings)
-
-            if args.bert_model:
-                inp.append(batch[dataset.SEGMENTS].word_ids)
-                inp.append(batch[dataset.SUBWORDS].word_ids)
 
             tg = self.train_batch(inp, factors)
 
             if not args.accu:
 
-                if args.fine_lr > 0:
-                    variables = self.outer_model.trainable_variables
-                    var1 = variables[0: args.lr_split]
-                    var2 = variables[args.lr_split:]
-                    tg1 = tg[0: args.lr_split]
-                    tg2 = tg[args.lr_split:]
-
-                    self._optimizer.apply_gradients(zip(tg2, var2))
-                    self._fine_optimizer.apply_gradients(zip(tg1, var1))
-                else:
-                    self._optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables))
+                self._optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables))
             else:
                 if num_gradients == 0:
                     gradients = []
