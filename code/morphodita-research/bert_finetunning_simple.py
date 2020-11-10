@@ -44,7 +44,8 @@ class Network:
         self.bert = model.model
         model_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2][-1]
 
-        self.outer_model = tf.keras.Model(inputs=inp2, outputs=model_output)
+        self.outer_model = tf.keras.Model(inputs=[subwords], outputs=model_output)
+
 
         if args.label_smoothing:
             self._loss = tf.losses.CategoricalCrossentropy()
