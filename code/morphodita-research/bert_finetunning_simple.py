@@ -63,6 +63,8 @@ class Network:
         with tf.GradientTape() as tape:
             probabilities = self.outer_model(inputs, training=True)
             tvs = self.outer_model.trainable_variables
+            print(probabilities)
+            print(str(probabilities.shape))
 
             if len(self.factors) == 1:
                 probabilities = [probabilities]
