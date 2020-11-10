@@ -29,7 +29,7 @@ class BertModel:
 
 
 class Network:
-    def __init__(self, args, num_words, num_chars, factor_words, model):
+    def __init__(self, args, num_words, num_chars, factor_words, model, labels):
 
         self.factors = args.factors
         self.factor_words = factor_words
@@ -43,6 +43,7 @@ class Network:
 
         self.bert = model.model
         model_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2][-1]
+        model_output = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(model_output)
 
         self.outer_model = tf.keras.Model(inputs=[subwords], outputs=model_output)
 
@@ -437,7 +438,7 @@ if __name__ == "__main__":
                       num_chars=len(train.factors[train.FORMS].alphabet),
                       factor_words=dict(
                           (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors),
-                      model=model_bert)
+                      model=model_bert, labels=len(labels_unique))
 
     # TODO nemame predikci !
     # slova: batch[0].word_ids
