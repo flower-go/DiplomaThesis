@@ -49,7 +49,7 @@ class MorphoDataset:
             self.analyses_ids = analyses_ids
 
     def __init__(self, filename, embeddings=None, elmo=None, train=None, lemma_re_strip=None, lemma_rule_min=None,
-                 shuffle_batches=True, max_sentences=None, bert=None):
+                 shuffle_batches=True, max_sentences=None, bert=None, simple=False):
         # Create factors
         self.bert = bert
         self._factors = []
@@ -228,12 +228,13 @@ class MorphoDataset:
                             bert_segments[-1].extend([i_w] * len(w_e))
                             bert_subwords[-1].extend(w_e)
 
-                        bert_subwords[-1] = np.array(tokenizer.build_inputs_with_special_tokens(bert_subwords[-1]),
+                        if not simple:
+                            bert_subwords[-1] = np.array(tokenizer.build_inputs_with_special_tokens(bert_subwords[-1]),
                                                      dtype=np.int32)
 
                         bert_segments[-1] = np.array(bert_segments[-1], dtype=np.int32)
 
-                    if bert.embeddings_only:
+                    if bert.embeddings_only and not simple:
                         w_subwords = bert_subwords[start:]
 
                         max_len = np.max([len(w) for w in w_subwords])
