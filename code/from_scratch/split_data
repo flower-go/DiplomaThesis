@@ -1,24 +1,31 @@
-from sklearn.model_selection import train_test_split
+
 import os
+import random
 
 print(os.getcwd())
 
 file="/home/straka/data/cs_lindat5gw/input.txt"
+#file = "oscar_small"
+random.seed(6)
 
-file1 = open(file, 'r')
-X = file1.readlines()
+def write_to_file(filename, data):
+    with open(filename, "a") as f:
+        for line in data:
+            f.write(line)
 
+# Using readline()
+data = []
+with open(file, 'r') as f:
+    for line in f:
 
-train, test = train_test_split(X, test_size=0.3, random_state=42)
-test, eval = train_test_split(test, test_size=0.5, random_state=42)
-with open("train1.txt", "w") as f:
-    for line in train:
-        f.write(line)
+        if not line.strip():
+            is_test = random.randint(1,1000) < 10
+            if is_test:
+                name = "test.txt"
+            else:
+                name = "train.txt"
+            write_to_file(name,data)
+            data = []
+        else:
+            data.append(line)
 
-with open("test1.txt", "w") as f:
-    for line in test:
-        f.write(line)
-
-with open("eval1.txt", "w") as f:
-    for line in eval:
-        f.write(line )
