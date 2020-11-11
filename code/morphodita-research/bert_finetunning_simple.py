@@ -61,23 +61,21 @@ class Network:
 
     @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, factors):
+        tags_mask = tf.not_equal(factors[0],0)
         with tf.GradientTape() as tape:
             probabilities = self.outer_model(inputs, training=True)
             tvs = self.outer_model.trainable_variables
             print(probabilities)
             print(str(probabilities.shape))
 
-            if len(self.factors) == 1:
-                probabilities = [probabilities]
             loss = 0.0
-            for i in range(len(self.factors)):
-                if args.label_smoothing:
-                    loss += self._loss(
-                        tf.one_hot(factors[i], self.factor_words[self.factors[i]]) * (1 - args.label_smoothing)
-                        + args.label_smoothing / self.factor_words[self.factors[i]], probabilities[i],
-                        probabilities[i]._keras_mask)
-                else:
-                    loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
+
+            if args.label_smoothing:
+                loss += self._loss(
+                    tf.one_hot(factors[0], self.factor_words[self.factors[0]]) * (1 - args.label_smoothing)
+                    + args.label_smoothing / self.factor_words[self.factors[0]], probabilities[0],tags_mask)
+            else:
+                loss += self._loss(tf.convert_to_tensor(factors[0]), probabilities, tags_mask)
 
         gradients = tape.gradient(loss, tvs)
 
@@ -438,7 +436,7 @@ if __name__ == "__main__":
                       num_chars=len(train.factors[train.FORMS].alphabet),
                       factor_words=dict(
                           (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors),
-                      model=model_bert, labels=len(labels_unique))
+                      model=model_bert, labels=labels_unique)
 
     # TODO nemame predikci !
     # slova: batch[0].word_ids
