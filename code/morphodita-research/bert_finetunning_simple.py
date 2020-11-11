@@ -84,8 +84,8 @@ class Network:
             for name, metric in self._metrics.items():
                 metric.reset_states()
             self._metrics["loss"](loss)
-            for i in range(len(self.factors)):
-                self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
+
+            self._metrics[self.factors[0] + "Raw"](factors[0], probabilities[0], tags_mask)
             for name, metric in self._metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
         return gradients
@@ -186,20 +186,18 @@ class Network:
 
     @tf.function(experimental_relax_shapes=True)
     def evaluate_batch(self, inputs, factors):
+        tags_mask = tf.not_equal(factors[0], 0)
         probabilities = self.outer_model(inputs, training=False)
-        if len(self.factors) == 1:
-            probabilities = [probabilities]
         loss = 0
-        for i in range(len(self.factors)):
-            if args.label_smoothing:
-                loss += self._loss(tf.one_hot(factors[i], self.factor_words[self.factors[i]]), probabilities[i],
-                                   probabilities[i]._keras_mask)
-            else:
-                loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
+
+        if args.label_smoothing:
+            loss += self._loss(tf.one_hot(factors[0], self.factor_words[self.factors[0]]), probabilities,
+                               tags_mask)
+        else:
+            loss += self._loss(tf.convert_to_tensor(factors[0]), probabilities[0], tags_mask)
 
         self._metrics["loss"](loss)
-        for i in range(len(self.factors)):
-            self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
+        self._metrics[self.factors[0] + "Raw"](factors[0], probabilities[0], tags_mask)
 
         return probabilities, [probabilities[f]._keras_mask for f in range(len(self.factors))]
 
