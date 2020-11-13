@@ -85,7 +85,8 @@ class Network:
                 metric.reset_states()
             self._metrics["loss"](loss)
 
-            self._metrics[self.factors[0] + "Raw"](factors[0], probabilities[0], tags_mask)
+
+            self._metrics[self.factors[0] + "Raw"](factors[0], probabilities, tags_mask)
             for name, metric in self._metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
         return gradients
@@ -197,9 +198,9 @@ class Network:
             loss += self._loss(tf.convert_to_tensor(factors[0]), probabilities[0], tags_mask)
 
         self._metrics["loss"](loss)
-        self._metrics[self.factors[0] + "Raw"](factors[0], probabilities[0], tags_mask)
+        self._metrics[self.factors[0] + "Raw"](factors[0], probabilities, tags_mask)
 
-        return probabilities, [probabilities[f]._keras_mask for f in range(len(self.factors))]
+        return probabilities, tags_mask
 
     def evaluate(self, dataset, dataset_name, args):
         for metric in self._metrics.values():
