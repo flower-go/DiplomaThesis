@@ -211,66 +211,9 @@ class Network:
             factors = []
             for f in self.factors:
                 factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
-            any_analyses = any(batch[train.FACTORS_MAP[factor]].analyses_ids for factor in self.factors)
             inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
-            if args.embeddings:
-                embeddings = self._compute_embeddings(batch, dataset)
-                inp.append(embeddings)
-
-            if args.bert:
-                bert_embeddings = self._compute_bert(batch, dataset, sentence_lens)
-                inp.append(bert_embeddings)
-
-            if args.bert_model:
-                inp.append(batch[dataset.SEGMENTS].word_ids)
-                inp.append(batch[dataset.SUBWORDS].word_ids)
 
             probabilities, mask = self.evaluate_batch(inp, factors)
-
-            if any_analyses:
-                predictions = [np.argmax(p, axis=2) for p in probabilities]
-
-                for i in range(len(sentence_lens)):
-                    for j in range(sentence_lens[i]):
-
-                        analysis_ids = [batch[dataset.FACTORS_MAP[factor]].analyses_ids[i][j] for factor in
-                                        self.factors]
-                        if not analysis_ids or len(analysis_ids[0]) == 0:
-                            continue
-
-                        known_analysis = any(all(analysis_ids[f][a] != dataset.UNK for f in range(len(self.factors)))
-                                             for a in range(len(analysis_ids[0])))
-                        if not known_analysis:
-                            continue
-
-                        # Compute probabilities of unknown analyses as minimum probability
-                        # of a known analysis - 1e-3.
-
-                        analysis_probs = [probabilities[factor][i, j].numpy() for factor in range(len(self.factors))]
-
-                        for f in range(len(args.factors)):
-                            min_probability = None
-                            for analysis in analysis_ids[f]:
-
-                                # TODO spatny shape, probabilities f analysis je vektor
-                                if analysis != dataset.UNK and (min_probability is None or analysis_probs[f][
-                                    analysis] - 1e-3 < min_probability):
-                                    min_probability = analysis_probs[f][analysis] - 1e-3
-
-                            analysis_probs[f][dataset.UNK] = min_probability
-                            analysis_probs[f][dataset.PAD] = min_probability
-
-                        best_index, best_prob = None, None
-                        for index in range(len(analysis_ids[0])):
-                            prob = sum(analysis_probs[f][analysis_ids[f][index]] for f in range(len(args.factors)))
-                            if best_index is None or prob > best_prob:
-                                best_index, best_prob = index, prob
-                        for f in range(len(args.factors)):
-                            predictions[f][i, j] = analysis_ids[f][best_index]
-
-            for fc in range(len(self.factors)):
-                self._metrics[self.factors[fc] + "Dict"](factors[fc] == predictions[fc],
-                                                         mask[fc])
 
         metrics = {name: metric.result() for name, metric in self._metrics.items()}
         with self._writer.as_default():
