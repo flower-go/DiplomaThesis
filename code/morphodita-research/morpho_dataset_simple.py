@@ -2,7 +2,7 @@ import morpho_dataset
 import os
 import numpy as np
 
-class SimpleDataset(morpho_dataset):
+class SimpleDataset():
 
     def __init__(self, debug, data,model):
         train,dev,test = self.return_simple_data(debug,data,model)
