@@ -92,7 +92,7 @@ class Network:
 
         num_gradients = 0
 
-        while not dataset.train.epoch_finished():
+        while not dataset.epoch_finished():
             sentence_lens, batch = dataset.next_batch(args.batch_size)
             factors = []
             for f in self.factors:
@@ -261,12 +261,12 @@ if __name__ == "__main__":
     # parser.add_argument("--test_only", default=None, type=str, help="Only test evaluation")
     # parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
     # parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
-    # parser.add_argument("--warmup_decay", default=0, type=int,
-    #                     help="Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--warmup_decay", default=0, type=int,
+                         help="Number of warmup steps, than will be applied inverse square root decay")
 
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
-#    args.cont = args.cont == 1
+  # args.cont = args.cont == 1
 
     # TODO vyřešit
     # tf.config.threading.set_inter_op_parallelism_threads(args.threads)
@@ -330,7 +330,7 @@ if __name__ == "__main__":
     for i, (epochs, learning_rate) in enumerate(args.epochs):
         for epoch in range(epochs):
 
-            network.train_epoch(dataset, args, learning_rate)
+            network.train_epoch(dataset.train, args, learning_rate)
 
             # if dev:
             #     print("evaluate")
