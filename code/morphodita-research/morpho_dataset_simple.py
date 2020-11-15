@@ -1,11 +1,23 @@
 import morpho_dataset
 import os
 import numpy as np
+import transformers
+
+class BertModel:
+    def __init__(self, name):
+        self.name = name
+        self.config = transformers.BertConfig.from_pretrained(name)
+        self.config.output_hidden_states = True
+        self.tokenizer = transformers.BertTokenizer.from_pretrained(name)
+        self.model = transformers.TFBertModel.from_pretrained(name,
+                                                              config=self.config)
+        self.embeddings_only = False
 
 class SimpleDataset(morpho_dataset):
 
     def __init__(self, debug, data,model):
-        train,dev,test = self.return_simple_data(debug,data,model)
+        model_bert = BertModel(model)
+        train,dev,test = self.return_simple_data(debug,data,model_bert)
         #TODO zbyle datasety
         self.train_encodings = train.bert_subwords
         train_tag_labels = train._factors[train.TAGS].word_ids
