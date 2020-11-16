@@ -7,7 +7,9 @@ import transformers
 import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
+from keras import backend as b
 import morpho_dataset
+import morpho_dataset_simple as mds
 import pickle
 import warnings
 
@@ -29,33 +31,23 @@ class BertModel:
 
 
 class Network:
-    def __init__(self, args, num_words, num_chars, factor_words, model, labels):
+    def __init__(self, args, model, labels):
 
-        self.factors = args.factors
-        self.factor_words = factor_words
-        self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
-        # if args.warmup_decay > 0:
-        #     self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],warmup_steps=args.warmup_decay,
-        #                                            decay_schedule_fn=lambda step: 1 / math.sqrt(step))
-
-        segments = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
         subwords = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+        inp = [subwords]
+        bert = model.model
+        bert_output = bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
 
-        self.bert = model.model
-        model_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2][-1]
-        model_output = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(model_output)
-
-        self.outer_model = tf.keras.Model(inputs=[subwords], outputs=model_output)
-
-
-        if args.label_smoothing:
-            self._loss = tf.losses.CategoricalCrossentropy()
-        else:
-            self._loss = tf.losses.SparseCategoricalCrossentropy()
-        self._metrics = {"loss": tf.metrics.Mean()}
-        for f in self.factors:
-            self._metrics[f + "Raw"] = tf.metrics.SparseCategoricalAccuracy()
-            self._metrics[f + "Dict"] = tf.metrics.Mean()
+        dropout = tf.keras.layers.Dropout(args.dropout)(bert_output)
+        # dense s softmaxem
+        predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
+        # model(inputs, outputs)
+        self.model = tf.keras.Model(inputs=inp, outputs=predictions)
+        # compile model
+        self.optimizer=tf.optimizers.Adam()
+        self.loss=tf.losses.SparseCategoricalCrossentropy()
+        self.metrics = {"loss": tf.metrics.Mean()}
+        self.metrics["TagsRaw"] = tf.metrics.SparseCategoricalAccuracy()
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
@@ -63,54 +55,52 @@ class Network:
     def train_batch(self, inputs, factors):
         tags_mask = tf.not_equal(factors[0],0)
         with tf.GradientTape() as tape:
-            probabilities = self.outer_model(inputs, training=True)
-            tvs = self.outer_model.trainable_variables
+            probabilities = self.model(inputs, training=True)
+            tvs = self.model.trainable_variables
             print(probabilities)
             print(str(probabilities.shape))
 
             loss = 0.0
 
             if args.label_smoothing:
-                loss += self._loss(
+                loss += self.loss(
                     tf.one_hot(factors[0], self.factor_words[self.factors[0]]) * (1 - args.label_smoothing)
                     + args.label_smoothing / self.factor_words[self.factors[0]], probabilities[0],tags_mask)
             else:
-                loss += self._loss(tf.convert_to_tensor(factors[0]), probabilities, tags_mask)
+                loss += self.loss(tf.convert_to_tensor(factors[0]), probabilities, tags_mask)
 
         gradients = tape.gradient(loss, tvs)
 
-        tf.summary.experimental.set_step(self._optimizer.iterations)  # TODO  co to je?
+        tf.summary.experimental.set_step(self.optimizer.iterations)  # TODO  co to je?
         with self._writer.as_default():
-            for name, metric in self._metrics.items():
+            for name, metric in self.metrics.items():
                 metric.reset_states()
-            self._metrics["loss"](loss)
+            self.metrics["loss"](loss)
+            self.metrics["TagsRaw"](factors[0], probabilities, tags_mask)
 
-
-            self._metrics[self.factors[0] + "Raw"](factors[0], probabilities, tags_mask)
-            for name, metric in self._metrics.items():
+            for name, metric in self.metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
         return gradients
 
     def train_epoch(self, dataset, args, learning_rate):
         if args.warmup_decay == 0:
-            self._optimizer.learning_rate = learning_rate
+            self.optimizer.learning_rate = learning_rate
 
         num_gradients = 0
 
-        while not train.epoch_finished():
+        while not dataset.epoch_finished():
             sentence_lens, batch = dataset.next_batch(args.batch_size)
             factors = []
-            for f in self.factors:
-                words = batch[dataset.FACTORS_MAP[f]].word_ids
-                factors.append(words)
-            inp = batch[dataset.FORMS].word_ids
+            words = batch[1].word_ids
+            factors.append(words)
+            inp = batch[dataset.data.FORMS].word_ids #TODO treba pridat input
             print('train epoch')
 
             tg = self.train_batch(inp, factors)
 
             if not args.accu:
 
-                self._optimizer.apply_gradients(zip(tg, self.outer_model.trainable_variables))
+                self.optimizer.apply_gradients(zip(tg, self.model.trainable_variables))
             else:
                 if num_gradients == 0:
                     gradients = []
@@ -134,11 +124,11 @@ class Network:
                             else:
                                 g += ng.numpy()
                 num_gradients += 1
-                if num_gradients == args.accu or len(train._permutation) == 0:
+                if num_gradients == args.accu or len(dataset.data._permutation) == 0:
                     gradients = [tf.IndexedSlices(*map(np.concatenate, zip(*g))) if isinstance(g, list) else g for g in
                                  gradients]
                     if args.fine_lr > 0:
-                        variables = self.outer_model.trainable_variables
+                        variables = self.model.trainable_variables
                         var1 = variables[0: args.lr_split]
                         var2 = variables[args.lr_split:]
                         tg1 = gradients[0: args.lr_split]
@@ -147,7 +137,7 @@ class Network:
                         self._optimizer.apply_gradients(zip(tg2, var2))
                         self._fine_optimizer.apply_gradients(zip(tg1, var1))
                     else:
-                        self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
+                        self._optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
                     num_gradients = 0
 
     # TODO create inputs jako jednu metodu pro train i evaluate!
@@ -188,34 +178,34 @@ class Network:
     @tf.function(experimental_relax_shapes=True)
     def evaluate_batch(self, inputs, factors):
         tags_mask = tf.not_equal(factors[0], 0)
-        probabilities = self.outer_model(inputs, training=False)
+        probabilities = self.model(inputs, training=False)
         loss = 0
 
         if args.label_smoothing:
-            loss += self._loss(tf.one_hot(factors[0], self.factor_words[self.factors[0]]), probabilities,
+            loss += self.loss(tf.one_hot(factors[0], self.factor_words[self.factors[0]]), probabilities,
                                tags_mask)
         else:
-            loss += self._loss(tf.convert_to_tensor(factors[0]), probabilities[0], tags_mask)
+            loss += self.loss(tf.convert_to_tensor(factors[0]), probabilities, tags_mask)
 
-        self._metrics["loss"](loss)
-        self._metrics[self.factors[0] + "Raw"](factors[0], probabilities, tags_mask)
+        self.metrics["loss"](loss)
+        self.metrics["TagsRaw"](factors[1], probabilities, tags_mask)
 
         return probabilities, tags_mask
 
     def evaluate(self, dataset, dataset_name, args):
-        for metric in self._metrics.values():
+        for metric in self.metrics.values():
             metric.reset_states()
         while not dataset.epoch_finished():
             sentence_lens, batch = dataset.next_batch(args.batch_size)
 
             factors = []
-            for f in self.factors:
-                factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
-            inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
+
+            factors.append(batch[1].word_ids)
+            inp = [batch[dataset.data.FORMS].word_ids]
 
             probabilities, mask = self.evaluate_batch(inp, factors)
 
-        metrics = {name: metric.result() for name, metric in self._metrics.items()}
+        metrics = {name: metric.result() for name, metric in self.metrics.items()}
         with self._writer.as_default():
             for name, value in metrics.items():
                 tf.summary.scalar("{}/{}".format(dataset_name, name), value)
@@ -243,36 +233,19 @@ if __name__ == "__main__":
     parser.add_argument("data", type=str, help="Input data")
     parser.add_argument("--batch_size", default=64, type=int, help="Batch size.")
     parser.add_argument("--beta_2", default=0.99, type=float, help="Adam beta 2")
-    parser.add_argument("--char_dropout", default=0, type=float, help="Character dropout")
-    parser.add_argument("--cle_dim", default=256, type=int, help="Character-level embedding dimension.")
-    parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
-    parser.add_argument("--embeddings", default=None, type=str, help="External embeddings to use.")
     parser.add_argument("--epochs", default="40:1e-3,20:1e-4", type=str, help="Epochs and learning rates.")
+    parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
-    parser.add_argument("--factors", default="Lemmas,Tags", type=str, help="Factors to predict.")
-    parser.add_argument("--factor_layers", default=1, type=int, help="Per-factor layers.")
+    parser.add_argument("--factors", default="Tags", type=str, help="Factors to predict.")
     parser.add_argument("--label_smoothing", default=0.00, type=float, help="Label smoothing.")
-    parser.add_argument("--lemma_re_strip", default=r"(?<=.)(?:`|_|-[^0-9]).*$", type=str,
-                        help="RE suffix to strip from lemma.")
-    parser.add_argument("--lemma_rule_min", default=2, type=int, help="Minimum occurences to keep a lemma rule.")
-    parser.add_argument("--min_epoch_batches", default=300, type=int, help="Minimum number of batches per epoch.")
-    parser.add_argument("--predict", default=None, type=str, help="Predict using the passed model.")
-    parser.add_argument("--rnn_cell", default="LSTM", type=str, help="RNN cell type.")
-    parser.add_argument("--rnn_cell_dim", default=512, type=int, help="RNN cell dimension.")
-    parser.add_argument("--rnn_layers", default=3, type=int, help="RNN layers.")
     parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
-    parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
-    parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
     parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
     parser.add_argument("--bert", default=None, type=str, help="Bert model for embeddings")
-    parser.add_argument("--bert_model", default=None, type=str, help="Bert model for training")
     parser.add_argument("--cont", default=0, type=int, help="load finetuned model and continue training?")
     parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
-    parser.add_argument("--test_only", default=None, type=str, help="Only test evaluation")
-    parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
-    parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
     parser.add_argument("--warmup_decay", default=0, type=int,
-                        help="Number of warmup steps, than will be applied inverse square root decay")
+                         help="Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
 
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
@@ -324,61 +297,30 @@ if __name__ == "__main__":
         data_paths[2] = "{}-test.txt".format(args.data)
 
     # TODO udelat cyklus
-    train = morpho_dataset.MorphoDataset(data_paths[0],
-                                         embeddings=args.embeddings_words if args.embeddings else None,
-                                         bert=model_bert,
-                                         lemma_re_strip=args.lemma_re_strip,
-                                         lemma_rule_min=args.lemma_rule_min, simple=True)
+    # train = morpho_dataset.MorphoDataset(data_paths[0],
+    #                                      embeddings=None,
+    #                                      bert=model_bert,
+    #                                      lemma_re_strip=r"(?<=.)(?:`|_|-[^0-9]).*$",
+    #                                      lemma_rule_min=2, simple=True)
+    dataset = mds.SimpleDataset(args.debug_mode, args.data,"train", args.bert)
 
-    if os.path.exists(data_paths[1]):
-        dev = morpho_dataset.MorphoDataset(data_paths[1], train=train, shuffle_batches=False,
-                                           bert=model_bert, simple=True
-                                           )
-    else:
-        dev = None
+    dev = mds.SimpleDataset(args.debug_mode,args.data, "dev", args.bert, train=dataset.data)
 
-    if os.path.exists(data_paths[2]):
-        test = morpho_dataset.MorphoDataset(data_paths[2], train=train, shuffle_batches=False,
-                                            bert=model_bert, simple=True
-                                            )
-    else:
-        test = None
+    test = mds.SimpleDataset(args.debug_mode, args.data, "test", args.bert, train=dataset.data)
 
     args.bert_size = 768
-    if args.warmup_decay > 0:
-        args.warmup_decay = math.floor(len(train.factors[1].word_strings) / args.batch_size)
+    #if args.warmup_decay > 0:
+    #    args.warmup_decay = math.floor(len(train.factors[1].word_strings) / args.batch_size)
     # Construct the network
 
-    train_encodings = train.bert_subwords
-    train_tag_labels = train._factors[train.TAGS].word_ids
-    train_segments = train.bert_segments
-    labels_unique = len(train.factors[0].words_map) #TODO tohle je nekde ulozené
-
-
-    def encode_tags(tags, encodings, segments):
-        labels = tags
-        encoded_labels = []
-        for doc_labels, s in zip(labels, segments):
-            # create an empty array of -100
-            doc_enc_labels = np.ones(len(s), dtype=int) * -100
-            first_indices = np.nonzero(np.r_[1, np.diff(s)])
-
-            # set labels whose first offset position is 0 and the second is not 0
-            doc_enc_labels[first_indices] = doc_labels
-            encoded_labels.append(doc_enc_labels.tolist())
-
-        return encoded_labels
-
-
-    train_labels = encode_tags(train_tag_labels, train_encodings,train_segments )
+    #train_encodings = train.bert_subwords
+    #train_tag_labels = train._factors[train.TAGS].word_ids
+    #train_segments = train.bert_segments
+    #labels_unique = len(train.factors[train.TAGS].words)
 
 
     network = Network(args=args,
-                      num_words=len(train.factors[train.FORMS].words),
-                      num_chars=len(train.factors[train.FORMS].alphabet),
-                      factor_words=dict(
-                          (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors),
-                      model=model_bert, labels=labels_unique)
+                      model=model_bert, labels=dataset.NUM_TAGS)
 
     # TODO nemame predikci !
     # slova: batch[0].word_ids
@@ -388,7 +330,7 @@ if __name__ == "__main__":
 
     log_file = open("{}/log".format(args.logdir), "w")
     for factor in args.factors:
-        print("{}: {}".format(factor, len(train.factors[train.FACTORS_MAP[factor]].words)), file=log_file,
+        print("{}: {}".format(factor, len(dataset.data.factors[dataset.data.FACTORS_MAP[factor]].words)), file=log_file,
               flush=True)
     print("Tagging with args:", "\n".join(("{}: {}".format(key, value) for key, value in sorted(vars(args).items())
                                            if key not in ["embeddings_data", "embeddings_words"])), flush=True)
@@ -404,7 +346,7 @@ if __name__ == "__main__":
     for i, (epochs, learning_rate) in enumerate(args.epochs):
         for epoch in range(epochs):
 
-            network.train_epoch(train, args, learning_rate)
+            network.train_epoch(dataset, args, learning_rate)
 
             if dev:
                 print("evaluate")
@@ -417,13 +359,13 @@ if __name__ == "__main__":
             if args.cont and test:
                 test_eval()
 
-        train.save_mappings("{}/mappings.pickle".format(args.logdir))  # TODO
+        dataset.data.save_mappings("{}/mappings.pickle".format(args.logdir))  # TODO
         if args.checkp:
             checkp = args.checkp
         else:
             checkp = args.logdir.split("/")[1]
 
-        network.outer_model.save_weights('./checkpoints/' + checkp)
+        network.model.save_weights('./checkpoints/' + checkp)
         print(args.logdir.split("/")[1])
 
     if test:
