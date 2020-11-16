@@ -139,7 +139,7 @@ class Network:
                         self._fine_optimizer.apply_gradients(zip(tg1, var1))
                     else:
                         print("trainable variables")
-                        print(str(len(self.model.trainable_variables))
+                        print(str(len(self.model.trainable_variables)))
                         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
                     num_gradients = 0
 
