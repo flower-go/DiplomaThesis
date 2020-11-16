@@ -42,6 +42,10 @@ class Network:
         subwords = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
 
         self.bert = model.model
+
+
+  
+        print ("Froze Embedding Layer")
         model_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2][-1]
         model_output = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(model_output)
 
@@ -65,6 +69,7 @@ class Network:
         with tf.GradientTape() as tape:
             probabilities = self.outer_model(inputs, training=True)
             tvs = self.outer_model.trainable_variables
+            tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
             print(probabilities)
             print(str(probabilities.shape))
 
@@ -195,7 +200,7 @@ class Network:
             loss += self._loss(tf.one_hot(factors[0], self.factor_words[self.factors[0]]), probabilities,
                                tags_mask)
         else:
-            loss += self._loss(tf.convert_to_tensor(factors[0]), probabilities[0], tags_mask)
+            loss += self._loss(tf.convert_to_tensor(factors[0]), probabilities, tags_mask)
 
         self._metrics["loss"](loss)
         self._metrics[self.factors[0] + "Raw"](factors[0], probabilities, tags_mask)

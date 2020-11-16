@@ -17,16 +17,16 @@ class SimpleDataset():
 
     def __init__(self, debug, data,model):
         model_bert = BertModel(model)
-        train,dev,test = self.return_simple_data(debug,data,model_bert)
+        self.train,self.dev,self.test = self.return_simple_data(debug,data,model_bert)
         #TODO zbyle datasety
-        self.train_encodings = train.bert_subwords
-        train_tag_labels = train._factors[train.TAGS].word_ids
-        self.train_segments = train.bert_segments
+        self.train_encodings = self.train.bert_subwords
+        train_tag_labels = self.train._factors[self.train.TAGS].word_ids
+        self.train_segments = self.train.bert_segments
         self.train_tag_labels = self.encode_tags(train_tag_labels, self.train_segments)
 
         #TODO mozna factor_words
 
-        self.NUM_TAGS = len(train.factors[0].words_map)
+        self.NUM_TAGS = len(self.train.factors[0].words_map)
 
 
     def encode_tags(self, tags, segments):
