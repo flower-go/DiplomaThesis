@@ -306,11 +306,11 @@ if __name__ == "__main__":
     #                                      bert=model_bert,
     #                                      lemma_re_strip=r"(?<=.)(?:`|_|-[^0-9]).*$",
     #                                      lemma_rule_min=2, simple=True)
-    dataset = mds.SimpleDataset(args.debug_mode, args.data,"train", args.bert)
+    dataset = mds.SimpleDataset(args.debug_mode, args.data,"train", model_bert)
 
-    dev = mds.SimpleDataset(args.debug_mode,args.data, "dev", args.bert, train=dataset.data)
+    dev = mds.SimpleDataset(args.debug_mode,args.data, "dev", model_bert, train=dataset.data)
 
-    test = mds.SimpleDataset(args.debug_mode, args.data, "test", args.bert, train=dataset.data)
+    test = mds.SimpleDataset(args.debug_mode, args.data, "test", model_bert, train=dataset.data)
 
     args.bert_size = 768
     #if args.warmup_decay > 0:

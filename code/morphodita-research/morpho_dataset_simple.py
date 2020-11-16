@@ -23,7 +23,7 @@ class SimpleDataset():
             self.analyses_ids = analyses_ids
 
     def __init__(self, debug, data, name,model, train=None):
-        model_bert = BertModel(model)
+        model_bert = model
         self.data = self.return_simple_data(debug,data,model_bert, name, train=None)
         self._sentence_lens = np.array([len(s)+2 for s in self.data.bert_segments])
         self._permutation = np.random.permutation(len(self._sentence_lens)) if self.data._shuffle_batches else np.arange(
