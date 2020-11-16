@@ -228,8 +228,7 @@ class MorphoDataset:
                             bert_segments[-1].extend([i_w] * len(w_e))
                             bert_subwords[-1].extend(w_e)
 
-                        if not simple:
-                            bert_subwords[-1] = np.array(tokenizer.build_inputs_with_special_tokens(bert_subwords[-1]),
+                        bert_subwords[-1] = np.array(tokenizer.build_inputs_with_special_tokens(bert_subwords[-1]),
                                                      dtype=np.int32)
 
                         bert_segments[-1] = np.array(bert_segments[-1], dtype=np.int32)
