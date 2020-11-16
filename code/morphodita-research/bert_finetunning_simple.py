@@ -138,7 +138,9 @@ class Network:
                         self._optimizer.apply_gradients(zip(tg2, var2))
                         self._fine_optimizer.apply_gradients(zip(tg1, var1))
                     else:
-                        self._optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
+                        print("trainable variables")
+                        print(str(len(self.model.trainable_variables))
+                        self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
                     num_gradients = 0
 
     # TODO create inputs jako jednu metodu pro train i evaluate!
@@ -189,7 +191,7 @@ class Network:
             loss += self.loss(tf.convert_to_tensor(factors[0]), probabilities, tags_mask)
 
         self.metrics["loss"](loss)
-        self.metrics["TagsRaw"](factors[1], probabilities, tags_mask)
+        self.metrics["TagsRaw"](factors[0], probabilities, tags_mask)
 
         return probabilities, tags_mask
 
@@ -246,6 +248,7 @@ if __name__ == "__main__":
     parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
     parser.add_argument("--warmup_decay", default=0, type=int,
                          help="Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
     parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
 
     args = parser.parse_args()
