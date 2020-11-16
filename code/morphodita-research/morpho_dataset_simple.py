@@ -31,6 +31,7 @@ class SimpleDataset():
 
 
         self.data._factors[self.data.TAGS].word_ids = self.encode_tags(self.data._factors[self.data.TAGS].word_ids,
+                                                                       self.data.bert_segments)
 
 
         self.NUM_TAGS = len(self.data.factors[0].words_map)
