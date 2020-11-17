@@ -140,7 +140,7 @@ if __name__ == "__main__":
     train_examples = imdb_covertion(train_examples)
 
     facebook.train._data["tokens"].append(train_examples)
-    facebook.train._data["labels"].append(train_labels)
+    facebook.train._data["labels"].append(np.array(train_labels) + 1)
 
 
     # Create the network and train
