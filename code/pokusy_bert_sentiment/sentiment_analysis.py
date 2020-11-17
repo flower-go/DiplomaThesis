@@ -29,12 +29,11 @@ class Network:
 
         bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
         # vezmu posledni vrstvu
-        print(bert_output.shape)
         # dropout
-        # dropout = tf.keras.layers.Dropout(args.dropout)(bert_output)
+        dropout = tf.keras.layers.Dropout(args.dropout)(bert_output)
         # dense s softmaxem
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(bert_output)
-        # model(inputs, outputs)
+
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
         # compile model
         self.model.compile(optimizer=tf.optimizers.Adam(),
@@ -92,7 +91,7 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", default=32, type=int, help="Batch size.")
     parser.add_argument("--bert", default="bert-base-multilingual-uncased", type=str, help="BERT model.")
     parser.add_argument("--epochs", default="2:5e-5,1:2e-5", type=str, help="Number of epochs.")
-    parser.add_argument("--dropout", default=0.1, type=float, help="Dropout.")
+    parser.add_argument("--dropout", default=0.5, type=float, help="Dropout.")
     parser.add_argument("--seed", default=42, type=int, help="Random seed.")
     parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose TF logging.")
@@ -138,29 +137,11 @@ if __name__ == "__main__":
                                       batch_size=-1, as_supervised=True)
 
     train_examples = tfds.as_numpy(train_data)
-    #train_examples = train_examples[:10]
-    #train_labels = train_labels[:10]
-    #test_examples, test_labels = tfds.as_numpy(test_data)
-    #(x_train, y_train), (x_test, y_test) = tf.keras.datasets.imdb.load_data()
-
     train_examples = imdb_covertion(train_examples)
-    print("test")
-    #test_examples = imdb_covertion(test_examples)
-    #train_ex,dev_ex, train_l, dev_l = train_test_split(train_examples,train_labels, stratify=train_labels, train_size=0.6)
-
 
     facebook.train._data["tokens"].append(train_examples)
     facebook.train._data["labels"].append(train_labels)
-   #facebook.dev._data["tokens"].append(dev_ex)
-    #facebook.dev._data["labels"].append(dev_l)
-    #facebook.test._data["tokens"].append(test_examples)
-    #facebook.test._data["labels"].append(test_labels)
 
-
-
-    #facebook.train._data["labels"] = facebook.train._data["labels"][:10]
-    #facebook.train._data["tokens"] = facebook.train._data["tokens"][:10]
-    #facebook.train._size = len(facebook.train._data["tokens"])
 
     # Create the network and train
     network = Network(args, len(facebook.train.LABELS))
