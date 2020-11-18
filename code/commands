@@ -1,10 +1,12 @@
 from datetime import datetime
 
-models = ['"bert-base-multilingual-uncased"', '"xlm-roberta-base"', '"DeepPavlov/bert-base-bg-cs-pl-ru-cased"']
+models = [
+    '"bert-base-multilingual-uncased"',
+    '"jplu/tf-xlm-roberta-base"']
 ls = "0.03"
 lr = "5e-5"
 lr_list = ["5e-5", "3e-5", "2e-5", "8e-6", "1e-6"]
-debug = True
+debug = False
 test = True
 model = '"bert-base-multilingual-uncased"'
 batch = 64
@@ -21,7 +23,7 @@ class Experiment:
     def __init__(self, name):
         now = datetime.now()
         timestr = now.strftime("%m%d_%H%M%S")
-        self.name = "outputs/$(date +%m%d-%H%M)" + "_" + name
+        self.name = "com_out2/$(date +%m%d-%H%M)" + "_" + name
 
 
 def generate(name):
@@ -63,11 +65,11 @@ def generate_bertemb(model):
     return output
 
 
-def generate_bertfine():
+def generate_bertfine(model):
     name = "bertfine"
     output = generate(name)
     output.append("--label_smoothing " + ls)
-    output.append("--bert_model " + '"bert-base-multilingual-uncased"')
+    output.append("--bert_model " + model)
     output.append("--cont " + "1")
     output.append('--epochs "4:' + lr + '"')
     output.append("--accu " + "16")
@@ -91,7 +93,12 @@ def generate_id(expe):
     ###expe
     output.append(expe)
 
-    output.append('"base"')
+    if (fine_lr > 0):
+        output.append('"f' + str(fine_lr) + '"')
+    elif (warmup > 0):
+        output.append('"warm"')
+    else:
+        output.append('"base"')
     output.append('"' + str(lr) + '"')
     output.append('"' + str(batch) + '"')
     output.append('"' + "all" + '"')
@@ -102,37 +109,45 @@ def generate_id(expe):
 
     print(start)
 
-# TODO checkpoints jen u bertfine a ty správné!!
+#TODO warmup a optimizers
+####################### bez bertů #######################################
+# print(" ".join(generate_baseline()))
+# generate_id('"base"')
+# print(" ".join(generate_LS()))
+# generate_id('"ls"')
 
-print(" ".join(generate_baseline()))
-generate_id('"base"')
-print(" ".join(generate_LS()))
-generate_id('"ls"')
+####################### pro každý model ###################################
 for m in models:
     model = m
-    print(" ".join(generate_bertemb(models[0])))
+    ################### embeddings ########################################
+    print(" ".join(generate_bertemb(model)))
     generate_id('"embed"')
     rescheck = checkp - 1
 
+    ################### all learning rates, 4 epochs ######################
     batch = 4
     for l in lr_list:
         lr = l
-        print(" ".join(generate_bertfine()))
+        print(" ".join(generate_bertfine(model)))
         generate_id('"fine"')
 
-fine_lr = 8e-6
-lr = "5e-3"
+    ################### two optimizers ####################
 
-print(" ".join(generate_bertfine()))
-generate_id('"fine"')
+    fine_lr = 8e-6
+    lr = "5e-3"
 
-
-arr = ["2e-5", "3e-5", "4e-5", "5e-5"]
-fine_lr = 0
-
-for l in arr:
-    lr = l
-    warmup = 1
-
-    print(" ".join(generate_bertfine()))
+    print(" ".join(generate_bertfine(model)))
     generate_id('"fine"')
+
+    ################## warmup ###########################
+
+
+    arr = ["2e-5", "3e-5", "4e-5", "5e-5"]
+    fine_lr = 0
+
+    for l in arr:
+        lr = l
+        warmup = 1
+
+        print(" ".join(generate_bertfine(model)))
+        generate_id('"fine"')
