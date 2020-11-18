@@ -118,7 +118,10 @@ def generate_id(expe):
 
 ####################### pro každý model ###################################
 for m in models:
+    warmup = 0
+    fine_lr = 0
     model = m
+    batch = 64
     ################### embeddings ########################################
     print(" ".join(generate_bertemb(model)))
     generate_id('"embed"')
