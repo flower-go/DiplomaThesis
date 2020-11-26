@@ -24,7 +24,7 @@ class SimpleDataset():
 
     def __init__(self, debug, data, name,model, train=None):
         model_bert = model
-        self.data = self.return_simple_data(debug,data,model_bert, name, train=None)
+        self.data = self.return_simple_data(debug,data,model_bert, name, train)
         self._sentence_lens = np.array([len(s)+2 for s in self.data.bert_segments])
         self._permutation = np.random.permutation(len(self._sentence_lens)) if self.data._shuffle_batches else np.arange(
             len(self._sentence_lens))
@@ -48,7 +48,6 @@ class SimpleDataset():
             first_indices = first_indices + 1
 
             doc_enc_labels[first_indices] = doc_labels
-            #doc_enc_labels = doc_enc_labels + 1
             encoded_labels.append(doc_enc_labels.tolist())
 
         return encoded_labels
