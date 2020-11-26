@@ -193,7 +193,12 @@ class MorphoDataset:
 
         if bert:
 
-            bert_file_name = (".").join(filename.split("/")[-1].split(".")[0:-1]) + "." + bert.name
+            a = bert.name.split("/")
+            if len(a) == 1:
+                bertname = bert.name
+            else:
+                bertname = a[1]
+            bert_file_name = (".").join(filename.split("/")[-1].split(".")[0:-1]) + "." + bertname
             bert_path = bert_file_name + ".pickle"
 
             # if BERT embeddings are precomputed
