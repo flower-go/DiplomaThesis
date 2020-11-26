@@ -274,6 +274,7 @@ class Network:
                                 g += ng.numpy()
                 num_gradients += 1
                 if num_gradients == args.accu or len(train._permutation) == 0:
+                    gradients = gradients/args.accu
                     gradients = [tf.IndexedSlices(*map(np.concatenate, zip(*g))) if isinstance(g, list) else g for g in
                                  gradients]
                     if args.fine_lr > 0:
@@ -599,7 +600,7 @@ if __name__ == "__main__":
                           (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors),
                       model=model_bert)
     if args.debug_mode:
-        tf.keras.utils.plot_model(network.outer_model, "my_first_model_with_shape_info.png", show_shapes=True)
+        tf.keras.utils.plot_model(network.outer_model, "my_first_model_with_shape_info.svg", show_shapes=True)
 
     if args.fine_lr > 0:
         args.lr_split = len(network.outer_model.trainable_variables) - len(network.model.trainable_variables)
