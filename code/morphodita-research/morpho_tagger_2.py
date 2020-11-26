@@ -19,10 +19,10 @@ from transformers import WarmUp
 class BertModel:
     def __init__(self, name, args):
         self.name = name
-        self.config = transformers.BertConfig.from_pretrained(name)
+        self.config = transformers.AutoConfig.from_pretrained(name)
         self.config.output_hidden_states = True
         self.tokenizer = transformers.BertTokenizer.from_pretrained(name)
-        self.model = transformers.TFBertModel.from_pretrained(name,
+        self.model = transformers.TFAutoModel.from_pretrained(name,
                                                               config=self.config)
         self.embeddings_only=True if args.bert else False
 
@@ -598,6 +598,8 @@ if __name__ == "__main__":
                       factor_words=dict(
                           (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors),
                       model=model_bert)
+    if args.debug_mode:
+        tf.keras.utils.plot_model(network.outer_model, "my_first_model_with_shape_info.png", show_shapes=True)
 
     if args.fine_lr > 0:
         args.lr_split = len(network.outer_model.trainable_variables) - len(network.model.trainable_variables)

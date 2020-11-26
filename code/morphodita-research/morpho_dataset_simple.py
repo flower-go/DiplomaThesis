@@ -34,7 +34,7 @@ class SimpleDataset():
                                                                        self.data.bert_segments)
 
 
-        self.NUM_TAGS = len(self.data.factors[0].words_map)
+        self.NUM_TAGS = len(self.data.factors[self.data.TAGS].words_map)
 
 
 

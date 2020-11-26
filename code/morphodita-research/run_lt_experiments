@@ -20,6 +20,5 @@ while read -r p; do
             sleep $sleep_time
             status=`myqstat | grep $id`
         done
-    fi=`ls -t outputs | head -1`
 
 done < commands
