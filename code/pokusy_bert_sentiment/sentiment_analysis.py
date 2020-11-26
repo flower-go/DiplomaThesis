@@ -22,10 +22,12 @@ class Network:
         subwords = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
         inp = [subwords]
 
-        config = transformers.BertConfig.from_pretrained(args.bert)
+        #config = transformers.BertConfig.from_pretrained(args.bert)
+        config = transformers.AutoConfig.from_pretrained(args.bert)
         config.output_hidden_states = True
-        self.bert = transformers.TFBertForSequenceClassification.from_pretrained(args.bert,
-                                                             config=config)
+       # self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained(args.bert,
+                                                             #config=config)
+        self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained(args.bert, config=config)
 
         bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
         # vezmu posledni vrstvu
@@ -88,13 +90,14 @@ class Network:
 if __name__ == "__main__":
     # Parse arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--batch_size", default=32, type=int, help="Batch size.")
+    parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
     parser.add_argument("--bert", default="bert-base-multilingual-uncased", type=str, help="BERT model.")
-    parser.add_argument("--epochs", default="2:5e-5,1:2e-5", type=str, help="Number of epochs.")
+    parser.add_argument("--epochs", default="10:5e-5,1:2e-5", type=str, help="Number of epochs.")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout.")
     parser.add_argument("--seed", default=42, type=int, help="Random seed.")
     parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose TF logging.")
+    parser.add_argument("--english", default=0, type=float, help="add some english data for training.")
     args = parser.parse_args([] if "__file__" not in globals() else None)
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
                    [epochslr.split(":")]]
@@ -133,14 +136,16 @@ if __name__ == "__main__":
         return data
 
     facebook = TextClassificationDataset("czech_facebook", tokenizer=tokenizer.encode)
-    train_data, train_labels = tfds.load(name="imdb_reviews", split="train",
+        
+    if args.english > 0:
+        train_data, train_labels = tfds.load(name="imdb_reviews", split="train",
                                       batch_size=-1, as_supervised=True)
 
-    train_examples = tfds.as_numpy(train_data)
-    train_examples = imdb_covertion(train_examples)
+        train_examples = tfds.as_numpy(train_data)
+        train_examples = imdb_covertion(train_examples)
 
-    facebook.train._data["tokens"].append(train_examples)
-    facebook.train._data["labels"].append(np.array(train_labels) + 1)
+        facebook.train._data["tokens"].append(train_examples)
+        facebook.train._data["labels"].append(np.array(train_labels) + 1)
 
 
     # Create the network and train
