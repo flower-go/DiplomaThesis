@@ -109,12 +109,11 @@ class SimpleDataset():
 
         # Word-level data
         factors = []
-        factor = self.data._factors[0]
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
         for i in range(batch_size):
             factors[-1].word_ids[i, 0:batch_sentence_lens[i]] = self.data.bert_subwords[batch_perm[i]]
 
-        factor = self.data._factors[2] #jen tags
+        factor = self.data._factors[self.data.TAGS] #jen tags
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
         for i in range(batch_size):
             factors[-1].word_ids[i, 0:batch_sentence_lens[i]] = factor.word_ids[batch_perm[i]]

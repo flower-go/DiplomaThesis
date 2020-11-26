@@ -53,7 +53,7 @@ class Network:
 
     @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, factors):
-        tags_mask = tf.not_equal(factors[0],0)
+        tags_mask = tf.math.logical_or(tf.not_equal(factors[0],0),  tf.not_equal(inputs, 0))
         with tf.GradientTape() as tape:
 
             probabilities = self.model(inputs, training=True)
@@ -85,7 +85,7 @@ class Network:
 
     def train_epoch(self, dataset, args, learning_rate):
         if args.warmup_decay == 0:
-            self.optimizer.learning_rate = learning_rate
+            self.optimizer.learning_rate = learning_rate/args.accu
 
         num_gradients = 0
 
@@ -180,7 +180,7 @@ class Network:
 
     @tf.function(experimental_relax_shapes=True)
     def evaluate_batch(self, inputs, factors):
-        tags_mask = tf.not_equal(factors[0], 0)
+        tags_mask = tf.math.logical_or(tf.not_equal(factors[0], 0), tf.not_equal(inputs, 0))
         probabilities = self.model(inputs, training=False)
         loss = 0
 
