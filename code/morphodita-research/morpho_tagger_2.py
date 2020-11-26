@@ -21,7 +21,7 @@ class BertModel:
         self.name = name
         self.config = transformers.AutoConfig.from_pretrained(name)
         self.config.output_hidden_states = True
-        self.tokenizer = transformers.BertTokenizer.from_pretrained(name)
+        self.tokenizer = transformers.AutoTokenizer.from_pretrained(name)
         self.model = transformers.TFAutoModel.from_pretrained(name,
                                                               config=self.config)
         self.embeddings_only=True if args.bert else False
