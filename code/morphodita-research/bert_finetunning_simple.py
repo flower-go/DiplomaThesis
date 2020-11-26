@@ -53,7 +53,7 @@ class Network:
 
     @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, factors):
-        tags_mask = tf.math.logical_or(tf.not_equal(factors[0],0),  tf.not_equal(inputs, 0))
+        tags_mask = tf.math.logical_or(tf.not_equal(factors[0],0),  tf.not_equal(inputs[0], 0))
         with tf.GradientTape() as tape:
 
             probabilities = self.model(inputs, training=True)
@@ -180,7 +180,10 @@ class Network:
 
     @tf.function(experimental_relax_shapes=True)
     def evaluate_batch(self, inputs, factors):
-        tags_mask = tf.math.logical_or(tf.not_equal(factors[0], 0), tf.not_equal(inputs, 0))
+        t1 = tf.not_equal(factors[0], 0)
+        t2 = tf.not_equal(inputs[0], 0)
+        tags_mask = tf.math.logical_or(t1,t2)
+        print(tags_mask.shape)
         probabilities = self.model(inputs, training=False)
         loss = 0
 
