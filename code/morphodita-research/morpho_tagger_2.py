@@ -14,6 +14,7 @@ import warnings
 from keras.models import load_model
 
 from transformers import WarmUp
+import keras.backend as K
 
 
 class BertModel:
@@ -28,6 +29,7 @@ class BertModel:
 
 
 class Network:
+
     def __init__(self, args, num_words, num_chars, factor_words, model):
 
         self.factors = args.factors
@@ -171,6 +173,10 @@ class Network:
             self._metrics[f + "Raw"] = tf.metrics.SparseCategoricalAccuracy()
             self._metrics[f + "Dict"] = tf.metrics.Mean()
 
+        if len(self.factors) ==2:
+            self._metrics["LemmasTags" + "Raw"] = tf.metrics.Mean()
+            self._metrics["LemmasTags" + "Dict"] = tf.metrics.SparseCategoricalAccuracy()
+
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
     @tf.function(experimental_relax_shapes=True)
@@ -201,6 +207,8 @@ class Network:
             self._metrics["loss"](loss)
             for i in range(len(self.factors)):
                 self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
+            if len(self.factors) == 2:
+                self._metrics["LemmasTags" + "Raw"](factors, probabilities, probabilities._keras_mask)
             for name, metric in self._metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
         return gradients
