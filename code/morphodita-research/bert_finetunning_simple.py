@@ -40,9 +40,11 @@ class Network:
 
         dropout = tf.keras.layers.Dropout(args.dropout)(bert_output)
         # dense s softmaxem
-        predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
+        predictions_tags = tf.keras.layers.Dense(labels["Tags"], activation=tf.nn.softmax)(dropout)
+        predictions_lemmas = tf.keras.layers.Dense(labels["Lemmas"], activation=tf.nn.softmax)(dropout)
+        out = [predictions_lemmas, predictions_tags]
         # model(inputs, outputs)
-        self.model = tf.keras.Model(inputs=inp, outputs=predictions)
+        self.model = tf.keras.Model(inputs=inp, outputs=out)
         # compile model
         self.optimizer=tf.optimizers.Adam()
         self.loss=tf.losses.SparseCategoricalCrossentropy()
