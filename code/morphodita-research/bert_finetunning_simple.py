@@ -47,7 +47,8 @@ class Network:
         self.optimizer=tf.optimizers.Adam()
         self.loss=tf.losses.SparseCategoricalCrossentropy()
         self.metrics = {"loss": tf.metrics.Mean()}
-        self.metrics["TagsRaw"] = tf.metrics.SparseCategoricalAccuracy()
+        for f in self.factors:
+            self._metrics[f + "Raw"] = tf.metrics.SparseCategoricalAccuracy()
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
@@ -58,17 +59,14 @@ class Network:
 
             probabilities = self.model(inputs, training=True)
             tvs = self.model.trainable_variables
-            print(probabilities)
-            print(str(probabilities.shape))
-
             loss = 0.0
 
-            if args.label_smoothing:
-                loss += self.loss(
-                    tf.one_hot(factors[0], self.factor_words[self.factors[0]]) * (1 - args.label_smoothing)
-                    + args.label_smoothing / self.factor_words[self.factors[0]], probabilities[0],tags_mask)
-            else:
-                loss += self.loss(tf.convert_to_tensor(factors[0]), probabilities, tags_mask)
+            for i in range(len(self.factors)):
+                if args.label_smoothing:
+                    loss += self._loss(tf.one_hot(factors[i], self.factor_words[self.factors[i]]), probabilities[i],
+                                       probabilities[i]._keras_mask)
+                else:
+                    loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], tags_mask)
 
         gradients = tape.gradient(loss, tvs)
 
@@ -77,7 +75,8 @@ class Network:
             for name, metric in self.metrics.items():
                 metric.reset_states()
             self.metrics["loss"](loss)
-            self.metrics["TagsRaw"](factors[0], probabilities, tags_mask)
+            for i in range(len(self.factors)):
+                self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], tags_mask)
 
             for name, metric in self.metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
@@ -92,9 +91,10 @@ class Network:
         while not dataset.epoch_finished():
             sentence_lens, batch = dataset.next_batch(args.batch_size)
             factors = []
-            words = batch[1].word_ids
-            factors.append(words)
-            inp = batch[dataset.data.FORMS].word_ids #TODO treba pridat input
+            for f in args.factors:
+                words = batch[dataset.data.FACTORS_MAP[f]].word_ids
+                factors.append(words)
+            inp = batch[dataset.data.FORMS].word_ids
             print('train epoch')
 
             tg = self.train_batch(inp, factors)
@@ -183,18 +183,19 @@ class Network:
         t1 = tf.not_equal(factors[0], 0)
         t2 = tf.not_equal(inputs[0], 0)
         tags_mask = tf.math.logical_or(t1,t2)
-        print(tags_mask.shape)
         probabilities = self.model(inputs, training=False)
         loss = 0
 
-        if args.label_smoothing:
-            loss += self.loss(tf.one_hot(factors[0], self.factor_words[self.factors[0]]), probabilities,
-                               tags_mask)
-        else:
-            loss += self.loss(tf.convert_to_tensor(factors[0]), probabilities, tags_mask)
+        for i in range(len(self.factors)):
+            if args.label_smoothing:
+                loss += self._loss(tf.one_hot(factors[i], self.factor_words[self.factors[i]]), probabilities[i],
+                                   probabilities[i]._keras_mask)
+            else:
+                loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], tags_mask)
 
         self.metrics["loss"](loss)
-        self.metrics["TagsRaw"](factors[0], probabilities, tags_mask)
+        for i in range(len(self.factors)):
+            self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], tags_mask)
 
         return probabilities, tags_mask
 
@@ -205,8 +206,9 @@ class Network:
             sentence_lens, batch = dataset.next_batch(args.batch_size)
 
             factors = []
-
-            factors.append(batch[1].word_ids)
+            for f in args.factors:
+                words = batch[dataset.data.FACTORS_MAP[f]].word_ids
+                factors.append(words)
             inp = [batch[dataset.data.FORMS].word_ids]
 
             probabilities, mask = self.evaluate_batch(inp, factors)
@@ -242,7 +244,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", default="40:1e-3,20:1e-4", type=str, help="Epochs and learning rates.")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
-    parser.add_argument("--factors", default="Tags", type=str, help="Factors to predict.")
+    parser.add_argument("--factors", default="Tags,Lemmas", type=str, help="Factors to predict.")
     parser.add_argument("--label_smoothing", default=0.00, type=float, help="Label smoothing.")
     parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
@@ -290,25 +292,6 @@ if __name__ == "__main__":
                    (epochs_lr.split(":") for epochs_lr in args.epochs.split(","))]
     model_bert = BertModel(args.bert, args)
 
-
-    # Load input data
-    data_paths = [None] * 3
-    if args.debug_mode:
-        print("DEBUG MODE")
-        data_paths[0] = "{}-train-small.txt".format(args.data)
-        data_paths[1] = "{}-dev-small.txt".format(args.data)
-        data_paths[2] = "{}-test-small.txt".format(args.data)
-    else:
-        data_paths[0] = "{}-train.txt".format(args.data)
-        data_paths[1] = "{}-dev.txt".format(args.data)
-        data_paths[2] = "{}-test.txt".format(args.data)
-
-    # TODO udelat cyklus
-    # train = morpho_dataset.MorphoDataset(data_paths[0],
-    #                                      embeddings=None,
-    #                                      bert=model_bert,
-    #                                      lemma_re_strip=r"(?<=.)(?:`|_|-[^0-9]).*$",
-    #                                      lemma_rule_min=2, simple=True)
     dataset = mds.SimpleDataset(args.debug_mode, args.data,"train", model_bert)
 
     dev = mds.SimpleDataset(args.debug_mode,args.data, "dev", model_bert, train=dataset.data)

@@ -3,16 +3,6 @@ import os
 import numpy as np
 import transformers
 
-class BertModel:
-    def __init__(self, name):
-        self.name = name
-        self.config = transformers.BertConfig.from_pretrained(name)
-        self.config.output_hidden_states = True
-        self.tokenizer = transformers.BertTokenizer.from_pretrained(name)
-        self.model = transformers.TFBertModel.from_pretrained(name,
-                                                              config=self.config)
-        self.embeddings_only = False
-
 class SimpleDataset():
     class FactorBatch:
         def __init__(self, word_ids, charseq_ids=None, charseqs=None, charseq_lens=None, analyses_ids=None):
@@ -32,9 +22,12 @@ class SimpleDataset():
 
         self.data._factors[self.data.TAGS].word_ids = self.encode_tags(self.data._factors[self.data.TAGS].word_ids,
                                                                        self.data.bert_segments)
+        self.data._factors[self.data.LEMMAS].word_ids = self.encode_tags(self.data._factors[self.data.LEMMAS].word_ids,
+                                                                       self.data.bert_segments)
 
 
         self.NUM_TAGS = len(self.data.factors[self.data.TAGS].words_map)
+        self.NUM_LEMMAS = len(self.data.factors[self.data.LEMMAS].words_map)
 
 
 
@@ -101,8 +94,6 @@ class SimpleDataset():
         batch_perm = self._permutation[:batch_size]
         self._permutation = self._permutation[batch_size:]
 
-        # General data
-
         batch_sentence_lens = self._sentence_lens[batch_perm]
         max_sentence_len = np.max(batch_sentence_lens)
 
@@ -112,7 +103,12 @@ class SimpleDataset():
         for i in range(batch_size):
             factors[-1].word_ids[i, 0:batch_sentence_lens[i]] = self.data.bert_subwords[batch_perm[i]]
 
-        factor = self.data._factors[self.data.TAGS] #jen tags
+        factor = self.data._factors[self.data.LEMMAS]
+        factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
+        for i in range(batch_size):
+            factors[-1].word_ids[i, 0:batch_sentence_lens[i]] = factor.word_ids[batch_perm[i]]
+
+        factor = self.data._factors[self.data.TAGS]
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
         for i in range(batch_size):
             factors[-1].word_ids[i, 0:batch_sentence_lens[i]] = factor.word_ids[batch_perm[i]]
