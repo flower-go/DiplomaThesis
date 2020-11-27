@@ -60,7 +60,7 @@ def generate_bertemb(model):
     name = "embed"
     output = generate(name)
     output.append("--label_smoothing " + ls)
-    output.append("--bert " + '"' + model + '"')
+    output.append("--bert " + model)
 
     return output
 
