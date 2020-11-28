@@ -21,7 +21,7 @@ X pridat slovnik
         X prepsat do eval_batch
         X opravit pocitani predikci
 
-- pridat accuracy pro dvojice factors
+
 X pridat berta jen embeddingy + ukladat predpoctene
 
     X vytvorit model a tokenizer - v dataset u pocitani
@@ -75,17 +75,20 @@ X text
         - dopsat implementaci
 - kód
     X zprovoznit i finetunning
+    - pridat accuracy pro dvojice factors
     - připravit skript na experimenty dle poznámek
         - sentiment
-        - tag+lemma
-            - v sloupcích budou tagraw, taglemma atd..
+        X tag+lemma
+            X v sloupcích budou tagraw, taglemma atd..
                 i vygrepování
                 i v řádcích jednotlivé modely nějak smysluplně seřazené a pojemnované bertmodel, lr type, epocha, ktere vrstvy
                 i oddělené tabulátorem
-                - pridat do souboru
+                X pridat do souboru
                 i osetrit ze sude radky je ten vypis
     i upravit vypisovani vysledku aby bylo tak hezké jak chci
-    - připravit skript co načte model a pak bude interaktivně vracet odpovědi
+    - pustit skript na vše
+
+    - připravit skript co načte model a pak bude interaktivně vracet odpovědi -  v colabu
         - sentiment
         - tag+lemma
 
@@ -93,7 +96,7 @@ X text
     i baseline bez ls
     i baseline s ls
     i embeddingy
-    - finetunning
+    i finetunning
         i 5 lr x 1-4 epochy (5e-5 3e-5 2e-5 8e-6 1e-6)
             i batch až 64
             i batch 16
@@ -103,41 +106,118 @@ X text
         i vše pustit na roberta, bert, slavicbert,
         - BERT český, electra česká
     - bert bez pipeline
-        ? na všech modelech
-        - lr warmup a decay
+        - tagging
+        - lemmatizace
+        , lr warmup a decay
         - brát skoro všechny vrstvy x 4 vrstvy x prumeorovat ci konkatenovat
         - vše pustit na roberta, bert, distillbert, slavicbert, BERT český
+    X  UPRAVIT COMMANDS ABY TO MENILO MODELY
 - electra
     X napsat samostatný tokenizer na trénování
-    - rozbalit data
-    - projit všechny argumenty na trenovani
-    - precist elektra jestli resi ktery tokenizer pouzit
+    X rozbalit data
+    X projit všechny argumenty na trenovani
+    X precist elektra jestli resi ktery tokenizer pouzit
     X prikaz na spusteni tokenizeru
-    - tokenizer encoding
+    X tokenizer encoding
+    - vybrat ctvrtinu a splacnout dohromady
+    - pustit
 
 - sentiment - kód
-    - prozkoumat data - poměry neutral/positive/negative
-    - vyřešit že airlines nemá neutrál
-    - počítat F1, precision, recall (pro jednotlivé třídy)
+    X prozkoumat data - poměry neutral/positive/negative
+    - pridat vyhodnocení na dev
+    - udelat trenovani jen nekterych vrstev ci warmup decay
+    - udelat cross validaci
+    x vyřešit že airlines nemá neutrál
+    - počítat F1, precision, recall (pro jednotlivé třídy) (nebo confusion matrix)
+    - modely pro jednotlivé datasety
     - české SOTA výsledky
-    - zapracovat ještě mall a csfd
+    - zapracovat ještě mall a csfd (mám odkaz)
     - zkusit překlad do angličtiny
-    - vše pustit na roberta, bert, distillbert, slavicbert, BERT czech
+    - vše pustit na
+        i roberta,
+        i bert,
+        - distillbert,
+        - slavicbert,
+        - BERT czech,
     - s angličtinou:
         - Zero-shot
         - monolingual,
         - multilingual training
         - bez trénování jen embeddingy
+        - pomer dat
 
 ================================================================================
-spíš ne
+PHASE 4
 ================================================================================
-- NER
-    - zapojit NER do taggeru
-        - pridat treti typ factors
-        - zaridit, ze to predpovida ty spravne veci pro spravna data
-        - namixovat data do batche z obou datasetu
-        - pridat do modelu vypocet
-        (?) jak bude vypadat loss?
-    - NER samostatne (z existujiciho kodu?)
+- text
+    - theory
+    - experimenty
+        - pripravit tabulky
+        - popsat moznosti hyperparametru
+    - implementace
+    - pořádek v gitu
+    - colab notebook
+        - sentiment
+        - tags and lemmas
+            - namapovat checkpoints na informace o modelech
+
+- experimenty
+    - tags,lemmas standard
+        X upravit checkpoints, abych měla všechny a věděla k čemu patří (vyresi se spustenim vseho)
+        - pustit
+        X využit expe argument (netreba)
+        - do grepu pridat i join accuracy
+    - bert simple
+        - lr warmup a decay
+        - vše pustit na roberta, bert, distillbert, slavicbert, BERT český
+        - trenovat jen poslední vrstvu a pak vše
+    - sentiment
+        - s angličtinou:
+        - Zero-shot
+        - monolingual,
+        - multilingual training
+        - bez trénování jen embeddingy
+        - pomer dat
+
+- implementace
+    - slavic bert obecne vyresit nacitani
+    - sentiment
+        - pridat vyhodnocení na dev
+        - udelat trenovani jen nekterych vrstev ci warmup decay
+        - udelat cross validaci
+        - počítat F1, precision, recall (pro jednotlivé třídy) (nebo confusion matrix)
+        - modely pro jednotlivé datasety
+        - české SOTA výsledky
+        - zkusit překlad do angličtiny
+        - opšny
+            - s angličtinou:
+            - Zero-shot
+            - monolingual,
+            - multilingual training
+            - bez trénování jen embeddingy
+            - pomer dat
+
+        - datasety
+            - mall
+            - csfd
+            X facebook
+    - morpho_tagger_2
+        X accuracy dohromady
+        - uložit obrazek jednou
+    - bert_finetunning_simple
+        - accuracy dohromady
+        X lemmatizace
+        - trenovatni jen posledni vrstva a zbytek (+ opšny na to)
+        - fine lr
+        - warmup a decay
+        - label smoothing
+        - cle
+    - electra
+        - vybrat ctvrtinu
+        - splacnout dohromady vety v dokumentu
+        X upravit sliding window opšnu
+
+
+
+
 
