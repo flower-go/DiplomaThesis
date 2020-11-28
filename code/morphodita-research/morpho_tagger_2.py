@@ -10,11 +10,23 @@ import tensorflow_addons as tfa
 import morpho_dataset
 import pickle
 import warnings
-
 from keras.models import load_model
 
 from transformers import WarmUp
-import keras.backend as K
+
+class CustomModel(tf.keras.Model):
+    def test_step(self, data):
+        # Unpack the data
+        x, y = data
+        # Compute predictions
+        y_pred = self(x, training=False)
+        # Updates the metrics tracking the loss
+        self.compiled_loss(y, y_pred, regularization_losses=self.losses)
+        # Update the metrics.
+        self.compiled_metrics.update_state(y, y_pred)
+        # Return a dict mapping metric names to current value.
+        # Note that it will include the loss (tracked in self.metrics).
+        return {m.name: m.result() for m in self.metrics}
 
 
 class BertModel:
@@ -114,7 +126,7 @@ class Network:
             if args.bert or args.bert_model:
                 inp.append(bert_embeddings)
 
-            self.model = tf.keras.Model(inputs=inp, outputs=outputs)
+            self.model = CustomModel(inputs=inp, outputs=outputs)
 
             print(str(self.model.weights[0][6][1]))
             if args.test_only:
@@ -156,7 +168,7 @@ class Network:
                 bert_output = bert_output[:, :-1] # tady se dava pryc sep
 
                 print("model len: " + str(len(inp2[:-2] + [bert_output])))
-                self.outer_model = tf.keras.Model(inputs=inp2, outputs=self.model(inp2[:-2] + [bert_output]))
+                self.outer_model = CustomModel(inputs=inp2, outputs=self.model(inp2[:-2] + [bert_output]))
             else:
                 self.outer_model = self.model
 
@@ -207,8 +219,6 @@ class Network:
             self._metrics["loss"](loss)
             for i in range(len(self.factors)):
                 self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
-            if len(self.factors) == 2:
-                self._metrics["LemmasTags" + "Raw"](factors, probabilities, probabilities._keras_mask)
             for name, metric in self._metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
         return gradients
@@ -608,7 +618,8 @@ if __name__ == "__main__":
                           (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors),
                       model=model_bert)
     if args.debug_mode:
-        tf.keras.utils.plot_model(network.outer_model, "my_first_model_with_shape_info.svg", show_shapes=True)
+        ...
+        #tf.keras.utils.plot_model(network.outer_model, "my_first_model_with_shape_info.svg", show_shapes=True)
 
     if args.fine_lr > 0:
         args.lr_split = len(network.outer_model.trainable_variables) - len(network.model.trainable_variables)
