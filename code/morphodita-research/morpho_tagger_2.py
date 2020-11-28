@@ -24,14 +24,13 @@ class CustomModel(tf.keras.Model):
         self.compiled_loss(y, y_pred, regularization_losses=self.losses)
         # Update the metrics.
         self.compiled_metrics.update_state(y, y_pred)
+
         # Return a dict mapping metric names to current value.
         # Note that it will include the loss (tracked in self.metrics).
-        return {m.name: m.result() for m in self.metrics}
-
-def join_accuracy(y_true, y_pred, y_true2, y_pred2):
-    a = K.equal(K.max(y_true, axis=-1),K.cast(K.argmax(y_pred,axis=-1),K.floatx()))
-    b = K.equal(K.max(y_true, axis=-1), K.cast(K.argmax(y_pred, axis=-1), K.floatx()))
-    return K.cast(K.equal(a,b),K.floatx()) 
+        result = {m.name: m.result() for m in self.metrics}
+        #joinAcc = np.sum(y == y_pred)/len(y)
+        result["joinAcc"] = 20
+        return result
 
 class BertModel:
     def __init__(self, name, args):
@@ -45,6 +44,9 @@ class BertModel:
 
 
 class Network:
+
+    def join_accuracy(self, labels, probabilities):
+        ...
 
     def __init__(self, args, num_words, num_chars, factor_words, model):
 
@@ -188,10 +190,10 @@ class Network:
         for f in self.factors:
             self._metrics[f + "Raw"] = tf.metrics.SparseCategoricalAccuracy()
             self._metrics[f + "Dict"] = tf.metrics.Mean()
+        if len(self.factors) == 2:
+            self._metrics["LemmasTagsRaw"] = tf.metrics.Mean()
+            self._metrics["LemmasTagsDict"] = tf.metrics.Mean()
 
-        if len(self.factors) ==2:
-            self._metrics["LemmasTags" + "Raw"] = join_accuracy
-            self._metrics["LemmasTags" + "Dict"] = tf.metrics.SparseCategoricalAccuracy()
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
@@ -223,14 +225,18 @@ class Network:
             self._metrics["loss"](loss)
             for i in range(len(self.factors)):
                 self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
+
             for name, metric in self._metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
-        return gradients
+        return probabilities,gradients
 
 
     def train_epoch(self, dataset, args, learning_rate):
         if args.warmup_decay == 0:
-            self._optimizer.learning_rate = learning_rate
+            if args.accu > 0:
+                self._optimizer.learning_rate = learning_rate/args.accu
+            else:
+                self._optimizer.learning_rate = learning_rate
         if args.fine_lr > 0:
             self._fine_optimizer.learning_rate = args.fine_lr
 
@@ -257,7 +263,7 @@ class Network:
                 inp.append(batch[dataset.SEGMENTS].word_ids)
                 inp.append(batch[dataset.SUBWORDS].word_ids)
 
-            tg = self.train_batch(inp, factors)
+            p, tg = self.train_batch(inp, factors)
 
             if not args.accu:
 
@@ -296,7 +302,7 @@ class Network:
                                 g += ng.numpy()
                 num_gradients += 1
                 if num_gradients == args.accu or len(train._permutation) == 0:
-                    gradients = gradients/args.accu
+                    gradients = gradients
                     gradients = [tf.IndexedSlices(*map(np.concatenate, zip(*g))) if isinstance(g, list) else g for g in
                                  gradients]
                     if args.fine_lr > 0:
@@ -439,8 +445,15 @@ class Network:
             for fc in range(len(self.factors)):
                 self._metrics[self.factors[fc] + "Dict"](factors[fc] == predictions[fc],
                                                          mask[fc])
+            if len(self.factors) == 2:
+                predictions_raw = [np.argmax(p, axis=2) for p in probabilities]
+                self._metrics["LemmasTagsDict"](np.logical_and(factors[0] == predictions[0], factors[1] == predictions[1]),mask[0])
+                self._metrics["LemmasTagsRaw"](
+                    np.logical_and(factors[0] == predictions_raw[0], factors[1] == predictions_raw[1]), mask[0])
+
 
         metrics = {name: metric.result() for name, metric in self._metrics.items()}
+
         with self._writer.as_default():
             for name, value in metrics.items():
                 tf.summary.scalar("{}/{}".format(dataset_name, name), value)
