@@ -28,6 +28,10 @@ class CustomModel(tf.keras.Model):
         # Note that it will include the loss (tracked in self.metrics).
         return {m.name: m.result() for m in self.metrics}
 
+def join_accuracy(y_true, y_pred, y_true2, y_pred2):
+    a = K.equal(K.max(y_true, axis=-1),K.cast(K.argmax(y_pred,axis=-1),K.floatx()))
+    b = K.equal(K.max(y_true, axis=-1), K.cast(K.argmax(y_pred, axis=-1), K.floatx()))
+    return K.cast(K.equal(a,b),K.floatx()) 
 
 class BertModel:
     def __init__(self, name, args):
@@ -186,7 +190,7 @@ class Network:
             self._metrics[f + "Dict"] = tf.metrics.Mean()
 
         if len(self.factors) ==2:
-            self._metrics["LemmasTags" + "Raw"] = tf.metrics.Mean()
+            self._metrics["LemmasTags" + "Raw"] = join_accuracy
             self._metrics["LemmasTags" + "Dict"] = tf.metrics.SparseCategoricalAccuracy()
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
