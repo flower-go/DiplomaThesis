@@ -16,6 +16,10 @@ from keras.models import load_model
 from transformers import WarmUp
 import keras.backend as K
 
+def join_accuracy(y_true, y_pred, y_true2, y_pred2):
+    a = K.equal(K.max(y_true, axis=-1),K.cast(K.argmax(y_pred,axis=-1),K.floatx()))
+    b = K.equal(K.max(y_true, axis=-1), K.cast(K.argmax(y_pred, axis=-1), K.floatx()))
+    return K.cast(K.equal(a,b),K.floatx()) 
 
 class BertModel:
     def __init__(self, name, args):
@@ -174,7 +178,7 @@ class Network:
             self._metrics[f + "Dict"] = tf.metrics.Mean()
 
         if len(self.factors) ==2:
-            self._metrics["LemmasTags" + "Raw"] = tf.metrics.Mean()
+            self._metrics["LemmasTags" + "Raw"] = join_accuracy
             self._metrics["LemmasTags" + "Dict"] = tf.metrics.SparseCategoricalAccuracy()
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
@@ -208,7 +212,7 @@ class Network:
             for i in range(len(self.factors)):
                 self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], probabilities[i]._keras_mask)
             if len(self.factors) == 2:
-                self._metrics["LemmasTags" + "Raw"](factors, probabilities, probabilities._keras_mask)
+                self._metrics["LemmasTags" + "Raw"](factors, probabilities, probabilities[0]._keras_mask)
             for name, metric in self._metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
         return gradients
