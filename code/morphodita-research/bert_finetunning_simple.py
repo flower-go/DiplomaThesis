@@ -40,8 +40,8 @@ class Network:
 
         dropout = tf.keras.layers.Dropout(args.dropout)(bert_output)
         # dense s softmaxem
-        predictions_tags = tf.keras.layers.Dense(labels["Tags"], activation=tf.nn.softmax)(dropout)
-        predictions_lemmas = tf.keras.layers.Dense(labels["Lemmas"], activation=tf.nn.softmax)(dropout)
+        predictions_tags = tf.keras.layers.Dense(labels[1], activation=tf.nn.softmax)(dropout)
+        predictions_lemmas = tf.keras.layers.Dense(labels[0], activation=tf.nn.softmax)(dropout)
         out = [predictions_lemmas, predictions_tags]
         # model(inputs, outputs)
         self.model = tf.keras.Model(inputs=inp, outputs=out)
@@ -49,8 +49,8 @@ class Network:
         self.optimizer=tf.optimizers.Adam()
         self.loss=tf.losses.SparseCategoricalCrossentropy()
         self.metrics = {"loss": tf.metrics.Mean()}
-        for f in self.factors:
-            self._metrics[f + "Raw"] = tf.metrics.SparseCategoricalAccuracy()
+        for f in args.factors:
+            self.metrics[f + "Raw"] = tf.metrics.SparseCategoricalAccuracy()
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
@@ -63,12 +63,12 @@ class Network:
             tvs = self.model.trainable_variables
             loss = 0.0
 
-            for i in range(len(self.factors)):
+            for i in range(len(args.factors)):
                 if args.label_smoothing:
-                    loss += self._loss(tf.one_hot(factors[i], self.factor_words[self.factors[i]]), probabilities[i],
+                    loss += self.loss(tf.one_hot(factors[i], self.factor_words[self.factors[i]]), probabilities[i],
                                        probabilities[i]._keras_mask)
                 else:
-                    loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], tags_mask)
+                    loss += self.loss(tf.convert_to_tensor(factors[i]), probabilities[i], tags_mask)
 
         gradients = tape.gradient(loss, tvs)
 
@@ -77,8 +77,8 @@ class Network:
             for name, metric in self.metrics.items():
                 metric.reset_states()
             self.metrics["loss"](loss)
-            for i in range(len(self.factors)):
-                self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], tags_mask)
+            for i in range(len(args.factors)):
+                self.metrics[args.factors[i] + "Raw"](factors[i], probabilities[i], tags_mask)
 
             for name, metric in self.metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
@@ -86,7 +86,9 @@ class Network:
 
     def train_epoch(self, dataset, args, learning_rate):
         if args.warmup_decay == 0:
-            self.optimizer.learning_rate = learning_rate/args.accu
+            self.optimizer.learning_rate = learning_rate
+            if args.accu>0:                                                             
+                self.optimizer.learning_rate = self.optimizer.learning_rate/args.accu
 
         num_gradients = 0
 
@@ -188,16 +190,16 @@ class Network:
         probabilities = self.model(inputs, training=False)
         loss = 0
 
-        for i in range(len(self.factors)):
+        for i in range(len(args.factors)):
             if args.label_smoothing:
-                loss += self._loss(tf.one_hot(factors[i], self.factor_words[self.factors[i]]), probabilities[i],
+                loss += self.loss(tf.one_hot(factors[i], self.factor_words[args.factors[i]]), probabilities[i],
                                    probabilities[i]._keras_mask)
             else:
-                loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], tags_mask)
+                loss += self.loss(tf.convert_to_tensor(factors[i]), probabilities[i], tags_mask)
 
         self.metrics["loss"](loss)
-        for i in range(len(self.factors)):
-            self._metrics[self.factors[i] + "Raw"](factors[i], probabilities[i], tags_mask)
+        for i in range(len(args.factors)):
+            self.metrics[args.factors[i] + "Raw"](factors[i], probabilities[i], tags_mask)
 
         return probabilities, tags_mask
 
@@ -246,7 +248,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", default="40:1e-3,20:1e-4", type=str, help="Epochs and learning rates.")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
-    parser.add_argument("--factors", default="Tags,Lemmas", type=str, help="Factors to predict.")
+    parser.add_argument("--factors", default="Lemmas,Tags", type=str, help="Factors to predict.")
     parser.add_argument("--label_smoothing", default=0.00, type=float, help="Label smoothing.")
     parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
@@ -312,7 +314,7 @@ if __name__ == "__main__":
 
 
     network = Network(args=args,
-                      model=model_bert, labels=dataset.NUM_TAGS)
+                      model=model_bert, labels=[dataset.NUM_LEMMAS,dataset.NUM_TAGS])
 
     # TODO nemame predikci !
     # slova: batch[0].word_ids
