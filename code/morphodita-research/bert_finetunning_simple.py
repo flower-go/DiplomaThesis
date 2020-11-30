@@ -37,7 +37,7 @@ class Network:
         inp = [subwords]
         bert = model.model
         bert_output = bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
-
+        self.labels = labels
         dropout = tf.keras.layers.Dropout(args.dropout)(bert_output)
         # dense s softmaxem
         predictions_tags = tf.keras.layers.Dense(labels[1], activation=tf.nn.softmax)(dropout)
@@ -47,7 +47,10 @@ class Network:
         self.model = tf.keras.Model(inputs=inp, outputs=out)
         # compile model
         self.optimizer=tf.optimizers.Adam()
-        self.loss=tf.losses.SparseCategoricalCrossentropy()
+        if args.label_smoothing:
+            self.loss = tf.losses.CategoricalCrossentropy()
+        else:
+            self.loss = tf.losses.SparseCategoricalCrossentropy()
         self.metrics = {"loss": tf.metrics.Mean()}
         for f in args.factors:
             self.metrics[f + "Raw"] = tf.metrics.SparseCategoricalAccuracy()
@@ -66,8 +69,8 @@ class Network:
 
             for i in range(len(args.factors)):
                 if args.label_smoothing:
-                    loss += self.loss(tf.one_hot(factors[i], self.factor_words[self.factors[i]]), probabilities[i],
-                                       probabilities[i]._keras_mask)
+                    loss += self.loss(tf.one_hot(factors[i], self.labels[i]) * (1 - args.label_smoothing)
+                        + args.label_smoothing /  self.labels[i], probabilities[i], tags_mask)
                 else:
                     loss += self.loss(tf.convert_to_tensor(factors[i]), probabilities[i], tags_mask)
 
@@ -193,8 +196,8 @@ class Network:
 
         for i in range(len(args.factors)):
             if args.label_smoothing:
-                loss += self.loss(tf.one_hot(factors[i], self.factor_words[args.factors[i]]), probabilities[i],
-                                   probabilities[i]._keras_mask)
+                loss += self.loss(tf.one_hot(factors[i], self.labels[i]), probabilities[i],
+                                  tags_mask)
             else:
                 loss += self.loss(tf.convert_to_tensor(factors[i]), probabilities[i], tags_mask)
 
@@ -255,7 +258,7 @@ if __name__ == "__main__":
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
     parser.add_argument("--factors", default="Lemmas,Tags", type=str, help="Factors to predict.")
-    parser.add_argument("--label_smoothing", default=0.00, type=float, help="Label smoothing.")
+    parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
     parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
     parser.add_argument("--bert", default=None, type=str, help="Bert model for embeddings")
