@@ -28,6 +28,8 @@ class SimpleDataset():
 
         self.NUM_TAGS = len(self.data.factors[self.data.TAGS].words_map)
         self.NUM_LEMMAS = len(self.data.factors[self.data.LEMMAS].words_map)
+        self.num_chars = len(self.data.factors[self.data.FORMS].alphabet)
+
 
 
 
@@ -112,6 +114,26 @@ class SimpleDataset():
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
         for i in range(batch_size):
             factors[-1].word_ids[i, 0:batch_sentence_lens[i]] = factor.word_ids[batch_perm[i]]
+
+
+        # Character-level data
+        for f, factor in enumerate(self.data._factors):
+            if not factor.characters: continue
+
+            factors[f].charseq_ids = np.zeros([batch_size, max_sentence_len], np.int32)
+            charseqs_map = {}
+            charseqs = []
+            for i in range(batch_size):
+                for j, charseq_id in enumerate(factor.charseq_ids[batch_perm[i]]):
+                    if charseq_id not in charseqs_map:
+                        charseqs_map[charseq_id] = len(charseqs)
+                        charseqs.append(factor.charseqs[charseq_id])
+                    factors[f].charseq_ids[i, j] = charseqs_map[charseq_id]
+
+            factors[f].charseq_lens = np.array([len(charseq) for charseq in charseqs], np.int32)
+            factors[f].charseqs = np.zeros([len(charseqs), np.max(factors[f].charseq_lens)], np.int32)
+            for i in range(len(charseqs)):
+                factors[f].charseqs[i, 0:len(charseqs[i])] = charseqs[i]
 
         return batch_sentence_lens, factors
 

@@ -31,17 +31,34 @@ class BertModel:
 
 
 class Network:
-    def __init__(self, args, model, labels):
+    def __init__(self, args, model, labels, num_chars):
+
+
 
         subwords = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-        inp = [subwords]
+        charseq_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+        charseqs = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+
+
+        cle = tf.keras.layers.Embedding(num_chars, args.cle_dim, mask_zero=True)(charseqs)
+        cle = tf.keras.layers.Dropout(rate=args.dropout)(cle)
+        cle = tf.keras.layers.Bidirectional(tf.keras.layers.GRU(args.cle_dim), merge_mode="concat")(cle)
+        cle = tf.gather(1 * cle, charseq_ids)
+
+
+        inp = [subwords, charseqs, charseq_ids]
         bert = model.model
         bert_output = bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
         self.labels = labels
         dropout = tf.keras.layers.Dropout(args.dropout)(bert_output)
+
+        inputs = [dropout,cle]
+        hidden = tf.keras.layers.Concatenate()(inputs)
+        hidden = tf.keras.layers.Dropout(rate=args.dropout)(hidden)
+        #TODO co s tim teď?
         # dense s softmaxem
         predictions_tags = tf.keras.layers.Dense(labels[1], activation=tf.nn.softmax)(dropout)
-        predictions_lemmas = tf.keras.layers.Dense(labels[0], activation=tf.nn.softmax)(dropout)
+        predictions_lemmas = tf.keras.layers.Dense(labels[0], activation=tf.nn.softmax)(hidden)
         out = [predictions_lemmas, predictions_tags]
         # model(inputs, outputs)
         self.model = tf.keras.Model(inputs=inp, outputs=out)
@@ -60,7 +77,7 @@ class Network:
 
     @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, factors):
-        tags_mask = tf.math.logical_or(tf.not_equal(factors[0],0),  tf.not_equal(inputs[0], 0))
+        tags_mask = tf.not_equal(factors[0],0)
         with tf.GradientTape() as tape:
 
             probabilities = self.model(inputs, training=True)
@@ -102,7 +119,7 @@ class Network:
             for f in args.factors:
                 words = batch[dataset.data.FACTORS_MAP[f]].word_ids
                 factors.append(words)
-            inp = batch[dataset.data.FORMS].word_ids
+            inp = [batch[dataset.data.FORMS].word_ids, batch[dataset.data.FORMS].charseqs,batch[dataset.data.FORMS].charseq_ids,]
             print('train epoch')
 
             tg = self.train_batch(inp, factors)
@@ -189,8 +206,7 @@ class Network:
     @tf.function(experimental_relax_shapes=True)
     def evaluate_batch(self, inputs, factors):
         t1 = tf.not_equal(factors[0], 0)
-        t2 = tf.not_equal(inputs[0], 0)
-        tags_mask = tf.math.logical_or(t1,t2)
+        tags_mask = t1
         probabilities = self.model(inputs, training=False)
         loss = 0
 
@@ -217,7 +233,8 @@ class Network:
             for f in args.factors:
                 words = batch[dataset.data.FACTORS_MAP[f]].word_ids
                 factors.append(words)
-            inp = [batch[dataset.data.FORMS].word_ids]
+            inp = [batch[dataset.data.FORMS].word_ids, batch[dataset.data.FORMS].charseqs, batch[dataset.data.FORMS].charseq_ids,]
+
 
             probabilities, mask = self.evaluate_batch(inp, factors)
 
@@ -258,6 +275,7 @@ if __name__ == "__main__":
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
     parser.add_argument("--factors", default="Lemmas,Tags", type=str, help="Factors to predict.")
+    parser.add_argument("--cle_dim", default=256, type=int, help="Character-level embedding dimension.")
     parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
     parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
@@ -323,7 +341,7 @@ if __name__ == "__main__":
 
 
     network = Network(args=args,
-                      model=model_bert, labels=[dataset.NUM_LEMMAS,dataset.NUM_TAGS])
+                      model=model_bert, labels=[dataset.NUM_LEMMAS,dataset.NUM_TAGS], num_chars=dataset.num_chars)
 
     # TODO nemame predikci !
     # slova: batch[0].word_ids
