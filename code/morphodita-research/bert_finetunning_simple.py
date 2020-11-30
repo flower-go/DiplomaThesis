@@ -82,6 +82,8 @@ class Network:
 
             probabilities = self.model(inputs, training=True)
             tvs = self.model.trainable_variables
+            if args.freeze:
+                tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
             loss = 0.0
 
             for i in range(len(args.factors)):
@@ -273,6 +275,7 @@ if __name__ == "__main__":
     parser.add_argument("--beta_2", default=0.99, type=float, help="Adam beta 2")
     parser.add_argument("--epochs", default="40:1e-3,20:1e-4", type=str, help="Epochs and learning rates.")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
+    parser.add_argument("--freeze", default=0, type=bool, help="Freezing bert layers")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
     parser.add_argument("--factors", default="Lemmas,Tags", type=str, help="Factors to predict.")
     parser.add_argument("--cle_dim", default=256, type=int, help="Character-level embedding dimension.")
@@ -289,6 +292,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
+    args.freeze = args.freeze == 1
     args.cont = args.cont == 1
 
     # TODO vyřešit
