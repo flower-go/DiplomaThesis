@@ -1,6 +1,7 @@
 import morpho_dataset
 import os
 import numpy as np
+import math
 import transformers
 
 class SimpleDataset():
@@ -91,7 +92,7 @@ class SimpleDataset():
 
         return train
 
-    def next_batch(self, batch_size):
+    def next_batch(self, batch_size,train=0):
         batch_size = min(batch_size, len(self._permutation))
         batch_perm = self._permutation[:batch_size]
         self._permutation = self._permutation[batch_size:]
@@ -100,10 +101,29 @@ class SimpleDataset():
         max_sentence_len = np.max(batch_sentence_lens)
 
         # Word-level data
+        if train > 0:
+            num_tokens = sum(batch_sentence_lens) - (len(batch_sentence_lens)*2)
+            num_del = math.floor(train*num_tokens)
+            a = np.zeros(num_tokens, dtype=int)
+            a[:num_del] = 1
+            np.random.shuffle(a)
+            s = 0
         factors = []
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
         for i in range(batch_size):
             factors[-1].word_ids[i, 0:batch_sentence_lens[i]] = self.data.bert_subwords[batch_perm[i]]
+            if train > 0:
+                start = s
+                s = s + batch_sentence_lens[i]
+                end = batch_sentence_lens[i]
+                indices = np.nonzero(a[start:end])
+                if len(indices) >0 :
+                    indices = np.array(indices) + 1
+                    factors[-1].word_ids[i,indices] = self.data.tokenizer.mask_token_id
+
+
+
+
 
         factor = self.data._factors[self.data.LEMMAS]
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))

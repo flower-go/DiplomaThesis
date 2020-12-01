@@ -50,7 +50,7 @@ class Network:
         bert = model.model
         bert_output = bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
         self.labels = labels
-        dropout = tf.keras.layers.Dropout(args.dropout)(bert_output)
+        dropout = tf.keras.layers.Dropout(rate=args.dropout)(bert_output)
 
         inputs = [dropout,cle]
         hidden = tf.keras.layers.Concatenate()(inputs)
@@ -116,7 +116,7 @@ class Network:
         num_gradients = 0
 
         while not dataset.epoch_finished():
-            sentence_lens, batch = dataset.next_batch(args.batch_size)
+            sentence_lens, batch = dataset.next_batch(args.batch_size, 0.1)
             factors = []
             for f in args.factors:
                 words = batch[dataset.data.FACTORS_MAP[f]].word_ids
