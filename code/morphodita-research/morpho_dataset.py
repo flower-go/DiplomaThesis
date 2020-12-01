@@ -202,6 +202,7 @@ class MorphoDataset:
             bert_path = bert_file_name + ".pickle"
 
             # if BERT embeddings are precomputed
+            self.tokenizer = bert.tokenizer
             if os.path.exists(bert_path):
                 self.bert_embeddings, self.bert_subwords, self.bert_segments = \
                     np.load(bert_path, allow_pickle=True)
@@ -209,7 +210,7 @@ class MorphoDataset:
             # else precomputed does not exist, compute here
             else:
                 batch_size_bert = 16
-                tokenizer = bert.tokenizer
+
                 model = bert.model
                 sentences_words = self._factors[self.FORMS].word_strings
                 sentences_count = len(sentences_words)
