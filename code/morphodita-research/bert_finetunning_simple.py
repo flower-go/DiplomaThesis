@@ -62,6 +62,9 @@ class Network:
         out = [predictions_lemmas, predictions_tags]
         # model(inputs, outputs)
         self.model = tf.keras.Model(inputs=inp, outputs=out)
+
+        if args.model != None:
+            self.model.load_weights(args.model)
         # compile model
         self.optimizer=tf.optimizers.Adam()
         if args.label_smoothing:
@@ -276,6 +279,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", default="40:1e-3,20:1e-4", type=str, help="Epochs and learning rates.")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
     parser.add_argument("--freeze", default=0, type=bool, help="Freezing bert layers")
+    parser.add_arqument("--model", default=None, type=str, help="Model for loading")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
     parser.add_argument("--factors", default="Lemmas,Tags", type=str, help="Factors to predict.")
     parser.add_argument("--cle_dim", default=256, type=int, help="Character-level embedding dimension.")
