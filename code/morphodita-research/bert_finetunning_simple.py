@@ -116,7 +116,7 @@ class Network:
         num_gradients = 0
 
         while not dataset.epoch_finished():
-            sentence_lens, batch = dataset.next_batch(args.batch_size, 0.1)
+            sentence_lens, batch = dataset.next_batch(args.batch_size, args.word_dropout)
             factors = []
             for f in args.factors:
                 words = batch[dataset.data.FACTORS_MAP[f]].word_ids
@@ -289,6 +289,7 @@ if __name__ == "__main__":
                          help="Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
     parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
+    parser.add_argument("--word_dropout", default=0, type=float, help="Word dropout rate")
 
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
