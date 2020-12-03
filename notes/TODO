@@ -205,16 +205,21 @@ PHASE 4
         X accuracy dohromady
         - uložit obrazek jednou
     - bert_finetunning_simple
-        - accuracy dohromady
+        X accuracy dohromady
         X lemmatizace
-        - trenovatni jen posledni vrstva a zbytek (+ opšny na to)
-        - fine lr
-        - warmup a decay
-        - label smoothing
-        - cle
+        X trenovani jen posledni vrstva a zbytek (+ opšny na to)
+        ? fine lr
+        ? warmup a decay
+        X label smoothing
+        X cle
+        X token dropout
+        ? word dropout
     - electra
-        - vybrat ctvrtinu
+        X vybrat ctvrtinu
         - splacnout dohromady vety v dokumentu
+            X ctvrtina
+            - pustit na vse
+        - zjistit kolik pameti
         X upravit sliding window opšnu
 
 

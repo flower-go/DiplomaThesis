@@ -12,29 +12,25 @@ from sklearn.model_selection import train_test_split
 
 from text_classification_dataset import TextClassificationDataset
 import tensorflow_datasets as tfds
+from sentiment_dataset import SentimentDataset
 
 
 class Network:
     def __init__(self, args, labels):
-        # TODO: Define a suitable model.
-
         # vstup
         subwords = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
         inp = [subwords]
 
-        #config = transformers.BertConfig.from_pretrained(args.bert)
+        # bert model
         config = transformers.AutoConfig.from_pretrained(args.bert)
         config.output_hidden_states = True
-       # self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained(args.bert,
-                                                             #config=config)
         self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained(args.bert, config=config)
 
-        bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
         # vezmu posledni vrstvu
-        # dropout
+        bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
         dropout = tf.keras.layers.Dropout(args.dropout)(bert_output)
         # dense s softmaxem
-        predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(bert_output)
+        predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
 
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
         # compile model
@@ -57,7 +53,6 @@ class Network:
                     tf.summary.scalar("train/{}".format(name), value)
 
     def train(self, omr, args):
-        # TODO: Train the network on a given dataset.
         for e, lr in args.epochs:
             b.set_value(self.model.optimizer.learning_rate, lr)
             for i in range(e):
@@ -66,21 +61,16 @@ class Network:
 
 
     def predict(self, dataset, args):
-        # TODO: Predict method should return a list/np.ndarray of the
-        # predicted label indices (no probabilities/distributions).
         return self.model.predict(self._transform_dataset(dataset.data["tokens"]), batch_size=16)
 
     def evaluate(self, dataset, name, args):
-        #zarovnat na stejnou delku a nacpat jako tensor nebo array
         return self.model.evaluate(self._transform_dataset(dataset.data["tokens"]), np.asarray(dataset.data["labels"]), 16)
 
     def _transform_dataset(self, dataset):
         max_len = max(len(a) for a in dataset)
-        print(str(max_len))
         data = []
         for i in dataset:
             max_l = max_len - len(i)
-
             data.append(i + [0]*max_l)
         
         return np.asarray(data)
@@ -119,12 +109,9 @@ if __name__ == "__main__":
         ",".join(("{}={}".format(re.sub("(.)[^_]*_?", r"\1", key), value) for key, value in sorted(vars(args).items())))
     ))
 
-    # TODO: Create the BERT tokenizer to `tokenizer` variable
     tokenizer = transformers.AutoTokenizer.from_pretrained(args.bert)
 
-    # TODO: Load the data, using a correct `tokenizer` argument, which
-    # should be a callable that given a sentence in a string produces
-    # a list/np.ndarray of token integers.
+    # Load data
 
     def imdb_covertion(data):
         for i in range(len(data)):
@@ -135,7 +122,7 @@ if __name__ == "__main__":
             data[i] = tokenizer.encode(data[i].decode('latin1'))
         return data
 
-    facebook = TextClassificationDataset("czech_facebook", tokenizer=tokenizer.encode)
+    facebook = SentimentDataset("facebook", tokenizer).data
         
     if args.english > 0:
         train_data, train_labels = tfds.load(name="imdb_reviews", split="train",
