@@ -8,10 +8,11 @@ import numpy as np
 import tensorflow as tf
 import transformers
 from keras import backend as b
+import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from text_classification_dataset import TextClassificationDataset
-import tensorflow_datasets as tfds
+
 from sentiment_dataset import SentimentDataset
 
 
@@ -58,6 +59,8 @@ class Network:
             for i in range(e):
                 network.train_epoch(omr.train, args)
                 metrics = network.evaluate(omr.dev, "dev", args)
+                print("Dev, epoch {}, lr {}, {}".format(e + 1, lr, metrics), file=f,
+                          flush=True)
 
 
     def predict(self, dataset, args):
@@ -88,6 +91,7 @@ if __name__ == "__main__":
     parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose TF logging.")
     parser.add_argument("--english", default=0, type=float, help="add some english data for training.")
+    parser.add_argument("--datasets", default="facebook,mall,csfd", type=str, help="Dataset for use")
     args = parser.parse_args([] if "__file__" not in globals() else None)
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
                    [epochslr.split(":")]]
@@ -113,33 +117,49 @@ if __name__ == "__main__":
 
     # Load data
 
-    def imdb_covertion(data):
-        for i in range(len(data)):
 
-            if len(data[i]) > 512:
-                data[i] = data[i][0:512]
 
-            data[i] = tokenizer.encode(data[i].decode('latin1'))
-        return data
+    dataset = SentimentDataset(tokenizer)
+    data_result = None
+    data_other = None
+    for d in args.datasets.split(","):
+        data = dataset.get_dataset(d,path="../../../datasets")
+        if str(type(data)) != "<class 'text_classification_dataset.TextClassificationDataset'>":
 
-    facebook = SentimentDataset("facebook", tokenizer).data
-        
+            data_other = pd.concat([data_other, data])
+        else:
+            data_result = data
+
+    train, test = train_test_split(data_other, test_size=0.3, shuffle=True, stratify=data_other["Sentiment"])
+    dev, test = train_test_split(test, test_size=0.5, stratify=test["Sentiment"])
+    if data_result == None:
+        data_result = TextClassificationDataset().from_array(data_other, tokenizer.encode)
+    else:
+
+        data_other = TextClassificationDataset().from_array([train,dev,test], tokenizer.encode)
+        #TODO tokenize
+        data_result.train._data["tokens"].append(data_other.train._data["tokens"])
+        data_result.train._data["labels"].append(np.array(data_other.train._data["labels"]))
+
+        data_result.dev._data["tokens"].append(data_other.dev._data["tokens"])
+        data_result.dev._data["labels"].append(np.array(data_other.dev._data["labels"]))
+
+        data_result.test._data["tokens"].append(data_other.test._data["tokens"])
+        data_result.test._data["labels"].append(np.array(data_other.test._data["labels"]))
+
+
     if args.english > 0:
-        train_data, train_labels = tfds.load(name="imdb_reviews", split="train",
-                                      batch_size=-1, as_supervised=True)
+        imdb_ex, imdb_lab = dataset.get_dataset("imdb")
+        imdb_ex = np.array(imdb_ex)
+        imdb_ex, imdb_lab,_,_ = train_test_split(imdb_ex,imdb_lab, train_size=args.english, shuffle=True, stratify=imdb_lab)
 
-        train_examples = tfds.as_numpy(train_data)
-        train_examples = imdb_covertion(train_examples)
-
-        facebook.train._data["tokens"].append(train_examples)
-        facebook.train._data["labels"].append(np.array(train_labels) + 1)
+        data_result.train._data["tokens"].append(imdb_ex)
+        data_result.train._data["labels"].append(imdb_lab + 1)
 
 
     # Create the network and train
-    network = Network(args, len(facebook.train.LABELS))
-    network.train(facebook, args)
-
-    # TODO pridat vyhodnoceni na dev!!!
+    network = Network(args, len(data_result.train.LABELS))
+    network.train(data_result, args)
 
     # Generate test set annotations, but to allow parallel execution, create it
     # in in args.logdir if it exists.
@@ -147,13 +167,13 @@ if __name__ == "__main__":
     test_prediction = []
     if os.path.isdir(args.logdir): out_path = os.path.join(args.logdir, out_path)
     with open(out_path, "w", encoding="ascii") as out_file:
-        for label in network.predict(facebook.test, args):
+        for label in network.predict(data_result.test, args):
             label = np.argmax(label)
             test_prediction.append(label)
-            print(facebook.test.LABELS[label], file=out_file)
+            print(data_result.test.LABELS[label], file=out_file)
 
-    if facebook.test.data["labels"][27] != -1:
-        acc = (np.array(facebook.test.data["labels"]) == np.array(test_prediction))
+    if data_result.test.data["labels"][27] != -1:
+        acc = (np.array(data_result.test.data["labels"]) == np.array(test_prediction))
         acc = sum(acc)/len(acc)
         print("Test accuracy: " + str(acc))
 
