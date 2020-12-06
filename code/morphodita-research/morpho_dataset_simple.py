@@ -103,21 +103,27 @@ class SimpleDataset():
         # Word-level data
         if train > 0:
             num_tokens = sum(batch_sentence_lens) - (len(batch_sentence_lens)*2)
+            print("num tokens " + str(num_tokens))
+            print("sentence lens " + str(batch_sentence_lens))
             num_del = math.floor(train*num_tokens)
             a = np.zeros(num_tokens, dtype=int)
             a[:num_del] = 1
             np.random.shuffle(a)
             s = 0
+            print(str(a))
         factors = []
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
         for i in range(batch_size):
             factors[-1].word_ids[i, 0:batch_sentence_lens[i]] = self.data.bert_subwords[batch_perm[i]]
             if train > 0:
                 start = s
+                print("start " + str(start))
+                end = s + batch_sentence_lens[i] - 1
+                print("end " + str(end))
                 s = s + batch_sentence_lens[i]
-                end = batch_sentence_lens[i]
                 indices = np.nonzero(a[start:end])
                 if len(indices) >0 :
+                    print(indices)
                     indices = np.array(indices) + 1
                     factors[-1].word_ids[i,indices] = self.data.tokenizer.mask_token_id
 
