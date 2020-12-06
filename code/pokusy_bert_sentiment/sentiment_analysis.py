@@ -91,7 +91,7 @@ if __name__ == "__main__":
     parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose TF logging.")
     parser.add_argument("--english", default=0, type=float, help="add some english data for training.")
-    parser.add_argument("--datasets", default="facebook,mall,csfd", type=str, help="Dataset for use")
+    parser.add_argument("--datasets", default=None, type=str, help="Dataset for use")
     args = parser.parse_args([] if "__file__" not in globals() else None)
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
                    [epochslr.split(":")]]
@@ -122,35 +122,37 @@ if __name__ == "__main__":
     dataset = SentimentDataset(tokenizer)
     data_result = None
     data_other = None
-    for d in args.datasets.split(","):
-        data = dataset.get_dataset(d,path="../../../datasets")
-        if str(type(data)) != "<class 'text_classification_dataset.TextClassificationDataset'>":
+    if args.datasets != None:
+        for d in args.datasets.split(","):
+            data = dataset.get_dataset(d,path="../../../datasets")
+            if str(type(data)) != "<class 'text_classification_dataset.TextClassificationDataset'>":
 
-            data_other = pd.concat([data_other, data])
+                data_other = pd.concat([data_other, data])
+            else:
+                data_result = data
+
+        train, test = train_test_split(data_other, test_size=0.3, shuffle=True, stratify=data_other["Sentiment"])
+        dev, test = train_test_split(test, test_size=0.5, stratify=test["Sentiment"])
+        if data_result == None:
+            data_result = TextClassificationDataset().from_array(data_other, tokenizer.encode)
         else:
-            data_result = data
 
-    train, test = train_test_split(data_other, test_size=0.3, shuffle=True, stratify=data_other["Sentiment"])
-    dev, test = train_test_split(test, test_size=0.5, stratify=test["Sentiment"])
-    if data_result == None:
-        data_result = TextClassificationDataset().from_array(data_other, tokenizer.encode)
-    else:
+            data_other = TextClassificationDataset().from_array([train,dev,test], tokenizer.encode)
+            #TODO tokenize
+            data_result.train._data["tokens"].append(data_other.train._data["tokens"])
+            data_result.train._data["labels"].append(np.array(data_other.train._data["labels"]))
 
-        data_other = TextClassificationDataset().from_array([train,dev,test], tokenizer.encode)
-        #TODO tokenize
-        data_result.train._data["tokens"].append(data_other.train._data["tokens"])
-        data_result.train._data["labels"].append(np.array(data_other.train._data["labels"]))
+            data_result.dev._data["tokens"].append(data_other.dev._data["tokens"])
+            data_result.dev._data["labels"].append(np.array(data_other.dev._data["labels"]))
 
-        data_result.dev._data["tokens"].append(data_other.dev._data["tokens"])
-        data_result.dev._data["labels"].append(np.array(data_other.dev._data["labels"]))
-
-        data_result.test._data["tokens"].append(data_other.test._data["tokens"])
-        data_result.test._data["labels"].append(np.array(data_other.test._data["labels"]))
+            data_result.test._data["tokens"].append(data_other.test._data["tokens"])
+            data_result.test._data["labels"].append(np.array(data_other.test._data["labels"]))
 
 
     if args.english > 0:
         imdb_ex, imdb_lab = dataset.get_dataset("imdb")
         imdb_ex = np.array(imdb_ex)
+        imdb_lab = np.array(imdb_lab)
         imdb_ex, imdb_lab,_,_ = train_test_split(imdb_ex,imdb_lab, train_size=args.english, shuffle=True, stratify=imdb_lab)
 
         data_result.train._data["tokens"].append(imdb_ex)
