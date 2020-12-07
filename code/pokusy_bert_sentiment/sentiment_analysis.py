@@ -140,14 +140,17 @@ if __name__ == "__main__":
 
             data_other = TextClassificationDataset().from_array([train,dev,test], tokenizer.encode)
             #TODO tokenize
-            data_result.train._data["tokens"].append(data_other.train._data["tokens"])
-            data_result.train._data["labels"].append(np.array(data_other.train._data["labels"]))
+            data_result.append_dataset(data_other)
+            #data_result.train.append_data(data_other.train._data["tokens"],data_other.train._data["labels"])
 
-            data_result.dev._data["tokens"].append(data_other.dev._data["tokens"])
-            data_result.dev._data["labels"].append(np.array(data_other.dev._data["labels"]))
-
-            data_result.test._data["tokens"].append(data_other.test._data["tokens"])
-            data_result.test._data["labels"].append(np.array(data_other.test._data["labels"]))
+            # data_result.train._data["tokens"].append(data_other.train._data["tokens"])
+            # data_result.train._data["labels"].append(np.array(data_other.train._data["labels"]))
+            #
+            # data_result.dev._data["tokens"].append(data_other.dev._data["tokens"])
+            # data_result.dev._data["labels"].append(np.array(data_other.dev._data["labels"]))
+            #
+            # data_result.test._data["tokens"].append(data_other.test._data["tokens"])
+            # data_result.test._data["labels"].append(np.array(data_other.test._data["labels"]))
 
 
     if args.english > 0:

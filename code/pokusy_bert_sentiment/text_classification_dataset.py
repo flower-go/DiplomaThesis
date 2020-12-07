@@ -86,6 +86,11 @@ class TextClassificationDataset:
 
                 yield tokens, labels
 
+        def append_data(self,tokens,labels):
+            self._size = self._size + len(tokens)
+            self._data["tokens"] = self._data["tokens"].extend(tokens)
+            self._data["labels"] = self._data["labels"].extend(labels)
+
 
     def __init__(self, dataset=None, tokenizer=None):
         """Create the dataset of the given name.
@@ -114,4 +119,12 @@ class TextClassificationDataset:
                                                     shuffle_batches=dataset == "train", from_array=True))
 
         return self
+
+
+    def append_dataset(self,dataset):
+        for d in ["train", "dev", "test"]:
+            data_orig = getattr(self, d)
+            data_new = getattr(dataset,d)
+            data_orig.append_data(data_new["tokens"], data_new["labels"]) #TODO nekotrnoluju stejne labels
+
 
