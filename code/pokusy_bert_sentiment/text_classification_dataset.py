@@ -94,6 +94,7 @@ class TextClassificationDataset:
         if dataset != None:
 
             path = "{}.zip".format(dataset)
+            print(path)
             if not os.path.exists(path):
                 print("Downloading dataset {}...".format(dataset), file=sys.stderr)
                 urllib.request.urlretrieve("{}/{}".format(self._URL, path), filename=path)
