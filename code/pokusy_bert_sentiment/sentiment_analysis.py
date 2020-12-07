@@ -154,7 +154,7 @@ if __name__ == "__main__":
         imdb_ex, imdb_lab = dataset.get_dataset("imdb")
         imdb_ex = np.array(imdb_ex)
         imdb_lab = np.array(imdb_lab)
-        imdb_ex, imdb_lab,_,_ = train_test_split(imdb_ex,imdb_lab, train_size=args.english, shuffle=True, stratify=imdb_lab)
+        imdb_ex, _,imdb_lab,_, = train_test_split(imdb_ex,imdb_lab, train_size=args.english, shuffle=True, stratify=imdb_lab)
 
         data_result.train._data["tokens"].append(imdb_ex)
         data_result.train._data["labels"].append(imdb_lab + 1)
