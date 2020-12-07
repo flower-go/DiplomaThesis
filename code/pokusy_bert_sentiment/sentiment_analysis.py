@@ -91,7 +91,7 @@ if __name__ == "__main__":
     parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose TF logging.")
     parser.add_argument("--english", default=0, type=float, help="add some english data for training.")
-    parser.add_argument("--datasets", default=None, type=str, help="Dataset for use")
+    parser.add_argument("--datasets", default="facebook", type=str, help="Dataset for use")
     args = parser.parse_args([] if "__file__" not in globals() else None)
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
                    [epochslr.split(":")]]
@@ -131,8 +131,10 @@ if __name__ == "__main__":
             else:
                 data_result = data
 
-        train, test = train_test_split(data_other, test_size=0.3, shuffle=True, stratify=data_other["Sentiment"])
-        dev, test = train_test_split(test, test_size=0.5, stratify=test["Sentiment"])
+
+        if data_other != None:
+            train, test = train_test_split(data_other, test_size=0.3, shuffle=True, stratify=data_other["Sentiment"])
+            dev, test = train_test_split(test, test_size=0.5, stratify=test["Sentiment"])
         if data_result == None:
             data_result = TextClassificationDataset().from_array(data_other, tokenizer.encode)
         else:
