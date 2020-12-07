@@ -58,8 +58,8 @@ class Network:
             b.set_value(self.model.optimizer.learning_rate, lr)
             for i in range(e):
                 network.train_epoch(omr.train, args)
-                #metrics = network.evaluate(omr.dev, "dev", args)
-                #print("Dev, epoch {}, lr {}, {}".format(i, lr, metrics[1]))
+                metrics = network.evaluate(omr.dev, "dev", args)
+                print("Dev, epoch {}, lr {}, {}".format(i, lr, metrics[1]))
 
 
     def predict(self, dataset, args):
@@ -75,7 +75,10 @@ class Network:
             max_l = max_len - len(i)
             data.append(i + [0]*max_l)
         
-        return np.asarray(data)
+        res = np.asarray(data)
+        print("prevedeno")
+        
+        return res
 
 
 
@@ -139,8 +142,10 @@ if __name__ == "__main__":
         elif data_other is not None:
 
             data_other = TextClassificationDataset().from_array([train,dev,test], tokenizer.encode)
+            print("pridani train " + str(len(data_other.train._data["tokens"])))
             #TODO tokenize
             data_result.train._data["tokens"].append(data_other.train._data["tokens"])
+            print("po pridani" + str(len(data_result.train.data["tokens"])))
             data_result.train._data["labels"].append(np.array(data_other.train._data["labels"]))
 
             data_result.dev._data["tokens"].append(data_other.dev._data["tokens"])
