@@ -126,6 +126,6 @@ class TextClassificationDataset:
         for d in ["train", "dev", "test"]:
             data_orig = getattr(self, d)
             data_new = getattr(dataset,d)
-            data_orig.append_data(data_new["tokens"], data_new["labels"]) #TODO nekotrnoluju stejne labels
+            data_orig.append_data(data_new.data["tokens"], data_new.data["labels"]) #TODO nekotrnoluju stejne labels
 
 
