@@ -66,6 +66,8 @@ class TextClassificationDataset:
 
         def batches(self, size=None):
             permutation = self._shuffler.permutation(self._size) if self._shuffler else np.arange(self._size)
+            print(self._size)
+            print( len(self._data["tokens"]))
             data_tokens = self._data["tokens"]
             data_labels = self._data["labels"]
 
