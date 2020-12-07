@@ -26,7 +26,9 @@ class SimpleDataset():
         self.data._factors[self.data.LEMMAS].word_ids = self.encode_tags(self.data._factors[self.data.LEMMAS].word_ids,
                                                                        self.data.bert_segments)
 
+        #TODO charseq_ids
 
+        self.data._factors[self.data.FORMS].charseq_ids = self.encode_tags(self.data._factors[self.data.FORMS].charseq_ids, self.data.bert_segments)
         self.NUM_TAGS = len(self.data.factors[self.data.TAGS].words_map)
         self.NUM_LEMMAS = len(self.data.factors[self.data.LEMMAS].words_map)
         self.num_chars = len(self.data.factors[self.data.FORMS].alphabet)
@@ -38,7 +40,7 @@ class SimpleDataset():
         labels = tags
         encoded_labels = []
         for doc_labels, s in zip(labels, segments):
-            # create an empty array of -100, -100 is used in the place of other-than-first subtokens of word
+            # create an empty array of 0 is used in the place of other-than-first subtokens of word
             doc_enc_labels = np.zeros(len(s)+2, dtype=int)
             first_indices = np.nonzero(np.r_[1, np.diff(s)])[0]
             first_indices = first_indices + 1
@@ -126,10 +128,6 @@ class SimpleDataset():
                     print(indices)
                     indices = np.array(indices) + 1
                     factors[-1].word_ids[i,indices] = self.data.tokenizer.mask_token_id
-
-
-
-
 
         factor = self.data._factors[self.data.LEMMAS]
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
