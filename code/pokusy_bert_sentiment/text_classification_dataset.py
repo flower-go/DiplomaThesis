@@ -88,8 +88,8 @@ class TextClassificationDataset:
 
         def append_data(self,tokens,labels):
             self._size = self._size + len(tokens)
-            self._data["tokens"] = self._data["tokens"].extend(tokens)
-            self._data["labels"] = self._data["labels"].extend(labels)
+            self._data["tokens"].extend(tokens)
+            self._data["labels"].extend(labels)
 
 
     def __init__(self, dataset=None, tokenizer=None):
