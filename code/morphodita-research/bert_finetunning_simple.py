@@ -127,6 +127,9 @@ class Network:
             inp = [batch[dataset.data.FORMS].word_ids, batch[dataset.data.FORMS].charseqs,batch[dataset.data.FORMS].charseq_ids,]
             print('train epoch')
 
+
+            #TODO jak je na tom maska
+
             tg = self.train_batch(inp, factors)
 
             if not args.accu:
@@ -246,7 +249,7 @@ class Network:
 
         if len(args.factors) == 2:
             predictions_raw = [np.argmax(p, axis=2) for p in probabilities]
-        self.metrics["LemmasTagsRaw"](
+            self.metrics["LemmasTagsRaw"](
             np.logical_and(factors[0] == predictions_raw[0], factors[1] == predictions_raw[1]), mask)
         metrics = {name: metric.result() for name, metric in self.metrics.items()}
         with self._writer.as_default():
