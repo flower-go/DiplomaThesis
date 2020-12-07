@@ -59,8 +59,7 @@ class Network:
             for i in range(e):
                 network.train_epoch(omr.train, args)
                 metrics = network.evaluate(omr.dev, "dev", args)
-                print("Dev, epoch {}, lr {}, {}".format(e + 1, lr, metrics), file=f,
-                          flush=True)
+                print("Dev, epoch {}, lr {}, {}".format(i, lr, metrics[1]))
 
 
     def predict(self, dataset, args):
@@ -131,11 +130,13 @@ if __name__ == "__main__":
             else:
                 data_result = data
 
-        train, test = train_test_split(data_other, test_size=0.3, shuffle=True, stratify=data_other["Sentiment"])
-        dev, test = train_test_split(test, test_size=0.5, stratify=test["Sentiment"])
+
+        if data_other != None:
+            train, test = train_test_split(data_other, test_size=0.3, shuffle=True, stratify=data_other["Sentiment"])
+            dev, test = train_test_split(test, test_size=0.5, stratify=test["Sentiment"])
         if data_result == None:
             data_result = TextClassificationDataset().from_array(data_other, tokenizer.encode)
-        else:
+        elif data_other != None:
 
             data_other = TextClassificationDataset().from_array([train,dev,test], tokenizer.encode)
             #TODO tokenize
