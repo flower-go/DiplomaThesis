@@ -74,7 +74,7 @@ class Network:
         return gradients
 
 
-    def train_epoch(self, dataset, args, learning_rate):
+    def train_epoch(self, dataset, args):
 
         num_gradients = 0
 
