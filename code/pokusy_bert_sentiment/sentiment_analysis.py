@@ -34,6 +34,8 @@ class Network:
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
 
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
+        if args.model != None:
+            self.model.load_weights(args.model)
         if args.label_smoothing:
             self.loss = tf.losses.CategoricalCrossentropy()
         else:
@@ -119,22 +121,22 @@ class Network:
 
 if __name__ == "__main__":
     # Parse arguments
+
     parser = argparse.ArgumentParser()
+    parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
     parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
     parser.add_argument("--bert", default="bert-base-multilingual-uncased", type=str, help="BERT model.")
-    parser.add_argument("--epochs", default="10:5e-5,1:2e-5", type=str, help="Number of epochs.")
+    parser.add_argument("--datasets", default="facebook,csfd", type=str, help="Dataset for use")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout.")
-    parser.add_argument("--model", default=None, type=str, help="Model for loading")
+    parser.add_argument("--english", default=0, type=float, help="add some english data for training.")
+    parser.add_argument("--epochs", default="10:5e-5,1:2e-5", type=str, help="Number of epochs.")
+    parser.add_argument("--freeze", default=0, type=bool, help="Freezing bert layers")
     parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
-    parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
-    parser.add_argument("--warmup_decay", default=0, type=int,
-                        help="Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--model", default=None, type=str, help="Model for loading")
     parser.add_argument("--seed", default=42, type=int, help="Random seed.")
     parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
-    parser.add_argument("--freeze", default=0, type=bool, help="Freezing bert layers")
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose TF logging.")
-    parser.add_argument("--english", default=0, type=float, help="add some english data for training.")
-    parser.add_argument("--datasets", default="facebook,csfd", type=str, help="Dataset for use")
+    parser.add_argument("--warmup_decay", default=0, type=int, help="Number of warmup steps, than will be applied inverse square root decay")
     args = parser.parse_args([] if "__file__" not in globals() else None)
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
                    [epochslr.split(":")]]
@@ -223,10 +225,19 @@ if __name__ == "__main__":
             label = np.argmax(label)
             test_prediction.append(label)
             print(data_result.test.LABELS[label], file=out_file)
+    dataset.data.save_mappings("{}/mappings.pickle".format(args.logdir))  # TODO
+    if args.checkp:
+        checkp = args.checkp
+    else:
+        checkp = args.logdir.split("/")[1]
+
+    network.model.save_weights('./checkpoints/' + checkp)
+    print(args.logdir.split("/")[1])
 
     if data_result.test.data["labels"][27] != -1:
         acc = (np.array(data_result.test.data["labels"]) == np.array(test_prediction))
         acc = sum(acc)/len(acc)
         print("Test accuracy: " + str(acc))
+
 
 
