@@ -41,20 +41,57 @@ class Network:
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
-    def train_epoch(self, dataset, args):
-        for batch in dataset.batches(size=args.batch_size):
-            metrics = self.model.train_on_batch(
-                batch[0],
-                batch[1],
-                reset_metrics=True)
+    def train_batch(self, inputs, gold_data):
+        with tf.GradientTape() as tape:
 
-            tf.summary.experimental.set_step(self.model.optimizer.iterations)
-            with self._writer.as_default():
-                for name, value in zip(self.model.metrics_names, metrics):
-                    tf.summary.scalar("train/{}".format(name), value)
+            probabilities = self.model(inputs, training=True)
+            tvs = self.model.trainable_variables
+            if args.freeze:
+                tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
+            loss = 0.0
+            #TODO nepotřebuji nic maskovat?
+            #TODO POužívám CLS? kdyžtak vyzkoušet
+
+
+            if args.label_smoothing:
+                loss += self.loss(tf.one_hot(gold_data, self.labels) * (1 - args.label_smoothing)
+                    + args.label_smoothing /  self.labels, probabilities)
+            else:
+                loss += self.loss(tf.convert_to_tensor(gold_data), probabilities)
+
+        gradients = tape.gradient(loss, tvs)
+
+        tf.summary.experimental.set_step(self.optimizer.iterations)  # TODO  co to je?
+        with self._writer.as_default():
+            for name, metric in self.metrics.items():
+                metric.reset_states()
+            self.metrics["loss"](loss)
+            for i in range(len(args.factors)):
+                self.metrics[args.factors[i] + "Raw"](gold_data, probabilities)
+
+            for name, metric in self.metrics.items():
+                tf.summary.scalar("train/{}".format(name), metric.result())
+        return gradients
+
+
+    def train_epoch(self, dataset, args, learning_rate):
+
+        num_gradients = 0
+
+        for batch in dataset.batches(size=args.batch_size):
+            metrics = self.train_batch(
+                batch[0],
+                batch[1])
+
+            # tf.summary.experimental.set_step(self.model.optimizer.iterations)
+            # with self._writer.as_default():
+            #     for name, value in zip(self.model.metrics_names, metrics):
+            #         tf.summary.scalar("train/{}".format(name), value)
 
     def train(self, omr, args):
         for e, lr in args.epochs:
+            if args.accu>0:
+                lr = lr/args.accu
             b.set_value(self.model.optimizer.learning_rate, lr)
             for i in range(e):
                 network.train_epoch(omr.train, args)
@@ -89,8 +126,14 @@ if __name__ == "__main__":
     parser.add_argument("--bert", default="bert-base-multilingual-uncased", type=str, help="BERT model.")
     parser.add_argument("--epochs", default="10:5e-5,1:2e-5", type=str, help="Number of epochs.")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout.")
+    parser.add_argument("--model", default=None, type=str, help="Model for loading")
+    parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
+    parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
+    parser.add_argument("--warmup_decay", default=0, type=int,
+                        help="Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--seed", default=42, type=int, help="Random seed.")
     parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
+    parser.add_argument("--freeze", default=0, type=bool, help="Freezing bert layers")
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose TF logging.")
     parser.add_argument("--english", default=0, type=float, help="add some english data for training.")
     parser.add_argument("--datasets", default="facebook,csfd", type=str, help="Dataset for use")
@@ -114,7 +157,7 @@ if __name__ == "__main__":
         datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S"),
         ",".join(("{}={}".format(re.sub("(.)[^_]*_?", r"\1", key), value) for key, value in sorted(vars(args).items())))
     ))
-
+    args.freeze = args.freeze == 1
     tokenizer = transformers.AutoTokenizer.from_pretrained(args.bert)
 
     # Load data
@@ -170,6 +213,8 @@ if __name__ == "__main__":
 
     # Create the network and train
     network = Network(args, len(data_result.train.LABELS))
+
+    #TODO pustit train epoch spavne
     network.train(data_result, args)
 
     # Generate test set annotations, but to allow parallel execution, create it
