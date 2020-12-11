@@ -28,16 +28,17 @@ class Network:
         self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained(args.bert, config=config)
 
         # vezmu posledni vrstvu
+        # TODO mohla bych vzít jen cls tokeny
         bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
         dropout = tf.keras.layers.Dropout(args.dropout)(bert_output)
-        # dense s softmaxem
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
 
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
-        # compile model
-        self.model.compile(optimizer=tf.optimizers.Adam(),
-                           loss=tf.losses.SparseCategoricalCrossentropy(),
-                           metrics=[tf.metrics.SparseCategoricalAccuracy(name="accuracy")])
+        if args.label_smoothing:
+            self.loss = tf.losses.CategoricalCrossentropy()
+        else:
+            self.loss = tf.losses.SparseCategoricalCrossentropy()
+        self.metrics = {"loss": tf.metrics.Mean()}
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
