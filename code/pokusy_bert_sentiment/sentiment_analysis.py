@@ -34,6 +34,7 @@ class Network:
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
 
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
+        self.optimizer=tf.optimizers.Adam()
         if args.model != None:
             self.model.load_weights(args.model)
         if args.label_smoothing:
@@ -95,7 +96,7 @@ class Network:
         for e, lr in args.epochs:
             if args.accu>0:
                 lr = lr/args.accu
-            b.set_value(self.model.optimizer.learning_rate, lr)
+            b.set_value(self.optimizer.learning_rate, lr)
             for i in range(e):
                 network.train_epoch(omr.train, args)
                 metrics = network.evaluate(omr.dev, "dev", args)
