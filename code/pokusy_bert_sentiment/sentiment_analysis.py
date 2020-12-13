@@ -82,7 +82,7 @@ class Network:
         num_gradients = 0
 
         for batch in dataset.batches(size=args.batch_size):
-            metrics = self.train_batch(
+            tg = self.train_batch(
                 batch[0],
                 batch[1])
 
@@ -90,6 +90,48 @@ class Network:
             # with self._writer.as_default():
             #     for name, value in zip(self.model.metrics_names, metrics):
             #         tf.summary.scalar("train/{}".format(name), value)
+            if not args.accu:
+
+                self.optimizer.apply_gradients(zip(tg, self.model.trainable_variables))
+            else:
+                if num_gradients == 0:
+                    gradients = []
+                    for index, g in enumerate(tg):
+                        if g == None:
+                            gradients.append(None)
+                        elif not isinstance(g, tf.IndexedSlices):
+                            gradients.append(g.numpy())
+                        else:
+                            gradients.append([(g.values.numpy(), g.indices.numpy())])
+
+                    # gradients = [
+                    #   g.numpy() if not isinstance(g, tf.IndexedSlices) else [(g.values.numpy(), g.indices.numpy())] for g
+                    #   in tg]
+                else:
+                    for g, ng in zip(gradients, tg):
+                        if ng != None:
+                            if isinstance(g, list):
+                                g.append((ng.values.numpy(), ng.indices.numpy()))
+                            else:
+                                g += ng.numpy()
+                num_gradients += 1
+                if num_gradients == args.accu or len(dataset.data._permutation) == 0:
+                    gradients = [tf.IndexedSlices(*map(np.concatenate, zip(*g))) if isinstance(g, list) else g for g in
+                                 gradients]
+                    if args.fine_lr > 0:
+                        variables = self.model.trainable_variables
+                        var1 = variables[0: args.lr_split]
+                        var2 = variables[args.lr_split:]
+                        tg1 = gradients[0: args.lr_split]
+                        tg2 = gradients[args.lr_split:]
+
+                        self._optimizer.apply_gradients(zip(tg2, var2))
+                        self._fine_optimizer.apply_gradients(zip(tg1, var1))
+                    else:
+                        print("trainable variables")
+                        print(str(len(self.model.trainable_variables)))
+                        self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
+                    num_gradients = 0
 
     def train(self, omr, args):
         for e, lr in args.epochs:
@@ -243,6 +285,8 @@ if __name__ == "__main__":
         acc = (np.array(data_result.test.data["labels"]) == np.array(test_prediction))
         acc = sum(acc)/len(acc)
         print("Test accuracy: " + str(acc))
+
+    #TODO dodelat akumulaci!!
 
 
 
