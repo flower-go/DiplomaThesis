@@ -35,6 +35,7 @@ class Network:
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
 
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
+        self.optimizer=tf.optimizers.Adam()
         if args.model != None:
             self.model.load_weights(args.model)
         if args.label_smoothing:
@@ -70,9 +71,8 @@ class Network:
             for name, metric in self.metrics.items():
                 metric.reset_states()
             self.metrics["loss"](loss)
-            for i in range(len(args.factors)):
-                self.metrics[args.factors[i] + "Raw"](gold_data, probabilities)
-
+    
+            #TODO metriky
             for name, metric in self.metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
         return gradients
@@ -116,7 +116,7 @@ class Network:
                             else:
                                 g += ng.numpy()
                 num_gradients += 1
-                if num_gradients == args.accu or len(dataset.data._permutation) == 0:
+                if num_gradients == args.accu:
                     gradients = [tf.IndexedSlices(*map(np.concatenate, zip(*g))) if isinstance(g, list) else g for g in
                                  gradients]
                     if args.fine_lr > 0:
@@ -138,7 +138,7 @@ class Network:
         for e, lr in args.epochs:
             if args.accu>0:
                 lr = lr/args.accu
-            b.set_value(self.model.optimizer.learning_rate, lr)
+            b.set_value(self.optimizer.learning_rate, lr)
             for i in range(e):
                 network.train_epoch(omr.train, args)
                 metrics = network.evaluate(omr.dev, "dev", args)
@@ -192,12 +192,14 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
+    
     parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
     parser.add_argument("--bert", default="bert-base-multilingual-uncased", type=str, help="BERT model.")
     parser.add_argument("--datasets", default="facebook,csfd", type=str, help="Dataset for use")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout.")
     parser.add_argument("--english", default=0, type=float, help="add some english data for training.")
     parser.add_argument("--epochs", default="10:5e-5,1:2e-5", type=str, help="Number of epochs.")
+    parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
     parser.add_argument("--freeze", default=0, type=bool, help="Freezing bert layers")
     parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
     parser.add_argument("--model", default=None, type=str, help="Model for loading")
