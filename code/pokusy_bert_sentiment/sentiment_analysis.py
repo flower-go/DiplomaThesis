@@ -21,6 +21,7 @@ class Network:
         # vstup
         subwords = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
         inp = [subwords]
+        self.labels = labels
 
         # bert model
         config = transformers.AutoConfig.from_pretrained(args.bert)
@@ -147,8 +148,30 @@ class Network:
     def predict(self, dataset, args):
         return self.model.predict(self._transform_dataset(dataset.data["tokens"]), batch_size=16)
 
-    def evaluate(self, dataset, name, args):
-        return self.model.evaluate(self._transform_dataset(dataset.data["tokens"]), np.asarray(dataset.data["labels"]), 16)
+    # def evaluate(self, dataset, name, args):
+    #     return self.model.evaluate(self._transform_dataset(dataset.data["tokens"]), np.asarray(dataset.data["labels"]), 16)
+
+
+    @tf.function(experimental_relax_shapes=True)
+    def evaluate_batch(self, inputs, factors):
+        probabilities = self.model(inputs, training=False)
+        loss = 0
+
+        for i in range(len(args.factors)):
+            if args.label_smoothing:
+                loss += self.loss(tf.one_hot(factors[i], self.labels[i]), probabilities[i])
+            else:
+                loss += self.loss(tf.convert_to_tensor(factors[i]), probabilities[i])
+
+        self.metrics["loss"](loss)
+
+        return probabilities
+
+    def evaluate(self, dataset, dataset_name, args):
+        for metric in self.metrics.values():
+            metric.reset_states()
+        for batch in dataset.batches(size=args.batch_size):
+            probabilities, mask = self.evaluate_batch(batch[0], batch[1])
 
     def _transform_dataset(self, dataset):
         max_len = max(len(a) for a in dataset)
@@ -233,18 +256,6 @@ if __name__ == "__main__":
             print("pridani train " + str(len(data_other.train._data["tokens"])))
             #TODO tokenize
             data_result.append_dataset(data_other)
-            #data_result.train.append_data(data_other.train._data["tokens"],data_other.train._data["labels"])
-
-            # data_result.train._data["tokens"].append(data_other.train._data["tokens"])
-            # data_result.train._data["labels"].append(np.array(data_other.train._data["labels"]))
-            #
-            # data_result.dev._data["tokens"].append(data_other.dev._data["tokens"])
-            # data_result.dev._data["labels"].append(np.array(data_other.dev._data["labels"]))
-            #
-            # data_result.test._data["tokens"].append(data_other.test._data["tokens"])
-            # data_result.test._data["labels"].append(np.array(data_other.test._data["labels"]))
-
-
 
     if args.english > 0:
         imdb_ex, imdb_lab = dataset.get_dataset("imdb")
@@ -259,7 +270,6 @@ if __name__ == "__main__":
     # Create the network and train
     network = Network(args, len(data_result.train.LABELS))
 
-    #TODO pustit train epoch spavne
     network.train(data_result, args)
 
     # Generate test set annotations, but to allow parallel execution, create it
