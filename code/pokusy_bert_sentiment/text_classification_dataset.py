@@ -115,6 +115,7 @@ class TextClassificationDataset:
 
     def from_array(self, data, tokenizer):
         for i,dataset in enumerate(["train", "dev", "test"]):
+            print("dataset")
             setattr(self, dataset, self.Dataset(data[i], tokenizer,
                                                     train=self.train if dataset != "train" else None,
                                                     shuffle_batches=dataset == "train", from_array=True))

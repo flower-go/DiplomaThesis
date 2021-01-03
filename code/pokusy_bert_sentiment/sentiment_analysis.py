@@ -141,8 +141,8 @@ class Network:
             b.set_value(self.optimizer.learning_rate, lr)
             for i in range(e):
                 network.train_epoch(omr.train, args)
-                metrics = network.evaluate(omr.dev, "dev", args)
-                print("Dev, epoch {}, lr {}, {}".format(i, lr, metrics[1]))
+                network.evaluate(omr.dev, "dev", args)
+                print("Dev, epoch {}, lr {}, {}".format(i, lr, self.metrics))
 
 
     def predict(self, dataset, args):
@@ -157,11 +157,11 @@ class Network:
         probabilities = self.model(inputs, training=False)
         loss = 0
 
-        for i in range(len(args.factors)):
-            if args.label_smoothing:
-                loss += self.loss(tf.one_hot(factors[i], self.labels[i]), probabilities[i])
-            else:
-                loss += self.loss(tf.convert_to_tensor(factors[i]), probabilities[i])
+
+        if args.label_smoothing:
+            loss += self.loss(tf.one_hot(factors, self.labels), probabilities)
+        else:
+            loss += self.loss(tf.convert_to_tensor(factors), probabilities)
 
         self.metrics["loss"](loss)
 
@@ -171,7 +171,7 @@ class Network:
         for metric in self.metrics.values():
             metric.reset_states()
         for batch in dataset.batches(size=args.batch_size):
-            probabilities, mask = self.evaluate_batch(batch[0], batch[1])
+            probabilities = self.evaluate_batch(batch[0], batch[1])
 
     def _transform_dataset(self, dataset):
         max_len = max(len(a) for a in dataset)
@@ -244,6 +244,7 @@ if __name__ == "__main__":
 
                 data_other = pd.concat([data_other, data])
             else:
+
                 data_result = data
 
 
@@ -251,7 +252,8 @@ if __name__ == "__main__":
             train, test = train_test_split(data_other, test_size=0.3, shuffle=True, stratify=data_other["Sentiment"])
             dev, test = train_test_split(test, test_size=0.5, stratify=test["Sentiment"])
         if data_result == None:
-            data_result = TextClassificationDataset().from_array(data_other, tokenizer.encode)
+            print("vytvroeni data result")
+            data_result = TextClassificationDataset().from_array([train,dev,test], tokenizer.encode)
         elif data_other is not None:
 
             data_other = TextClassificationDataset().from_array([train,dev,test], tokenizer.encode)
