@@ -124,11 +124,11 @@ class Network:
             for f in args.factors:
                 words = batch[dataset.data.FACTORS_MAP[f]].word_ids
                 factors.append(words)
+            print(str(sum(batch[dataset.data.FORMS].charseqs == 0)))
             inp = [batch[dataset.data.FORMS].word_ids, batch[dataset.data.FORMS].charseqs,batch[dataset.data.FORMS].charseq_ids,]
             print('train epoch')
 
-
-            #TODO jak je na tom maska
+            #TODO neměla bych prumerovat metriky?
 
             tg = self.train_batch(inp, factors)
 
@@ -180,8 +180,6 @@ class Network:
     # TODO vytvareni modelu jako jedna metoda pro outer i inner model
     def _compute_bert(self, batch, dataset, lenghts):
 
-        # max_len = np.max([len(batch[dataset.BERT].word_ids[i]) for i in range(len(batch[dataset.BERT].word_ids))])
-        # FIXME DATASET.BERT
         max_len = batch[dataset.EMBEDDINGS].word_ids.shape[1]
         result = np.zeros((len(batch[dataset.BERT].word_ids), max_len, len(batch[dataset.BERT].word_ids[0][0])))
         for sentence in range(len(batch[dataset.BERT].word_ids)):
@@ -276,27 +274,27 @@ if __name__ == "__main__":
 
     # Parse arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("data", type=str, help="Input data")
+
+    parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
     parser.add_argument("--batch_size", default=64, type=int, help="Batch size.")
+    parser.add_argument("--bert", default=None, type=str, help="Bert model for embeddings")
     parser.add_argument("--beta_2", default=0.99, type=float, help="Adam beta 2")
-    parser.add_argument("--epochs", default="40:1e-3,20:1e-4", type=str, help="Epochs and learning rates.")
+    parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
+    parser.add_argument("--cle_dim", default=256, type=int, help="Character-level embedding dimension.")
+    parser.add_argument("--cont", default=0, type=int, help="load finetuned model and continue training?")
+    parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
-    parser.add_argument("--freeze", default=0, type=bool, help="Freezing bert layers")
-    parser.add_argument("--model", default=None, type=str, help="Model for loading")
+    parser.add_argument("--epochs", default="40:1e-3,20:1e-4", type=str, help="Epochs and learning rates.")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
     parser.add_argument("--factors", default="Lemmas,Tags", type=str, help="Factors to predict.")
-    parser.add_argument("--cle_dim", default=256, type=int, help="Character-level embedding dimension.")
-    parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
-    parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
-    parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
-    parser.add_argument("--bert", default=None, type=str, help="Bert model for embeddings")
-    parser.add_argument("--cont", default=0, type=int, help="load finetuned model and continue training?")
-    parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
-    parser.add_argument("--warmup_decay", default=0, type=int,
-                         help="Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
-    parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
+    parser.add_argument("--freeze", default=0, type=bool, help="Freezing bert layers")
+    parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
+    parser.add_argument("--model", default=None, type=str, help="Model for loading")
+    parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
+    parser.add_argument("--warmup_decay", default=0, type=int,help="Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--word_dropout", default=0, type=float, help="Word dropout rate")
+    parser.add_argument("data", type=str, help="Input data")
 
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
@@ -314,12 +312,9 @@ if __name__ == "__main__":
         args.exp = "{}-{}".format(os.path.basename(__file__), datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S"))
 
     do_not_log = {"exp", "lemma_re_strip", "predict", "threads", "bert_model", "bert"}
-    #TODO ma byt toto fakt zakomentovane?
+
     args.logdir = "models/{}".format(
         args.exp
-        # ",".join(("{}={}".format(re.sub("(.)[^_]*_?", r"\1", key),
-        #                          re.sub("[^,]*/", "", value) if type(value) == str else value)
-        #           for key, value in sorted(vars(args).items()) if key not in do_not_log))
     )
     if not os.path.exists("models"): os.mkdir("models")
     if not os.path.exists(args.logdir): os.mkdir(args.logdir)
@@ -350,8 +345,6 @@ if __name__ == "__main__":
     #train_tag_labels = train._factors[train.TAGS].word_ids
     #train_segments = train.bert_segments
     #labels_unique = len(train.factors[train.TAGS].words)
-
-
     network = Network(args=args,
                       model=model_bert, labels=[dataset.NUM_LEMMAS,dataset.NUM_TAGS], num_chars=dataset.num_chars)
 
