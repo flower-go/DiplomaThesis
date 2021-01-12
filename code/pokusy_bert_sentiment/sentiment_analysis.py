@@ -7,9 +7,11 @@ import re
 import numpy as np
 import tensorflow as tf
 import transformers
+import math
 from keras import backend as b
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from transformers import WarmUp
 
 from text_classification_dataset import TextClassificationDataset
 
@@ -36,6 +38,9 @@ class Network:
 
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
         self.optimizer=tf.optimizers.Adam()
+        if args.warmup_decay > 0:
+            self.optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],warmup_steps=args.warmup_decay,
+                                                   decay_schedule_fn=lambda step: 1 / math.sqrt(step))
         if args.model != None:
             self.model.load_weights(args.model)
         if args.label_smoothing:
@@ -51,8 +56,10 @@ class Network:
 
             probabilities = self.model(inputs, training=True)
             tvs = self.model.trainable_variables
+            print(len(tvs))
             if args.freeze:
                 tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
+                print(len(tvs))
             loss = 0.0
             #TODO nepotřebuji nic maskovat?
             #TODO POužívám CLS? kdyžtak vyzkoušet
@@ -136,8 +143,9 @@ class Network:
 
     def train(self, omr, args):
         for e, lr in args.epochs:
-            if args.accu>0:
-                lr = lr/args.accu
+            if args.warmup_decay == 0:
+                if args.accu > 0:
+                    lr = lr / args.accu
             b.set_value(self.optimizer.learning_rate, lr)
             for i in range(e):
                 network.train_epoch(omr.train, args)
@@ -192,7 +200,6 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
-    
     parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
     parser.add_argument("--bert", default="bert-base-multilingual-uncased", type=str, help="BERT model.")
     parser.add_argument("--datasets", default="facebook,csfd", type=str, help="Dataset for use")
@@ -206,10 +213,13 @@ if __name__ == "__main__":
     parser.add_argument("--seed", default=42, type=int, help="Random seed.")
     parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose TF logging.")
+    parser.add_argument("--debug", default=False, type=int, help="use small debug data")
     parser.add_argument("--warmup_decay", default=0, type=int, help="Number of warmup steps, than will be applied inverse square root decay")
     args = parser.parse_args([] if "__file__" not in globals() else None)
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
                    [epochslr.split(":")]]
+
+    args.debug = args.debug == 1
 
     # Fix random seeds and threads
     np.random.seed(args.seed)
@@ -230,16 +240,12 @@ if __name__ == "__main__":
     args.freeze = args.freeze == 1
     tokenizer = transformers.AutoTokenizer.from_pretrained(args.bert)
 
-    # Load data
-
-
-
     dataset = SentimentDataset(tokenizer)
     data_result = None
     data_other = None
     if args.datasets != None:
         for d in args.datasets.split(","):
-            data = dataset.get_dataset(d,path="../../../datasets")
+            data = dataset.get_dataset(d,path="../../../datasets",args.debug)
             if str(type(data)) != "<class 'text_classification_dataset.TextClassificationDataset'>":
 
                 data_other = pd.concat([data_other, data])
@@ -252,13 +258,9 @@ if __name__ == "__main__":
             train, test = train_test_split(data_other, test_size=0.3, shuffle=True, stratify=data_other["Sentiment"])
             dev, test = train_test_split(test, test_size=0.5, stratify=test["Sentiment"])
         if data_result == None:
-            print("vytvroeni data result")
             data_result = TextClassificationDataset().from_array([train,dev,test], tokenizer.encode)
         elif data_other is not None:
-
             data_other = TextClassificationDataset().from_array([train,dev,test], tokenizer.encode)
-            print("pridani train " + str(len(data_other.train._data["tokens"])))
-            #TODO tokenize
             data_result.append_dataset(data_other)
 
     if args.english > 0:
@@ -270,6 +272,8 @@ if __name__ == "__main__":
         data_result.train._data["tokens"].append(imdb_ex)
         data_result.train._data["labels"].append(imdb_lab + 1)
 
+    if args.warmup_decay > 0:
+        args.warmup_decay = math.floor(len(data_result.train._data["tokens"]) / args.batch_size)
 
     # Create the network and train
     network = Network(args, len(data_result.train.LABELS))

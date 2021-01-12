@@ -9,21 +9,23 @@ class SentimentDataset():
 
     def __init__(self, tokenizer):
 
-        #TODO dodat spravne cesty k
         self.labels = {'n': 1, '0': 0, 'p': 2, 'b': 'BIP'}
         self.target_labels = [self.labels['n'], self.labels['0'], self.labels['p']]
-        self.max_sentence_length = 30  # no. of words
+        #self.max_sentence_length = 30  # no. of words %TODO is it true?
         self.tokenizer = tokenizer
 
 
-    def get_dataset(self, dataset_name, path=None):
+    def get_dataset(self, dataset_name, path=None, debug=False):
         if dataset_name == "facebook":
             return TextClassificationDataset(path + "/" + "czech_facebook", tokenizer=self.tokenizer.encode)
         if dataset_name == "imdb":
             return self._return_imdb(self.tokenizer)
         if dataset_name == "csfd":
             path = path + "/" + dataset_name
-            return self.load_data(path)
+            if debug:
+                return self.load_data(path, True)
+            else:
+                return self.load_data(path)
         if dataset_name == "mall":
             path = path + "/" + dataset_name + "cz"
             return self.load_data(path)
@@ -65,20 +67,32 @@ class SentimentDataset():
             .query('Sentiment != @filter_out') \
             .reset_index(drop=True)
 
-    def load_data(self,directory):
+    def load_data(self,directory, debug=False):
         '''
         Loads a dataset whose samples are split to individual files/per class.
 
         Returns a new DataFrame.
         '''
-        return pd \
-            .concat([
-            pd.read_csv('{}/positive.txt'.format(directory), sep='\n', header=None, names=['Post']).assign(
-                Sentiment=self.labels['p']),
-            pd.read_csv('{}/neutral.txt'.format(directory), sep='\n', header=None, names=['Post']).assign(
-                Sentiment=self.labels['0']),
-            pd.read_csv('{}/negative.txt'.format(directory), sep='\n', header=None, names=['Post']).assign(
-                Sentiment=self.labels['n'])
-        ], axis=0) \
-            .reset_index(drop=True)
+        if debug:
+            return pd \
+                .concat([
+                pd.read_csv('{}/positive-small.txt'.format(directory), sep='\n', header=None, names=['Post']).assign(
+                    Sentiment=self.labels['p']),
+                pd.read_csv('{}/neutral-small.txt'.format(directory), sep='\n', header=None, names=['Post']).assign(
+                    Sentiment=self.labels['0']),
+                pd.read_csv('{}/negative-small.txt'.format(directory), sep='\n', header=None, names=['Post']).assign(
+                    Sentiment=self.labels['n'])
+            ], axis=0) \
+                .reset_index(drop=True)
+        else:
+            return pd \
+                .concat([
+                pd.read_csv('{}/positive.txt'.format(directory), sep='\n', header=None, names=['Post']).assign(
+                    Sentiment=self.labels['p']),
+                pd.read_csv('{}/neutral.txt'.format(directory), sep='\n', header=None, names=['Post']).assign(
+                    Sentiment=self.labels['0']),
+                pd.read_csv('{}/negative.txt'.format(directory), sep='\n', header=None, names=['Post']).assign(
+                    Sentiment=self.labels['n'])
+            ], axis=0) \
+                .reset_index(drop=True)
 
