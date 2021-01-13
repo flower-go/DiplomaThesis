@@ -51,8 +51,11 @@ class Network:
 
             probabilities = self.model(inputs, training=True)
             tvs = self.model.trainable_variables
+            
+            print(len(tvs))
             if args.freeze:
                 tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
+                print(len(tvs))
             loss = 0.0
             #TODO nepotřebuji nic maskovat?
             #TODO POužívám CLS? kdyžtak vyzkoušet
