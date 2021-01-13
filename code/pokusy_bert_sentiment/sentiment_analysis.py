@@ -246,7 +246,7 @@ if __name__ == "__main__":
     data_other = None
     if args.datasets != None:
         for d in args.datasets.split(","):
-            data = dataset.get_dataset(d,path="../../../datasets",args.debug)
+            data = dataset.get_dataset(d,path="../../../datasets",debug=args.debug)
             if str(type(data)) != "<class 'text_classification_dataset.TextClassificationDataset'>":
 
                 data_other = pd.concat([data_other, data])
