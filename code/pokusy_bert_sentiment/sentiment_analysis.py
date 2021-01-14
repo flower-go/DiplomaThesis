@@ -290,7 +290,7 @@ if __name__ == "__main__":
             label = np.argmax(label)
             test_prediction.append(label)
             print(data_result.test.LABELS[label], file=out_file)
-    data_result.train.save_mappings("{}/mappings.pickle".format(args.logdir))  # TODO
+    #data_result.train.save_mappings("{}/mappings.pickle".format(args.logdir))  # TODO
     if args.checkp:
         checkp = args.checkp
     else:
