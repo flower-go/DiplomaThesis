@@ -150,7 +150,8 @@ class Network:
             for i in range(e):
                 network.train_epoch(omr.train, args)
                 network.evaluate(omr.dev, "dev", args)
-                print("Dev, epoch {}, lr {}, {}".format(i, lr, self.metrics))
+                metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * self.metrics[metric]) for metric in self.metrics))
+                print("Dev, epoch {}, lr {}, {}".format(i, lr, metrics_log))
 
 
     def predict(self, dataset, args):
