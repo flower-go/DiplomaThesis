@@ -151,7 +151,8 @@ class Network:
             for i in range(e):
                 network.train_epoch(omr.train, args)
                 network.evaluate(omr.dev, "dev", args)
-                print("Dev, epoch {}, lr {}, {}".format(i, lr, self.metrics))
+                metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * self.metrics[metric]) for metric in self.metrics))
+                print("Dev, epoch {}, lr {}, {}".format(i, lr, metrics_log))
 
 
     def predict(self, dataset, args):
@@ -291,7 +292,7 @@ if __name__ == "__main__":
             label = np.argmax(label)
             test_prediction.append(label)
             print(data_result.test.LABELS[label], file=out_file)
-    data_result.train.save_mappings("{}/mappings.pickle".format(args.logdir))  # TODO
+    #data_result.train.save_mappings("{}/mappings.pickle".format(args.logdir))  # TODO
     if args.checkp:
         checkp = args.checkp
     else:
