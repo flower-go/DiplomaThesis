@@ -14,24 +14,6 @@ from keras.models import load_model
 
 from transformers import WarmUp
 
-class CustomModel(tf.keras.Model):
-    def test_step(self, data):
-        # Unpack the data
-        x, y = data
-        # Compute predictions
-        y_pred = self(x, training=False)
-        # Updates the metrics tracking the loss
-        self.compiled_loss(y, y_pred, regularization_losses=self.losses)
-        # Update the metrics.
-        self.compiled_metrics.update_state(y, y_pred)
-
-        # Return a dict mapping metric names to current value.
-        # Note that it will include the loss (tracked in self.metrics).
-        result = {m.name: m.result() for m in self.metrics}
-        #joinAcc = np.sum(y == y_pred)/len(y)
-        result["joinAcc"] = 20
-        return result
-
 class BertModel:
     def __init__(self, name, args):
         self.name = name
@@ -132,7 +114,7 @@ class Network:
             if args.bert or args.bert_model:
                 inp.append(bert_embeddings)
 
-            self.model = CustomModel(inputs=inp, outputs=outputs)
+            self.model = tf.keras.Model(inputs=inp, outputs=outputs)
 
             print(str(self.model.weights[0][6][1]))
             if args.test_only:
@@ -174,7 +156,7 @@ class Network:
                 bert_output = bert_output[:, :-1] # tady se dava pryc sep
 
                 print("model len: " + str(len(inp2[:-2] + [bert_output])))
-                self.outer_model = CustomModel(inputs=inp2, outputs=self.model(inp2[:-2] + [bert_output]))
+                self.outer_model = tf.keras.Model(inputs=inp2, outputs=self.model(inp2[:-2] + [bert_output]))
             else:
                 self.outer_model = self.model
 
