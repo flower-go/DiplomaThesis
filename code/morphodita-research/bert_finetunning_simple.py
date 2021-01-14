@@ -266,7 +266,8 @@ if __name__ == "__main__":
     import re
 
     print(os.getcwd())
-    # Fix random seed
+
+    #TODO pridat jako parametr
     np.random.seed(42)
     tf.random.set_seed(42)
 
@@ -311,7 +312,7 @@ if __name__ == "__main__":
     if args.exp is None:
         args.exp = "{}-{}".format(os.path.basename(__file__), datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S"))
 
-    do_not_log = {"exp", "lemma_re_strip", "predict", "threads", "bert_model", "bert"}
+    do_not_log = {"exp", "lemma_re_strip", "predict", "threads", "bert_model", "bert"} #TODO vyřešit
 
     args.logdir = "models/{}".format(
         args.exp
@@ -371,7 +372,7 @@ if __name__ == "__main__":
 
     for i, (epochs, learning_rate) in enumerate(args.epochs):
         for epoch in range(epochs):
-
+            print("train epoch {}".format(epoch))
             network.train_epoch(dataset, args, learning_rate)
 
             if dev:
