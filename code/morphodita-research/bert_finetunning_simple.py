@@ -80,6 +80,7 @@ class Network:
 
     @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, factors):
+        print("train")
         tags_mask = tf.not_equal(factors[0],0)
         with tf.GradientTape() as tape:
 
