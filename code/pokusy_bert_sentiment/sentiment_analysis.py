@@ -151,7 +151,7 @@ class Network:
             for i in range(e):
                 network.train_epoch(omr.train, args)
                 network.evaluate(omr.dev, "dev", args)
-                metrics = {name: metric.result() for name, metric in self._metrics.items()}
+                metrics = {name: metric.result() for name, metric in self.metrics.items()}
                 metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * self.metrics[metric]) for metric in metrics))
                 print("Dev, epoch {}, lr {}, {}".format(i, lr, metrics_log))
 
