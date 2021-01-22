@@ -303,7 +303,7 @@ if __name__ == "__main__":
     network.model.save_weights('./checkpoints/' + checkp)
     print(args.logdir.split("/")[1])
 
-    if data_result.test.data["labels"][27] != -1:
+    if data_result.test.data["labels"][0] != -1:
         acc = (np.array(data_result.test.data["labels"]) == np.array(test_prediction))
         acc = sum(acc)/len(acc)
         print("Test accuracy: " + str(acc))
