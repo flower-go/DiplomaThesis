@@ -216,6 +216,7 @@ if __name__ == "__main__":
     parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose TF logging.")
     parser.add_argument("--debug", default=False, type=int, help="use small debug data")
+    parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
     parser.add_argument("--warmup_decay", default=0, type=int, help="Number of warmup steps, than will be applied inverse square root decay")
     args = parser.parse_args([] if "__file__" not in globals() else None)
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
