@@ -57,11 +57,11 @@ class Network:
             probabilities = self.model(inputs, training=True)
             tvs = self.model.trainable_variables
             print("vechny variables")
-            print(len(tvs))
+            print(str(len(tvs)))
             if args.freeze:
                 print("jen vrchni")
                 tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
-                print(len(tvs))
+                print(str(len(tvs)))
             loss = 0.0
             #TODO nepotřebuji nic maskovat?
             #TODO POužívám CLS? kdyžtak vyzkoušet
@@ -145,7 +145,7 @@ class Network:
 
     def train(self, omr, args):
         for e, lr in args.epochs:
-            print("epoch " + e)
+            print("epoch " + str(e))
             if args.warmup_decay == 0:
                 if args.accu > 0:
                     lr = lr / args.accu
