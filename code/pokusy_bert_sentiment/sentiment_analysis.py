@@ -98,12 +98,7 @@ class Network:
                 batch[0],
                 batch[1])
 
-            # tf.summary.experimental.set_step(self.model.optimizer.iterations)
-            # with self._writer.as_default():
-            #     for name, value in zip(self.model.metrics_names, metrics):
-            #         tf.summary.scalar("train/{}".format(name), value)
             if not args.accu:
-
                 self.optimizer.apply_gradients(zip(tg, self.model.trainable_variables))
             else:
                 if num_gradients == 0:
@@ -147,12 +142,12 @@ class Network:
 
     def train(self, omr, args):
         for e, lr in args.epochs:
-            print("epoch " + str(e))
             if args.warmup_decay == 0:
                 if args.accu > 0:
                     lr = lr / args.accu
             b.set_value(self.optimizer.learning_rate, lr)
             for i in range(e):
+                print("epoch " + str(i))
                 network.train_epoch(omr.train, args)
                 network.evaluate(omr.dev, "dev", args)
                 metrics = {name: metric.result() for name, metric in self.metrics.items()}
@@ -226,6 +221,8 @@ if __name__ == "__main__":
     args = parser.parse_args([] if "__file__" not in globals() else None)
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
                    [epochslr.split(":")]]
+
+    print(args.epochs)
 
     args.debug = args.debug == 1
 
