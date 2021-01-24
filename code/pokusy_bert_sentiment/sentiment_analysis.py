@@ -58,7 +58,6 @@ class Network:
 
             probabilities = self.model(inputs, training=True)
             tvs = tvs
-            print("delka " + str(len(tvs)))
             loss = 0.0
 
 
@@ -84,7 +83,7 @@ class Network:
     def train_epoch(self, dataset, args):
         num_gradients = 0
         tvs = self.model.trainable_variables
-        print(tvs)
+        print(str(len(tvs)))
         # if args.freeze:
         #     tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
         for batch in dataset.batches(size=args.batch_size):
