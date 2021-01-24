@@ -51,20 +51,13 @@ class Network:
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
-    def train_batch(self, inputs, gold_data):
+    def train_batch(self, inputs, gold_data, tvs):
         with tf.GradientTape() as tape:
 
             probabilities = self.model(inputs, training=True)
-            tvs = self.model.trainable_variables
-            print("vechny variables")
-            print(str(len(tvs)))
-            if args.freeze:
-                print("jen vrchni")
-                tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
-                print(str(len(tvs)))
+            tvs = tvs
+            print("delka " + str(len(tvs)))
             loss = 0.0
-            #TODO nepotřebuji nic maskovat?
-            #TODO POužívám CLS? kdyžtak vyzkoušet
 
 
             if args.label_smoothing:
@@ -88,16 +81,18 @@ class Network:
 
 
     def train_epoch(self, dataset, args):
-
         num_gradients = 0
-
+        tvs = self.model.trainable_variables
+        print(tvs)
+        if args.freeze:
+            tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
         for batch in dataset.batches(size=args.batch_size):
             tg = self.train_batch(
                 batch[0],
-                batch[1])
+                batch[1], tvs)
 
             if not args.accu:
-                self.optimizer.apply_gradients(zip(tg, self.model.trainable_variables))
+                self.optimizer.apply_gradients(zip(tg, tvs))
             else:
                 if num_gradients == 0:
                     gradients = []
@@ -109,9 +104,6 @@ class Network:
                         else:
                             gradients.append([(g.values.numpy(), g.indices.numpy())])
 
-                    # gradients = [
-                    #   g.numpy() if not isinstance(g, tf.IndexedSlices) else [(g.values.numpy(), g.indices.numpy())] for g
-                    #   in tg]
                 else:
                     for g, ng in zip(gradients, tg):
                         if ng != None:
@@ -133,12 +125,10 @@ class Network:
                         self._optimizer.apply_gradients(zip(tg2, var2))
                         self._fine_optimizer.apply_gradients(zip(tg1, var1))
                     else:
-                        print("trainable variables")
-                        print(str(len(self.model.trainable_variables)))
-                        self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
+                        self.optimizer.apply_gradients(zip(gradients, tvs))
                     num_gradients = 0
 
-    def train(self, omr, args):
+    def train(self, data, args):
         for e, lr in args.epochs:
             if args.warmup_decay == 0:
                 if args.accu > 0:
@@ -146,8 +136,8 @@ class Network:
             b.set_value(self.optimizer.learning_rate, lr)
             for i in range(e):
                 print("epoch " + str(i))
-                network.train_epoch(omr.train, args)
-                network.evaluate(omr.dev, "dev", args)
+                network.train_epoch(data.train, args)
+                network.evaluate(data.dev, "dev", args)
                 metrics = {name: metric.result() for name, metric in self.metrics.items()}
                 metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
                 print("Dev, epoch {}, lr {}, {}".format(i, lr, metrics_log))
@@ -220,9 +210,8 @@ if __name__ == "__main__":
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
                    [epochslr.split(":")]]
 
-    print(args.epochs)
-
     args.debug = args.debug == 1
+    args.freeze = args.freeze == 1
 
     # Fix random seeds and threads
     np.random.seed(args.seed)
@@ -240,7 +229,7 @@ if __name__ == "__main__":
         datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S"),
         ",".join(("{}={}".format(re.sub("(.)[^_]*_?", r"\1", key), value) for key, value in sorted(vars(args).items())))
     ))
-    args.freeze = args.freeze == 1
+
     tokenizer = transformers.AutoTokenizer.from_pretrained(args.bert)
 
     dataset = SentimentDataset(tokenizer)
@@ -278,10 +267,13 @@ if __name__ == "__main__":
     if args.warmup_decay > 0:
         args.warmup_decay = math.floor(len(data_result.train._data["tokens"]) / args.batch_size)
 
+    print("Delka datasetu " + str(len(data_result.train._data)))
+
     # Create the network and train
     network = Network(args, len(data_result.train.LABELS))
 
     network.train(data_result, args)
+    print("train ended")
 
     # Generate test set annotations, but to allow parallel execution, create it
     # in in args.logdir if it exists.
@@ -306,8 +298,6 @@ if __name__ == "__main__":
         acc = (np.array(data_result.test.data["labels"]) == np.array(test_prediction))
         acc = sum(acc)/len(acc)
         print("Test accuracy: " + str(acc))
-
-    #TODO dodelat akumulaci!!
 
 
 
