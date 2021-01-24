@@ -220,6 +220,8 @@ if __name__ == "__main__":
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
                    [epochslr.split(":")]]
 
+    print(args.epochs)
+
     args.debug = args.debug == 1
 
     # Fix random seeds and threads
