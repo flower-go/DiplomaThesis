@@ -33,6 +33,8 @@ class Network:
         # vezmu posledni vrstvu
         # TODO mohla bych vzít jen cls tokeny
         bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
+        if args.freeze:
+            bert_output.trainable = False
         dropout = tf.keras.layers.Dropout(args.dropout)(bert_output)
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
 
@@ -56,7 +58,6 @@ class Network:
 
             probabilities = self.model(inputs, training=True)
             tvs = tvs
-            print("delka " + str(len(tvs)))
             loss = 0.0
 
 
@@ -68,13 +69,12 @@ class Network:
 
         gradients = tape.gradient(loss, tvs)
 
-        tf.summary.experimental.set_step(self.optimizer.iterations)  # TODO  co to je?
+        tf.summary.experimental.set_step(self.optimizer.iterations)
         with self._writer.as_default():
             for name, metric in self.metrics.items():
                 metric.reset_states()
             self.metrics["loss"](loss)
-    
-            #TODO metriky
+
             for name, metric in self.metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
         return gradients
@@ -83,9 +83,9 @@ class Network:
     def train_epoch(self, dataset, args):
         num_gradients = 0
         tvs = self.model.trainable_variables
-        print(tvs)
-        if args.freeze:
-            tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
+        print(str(len(tvs)))
+        # if args.freeze:
+        #     tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
         for batch in dataset.batches(size=args.batch_size):
             tg = self.train_batch(
                 batch[0],
