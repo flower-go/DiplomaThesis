@@ -29,11 +29,14 @@ class Network:
         config = transformers.AutoConfig.from_pretrained(args.bert)
         config.output_hidden_states = True
         self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained(args.bert, config=config)
+        if args.freeze:
+            self.bert.trainable = False
 
         # vezmu posledni vrstvu
         # TODO mohla bych vzít jen cls tokeny
         bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
         if args.freeze:
+            print(str(args.freeze))
             bert_output.trainable = False
         dropout = tf.keras.layers.Dropout(args.dropout)(bert_output)
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
