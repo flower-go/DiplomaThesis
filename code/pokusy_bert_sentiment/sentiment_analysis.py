@@ -83,7 +83,10 @@ class Network:
     def train_epoch(self, dataset, args):
         num_gradients = 0
         tvs = self.model.trainable_variables
+        print("trainable")
         print(str(len(tvs)))
+        print(str(self.model.trainable_weights))
+
         # if args.freeze:
         #     tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
         for batch in dataset.batches(size=args.batch_size):
