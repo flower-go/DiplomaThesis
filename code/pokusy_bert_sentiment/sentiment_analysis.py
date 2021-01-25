@@ -85,7 +85,7 @@ class Network:
         tvs = self.model.trainable_variables
         print("trainable")
         print(str(len(tvs)))
-        print(str(self.model.trainable_weights))
+        print(str(len(self.model.trainable_weights)))
 
         # if args.freeze:
         #     tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
