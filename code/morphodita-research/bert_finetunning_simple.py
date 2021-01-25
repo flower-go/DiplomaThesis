@@ -126,8 +126,8 @@ class Network:
                 words = batch[dataset.data.FACTORS_MAP[f]].word_ids
                 factors.append(words)
             print("tvar " + str(batch[dataset.data.FACTORS_MAP["Lemmas"]].word_ids.shape))
-            print("kolik je maskovanych " + str(sum(batch[dataset.data.FACTORS_MAP["Lemmas"]].word_ids == 0)))
-            print("kolik neni " + str(sum(batch[dataset.data.FACTORS_MAP["Lemmas"]].word_ids != 0)))
+            print("kolik je maskovanych " + str(np.sum(batch[dataset.data.FACTORS_MAP["Lemmas"]].word_ids == 0, axis=1)))
+            print("kolik neni " + str(np.sum(batch[dataset.data.FACTORS_MAP["Lemmas"]].word_ids != 0, axis=1)))
             inp = [batch[dataset.data.FORMS].word_ids, batch[dataset.data.FORMS].charseqs,batch[dataset.data.FORMS].charseq_ids,]
             print('train epoch')
 
