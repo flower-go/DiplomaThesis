@@ -12,6 +12,7 @@ from keras import backend as b
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from transformers import WarmUp
+from sklearn.metrics import f1_score
 
 from text_classification_dataset import TextClassificationDataset
 
@@ -52,7 +53,7 @@ class Network:
             self.loss = tf.losses.CategoricalCrossentropy()
         else:
             self.loss = tf.losses.SparseCategoricalCrossentropy()
-        self.metrics = {"loss": tf.metrics.Mean()}
+        self.metrics = {"loss": tf.metrics.Mean(), "F1": tf.metrics.Mean()}
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
@@ -168,6 +169,7 @@ class Network:
             loss += self.loss(tf.convert_to_tensor(factors), probabilities)
 
         self.metrics["loss"](loss)
+        self.metrics["F1"](f1_score(factors,np.argmax(probabilities)))
 
         return probabilities
 
