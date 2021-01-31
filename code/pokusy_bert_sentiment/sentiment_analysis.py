@@ -169,8 +169,7 @@ class Network:
             loss += self.loss(tf.convert_to_tensor(factors), probabilities)
 
         self.metrics["loss"](loss)
-        pred = [np.argmax(p, axis=2) for p in probabilities]
-        self.metrics["F1"](f1_score(factors,pred))
+
 
         return probabilities
 
@@ -179,6 +178,8 @@ class Network:
             metric.reset_states()
         for batch in dataset.batches(size=args.batch_size):
             probabilities = self.evaluate_batch(batch[0], batch[1])
+            pred = [np.argmax(p, axis=2) for p in probabilities]
+            self.metrics["F1"](f1_score(batch[0], pred))
 
     def _transform_dataset(self, dataset):
         max_len = max(len(a) for a in dataset)
