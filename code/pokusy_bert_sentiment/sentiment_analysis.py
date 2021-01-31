@@ -169,6 +169,7 @@ class Network:
             loss += self.loss(tf.convert_to_tensor(factors), probabilities)
 
         self.metrics["loss"](loss)
+        print("type " + str(probabilities.type))
         self.metrics["F1"](f1_score(factors,np.argmax(probabilities)))
 
         return probabilities
