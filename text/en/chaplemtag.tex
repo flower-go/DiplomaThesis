@@ -1,0 +1,25 @@
+\chapter{Task 1: Lemmatization and part-of-speech tagging}
+\label{chap:tag}
+%TODO definice
+%TODO related work
+%TODO sota
+This work aims to improve previously published SOTA results for contextualized embeddings in czech lemmatization and tagging \citep{Straka2019}. 
+
+\begin{table}[!h]
+  \begin{tabular}{|l||c|c|c||c|c|c|}
+  \hline
+\multirow{2}{*}{Experiment} & \multicolumn{3}{c||}{Without Dictionary}  &
+      \multicolumn{3}{c|}{With Dictionary} \\ 
+    & Tags & Lemmas & Both & Tags & Lemmas & Both \\ \hline
+    StrakaB & 97.94\% & 98.75\% & 97.31\% & 98.05\% & 98.98\% & 97.65\% \\ \hline
+    emb (lr 0.0001) &  97.80\% & 98.70\% & 97.17\% & 97.95\% & 98.93\% & 97.55\% \\ \hline
+    baseline & 97.04 \% & 98.56 \% & 96.41\% &  97.31  \% & 98.83 \% & 96.90\% \\ \hline 
+    StrakaC & 97.67\% & 98.63\% & 97.02\% & 97.91\% & 98.94\% & 97.51\% \\ \hline
+  \end{tabular}
+  \caption{%TODO cite
+  Straka2019B is the best solution from \citep{Straka2019} paper. Straka2019C is a comparable solution  (BERT embeddings only), which was transformed into TF2 in this work.} 
+\end{table}
+%TODO jak jsem to udelala
+%TODO  vysledky
+
+

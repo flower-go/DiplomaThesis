@@ -9,7 +9,7 @@
 \setlength\oddsidemargin{15mm}
 \setlength\evensidemargin{15mm}
 \setlength\topmargin{0mm}
-\setlength\headsep{0mm}
+   \setlength\headsep{0mm}
 \setlength\headheight{0mm}
 % \openright makes the following text appear on a right-hand page
 \let\openright=\clearpage
@@ -35,6 +35,8 @@
 \usepackage{lmodern}
 \usepackage{hyperref}
 
+\DeclareUnicodeCharacter{00B4}{}
+
 %% Further useful packages (included in most LaTeX distributions)
 \usepackage{todonotes}
 \usepackage{nameref}
@@ -46,6 +48,8 @@
 \usepackage{graphicx}       % embedding of pictures
 \usepackage{fancyvrb}       % improved verbatim environment
 \usepackage{natbib}  
+\usepackage{multirow}
+\usepackage{float}
 \setcitestyle{authordate}
       % citation style AUTHOR (YEAR), or AUTHOR [NUMBER]
 \usepackage[nottoc]{tocbibind} % makes sure that bibliography and the lists
@@ -54,8 +58,6 @@
 \usepackage{dcolumn}        % improved alignment of table columns
 \usepackage{booktabs}       % improved horizontal lines in tables
 \usepackage{paralist}       % improved enumerate and itemize
-%\usepackage[usenames]{xcolor}  % typesetting in color
-
 \usepackage[automake,toc]{glossaries} %for list of abbreviations
 \makeglossaries
 \setacronymstyle{long-short}
@@ -70,7 +72,7 @@
 \def\ThesisAuthor{Bc. Petra Vysušilová}
 
 % Year when the thesis is submitted
-\def\YearSubmitted{2020}
+\def\YearSubmitted{2021}
 
 % Name of the department or institute, where the work was officially assigned
 % (according to the Organizational Structure of MFF UK in English,
@@ -98,7 +100,7 @@ Dedication.
 
 % Abstract (recommended length around 80-200 words; this is not a copy of your thesis assignment!)
 \def\Abstract{%
-Recently, several methods for unsupervised pre-training of contextualized word embeddings have been proposed, most importantly the BERT model (Devlin et al., 2018). Such contextualized representations have been extremely useful as additional features in many NLP tasks like morphosyntactic analysis, entity recognition or text classification.
+Recently, several methods for unsupervised pre-training of contextualized word embeddings have been proposed, most importantly the BERT model (Devlin et al., 2018). Such contextualized representations have been extremely useful as additional features in many NLP tasks like morphological or syntactic analysis, entity recognition or text classification.
 
 Most of the evaluation have been carried out on English. However, several of the released models have been pre-trained on many languages including Czech, like multilingual BERT or XLM-RoBERTa (Conneau et al, 2019). Therefore, the goal of this thesis is to perform experiments quantifying improvements of employing pre-trained contextualized representation in Czech natural language processing.
 }
@@ -128,9 +130,12 @@ Most of the evaluation have been carried out on English. However, several of the
 %%% Each chapter is kept in a separate file
 \include{preface}
 \include{chap01}
+\include{chaplemtag}
+\include{chapsentiment}
+\include{chapmodeling}
 \include{chap02}
-\include{chap03}
 \include{chap04}
+\include{chap03}
 
 
 \include{epilog}

@@ -1,9 +1,72 @@
 \chapter{Discussion}
 \label{chap:diss}
-\gls{ny} a second use \gls{ny}
 
-\citep{wu2020}
-%POSTUP
 
-%RESULTS
-%- aktualni SOTA - milanův článek
+\section{Experiments}
+This section offers a description of all performed experiments.
+For tagging and lemmatization exist two main experiment settings: with (morphodita) pipeline on top of bert embedding and simple version with bert plus simple classification head. Both networks can finetune ( %TODO dodelat popis v teorii) 
+or can freeze bert layers.
+
+
+
+
+
+
+
+
+
+%============effective batch size 16, mBERT, no lr changes===========
+\begin{table}
+\centering
+\caption{}
+\begin{tabular}{l|llll}
+\multicolumn{1}{l}{\textbf{lr 3e-05}} & 1     & 2      & 3     & 4      \\ 
+\hline\hline
+lemmasRaw                    & 98.60 & 98.59  & 98.58 & 98.58  \\ 
+\hline
+lemmasDict                   & 98.86 & 98.87  & 98.88 & 98.90  \\ 
+\hline
+TagsRaw                      & 97.52 & 97.42 & 97.54 & 97.50  \\ 
+\hline
+TagsDict                     & 97.71 & 97.65  & 97.77 & 97.73  \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{}
+\begin{tabular}{l|llll}
+\multicolumn{1}{l}{\textbf{lr~2e-05}} & 1     & 2     & 3      & 4      \\ 
+\hline\hline
+lemmasRaw                    & 98.63 & 98.62 & 98.63  & 98.61  \\ 
+\hline
+lemmasDict                   & 98.90 & 98.89 & 98.91  & 98.90  \\ 
+\hline
+TagsRaw                      & 97.59 & 97.59 & 97.68  & 97.68  \\ 
+\hline
+TagsDict                     & 97.79 & 97.79 & ~97.85 & 97.88  \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{}
+\begin{tabular}{l|llll}
+\multicolumn{1}{l}{lr 5e-05} & 1     & 2     & 3     & 4       \\ 
+\hline\hline
+lemmasRaw                    & 98.53 & 98.49 & 98.48 & 98.47   \\ 
+\hline
+lemmasDict                   & 98.81 & 98.80 & 98.80 & ~98.80  \\ 
+\hline
+TagsRaw                      & 97.21 & 97.14 & 97.19 & 97.14   \\ 
+\hline
+TagsDict                     & 97.46 & 97.39 & 97.45 & 97.40   \\
+\hline
+\end{tabular}
+\end{table}
+
+
+
+

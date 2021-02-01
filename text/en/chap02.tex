@@ -1,4 +1,7 @@
 \chapter{Implementation analysis}
+This chapter describes an implementation of all language models and other related code. Following a logical code structure, this chapter is divided into three sections. First section covers lemmatization and POS tagging task, which shares same neural network model.
+
+
 %co delam a jak to delam
 The practical part of this work is focused on these tasks:
 \begin{itemize}
@@ -16,7 +19,7 @@ The practical part of this work is focused on these tasks:
 \label{chap:impl}
 This chapter describes implemented linguistic models. As mentioned before, this work implements models for three Czech NLP tasks: tagging, lemmatization and sentiment analysis. Common model for first two tasks develops on the paper by \cite[]{straka2019czech} focused on application of contextual embeddings produced by language models as Bert %todo cite
  or Flair. %todo cite. 
- Third task, sentiment analysis, is perfomed by adding only one fully-connected layer at the top of bert model. So in the opposite to previous tasks, no sophisticated handcrafted pipeline is built and model relies only on the network powers of language structure representation.
+ Third task, sentiment analysis, is performed by adding only one fully-connected layer at the top of bert model. So in the opposite to previous tasks, no sophisticated handcrafted pipeline is built and model relies only on the network powers of language structure representation.
  \section{POS tagging and lemmatization model}
 The model for this part is build upon a model (and a code) for previous work on Czech NLP processing with contextual embeddings \cite[]{straka2019czech}. Data preparation %todo trida s odkazem do github
 pipeline - tokenization and sentence segmentation is taken over from the paper as well as base structure of lemmatizer and tagger network. 
