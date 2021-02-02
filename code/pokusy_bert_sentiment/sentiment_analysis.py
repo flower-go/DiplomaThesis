@@ -179,6 +179,7 @@ class Network:
         for batch in dataset.batches(size=args.batch_size):
             probabilities = self.evaluate_batch(batch[0], batch[1])
             print("probabilities shape " + str(probabilities.get_shape()))
+            print("type " + probabilities.type)
             pred = [np.argmax(p, axis=1) for p in probabilities] #TODO jaka osa?
             self.metrics["F1"](f1_score(batch[0], pred))
 
