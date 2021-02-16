@@ -180,7 +180,7 @@ class Network:
         for batch in dataset.batches(size=args.batch_size):
             probabilities = self.evaluate_batch(batch[0], batch[1])
             pred = [np.argmax(p) for p in probabilities]
-            self.metrics["F1"](f1_score(batch[1], pred, average=None))
+            self.metrics["F1"](f1_score(batch[1], pred, average="weighted"))
 
     def _transform_dataset(self, dataset):
         max_len = max(len(a) for a in dataset)
@@ -310,6 +310,8 @@ if __name__ == "__main__":
         c = confusion_matrix(np.array(data_result.test.data["labels"]), np.array(test_prediction))
         print(c)
         print("Test accuracy: " + str(acc))
+
+        print("F1 metrics: " + str(f1_score(np.array(data_result.test.data["labels"]), np.array(test_prediction),average="weighted")))
 
 
 
