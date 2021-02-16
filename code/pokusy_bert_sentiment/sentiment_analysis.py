@@ -13,6 +13,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 #from transformers import WarmUp
 from sklearn.metrics import f1_score
+from sklearn.metrics import confusion_matrix
 
 from text_classification_dataset import TextClassificationDataset
 
@@ -37,7 +38,7 @@ class Network:
         # TODO mohla bych vzít jen cls tokeny
         bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
         if args.freeze:
-            print(str(args.freeze))
+            print("freeze " + str(args.freeze))
             bert_output.trainable = False
         dropout = tf.keras.layers.Dropout(args.dropout)(bert_output)
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
@@ -178,10 +179,8 @@ class Network:
             metric.reset_states()
         for batch in dataset.batches(size=args.batch_size):
             probabilities = self.evaluate_batch(batch[0], batch[1])
-            print("probabilities shape " + str(probabilities.get_shape()))
-            print("type " + probabilities.type)
-            pred = [np.argmax(p, axis=1) for p in probabilities] #TODO jaka osa?
-            self.metrics["F1"](f1_score(batch[0], pred))
+            pred = [np.argmax(p) for p in probabilities]
+            self.metrics["F1"](f1_score(batch[1], pred, average=None))
 
     def _transform_dataset(self, dataset):
         max_len = max(len(a) for a in dataset)
@@ -209,7 +208,7 @@ if __name__ == "__main__":
     parser.add_argument("--english", default=0, type=float, help="add some english data for training.")
     parser.add_argument("--epochs", default="10:5e-5,1:2e-5", type=str, help="Number of epochs.")
     parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
-    parser.add_argument("--freeze", default=0, type=bool, help="Freezing bert layers")
+    parser.add_argument("--freeze", default=0, type=int, help="Freezing bert layers")
     parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
     parser.add_argument("--model", default=None, type=str, help="Model for loading")
     parser.add_argument("--seed", default=42, type=int, help="Random seed.")
@@ -308,6 +307,8 @@ if __name__ == "__main__":
     if data_result.test.data["labels"][0] != -1:
         acc = (np.array(data_result.test.data["labels"]) == np.array(test_prediction))
         acc = sum(acc)/len(acc)
+        c = confusion_matrix(np.array(data_result.test.data["labels"]), np.array(test_prediction))
+        print(c)
         print("Test accuracy: " + str(acc))
 
 
