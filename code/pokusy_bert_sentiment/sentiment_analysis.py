@@ -11,7 +11,7 @@ import math
 from keras import backend as b
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from transformers import WarmUp
+#from transformers import WarmUp
 from sklearn.metrics import f1_score
 
 from text_classification_dataset import TextClassificationDataset
@@ -204,7 +204,7 @@ if __name__ == "__main__":
     parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
     parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
     parser.add_argument("--bert", default="bert-base-multilingual-uncased", type=str, help="BERT model.")
-    parser.add_argument("--datasets", default="facebook,csfd", type=str, help="Dataset for use")
+    parser.add_argument("--datasets", default="mall,facebook,csfd", type=str, help="Dataset for use")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout.")
     parser.add_argument("--english", default=0, type=float, help="add some english data for training.")
     parser.add_argument("--epochs", default="10:5e-5,1:2e-5", type=str, help="Number of epochs.")
@@ -275,7 +275,6 @@ if __name__ == "__main__":
 
         data_result.train._data["tokens"].append(imdb_ex)
         data_result.train._data["labels"].append(imdb_lab + 1)
-
     if args.warmup_decay > 0:
         args.warmup_decay = math.floor(len(data_result.train._data["tokens"]) / args.batch_size)
 
