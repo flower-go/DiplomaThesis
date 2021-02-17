@@ -62,10 +62,7 @@ if __name__ == "__main__":
     #    tf.config.threading.set_inter_op_parallelism_threads(args.threads)
     #    tf.config.threading.set_intra_op_parallelism_threads(args.threads)
 
-    ##Loading datasets
-    tokenizer = transformers.AutoTokenizer.from_pretrained(args.bert)
-
-    dataset = SentimentDataset(tokenizer)
+    dataset = SentimentDataset(None)
     data_result = None
     data_other = None
     if args.datasets != None:
@@ -78,14 +75,11 @@ if __name__ == "__main__":
 
                 data_result = data
 
-        if data_other is not None:
-            train, test = train_test_split(data_other, test_size=0.3, shuffle=True, stratify=data_other["Sentiment"])
-            dev, test = train_test_split(test, test_size=0.5, stratify=test["Sentiment"])
-        if data_result == None:
-            data_result = TextClassificationDataset().from_array([train, dev, test], tokenizer.encode)
-        elif data_other is not None:
-            data_other = TextClassificationDataset().from_array([train, dev, test], tokenizer.encode)
-            data_result.append_dataset(data_other)
+    if data_other is not None and data_result is not None:
+        res_x = np.concatenate((np.array(data_result.train._data["tokens"]),np.array(data_result.dev._data["tokens"]),np.array(data_result.test._data["tokens"])))
+        res_y = np.concatenate((np.array(data_result.train._data["labels"]),np.array(data_result.dev._data["labels"]),np.array(data_result.test._data["labels"])))
+        data_result = pd.DataFrame({"Post": res_x, "Sentiment": res_y})
+        data_result = pd.concat(data_other, data_result)
 
     if args.english > 0:
         imdb_ex, imdb_lab = dataset.get_dataset("imdb")
@@ -101,16 +95,14 @@ if __name__ == "__main__":
     from sklearn.feature_extraction.text import CountVectorizer
 
     vectorizer = CountVectorizer(max_features=1500, min_df=5, max_df=0.7, stop_words=stopwords.words('english'))
-    X = np.concatenate((np.array(data_result.train._data["tokens"]),np.array(data_result.dev._data["tokens"]),np.array(data_result.test._data["tokens"])))
-    y = np.concatenate((np.array(data_result.train._data["labels"]),np.array(data_result.dev._data["labels"]),np.array(data_result.test._data["labels"])))
-    X = vectorizer.fit_transform(X).toarray()
+    X = vectorizer.fit_transform(data_result["Post"]).toarray()
 
 
     from sklearn.feature_extraction.text import TfidfTransformer
 
     tfidfconverter = TfidfTransformer()
-    X = tfidfconverter.fit_transform(X).toarray()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+    X = tfidfconverter.fit_transform(data_result["Post"]).toarray()
+    X_train, X_test, y_train, y_test = train_test_split(X, data_result["Sentiment"], test_size=0.2, random_state=0, stratify=True)
 
 
     #Training data
