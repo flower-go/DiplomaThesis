@@ -5,7 +5,7 @@ import os
 import re
 
 import numpy as np
-import stopwords as stopwords
+
 import tensorflow as tf
 import transformers
 import math
@@ -101,9 +101,8 @@ if __name__ == "__main__":
     from sklearn.feature_extraction.text import CountVectorizer
 
     vectorizer = CountVectorizer(max_features=1500, min_df=5, max_df=0.7, stop_words=stopwords.words('english'))
-
-    X = data_result.train._data["tokens"].extend(data_result.dev._data["tokens"].extend(data_result.test._data["tokens"]))
-    y = data_result.train._data["labels"].extend(data_result.dev._data["labels"].extend(data_result.test._data["labels"]))
+    X = np.concatenate((np.array(data_result.train._data["tokens"]),np.array(data_result.dev._data["tokens"]),np.array(data_result.test._data["tokens"])))
+    y = np.concatenate((np.array(data_result.train._data["labels"]),np.array(data_result.dev._data["labels"]),np.array(data_result.test._data["labels"])))
     X = vectorizer.fit_transform(X).toarray()
 
 
