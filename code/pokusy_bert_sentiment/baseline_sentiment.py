@@ -103,6 +103,8 @@ if __name__ == "__main__":
     vectorizer = CountVectorizer(max_features=1500, min_df=5, max_df=0.7, stop_words=stopwords.words('english'))
     X = np.concatenate((np.array(data_result.train._data["tokens"]),np.array(data_result.dev._data["tokens"]),np.array(data_result.test._data["tokens"])))
     y = np.concatenate((np.array(data_result.train._data["labels"]),np.array(data_result.dev._data["labels"]),np.array(data_result.test._data["labels"])))
+    print(str(len(X)))
+    print(X)
     X = vectorizer.fit_transform(X).toarray()
 
 
