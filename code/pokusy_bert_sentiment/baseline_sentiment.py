@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 import argparse
 import datetime
@@ -22,6 +23,8 @@ from sklearn.datasets import load_files
 nltk.download('stopwords')
 import pickle
 from nltk.corpus import stopwords
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.datasets import make_classification
 
 from text_classification_dataset import TextClassificationDataset
 
@@ -75,11 +78,15 @@ if __name__ == "__main__":
 
                 data_result = data
 
-    if data_other is not None and data_result is not None:
+    if data_result is not None:
         res_x = np.concatenate((np.array(data_result.train._data["tokens"]),np.array(data_result.dev._data["tokens"]),np.array(data_result.test._data["tokens"])))
         res_y = np.concatenate((np.array(data_result.train._data["labels"]),np.array(data_result.dev._data["labels"]),np.array(data_result.test._data["labels"])))
         data_result = pd.DataFrame({"Post": res_x, "Sentiment": res_y})
-        data_result = pd.concat(data_other, data_result)
+    if data_other is not None:
+        if data_result is not None:
+            data_result = pd.concat(data_other, data_result)
+        else:
+            data_result = data_other
 
     if args.english > 0:
         imdb_ex, imdb_lab = dataset.get_dataset("imdb")
@@ -95,14 +102,15 @@ if __name__ == "__main__":
     from sklearn.feature_extraction.text import CountVectorizer
 
     vectorizer = CountVectorizer(max_features=1500, min_df=5, max_df=0.7, stop_words=stopwords.words('english'))
+    #print(data_result["Post"])
     X = vectorizer.fit_transform(data_result["Post"]).toarray()
 
 
     from sklearn.feature_extraction.text import TfidfTransformer
 
     tfidfconverter = TfidfTransformer()
-    X = tfidfconverter.fit_transform(data_result["Post"]).toarray()
-    X_train, X_test, y_train, y_test = train_test_split(X, data_result["Sentiment"], test_size=0.2, random_state=0, stratify=True)
+    X = tfidfconverter.fit_transform(X).toarray()
+    X_train, X_test, y_train, y_test = train_test_split(X, data_result["Sentiment"], test_size=0.2, random_state=0, stratify=data_result["Sentiment"])
 
 
     #Training data
