@@ -71,12 +71,7 @@ if __name__ == "__main__":
     if args.datasets != None:
         for d in args.datasets.split(","):
             data = dataset.get_dataset(d, path="../../../datasets", debug=args.debug)
-            if str(type(data)) != "<class 'text_classification_dataset.TextClassificationDataset'>":
-
-                data_other = pd.concat([data_other, data])
-            else:
-
-                data_result = data
+            data_other = pd.concat([data_other, data])
 
     if data_result is not None:
         res_x = np.concatenate((np.array(data_result.train._data["tokens"]),np.array(data_result.dev._data["tokens"]),np.array(data_result.test._data["tokens"])))

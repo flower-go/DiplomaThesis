@@ -1,6 +1,8 @@
 from text_classification_dataset import TextClassificationDataset
 import tensorflow_datasets as tfds
 import pandas as pd
+import os
+import zipfile
 
 # loading csfd and mall datset from: https://github.com/kysely/sentiment-analysis-czech/blob/sentence-level/Sentiment%20Analysis%20in%20Czech.ipynb
 
@@ -17,7 +19,10 @@ class SentimentDataset():
 
     def get_dataset(self, dataset_name, path=None, debug=False):
         if dataset_name == "facebook":
-            return TextClassificationDataset(path + "/" + "czech_facebook", tokenizer=self.tokenizer.encode)
+            if self.tokenizer is not None:
+                return TextClassificationDataset(path + "/" + "czech_facebook", tokenizer=self.tokenizer.encode)
+            else:
+                return self._load_facebook(path + "/" + "czech_facebook")
         if dataset_name == "imdb":
             return self._return_imdb(self.tokenizer)
         if dataset_name == "csfd":
@@ -29,6 +34,22 @@ class SentimentDataset():
         if dataset_name == "mall":
             path = path + "/" + dataset_name + "cz"
             return self.load_data(path)
+
+
+    def _load_facebook(self, path):
+        tokens= []
+        labels=[]
+        with zipfile.ZipFile(path, "r") as zip_file:
+            for dataset in ["train", "dev", "test"]:
+                with zip_file.open("{}_{}.txt".format(os.path.splitext(path)[0].split("/")[-1], dataset),
+                                   "r") as dataset_file:
+                    for line in dataset_file:
+                        line = line.decode("utf-8").rstrip("\r\n")
+                        label, text = line.split("\t", maxsplit=1)
+
+                        tokens.append(text)
+                        labels.append(label)
+        return pd.DataFrame({"Post": tokens, "Sentiment": labels})
 
     def _return_imdb(self, tokenizer):
 
