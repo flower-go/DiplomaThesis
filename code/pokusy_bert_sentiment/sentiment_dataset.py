@@ -48,6 +48,10 @@ class SentimentDataset():
                         label, text = line.split("\t", maxsplit=1)
 
                         tokens.append(text)
+                        if label == "n":
+                            label = 1
+                        elif label == "p":
+                            label = 2
                         labels.append(label)
         return pd.DataFrame({"Post": tokens, "Sentiment": labels})
 
