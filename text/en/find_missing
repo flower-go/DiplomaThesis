@@ -1,0 +1,4 @@
+#!/bin/sh
+cat *.tex | gsed 's/\(citep\)/\n\1/g' | grep "^citep" | sed 's/citep{\(.*\)/\1/' | sed 's/}.*//' | sort | uniq >vse_citovane
+cat Diplomka.bib | grep "^@" | sed 's/.*{//' | sed 's/,//' | sort | uniq >vse_co_mam
+diff vse_citovane vse_co_mam | grep '^>' | sed 's/^>\ //' > chybejici

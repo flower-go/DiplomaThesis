@@ -1,19 +1,52 @@
-\contentsline {chapter}{Introduction}{2}{chapter*.2}% 
-\contentsline {chapter}{\numberline {1}Theory and related work}{3}{chapter.1}% 
-\contentsline {section}{\numberline {1.1}BERT explanation}{3}{section.1.1}% 
-\contentsline {subsection}{\numberline {1.1.1}Input embeddings}{3}{subsection.1.1.1}% 
-\contentsline {subsection}{\numberline {1.1.2}Pretraining tasks}{4}{subsection.1.1.2}% 
-\contentsline {chapter}{\numberline {2}Implementation analysis}{5}{chapter.2}% 
-\contentsline {section}{\numberline {2.1}POS tagging and lemmatization model}{5}{section.2.1}% 
-\contentsline {subsection}{\numberline {2.1.1}Dataset and preprocessing}{5}{subsection.2.1.1}% 
-\contentsline {subsection}{\numberline {2.1.2}Network}{5}{subsection.2.1.2}% 
-\contentsline {subsection}{\numberline {2.1.3}Python implementation}{7}{subsection.2.1.3}% 
-\contentsline {chapter}{\numberline {3}Discussion}{9}{chapter.3}% 
-\contentsline {chapter}{\numberline {4}User documentation}{10}{chapter.4}% 
-\contentsline {chapter}{Conclusion}{11}{chapter*.13}% 
-\contentsline {chapter}{Bibliography}{12}{chapter*.14}% 
-\contentsline {chapter}{List of Figures}{13}{chapter*.15}% 
-\contentsline {chapter}{List of Tables}{14}{chapter*.16}% 
-\contentsline {chapter}{List of Abbreviations}{15}{chapter*.17}% 
-\contentsline {chapter}{\numberline {A}Attachments}{16}{appendix.A}% 
-\contentsline {section}{\numberline {A.1}First Attachment}{16}{section.A.1}% 
+\contentsline {chapter}{Introduction}{3}{chapter*.2}% 
+\contentsline {chapter}{\numberline {1}Theory}{4}{chapter.1}% 
+\contentsline {section}{\numberline {1.1}Linguistics and \gls {nlp}}{4}{section.1.1}% 
+\contentsline {subsection}{\numberline {1.1.1}Morphology}{4}{subsection.1.1.1}% 
+\contentsline {subsubsection}{Lemmatization task}{4}{section*.3}% 
+\contentsline {subsubsection}{Part-of-speech tagging}{4}{section*.4}% 
+\contentsline {subsection}{\numberline {1.1.2}Semantics}{5}{subsection.1.1.2}% 
+\contentsline {subsubsection}{Sentiment analysis}{5}{section*.5}% 
+\contentsline {subsection}{\numberline {1.1.3}Language data}{5}{subsection.1.1.3}% 
+\contentsline {subsection}{\numberline {1.1.4}Historical Development}{8}{subsection.1.1.4}% 
+\contentsline {section}{\numberline {1.2}Deep Learning}{9}{section.1.2}% 
+\contentsline {subsection}{\numberline {1.2.1}Deep Learning History}{9}{subsection.1.2.1}% 
+\contentsline {subsection}{\numberline {1.2.2}Machine Learning and Regularization}{11}{subsection.1.2.2}% 
+\contentsline {subsection}{\numberline {1.2.3}Embeddings}{12}{subsection.1.2.3}% 
+\contentsline {subsubsection}{Non-contextualized embeddings}{13}{section*.6}% 
+\contentsline {subsubsection}{Contextualized embeddings}{14}{section*.7}% 
+\contentsline {subsection}{\numberline {1.2.4}Attention mechanism}{14}{subsection.1.2.4}% 
+\contentsline {subsection}{\numberline {1.2.5}Recurrent Neural Networks}{15}{subsection.1.2.5}% 
+\contentsline {subsection}{\numberline {1.2.6}Transformers}{17}{subsection.1.2.6}% 
+\contentsline {subsection}{\numberline {1.2.7}Transfer learning}{19}{subsection.1.2.7}% 
+\contentsline {section}{\numberline {1.3}BERT explanation}{21}{section.1.3}% 
+\contentsline {subsection}{\numberline {1.3.1}Input embeddings}{22}{subsection.1.3.1}% 
+\contentsline {subsection}{\numberline {1.3.2}Pretraining tasks}{24}{subsection.1.3.2}% 
+\contentsline {subsubsection}{Next Sentence Prediction}{24}{section*.13}% 
+\contentsline {subsubsection}{Masked Language Modeling}{24}{section*.14}% 
+\contentsline {subsection}{\numberline {1.3.3}Transformers encoder architecture}{24}{subsection.1.3.3}% 
+\contentsline {subsection}{\numberline {1.3.4}How to use BERT}{25}{subsection.1.3.4}% 
+\contentsline {subsection}{\numberline {1.3.5}Why is BERT so special?}{25}{subsection.1.3.5}% 
+\contentsline {chapter}{\numberline {2}Task 1: Lemmatization and part-of-speech tagging}{26}{chapter.2}% 
+\contentsline {chapter}{\numberline {3}Task 2: Sentiment Analysis}{28}{chapter.3}% 
+\contentsline {section}{\numberline {3.1}Task definition}{28}{section.3.1}% 
+\contentsline {section}{\numberline {3.2}Datasets}{28}{section.3.2}% 
+\contentsline {subsection}{\numberline {3.2.1}Facebook}{28}{subsection.3.2.1}% 
+\contentsline {subsection}{\numberline {3.2.2}csfd}{28}{subsection.3.2.2}% 
+\contentsline {subsection}{\numberline {3.2.3}mallcz}{28}{subsection.3.2.3}% 
+\contentsline {subsection}{\numberline {3.2.4}imdb}{29}{subsection.3.2.4}% 
+\contentsline {subsection}{\numberline {3.2.5}Experiments}{29}{subsection.3.2.5}% 
+\contentsline {chapter}{\numberline {4}Task 3: Language Modeling}{32}{chapter.4}% 
+\contentsline {chapter}{\numberline {5}Implementation analysis}{33}{chapter.5}% 
+\contentsline {section}{\numberline {5.1}POS tagging and lemmatization model}{33}{section.5.1}% 
+\contentsline {subsection}{\numberline {5.1.1}Dataset and preprocessing}{33}{subsection.5.1.1}% 
+\contentsline {subsection}{\numberline {5.1.2}Network}{34}{subsection.5.1.2}% 
+\contentsline {subsection}{\numberline {5.1.3}Python implementation}{35}{subsection.5.1.3}% 
+\contentsline {chapter}{\numberline {6}User documentation}{37}{chapter.6}% 
+\contentsline {chapter}{\numberline {7}Discussion}{38}{chapter.7}% 
+\contentsline {section}{\numberline {7.1}Experiments}{38}{section.7.1}% 
+\contentsline {chapter}{Conclusion}{40}{chapter*.16}% 
+\contentsline {chapter}{Bibliography}{41}{chapter*.17}% 
+\contentsline {chapter}{List of Figures}{47}{chapter*.18}% 
+\contentsline {chapter}{List of Tables}{50}{chapter*.19}% 
+\contentsline {chapter}{\numberline {A}Attachments}{51}{appendix.A}% 
+\contentsline {section}{\numberline {A.1}First Attachment}{51}{section.A.1}% 

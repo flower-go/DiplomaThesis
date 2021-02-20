@@ -4,9 +4,12 @@ The top-level auxiliary file: thesis.aux
 A level-1 auxiliary file: title.aux
 A level-1 auxiliary file: preface.aux
 A level-1 auxiliary file: chap01.aux
+A level-1 auxiliary file: chaplemtag.aux
+A level-1 auxiliary file: chapsentiment.aux
+A level-1 auxiliary file: chapmodeling.aux
 A level-1 auxiliary file: chap02.aux
-A level-1 auxiliary file: chap03.aux
 A level-1 auxiliary file: chap04.aux
+A level-1 auxiliary file: chap03.aux
 A level-1 auxiliary file: epilog.aux
 A level-1 auxiliary file: bibliography.aux
 The style file: mydinat.bst
@@ -16,44 +19,97 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 Database file #1: bibliography.bib
-You've used 3 entries,
+Database file #2: Diplomka.bib
+Warning--to sort, need author or key in PDT35
+Warning--empty note in Allen19
+Warning--no publisher, address, url or date in Bahdanau
+Warning--empty note in Bahdanau
+Warning--empty note in Bengio2003
+Warning--empty note in Brown
+Warning--no proper publisher, using url in Cheng
+Warning--empty note in Cheng
+Warning--no proper publisher, using url in Dai2015
+Warning--empty note in Dai2015
+Warning--no proper publisher, using url in francis79browncorpus
+Warning--empty note in francis79browncorpus
+Warning--empty note in Hana2005
+Warning--no publisher, address, url or date in Hladka
+Warning--empty note in Hladka
+Warning--no proper publisher, using url in Hochreiter1997
+Warning--empty note in Hochreiter1997
+Warning--no publisher, address, url or date in Horsmann
+Warning--empty note in Horsmann
+Warning--no publisher, address, url or date in Huh
+Warning--empty note in Huh
+Warning--no publisher, address, url or date in Hutchins
+Warning--empty note in Hutchins
+Warning--empty note in Hutchins1996
+Warning--no publisher, address, url or date in Li
+Warning--empty note in Li
+Warning--no proper publisher, using url in Libovicky
+Warning--empty note in Libovicky
+Warning--empty note in Ling
+Warning--no proper publisher, using url in McCulloch
+Warning--empty note in McCulloch
+Warning--no proper publisher, using url in Mikolov2013
+Warning--empty note in Mikolov2013
+Warning--no proper publisher, using url in Pennington
+Warning--empty note in Pennington
+Warning--no proper publisher, using url in Plank
+Warning--empty note in Plank
+Warning--no publisher, address, url or date in Plisson
+Warning--empty note in Plisson
+Warning--no proper publisher, using url in Putra
+Warning--empty note in Putra
+Warning--no proper publisher, using url in Rumelhart
+Warning--empty note in Rumelhart
+Warning--empty note in Russell1995
+Warning--empty note in Schwenk2006
+Warning--no proper publisher, using url in Straka2019b
+Warning--empty note in Straka2019b
+Warning--no proper publisher, using url in Szegedy2015
+Warning--empty note in Szegedy2015
+Warning--empty note in Turian2010
+Warning--empty note in Wilks
+You've used 64 entries,
             3552 wiz_defined-function locations,
-            822 strings with 6664 characters,
-and the built_in function-call counts, 2652 in all, are:
-= -- 328
-> -- 42
-< -- 73
-+ -- 96
-- -- 30
-* -- 247
-:= -- 458
-add.period$ -- 3
-call.type$ -- 3
-change.case$ -- 19
-chr.to.int$ -- 3
-cite$ -- 3
-duplicate$ -- 60
-empty$ -- 175
-format.name$ -- 53
-if$ -- 507
-int.to.chr$ -- 0
+            1216 strings with 19464 characters,
+and the built_in function-call counts, 59019 in all, are:
+= -- 7272
+> -- 966
+< -- 1933
++ -- 2455
+- -- 757
+* -- 5700
+:= -- 10208
+add.period$ -- 88
+call.type$ -- 64
+change.case$ -- 429
+chr.to.int$ -- 61
+cite$ -- 117
+duplicate$ -- 1236
+empty$ -- 3545
+format.name$ -- 1276
+if$ -- 10893
+int.to.chr$ -- 3
 int.to.str$ -- 1
-missing$ -- 4
-newline$ -- 29
-num.names$ -- 12
-pop$ -- 25
+missing$ -- 67
+newline$ -- 423
+num.names$ -- 252
+pop$ -- 547
 preamble$ -- 1
-purify$ -- 19
+purify$ -- 429
 quote$ -- 0
-skip$ -- 113
+skip$ -- 2687
 stack$ -- 0
-substring$ -- 222
-swap$ -- 18
-text.length$ -- 10
+substring$ -- 4926
+swap$ -- 373
+text.length$ -- 238
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 28
-warning$ -- 0
-while$ -- 27
+type$ -- 689
+warning$ -- 51
+while$ -- 608
 width$ -- 0
-write$ -- 43
+write$ -- 724
+(There were 51 warnings)

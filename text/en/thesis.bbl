@@ -1,4 +1,4 @@
-\begin{thebibliography}{3}
+\begin{thebibliography}{64}
 % this bibliography was produced with the style dinat.bst v2.5
 \makeatletter
 \newcommand{\dinatlabel}[1]%
@@ -7,14 +7,128 @@
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \expandafter\ifx\csname url\endcsname\relax\def\url#1{\texttt{#1}}\fi
 
-\bibitem[Devlin et \,al.(2018)Devlin, Chang, Lee and Toutanova]{BERT_ORIG}
-\dinatlabel{Devlin et \,al. 2018} \textsc{Devlin}, Jacob~; \textsc{Chang},
-  Ming-Wei~; \textsc{Lee}, Kenton~; \textsc{Toutanova}, Kristina:
-\newblock BERT: Pre-training of Deep Bidirectional Transformers for Language
-  Understanding.
+\bibitem[PDT35()]{PDT35}
+\dinatlabel{PDT35 } :
+\newblock \emph{PDT 3.5 Main page}. --
+\newblock URL \url{https://ufal.mff.cuni.cz/pdt3.5}
+
+\bibitem[Allen(1987)]{Allen19}
+\dinatlabel{Allen 1987} \textsc{Allen}, Robert~B.:
+\newblock {Several Studies on Natural Language {\textperiodcentered} and
+  Back-Propagation}.
+\newblock 1987.
+\newblock  -- Forschungsbericht
+
+\bibitem[Bahdanau et \,al.()Bahdanau, Cho and Bengio]{Bahdanau}
+\dinatlabel{Bahdanau et \,al. } \textsc{Bahdanau}, Dzmitry~; \textsc{Cho},
+  Kyunghyun~; \textsc{Bengio}, Yoshua:
+\newblock {NEURAL MACHINE TRANSLATION BY JOINTLY LEARNING TO ALIGN AND
+  TRANSLATE}.
+\newblock  -- Forschungsbericht
+
+\bibitem[Bengio et \,al.(2003)Bengio, Ducharme, Vincent, Jauvin, Ca, Kandola,
+  Hofmann, Poggio and Shawe-Taylor]{Bengio2003}
+\dinatlabel{Bengio et \,al. 2003} \textsc{Bengio}, Yoshua~; \textsc{Ducharme},
+  R{\'{e}}jean~; \textsc{Vincent}, Pascal~; \textsc{Jauvin}, Christian~;
+  \textsc{Ca}, Jauvinc@iro~U.~; \textsc{Kandola}, Jaz~; \textsc{Hofmann},
+  Thomas~; \textsc{Poggio}, Tomaso~; \textsc{Shawe-Taylor}, John:
+\newblock {A Neural Probabilistic Language Model}.
+\newblock 2003.
+\newblock  -- Forschungsbericht. --
+\newblock 1137--1155~S
+
+\bibitem[Bird et \,al.(2009)Bird, Klein and Loper]{NLTKbook}
+\dinatlabel{Bird et \,al. 2009} \textsc{Bird}, Steven~; \textsc{Klein}, Ewan~;
+  \textsc{Loper}, Edward:
+\newblock \emph{Natural Language Processing with Python}.
+\newblock 1st.
+\newblock O’Reilly Media, Inc., 2009. --
+\newblock ISBN 0596516495
+
+\bibitem[Brown et \,al.(1990)Brown, Cocke, {Della Pietra}, {Della Pietra},
+  Jelinek, Lafferty, Mercer and Roossin]{Brown}
+\dinatlabel{Brown et \,al. 1990} \textsc{Brown}, Peter~F.~; \textsc{Cocke},
+  John~; \textsc{{Della Pietra}}, Stephen~A.~; \textsc{{Della Pietra}},
+  Vincent~J.~; \textsc{Jelinek}, Fredrick~; \textsc{Lafferty}, John~D.~;
+  \textsc{Mercer}, Robert~L.~; \textsc{Roossin}, Paul~S.:
+\newblock {A STATISTICAL APPROACH TO MACHINE TRANSLATION}.
+\newblock 1990.
+\newblock  -- Forschungsbericht
+
+\bibitem[{\c{C}}ano and Bojar(2019)]{Cano2019}
+\dinatlabel{{\c{C}}ano and Bojar 2019} \textsc{{\c{C}}ano}, Erion~;
+  \textsc{Bojar}, Ondřej:
+\newblock {Sentiment Analysis of Czech Texts: An Algorithmic Survey}.
+\newblock In: \emph{ICAART 2019 - Proc. 11th Int. Conf. Agents Artif. Intell.}
+\newblock 2 (2019), jan, S.~973--979. --
+\newblock URL \url{http://arxiv.org/abs/1901.02780
+  http://dx.doi.org/10.5220/0007695709730979}
+
+\bibitem[Cheng et \,al.(2016)Cheng, Dong and Lapata]{Cheng}
+\dinatlabel{Cheng et \,al. 2016} \textsc{Cheng}, Jianpeng~; \textsc{Dong}, Li~;
+  \textsc{Lapata}, Mirella:
+\newblock {Long Short-Term Memory-Networks for Machine Reading}.
+\newblock URL \url{https://arxiv.org/abs/1601.06733}, 2016.
+\newblock  -- Forschungsbericht
+
+\bibitem[Cho et \,al.(2014)Cho, {Van Merri{\"{e}}nboer}, Gulcehre, Bahdanau,
+  Bougares, Schwenk and Bengio]{Cho2014}
+\dinatlabel{Cho et \,al. 2014} \textsc{Cho}, Kyunghyun~; \textsc{{Van
+  Merri{\"{e}}nboer}}, Bart~; \textsc{Gulcehre}, Caglar~; \textsc{Bahdanau},
+  Dzmitry~; \textsc{Bougares}, Fethi~; \textsc{Schwenk}, Holger~;
+  \textsc{Bengio}, Yoshua:
+\newblock {Learning phrase representations using RNN encoder-decoder for
+  statistical machine translation}.
+\newblock In: \emph{EMNLP 2014 - 2014 Conf. Empir. Methods Nat. Lang. Process.
+  Proc. Conf.}, Association for Computational Linguistics (ACL), jun 2014,
+  S.~1724--1734. --
+\newblock URL \url{https://arxiv.org/abs/1406.1078v3}. --
+\newblock ISBN 9781937284961
+
+\bibitem[Dai and Le(2015)]{Dai2015}
+\dinatlabel{Dai and Le 2015} \textsc{Dai}, Andrew~M.~; \textsc{Le}, Quoc~V.:
+\newblock {Semi-supervised Sequence Learning}.
+\newblock URL \url{http://ai.stanford.edu/amaas/data/sentiment/index.html},
+  2015.
+\newblock  -- Forschungsbericht
+
+\bibitem[Devlin et \,al.(2019)Devlin, Chang, Lee and Toutanova]{Devlin2019}
+\dinatlabel{Devlin et \,al. 2019} \textsc{Devlin}, Jacob~; \textsc{Chang},
+  Ming~W.~; \textsc{Lee}, Kenton~; \textsc{Toutanova}, Kristina:
+\newblock {BERT: Pre-training of deep bidirectional transformers for language
+  understanding}.
+\newblock In: \emph{NAACL HLT 2019 - 2019 Conf. North Am. Chapter Assoc.
+  Comput. Linguist. Hum. Lang. Technol. - Proc. Conf.} Bd.~1, Association for
+  Computational Linguistics (ACL), 2019, S.~4171--4186. --
+\newblock ISBN 9781950737130
+
+\bibitem[Feijo and Moreira(2020)]{Feijo2020}
+\dinatlabel{Feijo and Moreira 2020} \textsc{Feijo}, Diego de~V.~;
+  \textsc{Moreira}, Viviane~P.:
+\newblock {Mono vs Multilingual Transformer-based Models: a Comparison across
+  Several Language Tasks}.
 \newblock
-\newblock (2018). --
-\newblock URL \url{https://arxiv.org/abs/1810.04805}
+\newblock (2020), jul. --
+\newblock URL \url{http://arxiv.org/abs/2007.09757}
+
+\bibitem[Forcada and {\~{N}}eco(1997)]{Forcada1997}
+\dinatlabel{Forcada and {\~{N}}eco 1997} \textsc{Forcada}, Mikel~L.~;
+  \textsc{{\~{N}}eco}, Ram{\'{o}}n~P.:
+\newblock {Recursive hetero-Associative memories for translation}.
+\newblock In: \emph{Lect. Notes Comput. Sci. (including Subser. Lect. Notes
+  Artif. Intell. Lect. Notes Bioinformatics)} Bd.~1240 LNCS, Springer Verlag,
+  1997, S.~453--462. --
+\newblock URL \url{https://link.springer.com/chapter/10.1007/BFb0032504}. --
+\newblock ISBN 3540630473
+
+\bibitem[Francis and Kucera(1979)]{francis79browncorpus}
+\dinatlabel{Francis and Kucera 1979} \textsc{Francis}, W.~N.~; \textsc{Kucera},
+  H.:
+\newblock Brown Corpus Manual
+\newblock / Department of Linguistics, Brown University, Providence, Rhode
+  Island, US.
+\newblock URL \url{http://icame.uib.no/brown/bcm.html}, 1979.
+\newblock  -- Forschungsbericht
 
 \bibitem[Goodfellow et \,al.(2016)Goodfellow, Bengio and
   Courville]{Goodfellow-et-al-2016}
@@ -24,13 +138,440 @@
 \newblock MIT Press, 2016. --
 \newblock \url{http://www.deeplearningbook.org}
 
-\bibitem[Straka et \,al.(2019)Straka, Strakov{\'a} and
+\bibitem[Hana and Zeman(2005)]{Hana2005}
+\dinatlabel{Hana and Zeman 2005} \textsc{Hana}, Jiř{\'{i}}~; \textsc{Zeman},
+  Daniel:
+\newblock {Manual for Morphological Annotation Revision for the Prague
+  Dependency Treebank 2.0 UFAL}.
+\newblock 2005.
+\newblock  -- Forschungsbericht
+
+\bibitem[Hercig et \,al.(2018)Hercig, Krejzl and Kr{\'{a}}l]{Hercig2018}
+\dinatlabel{Hercig et \,al. 2018} \textsc{Hercig}, Tom{\'{a}}{\v{s}}~;
+  \textsc{Krejzl}, Peter~; \textsc{Kr{\'{a}}l}, Pavel:
+\newblock {Stance and sentiment in Czech}.
+\newblock In: \emph{Comput. y Sist.}
+\newblock 22 (2018), Nr.~3, S.~787--794. --
+\newblock URL \url{http://nlp.kiv.zcu.cz/research/sentiment{\#}stance.}. --
+\newblock ISSN 20079737
+
+\bibitem[Hladk{\'{a}}()]{Hladka}
+\dinatlabel{Hladk{\'{a}} } \textsc{Hladk{\'{a}}}:
+\newblock {Part of Speech Tags for Automatic Tagging and Syntactic Structures
+  1}.
+\newblock  -- Forschungsbericht
+
+\bibitem[Hochreiter and {Urgen Schmidhuber}(1997)]{Hochreiter1997}
+\dinatlabel{Hochreiter and {Urgen Schmidhuber} 1997} \textsc{Hochreiter},
+  Sepp~; \textsc{{Urgen Schmidhuber}}, J~J.:
+\newblock {Long short-term memory}.
+\newblock URL
+  \url{http://www7.informatik.tu-muenchen.de/{~}hochreithttp://www.idsia.ch/{~}juergen},
+  1997
+\newblock (8). -- Forschungsbericht. --
+\newblock 1735--1780~S
+
+\bibitem[Hoerl and Kennard(1970)]{Hoerl1970}
+\dinatlabel{Hoerl and Kennard 1970} \textsc{Hoerl}, Arthur~E.~;
+  \textsc{Kennard}, Robert~W.:
+\newblock {Ridge Regression: Biased Estimation for Nonorthogonal Problems}.
+\newblock In: \emph{Technometrics}
+\newblock 12 (1970), Nr.~1, S.~55--67. --
+\newblock ISSN 15372723
+
+\bibitem[Horsmann and Zesch()]{Horsmann}
+\dinatlabel{Horsmann and Zesch } \textsc{Horsmann}, Tobias~; \textsc{Zesch},
+  Torsten:
+\newblock {Do LSTMs really work so well for PoS tagging?-A replication study}.
+\newblock  -- Forschungsbericht. --
+\newblock 727--736~S
+
+\bibitem[Huh et \,al.()Huh, Agrawal and Efros]{Huh}
+\dinatlabel{Huh et \,al. } \textsc{Huh}, Minyoung~; \textsc{Agrawal}, Pulkit~;
+  \textsc{Efros}, Alexei~A.:
+\newblock {What makes ImageNet good for transfer learning?}
+\newblock  -- Forschungsbericht
+
+\bibitem[Hutchins()]{Hutchins}
+\dinatlabel{Hutchins } \textsc{Hutchins}, John:
+\newblock {Two precursors of machine translation: Artsrouni and Trojanskij}.
+\newblock  -- Forschungsbericht
+
+\bibitem[Hutchins(1996)]{Hutchins1996}
+\dinatlabel{Hutchins 1996} \textsc{Hutchins}, John:
+\newblock {ALPAC: the (in)famous report}.
+\newblock The MIT Press, 1996.
+\newblock  -- Forschungsbericht. --
+\newblock 131--135~S. --
+\newblock URL
+  \url{https://books.google.com/books?hl=cs{\&}lr={\&}id=yx3lEVJMBmMC{\&}oi=fnd{\&}pg=PA131{\&}dq=alpac+report{\&}ots=se2vhONMHp{\&}sig=ByL2IgJLxRwF3f6n9bqOPFx88r4}
+
+\bibitem[Jurafsky and Manning(2012)]{jurafsky2012natural}
+\dinatlabel{Jurafsky and Manning 2012} \textsc{Jurafsky}, Dan~;
+  \textsc{Manning}, Christopher:
+\newblock Natural language processing.
+\newblock In: \emph{Instructor}
+\newblock 212 (2012), Nr.~998, S.~3482
+
+\bibitem[Li et \,al.()Li, Bing, Zhang and Lam]{Li}
+\dinatlabel{Li et \,al. } \textsc{Li}, Xin~; \textsc{Bing}, Lidong~;
+  \textsc{Zhang}, Wenxuan~; \textsc{Lam}, Wai:
+\newblock {Exploiting BERT for End-to-End Aspect-based Sentiment Analysis *}.
+\newblock  -- Forschungsbericht. --
+\newblock 34--41~S
+
+\bibitem[Libovick{\'{y}} et \,al.()Libovick{\'{y}}, Rosa, Helcl and
+  Popel]{Libovicky}
+\dinatlabel{Libovick{\'{y}} et \,al. } \textsc{Libovick{\'{y}}}, Jindřich~;
+  \textsc{Rosa}, Rudolf~; \textsc{Helcl}, Jindřich~; \textsc{Popel}, Martin:
+\newblock {Solving Three Czech NLP Tasks End-to-End with Neural Models}.
+\newblock URL \url{https://www.yelp.com/dataset/}.
+\newblock  -- Forschungsbericht. --
+\newblock ISBN 11234/12839
+
+\bibitem[Ling et \,al.(2016)Ling, Lu{\'{i}}s, Marujo, Fernandez, Amir, Dyer,
+  Black and Trancoso]{Ling}
+\dinatlabel{Ling et \,al. 2016} \textsc{Ling}, Wang~; \textsc{Lu{\'{i}}s},
+  Tiago~; \textsc{Marujo}, Lu{\'{i}}s~; \textsc{Fernandez}, Ram{\'{o}}n~;
+  \textsc{Amir}, Astudillo~S.~; \textsc{Dyer}, Chris~; \textsc{Black},
+  Alan~W.~; \textsc{Trancoso}, Isabel:
+\newblock {Finding Function in Form: Compositional Character Models for Open
+  Vocabulary Word Representation}.
+\newblock 2016.
+\newblock  -- Forschungsbericht
+
+\bibitem[Liu et \,al.(2020)Liu, Kusner and Blunsom]{Liu2020}
+\dinatlabel{Liu et \,al. 2020} \textsc{Liu}, Qi~; \textsc{Kusner}, Matt~J.~;
+  \textsc{Blunsom}, Phil:
+\newblock {A Survey on Contextual Embeddings}.
+\newblock In: \emph{arXiv}
+\newblock (2020), mar. --
+\newblock URL \url{http://arxiv.org/abs/2003.07278}
+
+\bibitem[Marcus et \,al.(1993)Marcus, Santorini and Marcinkiewicz]{Marcus1993}
+\dinatlabel{Marcus et \,al. 1993} \textsc{Marcus}, Mitchell~;
+  \textsc{Santorini}, Beatrice~; \textsc{Marcinkiewicz}, Mary~A.:
+\newblock {Building a Large Annotated Corpus of English: The Penn Treebank}.
+\newblock In: \emph{Tech. Reports}
+\newblock (1993), oct. --
+\newblock URL \url{https://repository.upenn.edu/cis{\_}reports/237}
+
+\bibitem[McCulloch et \,al.()McCulloch, bulletin of~mathematical Biophysics and
+  1943]{McCulloch}
+\dinatlabel{McCulloch et \,al. } \textsc{McCulloch}, WS~; \textsc{Biophysics},
+  W Pitts~T. bulletin of~mathematical~; \textsc{1943}, Undefined:
+\newblock {A logical calculus of the ideas immanent in nervous activity}.
+\newblock URL
+  \url{https://link.springer.com/article/10.1007{\%}252FBF02478259}.
+\newblock  -- Forschungsbericht
+
+\bibitem[Mikolov et \,al.(2013)Mikolov, Chen, Corrado and Dean]{Mikolov2013}
+\dinatlabel{Mikolov et \,al. 2013} \textsc{Mikolov}, Tomas~; \textsc{Chen},
+  Kai~; \textsc{Corrado}, Greg~; \textsc{Dean}, Jeffrey:
+\newblock {Distributed Representations of Words and Phrases and their
+  Compositionality}.
+\newblock URL
+  \url{http://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and},
+  2013.
+\newblock  -- Forschungsbericht
+
+\bibitem[Minsky and Papert(2017)]{Minsky2017}
+\dinatlabel{Minsky and Papert 2017} \textsc{Minsky}, M~; \textsc{Papert}, SA:
+\newblock {Perceptrons: An introduction to computational geometry}.
+\newblock
+\newblock (2017). --
+\newblock URL
+  \url{https://www.google.com/books?hl=cs{\&}lr={\&}id=PLQ5DwAAQBAJ{\&}oi=fnd{\&}pg=PR5{\&}dq=perceptrons+an+introduction+to+computational+geometry{\&}ots=zzCzAMspY0{\&}sig=x0HLubdLNN3Irw4cZUlmdyHK8BM}
+
+\bibitem[Mitchell(1997)]{Mitchell1997}
+\dinatlabel{Mitchell 1997} \textsc{Mitchell}, Tom~M.:
+\newblock \emph{{Machine Learning}}.
+\newblock McGraw-Hil.
+\newblock New York : McGraw-Hill, 1997. --
+\newblock 99~S
+
+\bibitem[Montoyo et \,al.(2012)Montoyo, Mart{\'{i}}nez-Barco and
+  Balahur]{Montoyo2012}
+\dinatlabel{Montoyo et \,al. 2012} \textsc{Montoyo}, Andr{\'{e}}s~;
+  \textsc{Mart{\'{i}}nez-Barco}, Patricio~; \textsc{Balahur}, Alexandra:
+\newblock {Subjectivity and sentiment analysis: An overview of the current
+  state of the area and envisaged developments}.
+\newblock In: \emph{Decis. Support Syst.} Bd.~53, nov 2012, S.~675--679. --
+\newblock ISSN 01679236
+
+\bibitem[Oakley et \,al.(1995)]{oakley1995final}
+\dinatlabel{Oakley et \,al. 1995} \textsc{Oakley}, Brian et \,al.:
+\newblock \emph{Final Evaluation Of The Results Of Eurotra: A Specific
+  Programme Concerning the preparation of the development of an operational
+  EUROTRA system for Machine Translation}.
+\newblock 1995
+
+\bibitem[Pennington et \,al.(2014)Pennington, Socher and Manning]{Pennington}
+\dinatlabel{Pennington et \,al. 2014} \textsc{Pennington}, Jeffrey~;
+  \textsc{Socher}, Richard~; \textsc{Manning}, Christopher~D.:
+\newblock {GloVe: Global Vectors for Word Representation}.
+\newblock URL \url{http://nlp.}, 2014.
+\newblock  -- Forschungsbericht
+
+\bibitem[Peters et \,al.(2018)Peters, Neumann, Iyyer, Gardner, Clark, Lee and
+  Zettlemoyer]{Peters2018}
+\dinatlabel{Peters et \,al. 2018} \textsc{Peters}, Matthew~E.~;
+  \textsc{Neumann}, Mark~; \textsc{Iyyer}, Mohit~; \textsc{Gardner}, Matt~;
+  \textsc{Clark}, Christopher~; \textsc{Lee}, Kenton~; \textsc{Zettlemoyer},
+  Luke:
+\newblock {Deep contextualized word representations}.
+\newblock In: \emph{NAACL HLT 2018 - 2018 Conf. North Am. Chapter Assoc.
+  Comput. Linguist. Hum. Lang. Technol. - Proc. Conf.} Bd.~1, Association for
+  Computational Linguistics (ACL), feb 2018, S.~2227--2237. --
+\newblock URL \url{http://allennlp.org/elmo}. --
+\newblock ISBN 9781948087278
+
+\bibitem[Plank et \,al.()Plank, S{\o}gaard and Goldberg]{Plank}
+\dinatlabel{Plank et \,al. } \textsc{Plank}, Barbara~; \textsc{S{\o}gaard},
+  Anders~; \textsc{Goldberg}, Yoav:
+\newblock {Multilingual Part-of-Speech Tagging with Bidirectional Long
+  Short-Term Memory Models and Auxiliary Loss}.
+\newblock URL \url{https://github.com/clab/cnn}.
+\newblock  -- Forschungsbericht
+
+\bibitem[Plisson et \,al.()Plisson, Lavrac and Mladenic]{Plisson}
+\dinatlabel{Plisson et \,al. } \textsc{Plisson}, Jo{\"{e}}l~; \textsc{Lavrac},
+  Nada~; \textsc{Mladenic}, Dunja:
+\newblock {A Rule based Approach to Word Lemmatization}.
+\newblock  -- Forschungsbericht
+
+\bibitem[Putra et \,al.()Putra, Purwarianti and Ai-Vlb]{Putra}
+\dinatlabel{Putra et \,al. } \textsc{Putra}, Ilham~F.~; \textsc{Purwarianti},
+  Ayu~; \textsc{Ai-Vlb}, U-Coe:
+\newblock {Improving Indonesian Text Classification Using Multilingual Language
+  Model}.
+\newblock URL \url{https://www.yelp.com/dataset}.
+\newblock  -- Forschungsbericht
+
+\bibitem[Ramachandran et \,al.(2017)Ramachandran, Liu and Le]{Ramachandran2017}
+\dinatlabel{Ramachandran et \,al. 2017} \textsc{Ramachandran}, Prajit~;
+  \textsc{Liu}, Peter~J.~; \textsc{Le}, Quoc~V.:
+\newblock {Unsupervised pretraining for sequence to sequence learning}.
+\newblock In: \emph{EMNLP 2017 - Conf. Empir. Methods Nat. Lang. Process.
+  Proc.}, Association for Computational Linguistics (ACL), 2017, S.~383--391.
+  --
+\newblock ISBN 9781945626838
+
+\bibitem[Rosenblatt(1958)]{Rosenblatt1958}
+\dinatlabel{Rosenblatt 1958} \textsc{Rosenblatt}, F.:
+\newblock {The perceptron: A probabilistic model for information storage and
+  organization in the brain}.
+\newblock In: \emph{Psychol. Rev.}
+\newblock 65 (1958), nov, Nr.~6, S.~386--408. --
+\newblock ISSN 0033295X
+
+\bibitem[Ruder et \,al.(2019)Ruder, Peters, Swayamdipta and Wolf]{Ruder2019}
+\dinatlabel{Ruder et \,al. 2019} \textsc{Ruder}, Sebastian~; \textsc{Peters},
+  Matthew~E.~; \textsc{Swayamdipta}, Swabha~; \textsc{Wolf}, Thomas:
+\newblock {Neural Transfer Learning for Natural Language Processing}.
+\newblock In: \emph{Proc. 2019 Conf. North Am. Chapter Assoc. Comput. Linguist.
+  Tutorials}, 2019, S.~15--18
+
+\bibitem[Rumelhart et \,al.(1986)Rumelhart, Hinton, Nature and 1986]{Rumelhart}
+\dinatlabel{Rumelhart et \,al. 1986} \textsc{Rumelhart}, DE~; \textsc{Hinton},
+  GE~; \textsc{Nature}, RJ~W.~; \textsc{1986}, Undefined:
+\newblock {Learning representations by back-propagating errors}.
+\newblock URL \url{https://www.nature.com/articles/323533a0}, 1986.
+\newblock  -- Forschungsbericht
+
+\bibitem[Russell et \,al.(1995)Russell, Norvig, Canny, Malik and
+  Edwards]{Russell1995}
+\dinatlabel{Russell et \,al. 1995} \textsc{Russell}, Stuart~J.~;
+  \textsc{Norvig}, Peter~; \textsc{Canny}, John~F.~; \textsc{Malik},
+  Jitendra~M.~; \textsc{Edwards}, Douglas~D.:
+\newblock {Artificial Intelligence A Modern Approach}.
+\newblock 1995.
+\newblock  -- Forschungsbericht. --
+\newblock 529~S. --
+\newblock ISBN 0131038052
+
+\bibitem[dos Santos et \,al.(2016)dos Santos, Tan, Xiang and Zhou]{Santos2016}
+\dinatlabel{dos Santos et \,al. 2016} \textsc{Santos}, Cicero dos~;
+  \textsc{Tan}, Ming~; \textsc{Xiang}, Bing~; \textsc{Zhou}, Bowen:
+\newblock {Attentive Pooling Networks}.
+\newblock
+\newblock (2016), feb. --
+\newblock URL \url{http://arxiv.org/abs/1602.03609}
+
+\bibitem[Schwenk et \,al.(2006)Schwenk, Dchelotte and Gauvain]{Schwenk2006}
+\dinatlabel{Schwenk et \,al. 2006} \textsc{Schwenk}, Holger~;
+  \textsc{Dchelotte}, Daniel~; \textsc{Gauvain}, Jean-Luc:
+\newblock {Continuous Space Language Models for Statistical Machine
+  Translation}.
+\newblock 2006.
+\newblock  -- Forschungsbericht. --
+\newblock 723--730~S
+
+\bibitem[Straka et \,al.(2019{\natexlab{a}})Straka, Strakov{\'a} and
   Haji{\v{c}}]{straka2019czech}
-\dinatlabel{Straka et \,al. 2019} \textsc{Straka}, Milan~;
+\dinatlabel{Straka et \,al. 2019{\natexlab{a}}} \textsc{Straka}, Milan~;
   \textsc{Strakov{\'a}}, Jana~; \textsc{Haji{\v{c}}}, Jan:
 \newblock Czech Text Processing with Contextual Embeddings: POS Tagging,
   Lemmatization, Parsing and NER.
 \newblock In: \emph{International Conference on Text, Speech, and Dialogue}
 \newblock Springer (Veranst.), 2019, S.~137--150
+
+\bibitem[Straka et \,al.(2019{\natexlab{b}})Straka, Strakov{\'{a}} and
+  Haji{\v{c}}]{Straka2019}
+\dinatlabel{Straka et \,al. 2019{\natexlab{b}}} \textsc{Straka}, Milan~;
+  \textsc{Strakov{\'{a}}}, Jana~; \textsc{Haji{\v{c}}}, Jan:
+\newblock {Czech Text Processing with Contextual Embeddings: POS Tagging,
+  Lemmatization, Parsing and NER}.
+\newblock In: \emph{Lect. Notes Comput. Sci. (including Subser. Lect. Notes
+  Artif. Intell. Lect. Notes Bioinformatics)}
+\newblock 11697 LNAI (2019), sep, S.~137--150. --
+\newblock URL \url{http://arxiv.org/abs/1909.03544}
+
+\bibitem[Straka et \,al.(2019{\natexlab{c}})Straka, Strakov{\'{a}} and
+  Haji{\v{c}}]{Straka2019a}
+\dinatlabel{Straka et \,al. 2019{\natexlab{c}}} \textsc{Straka}, Milan~;
+  \textsc{Strakov{\'{a}}}, Jana~; \textsc{Haji{\v{c}}}, Jan:
+\newblock {Evaluating Contextualized Embeddings on 54 Languages in POS Tagging,
+  Lemmatization and Dependency Parsing}.
+\newblock
+\newblock (2019), aug. --
+\newblock URL \url{http://arxiv.org/abs/1908.07448}
+
+\bibitem[Straka et \,al.(2019{\natexlab{d}})Straka, Strakov{\'{a}} and
+  Haji{\v{c}}]{Straka2019b}
+\dinatlabel{Straka et \,al. 2019{\natexlab{d}}} \textsc{Straka}, Milan~;
+  \textsc{Strakov{\'{a}}}, Jana~; \textsc{Haji{\v{c}}}, Jan:
+\newblock {Regularization with Morphological Categories, Corpora Merging}.
+\newblock URL \url{https://github.com/google-research/}, 2019.
+\newblock  -- Forschungsbericht. --
+\newblock 95--103~S
+
+\bibitem[Sutskever et \,al.(2014)Sutskever, Vinyals and Le]{Sutskever2014}
+\dinatlabel{Sutskever et \,al. 2014} \textsc{Sutskever}, Ilya~;
+  \textsc{Vinyals}, Oriol~; \textsc{Le}, Quoc~V.:
+\newblock {Sequence to Sequence Learning with Neural Networks}.
+\newblock In: \emph{Adv. Neural Inf. Process. Syst.}
+\newblock 4 (2014), sep, Nr.~January, S.~3104--3112. --
+\newblock URL \url{http://arxiv.org/abs/1409.3215}
+
+\bibitem[Szegedy et \,al.(2015)Szegedy, Liu, Jia, Sermanet, Reed, Anguelov,
+  Erhan, Vanhoucke and Rabinovich]{Szegedy2015}
+\dinatlabel{Szegedy et \,al. 2015} \textsc{Szegedy}, Christian~; \textsc{Liu},
+  Wei~; \textsc{Jia}, Yangqing~; \textsc{Sermanet}, Pierre~; \textsc{Reed},
+  Scott~; \textsc{Anguelov}, Dragomir~; \textsc{Erhan}, Dumitru~;
+  \textsc{Vanhoucke}, Vincent~; \textsc{Rabinovich}, Andrew:
+\newblock {Going Deeper with Convolutions}.
+\newblock URL
+  \url{https://www.cv-foundation.org/openaccess/content{\_}cvpr{\_}2015/html/Szegedy{\_}Going{\_}Deeper{\_}With{\_}2015{\_}CVPR{\_}paper.html},
+  2015.
+\newblock  -- Forschungsbericht
+
+\bibitem[Taylor(1953)]{Taylor1953}
+\dinatlabel{Taylor 1953} \textsc{Taylor}, Wilson~L.:
+\newblock {“Cloze Procedure”: A New Tool for Measuring Readability}.
+\newblock In: \emph{Journal. Q.}
+\newblock 30 (1953), sep, Nr.~4, S.~415--433. --
+\newblock URL \url{http://journals.sagepub.com/doi/10.1177/107769905303000401}.
+  --
+\newblock ISSN 0022-5533
+
+\bibitem[Tibshirani(1996)]{Tibshirani1996}
+\dinatlabel{Tibshirani 1996} \textsc{Tibshirani}, Robert:
+\newblock {Regression Shrinkage and Selection Via the Lasso}.
+\newblock In: \emph{J. R. Stat. Soc. Ser. B}
+\newblock 58 (1996), jan, Nr.~1, S.~267--288. --
+\newblock URL
+  \url{https://rss.onlinelibrary.wiley.com/doi/full/10.1111/j.2517-6161.1996.tb02080.x
+  https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/j.2517-6161.1996.tb02080.x
+  https://rss.onlinelibrary.wiley.com/doi/10.1111/j.2517-6161.1996.tb02080.x}.
+  --
+\newblock ISSN 0035-9246
+
+\bibitem[Toutanova et \,al.(2003)Toutanova, Klein, Manning and
+  Singer]{Toutanova2003}
+\dinatlabel{Toutanova et \,al. 2003} \textsc{Toutanova}, Kristina~;
+  \textsc{Klein}, Dan~; \textsc{Manning}, Christopher~D.~; \textsc{Singer},
+  Yoram:
+\newblock {Feature-rich part-of-speech tagging with a cyclic dependency
+  network}.
+\newblock In: \emph{Proc. 2003 Conf. North Am. Chapter Assoc. Comput. Linguist.
+  Hum. Lang. Technol. - NAACL '03} Bd.~1.
+\newblock Morristown, NJ, USA~: Association for Computational Linguistics
+  (ACL), 2003, S.~173--180. --
+\newblock URL \url{http://portal.acm.org/citation.cfm?doid=1073445.1073478}
+
+\bibitem[Turian et \,al.(2010)Turian, Ratinov and Bengio]{Turian2010}
+\dinatlabel{Turian et \,al. 2010} \textsc{Turian}, Joseph~; \textsc{Ratinov},
+  Lev~; \textsc{Bengio}, Yoshua:
+\newblock {Word representations: A simple and general method for
+  semi-supervised learning}.
+\newblock Association for Computational Linguistics, 2010.
+\newblock  -- Forschungsbericht. --
+\newblock 11--16~S. --
+\newblock URL \url{http://metaoptimize.}
+
+\bibitem[Varsamopoulos et \,al.(2018)Varsamopoulos, Bertels and
+  Almudever]{rnn_paper}
+\dinatlabel{Varsamopoulos et \,al. 2018} \textsc{Varsamopoulos}, Savvas~;
+  \textsc{Bertels}, Koen~; \textsc{Almudever}, Carmen:
+\newblock \emph{Designing neural network based decoders for surface codes}.
+\newblock 11 2018
+
+\bibitem[Vaswani et \,al.(2017)Vaswani, Brain, Shazeer, Parmar, Uszkoreit,
+  Jones, Gomez, Kaiser and Polosukhin]{Vaswani2017}
+\dinatlabel{Vaswani et \,al. 2017} \textsc{Vaswani}, Ashish~; \textsc{Brain},
+  Google~; \textsc{Shazeer}, Noam~; \textsc{Parmar}, Niki~; \textsc{Uszkoreit},
+  Jakob~; \textsc{Jones}, Llion~; \textsc{Gomez}, Aidan~N.~; \textsc{Kaiser},
+  {\L}ukasz~; \textsc{Polosukhin}, Illia:
+\newblock {Attention Is All You Need}.
+\newblock
+\newblock (2017)
+
+\bibitem[Wang et \,al.(2015)Wang, Qian, Soong, He and Zhao]{Wang2015}
+\dinatlabel{Wang et \,al. 2015} \textsc{Wang}, Peilu~; \textsc{Qian}, Yao~;
+  \textsc{Soong}, Frank~K.~; \textsc{He}, Lei~; \textsc{Zhao}, Hai:
+\newblock {Part-of-Speech Tagging with Bidirectional Long Short-Term Memory
+  Recurrent Neural Network}.
+\newblock
+\newblock (2015), oct. --
+\newblock URL \url{http://arxiv.org/abs/1510.06168}
+
+\bibitem[Wilks(2005)]{Wilks}
+\dinatlabel{Wilks 2005} \textsc{Wilks}, Yorick:
+\newblock {The History of Natural Language Processing and Machine Translation}.
+\newblock 2005.
+\newblock  -- Forschungsbericht
+
+\bibitem[Wu et \,al.(2016)Wu, Schuster, Chen, Le, Norouzi, Macherey, Krikun,
+  Cao, Gao, Macherey, Klingner, Shah, Johnson, Liu, Kaiser, Gouws, Kato, Kudo,
+  Kazawa, Stevens, Kurian, Patil, Wang, Young, Smith, Riesa, Rudnick, Vinyals,
+  Corrado, Hughes and Dean]{Wu2016}
+\dinatlabel{Wu et \,al. 2016} \textsc{Wu}, Yonghui~; \textsc{Schuster}, Mike~;
+  \textsc{Chen}, Zhifeng~; \textsc{Le}, Quoc~V.~; \textsc{Norouzi}, Mohammad~;
+  \textsc{Macherey}, Wolfgang~; \textsc{Krikun}, Maxim~; \textsc{Cao}, Yuan~;
+  \textsc{Gao}, Qin~; \textsc{Macherey}, Klaus~; \textsc{Klingner}, Jeff~;
+  \textsc{Shah}, Apurva~; \textsc{Johnson}, Melvin~; \textsc{Liu}, Xiaobing~;
+  \textsc{Kaiser}, {\L}ukasz~; \textsc{Gouws}, Stephan~; \textsc{Kato},
+  Yoshikiyo~; \textsc{Kudo}, Taku~; \textsc{Kazawa}, Hideto~; \textsc{Stevens},
+  Keith~; \textsc{Kurian}, George~; \textsc{Patil}, Nishant~; \textsc{Wang},
+  Wei~; \textsc{Young}, Cliff~; \textsc{Smith}, Jason~; \textsc{Riesa}, Jason~;
+  \textsc{Rudnick}, Alex~; \textsc{Vinyals}, Oriol~; \textsc{Corrado}, Greg~;
+  \textsc{Hughes}, Macduff~; \textsc{Dean}, Jeffrey:
+\newblock {Google's Neural Machine Translation System: Bridging the Gap between
+  Human and Machine Translation}.
+\newblock
+\newblock (2016), sep. --
+\newblock URL \url{http://arxiv.org/abs/1609.08144}
+
+\bibitem[Yang et \,al.(2019)Yang, Dai, Yang, Carbonell, Salakhutdinov and
+  Le]{Yang2019}
+\dinatlabel{Yang et \,al. 2019} \textsc{Yang}, Zhilin~; \textsc{Dai}, Zihang~;
+  \textsc{Yang}, Yiming~; \textsc{Carbonell}, Jaime~; \textsc{Salakhutdinov},
+  Ruslan~; \textsc{Le}, Quoc~V.:
+\newblock {XLNet: Generalized Autoregressive Pretraining for Language
+  Understanding}.
+\newblock In: \emph{arXiv}
+\newblock (2019), jun. --
+\newblock URL \url{http://arxiv.org/abs/1906.08237}
 
 \end{thebibliography}

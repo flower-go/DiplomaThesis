@@ -1,102 +1,48 @@
 \chapter{Theory}
 \label{chap:theandme}
-This chapter is divided into three parts. The first part introduces basic concepts of linguistics and natural language processing. Deep learning basics, with a focus of this work in mind, are presented in the second part. The third part of this chapter offers a more detailed explanation of methods directly relevant to this work (especially BERT model).
+This chapter is divided into three parts. The first part introduces basic concepts of linguistics and natural language processing. With the focus of this work in mind, deep learning basics are presented in the second part. The third part of this chapter offers a more detailed explanation of methods directly relevant to this work (especially the BERT model).
 
 \section{Linguistics and \gls{nlp}}
-
-
-%\subsection{Linguistics and Natural Language Processing -- Basic concepts}
-Natural language processing can be described as a science at the border of linguistics and computer science although according to \citep{Wilks}, NLP itself is not a subject of a scientific research, it is rather a collection of problems, which can be examined. These tasks are drawn from general linguistics field and the goal is to solve (or \textit{process}) them by computers. General linguistics is a science which study and describes language. Its focus can be divided into following sub-fields: phonetics, phonology, morphology, syntax, semantics and pragmatics. 
-This work is focused on task belonging into morphology (lemmatization, POS tagging) and semantics (sentiment analysis). More detailed description of tasks can be found in following subsections and in dedicated chapters for each task. Apart from tasks introduction, this chapter also includes a brief NLP history overview and a presentation of possible language data types.   %TODO odkazy? 
-
-
-%Začít někde tady NLP věda na hranici lingvistiky a computer science
-%a vysvetlit co patri do ligvistiky (co to je lingvistika) a co patri do comp science (+ def)
-%Overlap between computer science and linguistics can be seen in natural language processing or computational linguistics. Although these two terms are often interchangeable, according to \citep{Wilks}, they are different. \citep{Wilks} states, that natural language processing by computers is called computational linguistics. 
-%Natural language processing itself is not a subject of a scientific research, it is rather a collection of problems (like machine translation, summarization etc.), which can be examined. On the other hand, computational linguistics (CL) is a subject of research itself. Into problems connected with CL falls more technical ones -- part-of-speech tagging, syntax parsing, lemmatization -- which are not directly useful for non-expert users, but they can serve as a tool for proving linguistic theories or for achieving more sophisticated NLP tasks. %TODO nejaky zaver z tohoto odstavce? najit dalsi relevantni zdroje, co sem napsat dál? 
-
-%TODO do záveru napsat, co bude v dalších podkapitolách
-
+Natural language processing can be described as a science at the border of linguistics and computer science. However, according to \citep{Wilks}, NLP itself is not a scientific research subject. It is instead a collection of problems, which can be examined. These tasks are drawn from the general linguistics field, and the goal is to solve (or \textit{process}) them by computers. General linguistics studies and describes the language. Its focus can be divided into the following sub-fields: phonetics, phonology, morphology, syntax, semantics, and pragmatics. %TODO zdroj?
+This work focuses on morphology (lemmatization, POS tagging) and semantics (sentiment analysis). A more detailed description of tasks can be found in the following subsections and dedicated chapters for each task. Apart from the introduction of tasks, this chapter also includes a brief NLP history overview and a presentation of possible data sources for NLP training.
 
 \subsection{Morphology}
-Morphology studies an internal structures of words.
-% todo do obrázku když už Basic building block of a word is a morpheme and such morphemes can represent semantics (meaning) or grammatical role of the world. %příklad
-%One word can occur many forms created via inflection. %todo like apple - apples, 
-%Such a set of all possible forms is called lexeme. Morphology is eldest lingusitical field % zdroj, 
-%early automated models for morphological language processing focused on generating forms from lemmas % zdroj, Two level morphology
- % obrázek 
-Morphology is used for many tasks, which can be divided into generative and analytical tasks. Generative tasks focuses on generation of word forms for given grammatical category. This can be useful for machine translation, full-text searching, labeling of documents by their key words or spell check. Result of a morphological analysis is a set of possible lemmas and tags for given word form. This set can be further narrowed by lemmatization (selection of the one "right" lemma), morphological tagging (selection of one right tag in given context), partitional disambiguation (removes all tags and lemmas, which can be reliably removed).
+Morphology studies an internal structure of words. Morphology is used for many tasks, which can be divided into generative and analytical ones. Generative tasks focus on the generation of word forms for a given grammatical category. These forms can be useful for machine translation, full-text searching, labeling documents by their keywords, or spell-check. The result of morphological analysis is a set of possible lemmas and tags for a given word form. This set can be further narrowed by lemmatization (selection of the one "right" lemma), morphological tagging (selection of one correct tag in the given context), or partitional disambiguation (removes all tags and lemmas, which can be reliably removed).
 
 \par
-\subsubsection{Lematization task}
-Lemmatization task consist of finding a \textit{lemma}. Lemma is one chosen form of a word, selected to represent whole set of all possible word's forms (such set is called lexeme).  Which form is used as lemma is chosen by a convention -- for noun it is nominative of singular, for verb its infinitive etc.
+\subsubsection{Lemmatization task}
+Lemmatization task consist of finding a \textit{lemma}. Lemma is one chosen form of a word, selected to represent the whole set of all possible word's forms (such set is called lexeme).  A convention chooses word form used as lemma -- it is nominative of singular for a noun, an infinitive for a verb, etc.
 \par
-For example, lexeme for a czech word \textit{jablko} is \textit{jablko, jablka, jablku,  jablkem, jablek, jablky, jablkům} and lemma is \textit{jablko}.
+For example, lexeme for a Czech word \textit{jablko} is \textit{jablko, jablka, jablku,  jablkem, jablek, jablky, jablkům} and the lemma is \textit{jablko}.
 
 \subsubsection{Part-of-speech tagging} 
-Part-of-speech tagging classifies word into one of part-of-speech categories (like noun, pronoun, verb, etc) \citep{Hladka}. Part of tagging can also be a determination of grammatical categories (like case, number, tense). %TODO obrázek s príkladem 
-Czech morphology developement is dated from 1989 %TODO zdroj Hajič.
-and in description of words uses 15-places morphological tags \citep{Hana2005}.
-A more detailed description of each position can be seen in table \ref{Tab:tagset}.
-
-\begin{table}
-\centering
-\label{Tab:tagset}
-\begin{tabular}{ |c|c|c| } 
-
-
- \hline
- Position & Name & Description \\ 
- \hline \hline
- 1 & POS & Part of speech \\ \hline
- 2 & SubPOS & Detailed part of speech \\ \hline
-  3 & Gender & Gender \\ \hline
-4 & Number & Number \\\hline
-  5 & Case & Case \\ \hline
- 6 & PossGender & Possessor's gender \\\hline
-  7 & PossNumber & Possessor's number \\ \hline
-8 & Person & Person \\\hline
-  9 & Tense & Tense \\ \hline
- 10 & Grade & Degree of comparison\\\hline
-  11 & Negation & Negation \\ \hline
- 12 & Voice & Voice \\\hline
- 13 & Reserve1 & Reserve \\ \hline
-14 & Reserve2 & Reserve \\\hline
-  15 & Var & Variant, style \\ 
- \hline
-
-\end{tabular}
-\caption{Table from \citep{Hana2005} describes all 15 positions of Czech morphological tagging.
-} 
-\end{table}
-
+Part-of-speech tagging classifies word into one of the part-of-speech categories (like a noun, pronoun, or verb) \citep{Hladka}. Part of tagging can also be a determination of grammatical categories (e.g., case, number, or tense). 
 
 \subsection{Semantics}
-Semantics is dealing with word meaning. This is definitely more complicated object of study even for humans, let alone for computers. Word meaning can be subjective, change during historical periods, sentence is not simple sum of meanings of its words and many other problems comes with efforts of learning computers to truly understand a human language.
+Semantics deals with word meaning. This is a more challenging study than morphology, even for humans, let alone for computers. Word meaning can be subjective, change during historical periods, a sentence is not a simple sum of meanings of its words, and many other problems come with learning computers to truly understand a human language. 
+\par
+Semantic analysis can be useful for various tasks, from natural language text generation to recognizing homonymy or polysemy of given words. It could solve sophisticated assignments as answering questions about the input text document or help in high-quality translation. Another possible task is to find in the text so-called named entities - like persons, months, or cites - or linking these entities to some knowledge base. 
 
-Sentiment analysis can be useful for various tasks from natural language text generation to recognition of homonymy or polysemy of given words. It could solve sophisticated assignments as answering questions about the input text document or help in high-quality translation. Another possible task is to find in the text so-called named entities - like persons, months or cites - or linking these entities to some knowledge base. 
 \subsubsection{Sentiment analysis}
-An input of a sentiment analysis is a text and the output is a classification into one of categories. In this work, categories are positive, negative and in some data sets also neutral, but it is also common to use labels like abusive or ironic.
-As a part of sentiment analysis can be involved so-called subjectivity\citep{Montoyo2012}. The goal of subjectivity prediction is to classify if the
-opinion (both positive or negative) is objective or the author is personally interested and has strong emotions about his claims. For example, the following text could be recognized as objective: “The sound of this notebook is clear.”, “The base is not stable enough.” or even “An internet connection in this area is bad.” in contrast with “I hate the way the new touchpad works.”. The subjectivity of the claim does not depend on its sentiment. This part of sentiment analysis was not included in this work and it is mentioned just for completeness. %TODO
+An input of sentiment analysis is a text, and the output is a classification into one of the categories. In this work, categories are positive, negative, and in some datasets also neutral, but it is common to use labels like abusive or ironic, too.
+As a part of sentiment analysis can be involved so-called subjectivity\citep{Montoyo2012}. The subjectivity prediction goal is to classify if the
+opinion (both positive or negative) is objective or the author is personally interested and has strong emotions about his claims. For example, the following text could be recognized as objective: "The sound of this notebook is clear.", "The base is not stable enough." or even "An internet connection in this area is bad." in contrast with "I hate the way the new touchpad works.". The subjectivity of the claim does not depend on its sentiment. This part of sentiment analysis was not included in this work, and it is mentioned just for completeness.
 
 \subsection{Language data}
-Inputs to natural language processing can be formed by data of many kinds and can be categorized by a form or by a source. 
-As for form, we can work with corporas or datasets of various sizes, containig data from many sources. A corpora is a large collection of texts, which aims to be in some way representative sample of a language. This is not fully possible, mainly because the selection of examples in the corpus is limited compared to a diversity of language. Most famous linguistic corporas are co-called Brown corpus \citep{francis79browncorpus} -- first electronical corpora mixed from newspaper articles and beletry, and PennTreebank \citep{Marcus1993}, which si first syntactically anotated corpus, but has quite domain limited source - articles from Wall Street Journal. One of corpora's type is a treebanks. A treebank is a parsed corpus with various types of annotations and uses trees for representation of dependencies. An example of such trees can be seen on figure \ref{fig:trees} and an example of a treebank is presented on picture \ref{fig:treebank}
-%TODO - kouknout do poznámek.
-The question arises as to what is the difference between a corpora and a "simple" dataset. Sometimes these terms can be interchangeable in the sense that the usage of both can be the same. In some cases, both types of data can be used for the same task, but the difference is more theoretical. The idea of a corpora is to collect somehow representative sample of a language with annotations on many levels which allows a performation of different analysis upon this data. Dataset is typically created on restricted domain (like tweets on US Airlines pages \footnote{https://www.kaggle.com/crowdflower/twitter-airline-sentiment} or movie reviews \footnote{https://www.kaggle.com/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews}) 
-and are annotated for one type of task (in this case sentiment).  
+Data of many kinds can serve as an input into natural language processing, and this data can be categorized by a form or by a source.
+As for form, we can work with corpora or datasets of various sizes, containing data from many sources. A corpus is a large collection of texts, aiming to be a representative sample of a language. This is not entirely possible, mainly because the selection of examples in the corpus is limited compared to language diversity. Despite these limitations, corpora are a valuable source of language information and are widely used in NLP. The most famous linguistic corpora are co-called Brown corpus \citep{francis79browncorpus} -- first electronic corpus mixed from newspaper articles and fiction literature, and PennTreebank \citep{Marcus1993}, which is the first syntactically annotated corpus but has quite a domain limited source - articles from Wall Street Journal. The internal structure of corpora can be of many types. One of corpora's type is a treebank. A treebank is a parsed corpus with many possible types of annotations and uses trees to represent dependencies. An example of such trees can be seen in figure \ref{fig:trees} and an example of a treebank is presented in picture \ref{fig:pdt}.
+The question arises as to what is the difference between a corpus and a "simple" dataset. Sometimes these terms can be interchangeable in the sense that the usage of both can be the same. Both types of data can be used for the same task, but the difference can be seen in a purpose of a collection. A corpus's idea is to collect a somehow representative sample of a language with annotations on many levels, which allows the performance of various analysis upon this data. Dataset is typically created on a restricted domain (like tweets on US Airlines pages \footnote{https://www.kaggle.com/crowdflower/twitter-airline-sentiment} or movie reviews \footnote{https://www.kaggle.com/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews}) 
+Moreover, they are annotated for one type of task (in this case, sentiment).  
 \begin{figure}[h]
 \centering
 \includegraphics[width=1\textwidth]{../img/syntax_depedency_trees.png}
 \caption{
-An example of the syntax and dependency tree. Dependency tree, as the name indicates, describes dependencies between words. Such dependencies are of various types, for example an elephant in the example is an direct object of the shooting action. A root of such tree is typically a predicate of the sentence. On the other hand, syntax tree represents syntactic structure of the sentence according to the grammar. The root of the tree is \textit{sentence}, which is split to noun and verb phrase. These can be further divided into phrases compound from particular instances of parts of speech (e.g. nouns, adverbs, verbs, prepositions etc).
+An example of the syntax and dependency tree. The dependency tree, as the name indicates, describes dependencies between words. Such dependencies are of various types; for example, an elephant in the example text is a direct object of the shooting action. A root of such a tree is typically a predicate of the sentence. On the other hand, the syntax tree represents the sentence's syntactic structure according to the grammar. The root of the tree is \textit{sentence}, which is split into noun and verb phrase. These can be further divided into phrases compound from particular instances of parts of speech (e.g., nouns, adverbs, verbs, prepositions, etc.).
 \newline \textit{Source: \cite{NLTKbook}}}
 \label{fig:trees}
 \end{figure}
 
 \begin{figure}
-\centering
 \includegraphics[width=1\textwidth]{../img/prague_dep_treebank.png}
 \caption{
 Prague dependency treebank example \cite{PDT35} for the sentences:
@@ -104,185 +50,143 @@ Prague dependency treebank example \cite{PDT35} for the sentences:
 \label{fig:pdt}
 \end{figure}
 
-Data in both dataset and corpora can come from many written or oral sources. For machine translation documents with many language versions are appropriate. An example of the use of such multilingual documents is a project Eurotra \citep{oakley1995final}.
-Eurotra was almost twenty years lasting project of the European Commission dedicated to machine translation started on the latest seventieths. EU administrative documents in French and English served as datasets. %TODO jak byli kvalitní
-Linguistic data can differ in quality and a length.  Relatively new source of data are social networks like twitter, reddit or facebook. Data from some social networks (facebook, twitter) are very different from more traditional sources like scientific papers, newspaper articles or books.  These data are short snippets of text full of odd characters, newlines, and ends of lines. They contain pictures, emoji, a mixture of different languages, slang expressions, and grammatical errors. And they are very short, sometimes they consists only of one sentence, few hashtags and a link or a picture. Because people share their opinions, emotions and are ready to do their choices according to incoming influences, social networks are very important source of information. Big problem while analysing this data is their amount. Only a twitter uses produce about 12 TB of data per day \footnote{https://bigdatashowcase.com/how-much-big-data-companies-make-on-internet/}. it is not possible to process all the data manualy so this is one of reasons for importance of natural language processing.  %TODO nemá to být v úvodu?
+Data in both dataset and corpora can come from many written or oral sources. For machine translation, documents with many language versions are appropriate. An example of the use of such multilingual documents was a project Eurotra \citep{oakley1995final}. Linguistic data can, however,  differ in quality and length.  A relatively new source of data are social networks like Twitter, Reddit, or Facebook. Data from some social networks (Facebook, Twitter) are very different from traditional sources like scientific papers, newspaper articles, or books.  These data are short snippets of text full of odd characters, newlines, and ends of lines. They contain pictures, emojis, a mixture of different languages, slang expressions, and grammatical errors. Furthermore, they are very short; sometimes, they consist only of one sentence, few hashtags, and a link or a picture. Because people share their opinions and emotions and are ready to make their choices according to incoming influences, social networks are an important source of information. The big problem while analyzing this data is their amount. Only a twitter uses produce about 12 TB of data per day \footnote{https://bigdatashowcase.com/how-much-big-data-companies-make-on-internet/}. It is impossible to process all the data manually, so this is one reason for the rasing industry importance of natural language processing.
 
 \subsection{Historical Development}
-Historical development of computer linguistics was significantly affected by machine translation \citep{Wilks}. Many important milestones in the history of machine translation also improved other parts of \gls{nlp}, so I will briefly present its historical development. First attempts to translation started in 1933 by patents for machine translations (mechanical multilingual dictionaries) \citep{Hutchins}
-followed by a big boom of machine translation in the 50s and 60s and than continued by a slowdown after ALPAC report in 1966 \citep{Hutchins1996}. 
+The historical development of computer linguistics was significantly affected by machine translation \citep{Wilks}. Many essential milestones in machine translation history also improved other parts of \gls{nlp}, so I will briefly present its historical development. First attempts to translation formally started in 1933 by patents for machine translations (mechanical multilingual dictionaries) \citep{Hutchins}
+followed by a big boom of machine translation in the 50s and 60s and then continued by a slowdown after ALPAC report in 1966 \citep{Hutchins1996}. 
 
-First attempts to machine translation were based on bilingual dictionaries and sets of rules. Such translation was based on a translation of individual word or a group of words with a subsequent improvement of syntax and morphology. Resulting translation weren't good and required lots of work of human work of expert linguists. This approach was replaced around year 1990 by a statistical translation \citep{Brown}. Central idea of a statistical machine translation is a probability of a translated sentence, given the original sentence. This includes also a probability of resulting sentence in the target language. Such probabilities were computed using frequencies of words or their sequences (n-grams) in large language corpus. \citep{jurafsky2012natural} %TODO nejake vysledky, SOTA? 
-These methods were quite successful but they suffered from the curse of dimensionality \citep[p.450]{Goodfellow-et-al-2016}.  %TODO str 450 z DLbook
-Next stage of machine translation (and also other NLP tasks) starts with the second wave of a popularity of neural networks.
-There is too many possible words or n-grams of words and there is no way how to share learned informations between similar words or sequences in statistical methods. A solution of this problem can be seen in the paper \citep{Bengio2003}, where authors presented neural trained word embeddings (see \ref{sec:embedd}). Even better results were obtained by neural language models (probabilites of words are learned by neural network) \citep{Schwenk2006}. Current natural language processing is built on deep recurrent neural networks and encoder-decoder architecture, firstly published in \citep{Cho2014}, \citep{Sutskever2014} and \citep{Wu2016}.
-
-In current times, not only machine translation systems but any other linguistic tasks are solved by neural networks. State-of-the-art result for machine translation, sentiment analysis and many others hold by methods based on depp learning \footnote{http://nlpprogress.com/}. For that reason, the following subsection presents deep learning basics, their usage and improvements in \gls{nlp} in recent years.
-
+The first solutions to machine translation tasks were based on bilingual dictionaries and sets of rules. This method translated an individual word or a small group of words with a subsequent improvement of syntax and morphology. The resulting translation was not good and required lots of work of human work of expert linguists. This approach was replaced around the year 1990 by a statistical translation \citep{Brown}. A statistical machine translation's central idea is a probability of a translated sentence, given the original sentence. This includes also a probability of resulting sentence in the target language. This probability distribution is called a language model, and although it is one of the most aged ideas in NLP, it is an integral part of current best NLP solutions. Words probabilities were originally computed using frequencies of words or their sequences (n-grams) in large language corpus \citep{jurafsky2012natural} (for more information about probabilistic language models, see subsection \ref{sub:models}). These methods were quite successful, but they suffered from the curse of dimensionality \citep[p.450]{Goodfellow-et-al-2016}. The next stage of machine translation (and other NLP tasks) starts with the second wave of neural networks' popularity. There are too many possible words or n-grams of words, and there is no way to share learned information between similar words or sequences in statistical methods. A solution to this problem could be a paper \citep{Bengio2003}, where authors presented neural trained word embeddings (see \ref{sec:embedd}). Neural language models obtained even better results (a neural network learns probabilities of words) \citep{Schwenk2006}. Current natural language processing is built on deep recurrent neural networks and encoder-decoder architecture, firstly published in \citep{Cho2014}, \citep{Sutskever2014} and \citep{Wu2016}. In current times, neural networks are applied to machine translation and almost any other linguistic tasks. State-of-the-art result for machine translation, sentiment analysis, and many others hold by methods based on deep learning \footnote{http://nlpprogress.com/}. For that reason, the following subsection presents deep learning basics, their usage, and improvements in \gls{nlp} in recent years. %TODO neni tu ten improvement
 \section{Deep Learning}
-Neural networks are designed as supervised machine learning techniques. It means that input data consist of two-part examples -- observations and correct response for each observation. Supervised methods than tries to produce an output which will correctly predict responses. \citep{Russell1995}
+%TODO predmluva
+
+\subsection{Deep Learning History}
+The history of learning algorithms inspired by a human brain started in the 1940s under the name \textit{cybernetics} \citep{Goodfellow-et-al-2016}, \citep{McCulloch}. The first such architecture was a perceptron \citep{Rosenblatt1958}.
+Perceptron, found in 1958, is the most straightforward neural network with just one layer serving for binary classification (see Fig. \ref{pic:perceptron}). A perceptron's input is a vector of features describing an input example, and output is classification into class 0 or 1.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\columnwidth]{../img/perceptron}
+\caption{A one-layer perceptron architecture. The result is formed by the application of the activation function on a weighted sum of inputs. Weights are updated during training till it returns satisfactory results. }
+\label{pic:perceptron}
+\end{figure}
+
+There also exists a multi-class version for the general classification. The problem of the perceptron was the inability to classify data that are not linearly separable \citep{Minsky2017} (see Fig. \ref{pic:xor}), which led to a lack of interest in deep networks for some period.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.6\columnwidth]{../img/xor}
+\caption{This picture illustrates XOR problem. Perception can find the correct solution only if the data are linearly separable. It means that they can be divided by a hyperplane. An example of such two-dimensional data can be seen in picture A). The dotted line shows a possible border for separation. Picture B) shows XOR problem. XOR is a logical operation on two boolean variables, which returns true if one variable is True (1) and the other one is False (0), and returns False otherwise. Such data cannot be separated by one hyperplane. Linearly non-separable data can be, for example, separated by a circle (pic. C)}
+\label{pic:xor}
+\end{figure}
+
+The era of \textit{deep} neural networks started around the year 2007 \citep{Goodfellow-et-al-2016} with bigger datasets and greater computational resources. These two new features opened the possibility of neural network learning without expertly handcrafted parameters tuning with good results.
+Many ideas which are currently frequently used are quite old - like backpropagation \citep{Rumelhart} or even encoder-decoder architecture \citep{Allen19}, \citep{Forcada1997}. However, they became popular only after the development in other computer science areas reached a level where they can be trained in a reasonable time.
 \par
-Supervised machine learning problems can be distinguished by the desired outcome as classification or regression. Classification means that we want to sort data into one of predefined classes, meanwhile regression's gaol is a numerical result. In the case of multi-class classification, true results (labels) can be in one of following forms --  text, numbers or one-hot vector. If there are more than two classes presented, one-hot vector has length equal to number of classes and consist of zeros on every indices but target class index, where is one.
- %TODO sjednotit label, response, 
+The basic type of DNN is a multilayer perceptron (see picture \ref{pic:multilayer}).
+It is combined with neurons; every neuron has an \textit{activation function}, which is applied to its input. Input to every, but the first layer is a weighted combination of (possibly selection of) neurons from a previous layer. 
+Different NN types differ by number and shape of layers, activation functions, and connections between neurons. (see Fig. \ref{pic:multilayer}).
+\begin{figure}[h]
+\centering
+\includegraphics[width=1\columnwidth]{../img/multilayer}
+\caption{Multilayer perceptron (or feed-forward neural network) is formed input and output layer and a variable number of hidden layers with different sizes. In every layer, the chosen application function is applied to a weighted sum of inputs from the previous layer.}
+\label{pic:multilayer}
+\end{figure}
+\par
+The following subsections present some of the key ideas for (not only) NLP and specifically for BERT. In NLP, the same as in other machine learning methods, it is necessary to decide how to encode the input to make it processable by computers, especially which input features are important for the given task and should be included. These questions are in NLP addressed, among others, by two techniques: word embeddings (see section \ref{sec:embedd}) and attention mechanism (see section \ref{sub:attention}). Word embeddings deal with the representation of words and their meaning, while the attention mechanism determines which parts of the text are relevant for a given task. Many machine learning methods are applied to data with no defined order between samples, like images or descriptions of petals for each sample flower\footnote{https://archive.ics.uci.edu/ml/datasets/iris}.
+Language data are, however, different because their nature is sequential. Word and sentence ordering is an essential part of the text, and lack of it can make text absolutely nonsense. This problem can be more or less satisfactorily handled by Recurrent Neural Networks (section \ref{sub:RNN}) and Transformers architecture (section \ref{sub:transformers}). Combining all these methods led to a BERT models family, which are used for this work (see section \ref{sec:bert}).
 
-\subsection{True ML Goal and Regularization}
-Supervised machine learning goal is not to predict correctly all labels in example data, but to predict correctly all possible inputs from the distribution example data are taken from. During training there can appear a problem called \textit{overfitting}. As showed in Figure \ref{pic:overfitting}, 
-
+\subsection{Machine Learning and Regularization}
+\label{sub:ml}
+According to \citep{Mitchell1997}, machine learning is: "A computer
+program is said to learn from experience E with respect to some class of tasks T and performance measure P, if its performance at tasks in T, as measured by P, improves with experience E." For the techniques examined in this work, experiences are language data -- every single experience is a text. To provide some measure, it is needed to know the ML algorithm's correct output. Many deep learning methods are constructed as \textit{supervised}, which means that every experience has a corresponding label with a correct response (so-called gold data). Metrics used in this case reflects the portion of correctly predicted labels. \citep{Russell1995} Such data structure is handy for machine learning, but it is hard to obtain them in the required amount because they are usually created manually by humans \footnote{Obviously, if it were already possible to create labels by computers, there would not be necessary to learn it.}. Opposite to this approach are \textit{unsupervised} methods, where no labeled data exists, and metrics are based on different result features (e.g., the compactness of resulting groups). As for tasks, it is possible to distinguish them by the desired outcome between two basic categories: classification and regression. The classification consists of sorting data into one of the predefined classes (e.g., noun, adjective, verb); meanwhile, regression's goal is to predict a numerical result (e.g., expected number of borrowed books in a school library this year).
+\par
+To be precise supervised machine learning goal is not to predict all labels correctly in an example data (it would be enough to memorize them), but to predict correctly all possible inputs from the distribution example data are taken from (find some general features for correct performance). During training, there can appear a problem called \textit{overfitting}. As showed in Figure \ref{pic:overfitting}, overfitting problem is that the result prediction function practically memorized all training data examples and can minimize the error on them very nicely, but probably will not perform well on previously unseen data. A regularization is a tool for preventing such issues. Well known regularization techniques like lasso regression \citep{Tibshirani1996} or ridge regression \citep{Hoerl1970}, which are used for linear regression, works by adding some new members into the sum for the loss function, which should be minimized.
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.7\columnwidth]{../img/overfitting}
 \caption{Figure A) presents overfitting scenario. Figure B) illustrates possible well-generalized solution. }
 \label{pic:overfitting}
 \end{figure}
-overfitting problem is that result prediction function practically memorized all training data examples and can minimize the error on them very nicely, but probably will not perform well on previously unseen data. Regularization is a tool for preventing such issues. Well known regularization techniques like lasso regression \citep{Tibshirani1996} or ridge regression \citep{Hoerl1970}, which are used for linear regression, works by adding some new members into the sum for the loss function which should be minimize. %TODO english improvement
-Another classification regularization method, which is also used in this work, is label smoothing.
-\par
-Label smoothing \citep{Szegedy2015} is an idea applicable to every classification problem, therefore is not limited to a NLP only.
-In any classification task, training data contains labels of the correct classes. In binary classification or one-hot encoded labels, correct class is denoted by 1 and incorrect class(es) by 0. Instead of this, label smoothing applies following formula: 
+Another classification regularization method, which is also used in this work, is label smoothing. Label smoothing \citep{Szegedy2015} is an idea applicable to every classification problem, therefore is not limited to an NLP only.
+In any classification task, training data contains labels of the correct classes. In binary classification or one-hot encoded labels, correct class is denoted by 1 and incorrect class(es) by 0 \footnote{One-hot encoding transforms each label into a vector of size K, where n is a number of all possible classes. Than such vector is zero at all position expect the c-th position, where c is the correct class.}. Instead of this, label smoothing applies following formula: 
 $$y_{new} = (1 - \epsilon) * y + \alpha / K$$, where $K$ is number of classes. Label smoothing is used as a cure for overfitting and overconfidence in the case of use of a softmax 
  as output activation function. Loss function for softmax classification is: 
  $$ loss = -\sum_{i=1}^{n} \sum_{y=1}^{K} p(y \mid x_i) log \, q_{\theta} ( y_i \mid x_i ) $$
- and after substitution of label smoothing\footnote{Taken from: https://leimao.github.io/blog/Label-Smoothing/}:
+ and after substitution of label smoothing\footnote{\label{note1} Taken from: https://leimao.github.io/blog/Label-Smoothing/}:
 $$
 loss_{ls} = -\sum_{i=1}^{n} \sum_{y=1}^{K} [(1-\epsilon) p(y \mid x_i)+\epsilon u(y\mid x_i)]log \, q_\theta(y \mid x_i) $$,
-which gaves after multiplication\footnote{Taken from: https://leimao.github.io/blog/Label-Smoothing/}:
-
+which gaves after multiplication \footnote{see footnote \ref{note1}.}:
  \begin{equation} \label{eq:lsloss}
  loss_{ls}= \sum_{i=1}^{n} {(1- \epsilon)[- \sum_{y=1}^{K} p(y\mid x_i) log \, q\theta(y \mid x_i)]+\epsilon [- \sum_{y=1}^{K} u(y \mid x_i)log \, q\theta (y\mid x_i)]}
  \end{equation}
-
-From equation \ref{eq:lsloss} can be seen, than if the network is very confidential about some prediction, second part of loss function is very large, so label smoothing works as a regularization of overconfidence.
-
-\subsection{Deep Learning History}
-The history of learning algorithms inspired by a human brain started in the 1940s under the name \textit{cybernetics} \citep{Goodfellow-et-al-2016}, \citep{McCulloch}. First such architecture was a perceptron \citep{Rosenblatt1958}.
-Perceptron , found in 1958, is the simplest neural network with just one layer serving for binary classification (see Fig. \ref{pic:perceptron}). Input of a perceptron is a vector of features describing an input example and an output is classification into class 0 or 1.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.8\columnwidth]{../img/perceptron}
-\caption{A one-layer perceptron architecture. The result is formed by the application of activation function on a weighted sum of inputs. Weights are updated during training till it returns satisfactory results. }
-\label{pic:perceptron}
-\end{figure}
-There also exists a multi-class version for the general classification. The problem of this perceptron was the inability to classify data that are not linearly separable \citep{Minsky2017} (see Fig. \ref{pic:xor}), which led to a lack of interest in deep networks for some period.
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.6\columnwidth]{../img/xor}
-\caption{This picture illustrates XOR problem. Perception can find the correct solution only if the data are linearly separable. It means, that they can be divided by a hyperplane. An example of such two-dimensional data can be seen in picture A). The dotted line shows a possible border for separation. Picture B) shows XOR problem. XOR is a logical operation on two boolean variables, which returns true if one variable is True (1) and the other one is False (0), and returns False otherwise. Such data cannot be separated by one hyperplane. Linearly non-separable data can be for example separated by a circle (pic. C)}
-\label{pic:xor}
-\end{figure}
-
-Era of \textit{deep} neural networks started around year 2007 %TODO zdroj
-with bigger datasets and greater computational resources. These two new features opened the possibility of neural network learning without expertly handcrafted parameters tuning with good results.
-Many ideas which are currently frequently used are quite old - like backpropagation \citep{Rumelhart} or even encoder-decoder architecture \citep{Allen19}, \citep{Forcada1997}.
-
-\par
-The basic type of DNN is a multilayer perceptron (see picture \ref{pic:multilayer}).
-It is combined with neurons, every neuron has an \textit{activation function} %TODO napsat něco
-, which is applied to its input. Input to every, but the first layer is a weighted combination of (possibly selection of) previous layer neurons. 
-Different types of NN differs by number and shape of layers, activation functions and connections between neurons. (see Fig. \ref{pic:multilayer}).
-\begin{figure}[h]
-\centering
-\includegraphics[width=1\columnwidth]{../img/multilayer}
-\caption{Multilayer perceptron (or feed-forward neural network) is formed input and outpu layer and variable number of hidden layers with different sizes. In every layer, chosen application function is applied to a weighted sum of inputs from previous layer.}
-\label{pic:multilayer}
-\end{figure}
-
-\par
-Some of the key ideas for (not only) NLP and specifically for BERT, are presented in the following subsections.
-
-\par
-In NLP, same as in other machine learning methods, is necessary to decide how to encode the input to make it processable by computers and especially which input features are important for given task and should be included. These questions are in NLP addressed, among others, by two techniques: word embeddings (see section \ref{sec:embedd}) and attention mechanism (see section \ref{sub:attention}). Word embeddings deals with representation of words and their meaning, while attention mechanism determines which parts of text are relevant for given task.
-
-Many machine learning methods are applied to data with no defined order between samples -- like a bunch of images or description of petals for each sample flower. %TDO odkaz
-Language data are, however, different, because their nature is sequential. Word and sentences ordering is an important part of text and lack of it can make text absolutely nonsense. This problems can be more or less satisfactorily handled by Recurrent Neural Networks (in section \ref{sub:RNN}) and Transformers architecture (section \ref{sub:transformers}). Combination of all these methods led to a BERT models family, which are used for this work (see section \ref{sec:bert}).
-
+From equation \ref{eq:lsloss} can be seen, then if the network is very confidential about some prediction, the second part of the loss function is very large, so label smoothing works as a regularization of overconfidence.
 
 \subsection{Embeddings}
 \label{sec:embedd}
-Good performance of NLP models relies on a text representation. What is hypothetically deserved is to teaching computers to understand semantics of language. Once computer has a good representation of what given text \textit{means}, it should be easy to answer questions, translate it into an another language etc. Because NN are able to work only with numerical representation of inputs, second requirement upon such language representation is to be numerical. Straightforward way is to represent input words in one-hot encoding. In one-hot representation single word is represented by a vector, where is only 1 at the position of respective word and all other positions are zeros. Such vector is long as a number of distinct words in a dictionary, so it could be quite large. Most important problem of one-hot representation is that every two words similarly distant to each other. It can be an advantage in some areas, but it is not true in linguistics. Words can have similar meanings or be opposite to each other, generally spoken a distance between them is not uniform.
+Good performance of NLP models relies on a text representation. What is hypothetically deserved is to teaching computers to understand the semantics of the language. Once the computer has a good representation of what given text \textit{means}, it should be easy to answer questions, translate it into another language, etc. Because NN can work only with a numerical representation of inputs, the second requirement upon such language representation is to be numerical. The straightforward way is to represent input words in one-hot encoding. In one-hot representation, a single word is represented by a vector, and one is only at the position of the respective word; all other positions are zeros. Such vector is long as a count of distinct words in a dictionary, therefore it could be quite large. The most important problem of one-hot representation is that every two words similarly distant from each other. It can be an advantage in some areas, but it is not a correct assumption in linguistics. Words can have similar meanings or be opposite to each other, generally spoken, a distance between them is not uniform.
 \par
-When compared to one-hot encoding, embeddings  \citep{Bengio2003}, \citep{Ling} are better solution for language data. Embedding is also a vector, which represent input word, but in contrast to one-hot encoding, its size does not depend on the vocabulary size. These embedding are not hand crafted by humans, they are learned by NN. They can be learned for every specific task from scratch or it is possible to use embeddings trained for usage in many tasks like in the following cases.
-Before contextualized embeddings appeared, pretrained embeddings were created mainly by Word2Vec \citep{Mikolov2013}  
-%TODO turian, mikolov, pennington -- embeddings normal
-, specifically by its two variants: CBOW and SkipGram model.
-CBOW model's objective is to predict a masked word from its context and SkipGram does exactly the opposite - predicting context of a given word. %TODO obrázek?
-These predicting objectives serves just as a tool for forcing a network to learn useful word representation.  Embeddings are then imputed into network as a embedding layer at the beginning of the network with size $number\_of\_words \times embedding\_size$. We still need to bridge the gap between text and numbers, so it is possoble to use one-hot encoding or simple word numbering as an input into this first embedding layer.  Word2Vec-like embeddings uses just few context words and they does not use explicitly information about statistics in whole dataset. GloVe \citep{Pennington} embeddings, on the other hand, uses information about frequencies of pairs of words in a whole dataset and are designed to project word vectors into meaningful vector space. 
+When compared to one-hot encoding, embeddings  \citep{Bengio2003}, \citep{Ling} are better solution for language data. Embedding is also a vector representing an input word, but in contrast to one-hot encoding, its size does not depend on the vocabulary size. These embeddings are not handcrafted by humans, NN learns them. They can be learned for every specific task from scratch, or it is possible to use embeddings trained for usage in many tasks like in the following cases.
+
+\subsubsection{Non-contextualized embeddings}
+Before contextualized embeddings appeared, pretrained embeddings were created mainly by Word2Vec \citep{Mikolov2013}, \citep{Turian2010}, \citep{Pennington}, specifically by its two variants: CBOW and SkipGram model.
+CBOW model's objective is to predict a masked word from its context, and SkipGram does precisely the opposite - predicting the context of the given word. These predicting objectives serves just as a tool for forcing a network to learn a useful word representation. Embeddings are then imputed into a network as an embedding layer with size $number\_of\_words \times embedding\_size$. We still need to bridge the gap between text and numbers, so it is possible to use one-hot encoding or simple word numbering as an input into this first embedding layer.  Word2Vec-like embeddings use just a few context words, and they do not explicitly use information about statistics in the whole dataset. GloVe \citep{Pennington} embeddings, on the other hand, uses information about frequencies of pairs of words in a whole dataset and are designed to project word vectors into meaningful vector space. 
 \\
-Embeddings of previously described types though uses context of the word -- it is in fact how they are meant to work. Similar words are supposed to appear frequently in similar context. Problem of such embeddings is that an input word embedding in the first layer of neural network is computed independently on neighbour words, so the same word has always the same embedding regardless of the context. In the case of homonyms,non-contextualized embeddings are a mixture of all the (possibly very different) meanings, which can lead to poor results.  The problem with same word embedding in different context is definitely a problem in the case of homonyms, but also in other cases contextualized embeddings seems to give better results \citep{Straka2019a}, \citep{Liu2020}.
+Embeddings of previously described types use a  context of the word -- it is, in fact, the way how they are meant to work. Similar words are supposed to appear frequently in a similar context. The problem of such embeddings is that an input word embedding in the first layer of the neural network is computed independently on neighbor words, so the same word always has the same embedding regardless of the context. In the case of homonyms, non-contextualized embeddings are a mixture of all the (possibly very different) meanings, which can lead to poor results. %TODO zdroj
+The problem with same word embedding in a different context is a problem in the case of homonyms, but also in other cases, contextualized embeddings seem to give better results \citep{Straka2019a}, \citep{Liu2020}.
 
 \subsubsection{Contextualized embeddings}
-To solve the problem of different word meanings, contextualized embeddings where invented in recent years, namely BERT \citep{Devlin2019}, ELMo \citep{Peters2018} and XLNet \citep{Yang2019}. %TODO precist \citep{Raffel2019}.  - není nový typ, spíš souhrn
-Contextualized embedding of a word is computed with a knowledge of the whole sentence dynamically for each word occurrence.
-In addition to BERT, there are also other contextualized embedding architextures, namely GTP-2 %TODO zdroj radfford, 
-and ELMo. Their comparison can be found in a subsection \ref{sub:specialBert}. 
-%TODO pridat moznosti jak zapojit embeddings - dát k trénování a modelům
-%TODO catastrophic forgetting
+To solve the problem of different word meanings, contextualized embeddings were invented in recent years, namely BERT \citep{Devlin2019}, ELMo \citep{Peters2018} and XLNet \citep{Yang2019}. %TODO precist \citep{Raffel2019}. 
+Their comparison can be found in a subsection \ref{sub:specialBert}. 
 \par
-As embeddings are trained after the input is encoded into one-hot vectors, it is impossible to use pretrained embedding for encoding of previously unseen words. This is solved by embeddings of characters or subwords, so the whole word embedding can be later compound of them. The possibilities of involving and training such embeddings are described in more detail in section \ref{sub:models}.
-
-Embeddings are currently best option of input representation, but other part of problem is how to recognize, which parts of input are useful for given task. This problem is addressed by attention mechanism, described in the following subsection. 
+As embeddings are trained after the input is encoded into one-hot vectors, it is impossible to use pretrained embedding for the encoding of previously unseen words. This problem is solved by embeddings of characters or subwords so that the whole word embedding can be later compounded of them. Section \ref{sub:models} describes the possibilities of involving and raining such embeddings in more detail. Embeddings are currently the best option of an input representation, but another part of the problem is recognizing which parts of the input are valid for the given task. This problem is addressed by the attention mechanism, described in the following subsection. 
 
 \subsection{Attention mechanism}
 \label{sub:attention}
-Attention mechanism \citep{Bahdanau} is widely used in NLP as a tool for extracting relevant informations from word sequences. For example when generating translation of some sentence, each word in target language corresponds to just few words in source sentence, not to a whole sentence. Attention gives weights to the words, which represents this connections (see picture \ref{pic:att_trans}).
+Attention mechanism \citep{Bahdanau} is widely used in NLP as a tool for extracting relevant information from word sequences. For example, when generating a sentence translation, each word in the target language corresponds to just a few words in the source sentence, not to a whole sentence. Attention gives weights to the words, which represents this connections (see picture \ref{pic:att_trans}).
 
 \begin{figure}[h]
-\label{pic:att_trans}
-\centering
 \includegraphics[width=0.7\columnwidth]{../img/attention_translate}
 \caption{Figure 3 of \citep{Bahdanau}
 }
+\label{pic:att_trans}
 \end{figure}
-
-
-When the task is a question answering, attention can help a model to focus on relevant part in the text, where the answer is located \citep{Santos2016}. For example see picture \ref{pic:att_cnn}
+When the task is a question answering, attention can help a model focus on a relevant part of the text, where the answer is located \citep{Santos2016}. For example see picture \ref{pic:att_cnn}
 
 \begin{figure}[h]
-\label{pic:att_cnn}
 \centering
 \includegraphics[width=0.7\columnwidth]{../img/attention_cnn}
 \caption{Figure 3 of \citep{Santos2016}
 }
+\label{pic:att_cnn}
 \end{figure}
-Same idea can be (and really is) applied into computer vision, where it imitates human behaviour. Humans also focuses on (or \textit{attend to}) just  a few parts of their visual input when they are, for example, recognizing things on pictures.
-Modification to an attention concept, called self-attention \citep{Cheng}, deals with relationships inside one part of text (e.g. a sentence). This variant of attention do not connect one part of text (like question) to other different part of text (like answer), but only models relationships inside one part. Attention has three inputs -- key, value and query, all vectors. The output is weighted sum of values and the weights are computed with respect to key-query pair \footnote{This video series helped me a lot with an understanding of self-attention concept: https://youtube.com/playlist?list=PL75e0qA87dlG-za8eLI6t0\_Pbxafk-cxb}. For more explanation, see picture \ref{pic:att_self}
+
+The same idea can be applied to computer vision, where it imitates human behavior. Humans also focus on (or \textit{attend to}) just a few parts of their visual input when they are, for example, recognizing things in pictures.
+Modification to an attention concept, called self-attention \citep{Cheng}, deals with relationships inside one part of the text (e.g., a sentence). This variant of attention do not connect one part of the text (like a question) to another distinct part of the text (like an answer) but only models relationships inside one part. To offer more technical details, attention has three inputs -- key, value, and query, all vectors. The output is a weighted sum of values, and the weights are computed with respect to key-query pair \footnote{This video series helped me a lot with an understanding of the self-attention concept: https://youtube.com/playlist?list=PL75e0qA87dlG-za8eLI6t0\_Pbxafk-cxb}. For more explanation, see picture \ref{pic:att_self}
 \begin{figure}[h]
-\label{pic:att_self}
 \centering
 \includegraphics[width=1\columnwidth]{../img/self_attention1}
-\caption{Self-attention mechanism scheme for one concrete query vector. The result is an embedding, which is improved by the context of the word. This picture illustrates result for first word embedding (l1) in a 4 words long text. Keys, values and a query are all multiplied by their respective weights ($W_k$, $W_v$ and $W_q$) before any other operation with them. These weights are trained during learning. Dot products between every word and a query are computed. Result is a number for every input word, so 4 numbers at the end. These numbers are normalized, so the sum of them is equal to 1. After that, these words serve as a weights ($M_x$), which indicates relationship between query and every other word. Resulting better embedding for the query is than obtained as a sum of the word embeddings weighted by these obtained weights. 
+\caption{Self-attention mechanism scheme for one concrete query vector. The result is an embedding, which is improved by the context of the word. This picture illustrates the result for the embedding of the first word (l1) in a four-word long text. Keys, values, and a query are all multiplied by their respective weights ($W_k$, $W_v$, and $W_q$) before any other operation with them. These weights are trained during learning. Dot products between every word and a query are computed. A result is a number for every input word, so four numbers at the end. These numbers are normalized, so the sum of them is equal to 1. These words serve as a weight ($M_x$), which indicates the relationship between the query and every other word. The resulting better embedding for the query is then obtained as a sum of the word embeddings weighted by these obtained weights. 
 }
+\label{pic:att_self}
 \end{figure}
-
-\par
-Together with transformers architecture, which is an important part of BERT and other language models used in this work, was also published a new approach to self-attention - \textit{multihead attention} \citep{Vaswani2017}. Multihead attention also tries to model relationships between the words in the same sequence. As it is multihead, it can, for one word, pay attention to more words (or their parts).  
-
-\subsection{Language modelling}
-\label{sub:models}
-Contextualization of embeddings is not important only because it solves the problem of same words with different meaning, but also because they are supposed to store a knowledge independent on any language. %TODO proč? : (Liu et al., 2019a; Hewitt and Liang, 2019; Hewitt and Manning, 2019; Tenney et al., 2019a) demonstrate across languages
-
-Contextualized embeddings can be obtained by supervised or unsupervised learning \citep{Liu2020}. This work focuses on unsupervised learning, as it is currently very promising field according to recent results and also because unsupervised learning does not depend on large manually created datasets. Supervised methods uses machine translation, which is the classic NLP task, but also natural language inference or other tasks with potential to capture general knowledge about language.
-
-Unsupervised learning tries to learn a language model -- probability distribution over a sequence of tokens given by following equation:
- \begin{equation*}
-  p(t_1, t_2,...,t_N) =\prod_{i=1}^{N} p(t_i | t_1, t_2, ..., t_{i-1})
-\end{equation*}.
-
-
-
+With transformers architecture, an important part of BERT and other language models used in this work, it also published a new approach to self-attention - \textit{multihead attention} \citep{Vaswani2017}. Multihead attention also tries to model relationships between the words in the same sequence. As it is multiheaded, it can, for one word, pay attention to more words (or their parts) (see figure \ref{pic:att_multi}.
+\begin{figure}[h]
+\centering
+\includegraphics[width=1\columnwidth]{../img/attention_multi}
+\caption{Figure 2 from \citep{Vaswani2017}. %TODO popisek
+}
+\label{pic:att_multi}
+\end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%GRU, LSTM, Transformers
 \subsection{Recurrent Neural Networks}
 \label{sub:RNN}
- %TODO napojit nějak normálně 
- % %TODO vysvetlit
-Text sequences can be very long and related words often has logn distance in between. This places hard demands on neural networks, because such data structure differs from most of other NN applications, where input samples are independent and ordering does not matter. This can also leads to vanishing/exploding gradients, because information should be carried for many steps, which leads in many multiplications of very small or big numbers in neural networks.
-
-The construction of such networks, which are able to capture natural language structure requires solving two problems:
+Text sequences can be very long, and related words often have a long distance in between. This fact places challenging demands on neural networks because such data structure differs from most other NN applications, where input samples are independent, and order does not matter. Text size can also lead to vanishing/exploding gradients because information should be carried for many steps, leading to many multiplications of very small or big numbers in neural networks. The construction of such networks, which can capture natural language structure, requires solving two problems:
 \begin{itemize}
-\item input should be understood by network as a sequence,
-\item there must be a possibility to use information from other parts of sentence (and do not forget them).
+\item input should be understood by the network as a sequence,
+\item there must be a possibility to use information from other parts of the sentence (and do not forget them).
 \end{itemize}
- First problem was solved by simple Recurrent Neural Networks (RNN). To represent an ordering and a continuity of input words, basic RNN adds a connection between output for one word and an input for the next word (see picture \ref{pic:rnn}). 
+The first problem was solved by simple Recurrent Neural Networks (RNN). To represent an ordering and a continuity of input words, basic RNN adds a connection between the output for one word and an input for the next word (see picture \ref{pic:rnn}). 
  
 \begin{figure}[h]
 \centering
@@ -290,12 +194,10 @@ The construction of such networks, which are able to capture natural language st
 \protect\caption{Basic Recurent neural network architecture. It is composed by one rnn cell which recurrently uses informations from previous seen input. For better illustration of working in the time, RNN can be visualised as a chain of cells connected by a result of previous cell. source: \textit{Picture from https://medium.com/deeplearningbrasilia/deep-learning-recurrent-neural-networks-f9482a24d010}.}
 \label{pic:rnn}
 \end{figure}
- 
- 
- 
-The latter problem needs a more complicated approach. There are basically three attempts to solve this \textit{short memory} of RNN cells -- Gated Recurrent Unit (GRU) \citep{Cho2014}, Long Short Term Memory (LSTM) \citep{Hochreiter1997} and Transformers architecture \citep{Vaswani2017} with attention mechanism.
+
+The latter problem needs a more complicated approach. There are three attempts to solve this \textit{short memory} of RNN cells -- Gated Recurrent Unit (GRU) \citep{Cho2014}, Long Short Term Memory (LSTM) \citep{Hochreiter1997} and Transformers architecture \citep{Vaswani2017} with an attention mechanism.
 \par
-Both LSTM and GRU uses an idea of gating. Term \textit{gate} refers to a weight (multiplication factor) for previous informations and new input. Gate determines which information from previous words should be remembered and which should be forgotten. To achieve this, gate is formed by sigmoid activation function, which range is from 0 to 1 and present a portion of remembered information. Previous informations are encoded in a cell state and a hidden state, both passed from cell to cell (with application of gates). Comparison of both architectures can be found on figure \ref{pic:lstm_gru}.
+Both LSTM and GRU uses an idea of gating. Term \textit{gate} refers to a weight (multiplication factor) for previous informations and new input. Gate determines which information from previous words should be remembered and which should be forgotten. For regulating the memory, the gate is formed by the sigmoid activation function, ranging from 0 to 1 and presenting a portion of remembered information. Previous information is encoded in a cell state and a hidden state, both passed from cell to cell (with the application of gates). Comparison of both architectures can be found in figure \ref{pic:lstm_gru}.
 
 \begin{figure}[h]
 \centering
@@ -304,22 +206,14 @@ Both LSTM and GRU uses an idea of gating. Term \textit{gate} refers to a weight 
 \label{pic:lstm_gru}
 \end{figure}
 \subsubsection*{LSTM} LSTM cell uses input, output and forget gate. Every gate is composed by sigmoid function with actual input and previous hidden state as inputs.
-\textit{Forget gate} filters information from previous cell state. Input gate decides which parts of input will affect the results. Output gate then selects which part of the result will be actually part of an output. Source: \textit{\citep{rnn_paper}}%see picture 
-%see picture with gates and equations!
-%http://colah.github.io/posts/2015-08-Understanding-LSTMs/
+\textit{Forget gate} filters information from previous cell state. Input gate decides which parts of input will affect the results. Output gate then selects which part of the result will be actually part of an output. Source: \textit{\citep{rnn_paper}}
 \subsubsection*{GRU}
-GRU also uses gates: reset gate and update gate. %todo obrzek s popisem.
-Reset gate is responsible for how much of previous state will take in the new state. Update gate is then weight for a combination for previous and current states, which together form new output.
-
+GRU also uses gates: reset gate and update gate.
+The reset gate is responsible for how much of the previous state will take in the new state. Update gate serves as a weight for a combination of previous and current states, which form new output.
 
 \subsection{Transformers}
 \label{sub:transformers}
-A Tranformers architecture was proposed in 2017, in a paper Attention Is All You Need \citep{Vaswani2017} and essentially depends on self-attention mechanism (see subsection \ref{sub:attention}). In the example of sentence processing, attention in nutshell is able to tell us which other words are important while determining something about currently processed word.
-Tranformers uses encoder-decoder architecture, which was simultaneously publicated in 2014 by \citep{Cho2014}, \citep{Sutskever2014} and \citep{Wu2016}. The basic idea behind this architecture is following: encoder and decoder are connected by some middle layer of fixed size which aims to be good representation of an input. Encoder reads its input and tries to learn such weights, that encoder's final representation of the input contains all important information. This representation than serves as an input into decoder and tries to produce best results. It was first use for machine translation, so the output of the encoder in this case is a sentence in the target language with same meaning as original input. 
-%Transformers architecture is formed by more than one encoder and the same number of decoders. So the input is processed by a sequence of encoders and then by a sequence of decoders (with shortcuts between decoders line input and every layer).
-\ref{pic:enco_deco}  \ref{pic:enco_deco_all} %TODO dopsat popisy
-
- %TODO obrazek encoder_decoder http://jalammar.github.io/illustrated-transformer/
+A Tranformers architecture was proposed in 2017, in a paper Attention Is All You Need \citep{Vaswani2017} and essentially depends on a self-attention mechanism (see subsection \ref{sub:attention}). In the example of sentence processing, attention is able to tell us which other words are important while determining something about the currently processed word. Tranformers uses encoder-decoder architecture, which was simultaneously published in 2014 by \citep{Cho2014}, \citep{Sutskever2014} and \citep{Wu2016}. This architecture's basic idea is the following: encoder and decoder are connected by some middle layer of fixed size, aiming to be a good representation of the input. The encoder reads its input and tries to learn such weights that the encoder's final representation of the input contains all important information. This representation serves as an input into the decoder, which tries to produce the best results. It was first used for machine translation, so the decoder's output, in this case, is a sentence in the target language with the same meaning as an original input (see figures \ref{pic:enco_deco}  and \ref{pic:enco_deco_all}).
 \begin{figure}[h]
 \centering
 \includegraphics[width=1\columnwidth]{../img/encoder_decoder}
@@ -330,30 +224,83 @@ Tranformers uses encoder-decoder architecture, which was simultaneously publicat
 \begin{figure}[h]
 \centering
 \includegraphics[width=1\columnwidth]{../img/encoder_decoder_all}
-\protect\caption{ In transformers, encoder and decoder parts are both composed by many of block of respective types. The input goes first through a series of encoders and than the output of encoder part is put into every decoder in the decoder part. %TODO říct proč 
+\protect\caption{ In transformers, encoder and decoder parts are both composed by many of block of respective types. The input goes first through a series of encoders and than the output of encoder part is put into every decoder in the decoder part. %TODO říct proč
 source: http://jalammar.github.io/illustrated-transformer/  }
 \label{pic:enco_deco_all}
 \end{figure}
+A self-attention mechanism is supposed to select the most important words to be focused on and used in many places -- for the input of every encoder layer, for the input of every decoder layer (although masked), and also between encoder and decoder. On the decoder side, the self-attention layer is masked so the decoder can "see" just previous words (there are $-inf$ values in the positions on the right side). For a representation of word position in the sentence (as it is not an RNN cell and it can process all words simultaneously), transformers use position embeddings, which are trained to represent the sentence's ordering.
 
-%TODO a  encoder_decoder_all
-Self-attention mechanism which is supposed to select most important words to be focused on is used on many places -- for input of every encoder layer, input of every decoder layer (although masked) and also between encoder and decoder. On the decoder side, self-attention layer is masked so the decoder can "see" just previous words (there are $-inf$ values in the positions on the right side). For representation of word position in the sentence (as it is not RNN cell and it can process all words simultaneously) Transformers uses position embeddings, which are trained to represent the ordering in the sentence.
-%fixed length vector
-%recurrent and shortuct links,normalization
+\subsection{Transfer learning}
+\label{sub:models}
+Transfer learning is a very important idea because it allows, as the name suggests, to transfer learned knowledge between different tasks. 
+%According to bla bla it is leading in industry
+Reusing the knowledge can lead to lower training times with fewer demands on technical resources (GPU, CPU) and training data size. It even allows to successfully apply automatic processing into domains where labeled data are not available by transferring the knowledge from another domain with enough training examples. In addition, usage of underlying common knowledge between different tasks can also improve the results of learning algorithms on each task. %TODO{as can be seen where?}
+
+One of the first big successes of transfer learning comes from the computer vision field by using models pretrained on ImageNet (currently also on other datasets). ImageNet %TODO cite ImageNet Large Scale Visual Recognition Challenge 
+is a big dataset of labeled pictures. %TODO jak vypadají labely 
+Many large deep models were trained on this dataset and then applied to different computer vision tasks with great success \citep{Huh}. %TODO nekam ze proc to funguje a co vsechno se uci se stale zkouma
+%TODO Ruder obrázek taxonomie transfer learningu
+Following the taxonomy in figure \ref{pic:tl_taxonomy}, currently most important transfer learning applications in NLP falls into \textit{sequential transfer learning} category. Machine learning models are first trained on some tasks, and the trained result is then used in many different tasks.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\columnwidth]{../img/tl_taxonomy}
+\caption{Figure from \protect\citep{Ruder2019} offers possible taxonomy for transfer learning. %TODO co je to domena
+Transfer learning allows the use of trained models on tasks with different sets of labels or different input data's nature. Input data can vary in domain they come from (wikipedia text versus a novel or a social network posts), they can learn from different features (e.g. different languages) or the distribution of classes is different than it was in the training data (so some highly presented classes in training data are rare in this new task and others are quite common but previously not seen too many times).
+}
+\label{pic:tl_taxonomy}
+\end{figure}
+For natural language processing, transfer learning is currently mainly represented by contextualized embeddings obtained from pretrained language models.
+Contextualization of embeddings is not important only because it solves the problem of homonyms but also because they are supposed to store knowledge independent of any language.  \citep{Feijo2020}.  %TODO proč? : (Liu et al., 2019a; Hewitt and Liang, 2019; Hewitt and Manning, 2019; Tenney et al., 2019a) demonstrate across languages
+
+Contextualized embeddings can be obtained by supervised or unsupervised learning \citep{Liu2020}. This work focuses on unsupervised learning, as it is currently a promising field according to recent results and because unsupervised learning does not depend on large manually created datasets. \footnote{This is a slight terminology inaccuracy. In section \ref{sub:ml}, unsupervised learning was defined as a task where data does not contain correct answer. BERT and derived models, however, use pretraining tasks where the input does not need the manual annotation, but in training itself, individual experiences are provided with the correct answer.} Supervised methods use machine translation, which is the classic NLP task, but also natural language inference or other tasks with the potential to capture general knowledge about language.
+
+Unsupervised learning tries to learn a language model -- a probability distribution over a sequence of tokens given by the following equation:
+ \begin{equation*}
+  p(t_1, t_2,...,t_N) =\prod_{i=1}^{N} p(t_i | t_1, t_2, ..., t_{i-1})
+\end{equation*} \citep{Liu2020}. To reduce this problem, it is possible to consider only fixed size sequences of $n-1$ previous words for every word probability called \textit{n-grams} \citep{Bengio2003}.
+%TODO kromě liu ještě nějaký zdroj na language modelling - bengio2003
+To achieve the goal of learning a language model, one can use many different tasks, which are believed to force the network to learn useful knowledge about language. 
+First attempts were made with autoencoders (read the text, encode and decode back) \citep{Dai2015} and machine translation \citep{Ramachandran2017}, but later papers come with better architectures and various new objectives which are described later in sectio \ref{sec:bert}. %TODO ze to bude lepe popsane pozdeji
+
+%TODO predelat tabulku z Liu2020 aby tam byly i jména atd.
+
+%TODO pridat jak se to pouziva:  nebo jak by mohlo
+%\citep{Howard2018} 
+There are generally two ways to transfer learned knowledge \citep{Feijo2020}: extract some representation from the model and use it in another model statically or modify a model by changing the head and \textit{finetunne} the whole newly created model for a specific task. There is also a possibility to combine both approaches and, at first, take static features as an input for training, and then when the head starts to perform well, fine-tune the whole model with this better head, so the original weights converge more efficiently to the wanted solution. More detail is offered in \ref{sub:howto}.
 
 
+%TODO a \citep{Sun} finetunning
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Relevant methods
 \section{BERT explanation}
 \label{sec:bert}
-This work mainly relies on Bidirectional Encoder Representations from Transformers (BERT) \citep{Devlin2019}, so this section describes and explains main mechanisms of this model. Importance of BERT model is connected with an idea of \textit{transfer learning}. This techniques uses previously learned knowledge and applies such pretrained model on another task \citep{Feijo2020}. BERT is an example of such technique. BERT is trained on two tasks -- next sentence prediction and masked language modelling, but its strength does not lie directly in an ability to predict missing word. These two task are just a way how to teach a model something important about language in general. Final model can be used for almost every NLP task just by changing classification head. There are generaly two ways, how to transfer learned knowledge \citep{Feijo2020}: extract some representation from the model and use in another model statically or modify a model by changing the head and \textit{finetunne} the whole newly created model for specific task. There is also a possibility to combine both approaches and at first take static features as an input for trainig and than, when the head starts to perform well, finetune whole model with this better head, so the original weights converge more efficiently to wanted solution.
+This work mainly relies on Bidirectional Encoder Representations from Transformers (BERT) \citep{Devlin2019} and its variants, so this section describes and explains the main features of this model. BERT is a pre-trained language model that is then fine-tuned for many other tasks, so it is an example of transfer learning (see \ref{sub:models}).
+For the purpose of training a language model, BERT is trained on two tasks -- next sentence prediction and masked language modeling. These two tasks are just a way to teach a model something important about language in general, the same way as training on ImageNet classification helps computer vision models the power to solve more sophisticated tasks. Result BERT model can be used for almost every NLP task just by changing the classification head. BERT is very successful in solving NLP tasks, although it was overcome in many tasks by later derived models. 
+%TODO proč je to dobré, nějaké výsledky!!!!
 
-%TODO jak je super, že to je bidirectional
+The second part of its popularity is the transfer learning feature of BERT. Google %todo autoři článku, 
+published pre-trained models for English and later also for Chinese and multilingual model and other monolingual models were also published by other authors. ( %TODO jak bert?)
+Training of the language model requires a considerable amount of data 
+and computational time, but it is needed to be done just once. When the model is trained, it can be used for many tasks by changing the classification head and training only newly added layers and/or training all layers (but in this case only for a few episodes and with smaller data) and still performing on the state-of-the-art level. %TODO presny popis 
+% The performance of multilingual model can be doubt, especially in the case of smaller languages, so more monolingual models were published all over the world after that. This is very important feature. 
+% nejake jsou primo v BERTovi
+
+%TODO jak je super, že to je bidirectional narozdíl od...
+
+%TODO jak se používá ta multilingual verze a jaké jsou jazykové verze
 
 %TODO dky se to objevil ten transfer learning, v čem se bert neliší a v čem ano.
-The core of BERT algorithm is based on these three features -- two unsupervised task for pretraining, input and its embeddings and transformers encoder architecture. %TODO něco o tom transfer learningu?
+The core of BERT algorithm is based on these three features
+\begin{itemize}
+\item two unsupervised task for pretraining,
+\item input embeddings
+\item transformers encoder architecture
+\end{itemize}
+, which will be described in the following sections.
 
 \subsection{Input embeddings}
 %todo obrazek
-BERT uses concatenation of three types of embeddings as an input representation -- token embeddings, position embeddings and segment embeddings. %todo figura z berta
+BERT uses the concatenation of three types of embeddings as an input representation -- token embeddings, position embeddings, and segment embeddings. %todo figura z berta
 
 \begin{figure}[h]
 \centering
@@ -364,51 +311,83 @@ Source: \textit{\citep{Devlin2019}}.}
 \end{figure}
 
 \subsubsection*{Token embeddings}
-Input of BERT model can be one or two word sequences (not necessarily two sentences, but e.g. also paragraphs). All words are split into tokens and converted into embeddings with a use of pretrained embeddings model. One word can be tokenized into more tokens, because BERT uses WordPiece %todo zdroj
-embeddings \citep{Wu2016}. WordPiece pretrained embedding algorithm was originaly created for task of Google voice search for Asian languages and is designed to minimize an occurrence of unknown word tokens. %TODO někam napsat proč se tohle děje
-WordPiece model was not pretrained as a part of BERT paper experiments, but represents quite interesting solution, so I will briefly explain the idea. It is impossible to prepare embeddings for every possible word in a language, because this would cause intractably long size of embeddings. Every word which is not a part of selected embedding set is encoded in the same way as a unknown word. This situation is not desired, because we lost informations about words. WordPiece deals this problem in following manner: In the first iteration of training, the model creates embeddings only for basic characters. In every other iteration, some existing model words are concatenated together in the way that cause the highest likelihood of input text. As a result of this method, some words will be embedded as one word and some will be split into more tokens as can be seen on figure. %todo obrazek
+The BERT model input can be one or two sequences (not necessarily two sentences, but e.g., also paragraphs) \footnote{Different terminology is used here than in the original paper. In \citep{Devlin2019}, \textit{sentence} is a term for a whole part of input (fist or second), while a term \textit{sequence} is used for whole bert input compound from one or two \textit{sentences}}. All words are split into tokens and converted into embeddings with the use of a pretrained embeddings model. One word can be tokenized into more tokens because BERT uses WordPiece %todo zdroj
+embeddings \citep{Wu2016}. WordPiece pretrained embedding algorithm was originaly created for the task of Google voice search for Asian languages and is designed to minimize unknown word tokens. %TODO někam napsat proč se tohle děje
+WordPiece model was not pretrained as a part of BERT paper experiments, but represents a quite interesting solution, so the idea will be briefly explained here.
+
+It is impossible to prepare embeddings for every possible word in a language because this would cause an intractably long embedding size. Every word which is not a part of the selected embedding set is encoded in the same way as an unknown word. This situation is not desired because we lost information about words. WordPiece deals with this problem in the following manner: In the first iteration of training, the model creates embeddings only for characters. In every other iteration, some existing model words are concatenated together in a way that causes the highest likelihood of input text. As a result of this method, some words will be embedded as one word, and some will be split into more tokens, as can be seen in figure \ref{pic:bert_inp}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1\columnwidth]{../img/bert_input}
+\protect\caption{This figure illustrates a transformation of one input sentence (from PDT3) to suit bert input expectations. The sentence is divided into words and then into tokens from wordpiece tokenizer vocabulary. Accents may be removed depending on the used model. The sentence is decorated with special CLS and SEP tokens to mark the beginning and the end of the sentence. All tokens are then converted into numbers. }
+\label{pic:bert_inp}
+\end{figure}
+
+
 \par
-There are three other tokens which are added after this step -- CLS, END, SEP. 
-CLS token is added at the beginning of the input and is used as first sequence embedding for classification tasks (as sentence analysis). SEP token separates both sequences and END token is appended at the end. Whole input transformation can be seen on figure \ref{pic:bert_emb}.
+Three other tokens are added after this step -- CLS, END, SEP. 
+CLS token is added at the beginning of the input and is used as the first sequence embedding for classification tasks (as sentence analysis). SEP token separates both sequences, and END token is appended at the end. Whole input transformation can be seen on figure \ref{pic:bert_emb}. %TODO nejsem si jistá tím END
 
 \subsubsection*{Position embeddings}
-All input tokens are processed simultaneously, that is the reason why BERT is often called \textit{undirectional} rather than \textit{bidirectional}. This featrue causes an absence of information about order of tokens. However, nature of the language is sequential, bunch of words without an order has no language meaning and capturing this problem leaded to recurrent neural networks at first. In BERT is no recurrent cell, and this problem is solved by position embeddings. They have same shape as token embeddings (and also as segment embeddings) and they are learned the same way as other embedding layers. Maximum input size in original BERT is 512 so this embedding layer shoulb be able to represent position from 1 to 512. This learning is a difference from original transformers, where position was also encoded as embeddings, but they  were fixed, not learned.
+All input tokens are processed simultaneously. That is the reason why BERT is often called \textit{undirectional} rather than \textit{bidirectional}. This feature causes an absence of information about the order of tokens. However, the nature of the language is sequential. A bunch of words without an order has no language meaning, and capturing this problem led to recurrent neural networks at first. In BERT is no recurrent cell, and instead, position embeddings solve this problem. They have the same shape as token embeddings (and as segment embeddings), and they are learned the same way as other embedding layers. The original BERT's maximum input size is 512, so this embedding layer should represent positions from 1 to 512. This learning is different from original transformers, where the position was also encoded as embeddings, but embeddings were fixed, not learned.
 
 \subsubsection*{Segment embeddings}
-These emebddings just indicates whether the token belongs to first or second part of input. It has same dimension as position and token embeddings and they are also learned. Beccause BERT input can consist from at most two parts, segment embeddings just encode whether the token belongs to first or second part.
+These embeddings indicate whether the token belongs to the first or second part of the input. It has the same dimension as position and token embeddings, and they are also learned. Because BERT input can consist of at most two parts, segment embeddings encode whether the token belongs to the first or second part.
 
 \subsection{Pretraining tasks}
 
 %TODO narozdil od jinych modelu co jsou trenovane jednosmerne blabla...
-BERT is pretrained on two unsupervised tasks -- Next Sentence Prediction (NSP) and Masked LM (MLM). These two tasks were chosen specifically because BERT's authors belief they can force language model to learn general and useful knowledge about language. 
+BERT is pretrained on two unsupervised tasks -- Next Sentence Prediction (NSP) and Masked language modeling (MLM). These two tasks were chosen because BERT's authors believe they can force language models to learn general and valuable knowledge about language.
 
-\subsubsection*{Next Sentence Prediction}
-Input of the BERT model for this task are two sentences, A and B. In 50\% of cases, sentence B is sentence which really follows sentence A in the source text. Otherwise it is random sentence from the text. A goal of the task is decision whether sentence B is following or random, i.e. binary classification. Motivation for this task is a need to represent relationships between sentences, not only between words. Experiments in \citep{
-Devlin2019} showed its usefulness for text tasks as question answering. Sentence-level classification with BERT as in this case can be performed by using last hidden representation of CLS token (first token of every input example). Authors assume that this token can work as a summary of the whole sentence.
+\subsubsection{Next Sentence Prediction}
+The input of the BERT model for this task is two sentences, A and B. In 50\% of cases, sentence B is the sentence that follows sentence A in the source text. Otherwise, it is a random sentence from the text. A goal of the task is whether sentence B is following or random, i.e., binary classification. The motivation for this task is a need to represent relationships between sentences, not only between words. Experiments in \citep{
+Devlin2019} showed its usefulness for text tasks as question answering. Sentence-level classification with BERT, as in this case, can be performed by using the last hidden representation of CLS token (the first token of every input example). Authors assumed that this token could work as a summary of the whole sentence, although later work has shown better approaches. %TODO nejake zdroje
 
-\subsubsection*{Masked Language Modeling}
+\subsubsection{Masked Language Modeling}
 Masked Language Modeling or in other words Cloze task \citep{Taylor1953}
-consist of prediction of some missing words in text. In the case of BERT, its implementing in the following way: 15\% of tokens in each sequence are chosen. For each of this chosen tokens there is 80\% chance to be replaced by MASK token, 10\% chance to by replaced by random token or it will remain unchanged with 10\% probability. This ensures that the model will try to predict tokens not only in the case of MASK token presence. For backpropagation, only predictions of MASK token are taken into account. Prediction is done by a softmax function which input is last hidden representation of respective token and softmax layer outputs a probability distribution for prediction of every possible word.
+consist of prediction of some missing words in the text. In BERT's case, its implementing in the following way: 15\% of tokens in each sequence is chosen. For each of these chosen tokens, there is 80\% chance to be replaced by a MASK token, 10\% chance to be replaced by a random token or it will remain unchanged with 10\% probability. This way of masking ensures that the model will try to predict tokens not only in MASK token presence. For backpropagation, only predictions of the MASK token are taken into account. Prediction is made by a softmax function whose input is the last hidden representation of the respective token, and softmax layer outputs a probability distribution for predicting every possible word. %TODO to je včetně appendixu
 
 \subsection{Transformers encoder architecture}
 BERT adapts encoder part of architecture from original Transformers paper   \citep{Vaswani2017} (see section \ref{sub:transformers}).
-Actually, BERT uses its encoder architecture for each layer, 
-%todo odkaz a vysvetlit
- o there is L (e.g. 12 in the case of BERT base model) encoder layers finished with one fully connected layer for specific task. In pretraining, there is only one layer responsible for MLM and NSP, as each task uses different part of last hidden layer informations. %todo obrazek architektury
+BERT uses its encoder architecture for each layer, 
+ so L encoder layers are finished with one fully connected layer for a specific task. The original paper presents two sizes of architecture: base and large. Their comparison can be seen in figure %TODO dodelat obrazek staci z paperu
+ 
+  
+
+ %TODO obrazek architektury
  
  %TODO hyperparametry 
  %TODO dalsi modely - model compression je popsaná v článku Liu2020
  %TODO liu2020 predstavuje co potrebujeme vedet - co by se dalo zkoumat
  %TODO v cem jsou dobre
+ 
+ \subsection{How to use BERT}
+ \label{sub:howto}
+ For using on a new tasks, there are basically two possibilities:
+ \begin{itemize}
+ \item one data pass through BERT to generate embeddings
+ \item add new classification head(s) and train whole model
+ \end{itemize}.
+ In the first case, the model is used only once to generate embeddings for all input data. These embeddings are stored and later fed to any other NLP model like regular embeddings. Technically this can be achieved by stacking the second model on the top of BERT and freeze (disable training) on BERT layers, but whit would be time and memory more consuming. This method is valid, the results will more likely be improved by using BERT embeddings over some other types, but as BERT paper suggests, this method loses some language model potential. %TODO jake jsou moznosti vytvorit ty embeddings?
+%Semi-supervised Sequence Learning and ULMFiT.
+ In the second case, a typical scenario based on  
+ is following:
+ Classification head or more sophisticated model is stacked on the top of BERT. In the first phase, this whole new model is trained as if it was using only BERT embeddings, i.e., BERT part is frozen. This phase takes a fair amount of episodes %TODO  co je typicke
+ and typical learning rate around %TODO doplnit. 
+ After that, when the model is not a totally random mess and returns quite decent results, the whole model, including BERT layers, is further trained (finetunned) for few episodes and with a significantly smaller learning rate, e.g. %TODO doplnit.
+ This training practice's motivation is the belief that the original language model captured many generally applicable information about the language and is better than random initialization. Because the model is large and supervised data are usually not so big, it is undesirable to train the whole model, as it can take a long time to convergence and randomly mess up with the trained model's knowledge. After the first training phase, however, the classification head knows the right direction, figuratively speaking, and with the small learning rate, the goal is just to customize the language model a bit for current tasks. %TODO ZDROJE!!!
+
  \subsection{Why is BERT so special?}
  \label{sub:specialBert}
  %napsat ze je special a proc -- vysledky, asi v teorii a odkaz dát sem
-For deep learning architectures, it is quite common that reason why they work (especially why they work so well in comparison with other posibilities) is not visible at first sight. Authors offers following explanation. In contrast to other SOTA league language models, BERT uses both bidirectional context of words. In the figure %todo obrazek z berta
+For deep learning architectures, it is quite common that why they work (especially why they work so well compared to other possibilities) is not visible at first sight. The authors offer the following explanation. In contrast to other SOTA league language models, BERT uses both contexts of words. In the figure %todo obrazek z berta
 is a comaprison of two other such models - ELMo and GTP %todo zdroje
 . GTP is also based on Transformers architecture, but unlike BERT, it uses decoder part of Transformer. 
-GTP uses just left context of the word, as a sentence is proceeded sequentially. ELMo uses LSTM %todo odkaz
-with both left-to-right and right-to-left training and concatenates results at the end. BERT is proceeding both sides context simultaneously and due to an architecture, in \textit{every layer} every transformer block has potentially information from every other block (and thus from every other word). That is the reason, why BERT is called \textbf{deeply} bidirectional or also non-directional (because there is no right-to-left or left-to-right direction of processing).
+GTP uses just the left context of the word, as a sentence is processed sequentially. ELMo uses LSTM %todo odkaz
+with both left-to-right and right-to-left training and concatenates results at the end. BERT is proceeding both sides context simultaneously, and due to architecture, in \textit{every layer} every transformer block potentially has information from every other block (and thus from every other word). That is why BERT is called \textbf{deeply} bidirectional or non-directional (because there is no right-to-left or left-to-right direction of processing).
 \par
-Explanation of why and how BERT works are, however, not so simple. There are many papers on how BERT works, what BERT really learns and know, how BERT architecture can be simplyfied and so on. There actually appeared new term "bertology" for this area of research.
+Responses to questions why and how BERT works are, however, not so simple. There are many papers on how BERT works, what BERT learns and knows, how BERT architecture can be simplified and so on. There appeared new term "bertology" for this area of research.
  
+
 

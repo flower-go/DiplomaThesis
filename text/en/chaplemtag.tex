@@ -1,6 +1,40 @@
 \chapter{Task 1: Lemmatization and part-of-speech tagging}
 \label{chap:tag}
 %TODO definice
+Czech morphology developement is dated from 1989 %TODO zdroj Hajič.
+and in description of words uses 15-places morphological tags \citep{Hana2005}.
+A more detailed description of each position can be seen in table \ref{Tab:tagset}.
+
+\begin{table}
+\centering
+\label{Tab:tagset}
+\begin{tabular}{ |c|c|c| } 
+
+
+ \hline
+ Position & Name & Description \\ 
+ \hline \hline
+ 1 & POS & Part of speech \\ \hline
+ 2 & SubPOS & Detailed part of speech \\ \hline
+  3 & Gender & Gender \\ \hline
+4 & Number & Number \\\hline
+  5 & Case & Case \\ \hline
+ 6 & PossGender & Possessor's gender \\\hline
+  7 & PossNumber & Possessor's number \\ \hline
+8 & Person & Person \\\hline
+  9 & Tense & Tense \\ \hline
+ 10 & Grade & Degree of comparison\\\hline
+  11 & Negation & Negation \\ \hline
+ 12 & Voice & Voice \\\hline
+ 13 & Reserve1 & Reserve \\ \hline
+14 & Reserve2 & Reserve \\\hline
+  15 & Var & Variant, style \\ 
+ \hline
+
+\end{tabular}
+\caption{Table from \citep{Hana2005} describes all 15 positions of Czech morphological tagging.
+} 
+\end{table}
 %TODO related work
 %TODO sota
 This work aims to improve previously published SOTA results for contextualized embeddings in czech lemmatization and tagging \citep{Straka2019}. 
@@ -21,5 +55,13 @@ This work aims to improve previously published SOTA results for contextualized e
 \end{table}
 %TODO jak jsem to udelala
 %TODO  vysledky
+
+\citep{Horsmann}
+\citep{Plank}
+\citep{Plisson}
+\citep{Straka2019b}
+\citep{Straka2019a}
+\citep{Toutanova2003}
+\citep{Wang2015}
 
 

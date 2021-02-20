@@ -37,6 +37,7 @@
 
 \DeclareUnicodeCharacter{00B4}{}
 
+
 %% Further useful packages (included in most LaTeX distributions)
 \usepackage{todonotes}
 \usepackage{nameref}
@@ -127,6 +128,12 @@ Most of the evaluation have been carried out on English. However, several of the
 
 \tableofcontents
 
+
+%%% Abbreviations used in the thesis, if any, including their explanation
+%%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.
+%\chapwithtoc{List of Abbreviations}
+\printglossary[title=List of Abbreviations]
+
 %%% Each chapter is kept in a separate file
 \include{preface}
 \include{chap01}
@@ -149,11 +156,6 @@ Most of the evaluation have been carried out on English. However, several of the
 %%% Tables used in the thesis (consider if this is needed)
 %%% In mathematical theses, it could be better to move the list of tables to the beginning of the thesis.
 \listoftables
-
-%%% Abbreviations used in the thesis, if any, including their explanation
-%%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.
-%\chapwithtoc{List of Abbreviations}
-\printglossary[title=List of Abbreviations]
 
 %%% Attachments to the master thesis, if any. Each attachment must be
 %%% referred to at least once from the text of the thesis. Attachments

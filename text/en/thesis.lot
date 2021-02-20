@@ -1,5 +1,13 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {2.1}{\ignorespaces Table from \citep {Hana2005} describes all 15 positions of Czech morphological tagging. }}{27}{table.2.1}% 
+\contentsline {table}{\numberline {2.2}{\ignorespaces Straka2019B is the best solution from \citep {Straka2019} paper. Straka2019C is a comparable solution (BERT embeddings only), which was transformed into TF2 in this work.}}{27}{table.2.2}% 
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {7.1}{\ignorespaces }}{38}{table.7.1}% 
+\contentsline {table}{\numberline {7.2}{\ignorespaces }}{39}{table.7.2}% 
+\contentsline {table}{\numberline {7.3}{\ignorespaces }}{39}{table.7.3}% 
 \addvspace {10\p@ }
