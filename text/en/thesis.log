@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.11.16)  20 FEB 2021 18:23
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.11.16)  3 MAR 2021 19:56
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1047,7 +1047,7 @@ loading the todonotes package. on input line 124.
 
 (./title.tex
 Package hyperref Info: Option `pageanchor' set `false' on input line 6.
-<../img/logo-en.pdf, id=214, 506.4591pt x 156.49065pt>
+<../img/logo-en.pdf, id=210, 506.4591pt x 156.49065pt>
 File: ../img/logo-en.pdf Graphic file (type pdf)
 <use ../img/logo-en.pdf>
 Package pdftex.def Info: ../img/logo-en.pdf  used on input line 9.
@@ -1134,14 +1134,14 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <7> on input line 34.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <5> on input line 34.
-<../img/syntax_depedency_trees.png, id=362, 537.50812pt x 237.13594pt>
+<../img/syntax_depedency_trees.png, id=357, 537.50812pt x 237.13594pt>
 File: ../img/syntax_depedency_trees.png Graphic file (type png)
 <use ../img/syntax_depedency_trees.png>
 Package pdftex.def Info: ../img/syntax_depedency_trees.png  used on input line 
 38.
 (pdftex.def)             Requested size: 412.56496pt x 182.01266pt.
  [5]
-<../img/prague_dep_treebank.png, id=379, 919.93687pt x 490.08093pt>
+<../img/prague_dep_treebank.png, id=374, 919.93687pt x 490.08093pt>
 File: ../img/prague_dep_treebank.png Graphic file (type png)
 <use ../img/prague_dep_treebank.png>
 Package pdftex.def Info: ../img/prague_dep_treebank.png  used on input line 46.
@@ -1161,12 +1161,12 @@ gnored
                                                   
 l.54 
       <../img/prague_dep_treebank.png>] [8]
-<../img/perceptron.pdf, id=450, 268.12169pt x 139.4811pt>
+<../img/perceptron.pdf, id=445, 268.12169pt x 139.4811pt>
 File: ../img/perceptron.pdf Graphic file (type pdf)
 <use ../img/perceptron.pdf>
 Package pdftex.def Info: ../img/perceptron.pdf  used on input line 69.
 (pdftex.def)             Requested size: 330.05322pt x 171.71608pt.
-<../img/xor.pdf, id=454, 592.13219pt x 196.8153pt>
+<../img/xor.pdf, id=449, 592.13219pt x 196.8153pt>
 File: ../img/xor.pdf Graphic file (type pdf)
 <use ../img/xor.pdf>
 Package pdftex.def Info: ../img/xor.pdf  used on input line 78.
@@ -1194,7 +1194,7 @@ pdfTeX warning: /Library/TeX/texbin/pdflatex (file ../img/xor.pdf): PDF inclusi
 on: invalid other resource which is no dict (key 'ProcSets', type <array>); ign
 ored.
 >]
-<../img/multilayer.pdf, id=513, 376.52669pt x 277.035pt>
+<../img/multilayer.pdf, id=508, 376.52669pt x 277.035pt>
 File: ../img/multilayer.pdf Graphic file (type pdf)
 <use ../img/multilayer.pdf>
 Package pdftex.def Info: ../img/multilayer.pdf  used on input line 91.
@@ -1211,7 +1211,7 @@ pdfTeX warning: /Library/TeX/texbin/pdflatex (file ../img/multilayer.pdf): PDF
 inclusion: invalid other resource which is no dict (key 'ProcSets', type <array
 >); ignored.
 >]
-<../img/overfitting.pdf, id=563, 349.305pt x 139.4811pt>
+<../img/overfitting.pdf, id=558, 349.305pt x 139.4811pt>
 File: ../img/overfitting.pdf Graphic file (type pdf)
 <use ../img/overfitting.pdf>
 Package pdftex.def Info: ../img/overfitting.pdf  used on input line 107.
@@ -1232,7 +1232,7 @@ pdfTeX warning: /Library/TeX/texbin/pdflatex (file ../img/overfitting.pdf): PDF
  inclusion: invalid other resource which is no dict (key 'ProcSets', type <arra
 y>); ignored.
 >] [13]
-<../img/attention_translate.png, id=647, 1082.0425pt x 1208.515pt>
+<../img/attention_translate.png, id=642, 1082.0425pt x 1208.515pt>
 File: ../img/attention_translate.png Graphic file (type png)
 <use ../img/attention_translate.png>
 Package pdftex.def Info: ../img/attention_translate.png  used on input line 149
@@ -1245,17 +1245,17 @@ Package pdftex.def Info: ../img/attention_translate.png  used on input line 149
                                                   
 l.155 
        <../img/attention_translate.png>]
-<../img/attention_cnn.png, id=663, 738.76pt x 624.3325pt>
+<../img/attention_cnn.png, id=658, 738.76pt x 624.3325pt>
 File: ../img/attention_cnn.png Graphic file (type png)
 <use ../img/attention_cnn.png>
 Package pdftex.def Info: ../img/attention_cnn.png  used on input line 158.
 (pdftex.def)             Requested size: 288.7942pt x 244.06029pt.
-<../img/self_attention1.jpg, id=670, 663.47874pt x 442.65375pt>
+<../img/self_attention1.jpg, id=665, 663.47874pt x 442.65375pt>
 File: ../img/self_attention1.jpg Graphic file (type jpg)
 <use ../img/self_attention1.jpg>
 Package pdftex.def Info: ../img/self_attention1.jpg  used on input line 168.
 (pdftex.def)             Requested size: 412.56496pt x 275.25299pt.
-<../img/attention_multi.jpg, id=674, 315.42844pt x 150.9389pt>
+<../img/attention_multi.jpg, id=669, 315.42844pt x 150.9389pt>
 File: ../img/attention_multi.jpg Graphic file (type jpg)
 <use ../img/attention_multi.jpg>
 Package pdftex.def Info: ../img/attention_multi.jpg  used on input line 176.
@@ -1282,7 +1282,7 @@ File: omslmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `OMS/lmr/m/n' in size <12> not available
 (Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 186.
-<../img/rnn.png, id=691, 1405.25pt x 416.55624pt>
+<../img/rnn.png, id=686, 1405.25pt x 416.55624pt>
 File: ../img/rnn.png Graphic file (type png)
 <use ../img/rnn.png>
 Package pdftex.def Info: ../img/rnn.png  used on input line 193.
@@ -1299,7 +1299,7 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 l.200 B
        oth LSTM and GRU uses an idea of gating. Term \textit{gate} refers to...
  <../img/self_attention1.jpg>]
-<../img/lstm_gru.png, id=706, 1391.95032pt x 419.31656pt>
+<../img/lstm_gru.png, id=701, 1391.95032pt x 419.31656pt>
 File: ../img/lstm_gru.png Graphic file (type png)
 <use ../img/lstm_gru.png>
 Package pdftex.def Info: ../img/lstm_gru.png  used on input line 204.
@@ -1312,7 +1312,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 205--205
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<../img/encoder_decoder.png, id=720, 882.29625pt x 280.04625pt>
+<../img/encoder_decoder.png, id=715, 882.29625pt x 280.04625pt>
 File: ../img/encoder_decoder.png Graphic file (type png)
 <use ../img/encoder_decoder.png>
 Package pdftex.def Info: ../img/encoder_decoder.png  used on input line 219.
@@ -1327,7 +1327,7 @@ l.223
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<../img/encoder_decoder_all.png, id=731, 1222.5675pt x 795.97375pt>
+<../img/encoder_decoder_all.png, id=726, 1222.5675pt x 795.97375pt>
 File: ../img/encoder_decoder_all.png Graphic file (type png)
 <use ../img/encoder_decoder_all.png>
 Package pdftex.def Info: ../img/encoder_decoder_all.png  used on input line 226
@@ -1349,10 +1349,10 @@ l.232
                                                   
 l.232 
        <../img/rnn.png (PNG copy)> <../img/lstm_gru.png>]
-<../img/tl_taxonomy.png, id=742, 2007.5pt x 1664.2175pt>
+<../img/tl_taxonomy.png, id=739, 2007.5pt x 1664.2175pt>
 File: ../img/tl_taxonomy.png Graphic file (type png)
 <use ../img/tl_taxonomy.png>
-Package pdftex.def Info: ../img/tl_taxonomy.png  used on input line 247.
+Package pdftex.def Info: ../img/tl_taxonomy.png  used on input line 243.
 (pdftex.def)             Requested size: 288.7942pt x 239.41351pt.
 
 
@@ -1363,46 +1363,70 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 
 \@EveryShipout@Output ...@Org@Shipout \box \@cclv 
                                                   
-l.257 
-       <../img/encoder_decoder.png>] [20pdfTeX warning (ext4): destination with
- the same identifier (name{figure.1.14}) has been already used, duplicate ignor
-ed
-
-\@EveryShipout@Output ...@Org@Shipout \box \@cclv 
-                                                  
-l.271 
-       <../img/encoder_decoder_all.png>] [21pdfTeX warning (ext4): destination 
-with the same identifier (name{figure.1.15}) has been already used, duplicate i
+l.251 \par
+           <../img/encoder_decoder.png>] [20pdfTeX warning (ext4): destination 
+with the same identifier (name{figure.1.14}) has been already used, duplicate i
 gnored
 
 \@EveryShipout@Output ...@Org@Shipout \box \@cclv 
                                                   
-l.287 
-       <../img/tl_taxonomy.png>]
-<../img/bert_embeddings.png, id=792, 621.32124pt x 218.8175pt>
+l.257 \section
+              {BERT and its descendants} <../img/encoder_decoder_all.png>]
+[21pdfTeX warning (ext4): destination with the same identifier (name{figure.1.1
+5}) has been already used, duplicate ignored
+
+\@EveryShipout@Output ...@Org@Shipout \box \@cclv 
+                                                  
+l.265 \paragraph
+                {ELMo} is third in the series of biLSTM architecture models ...
+ <../img/tl_taxonomy.png>]
+LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 279
+.
+
+(/usr/local/texlive/2019/texmf-dist/tex/latex/lm/ot1lmtt.fd
+File: ot1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
+) [22]
+<../img/bert_embeddings.png, id=840, 621.32124pt x 218.8175pt>
 File: ../img/bert_embeddings.png Graphic file (type png)
 <use ../img/bert_embeddings.png>
-Package pdftex.def Info: ../img/bert_embeddings.png  used on input line 307.
+Package pdftex.def Info: ../img/bert_embeddings.png  used on input line 292.
 (pdftex.def)             Requested size: 412.56496pt x 145.29811pt.
- [22pdfTeX warning (ext4): destination with the same identifier (name{figure.1.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[23]
+<../img/bert_input.pdf, id=862, 551.1792pt x 189.8292pt>
+File: ../img/bert_input.pdf Graphic file (type pdf)
+<use ../img/bert_input.pdf>
+Package pdftex.def Info: ../img/bert_input.pdf  used on input line 305.
+(pdftex.def)             Requested size: 412.56496pt x 142.09346pt.
+ [24pdfTeX warning (ext4): destination with the same identifier (name{figure.1.
 16}) has been already used, duplicate ignored
 
 \@EveryShipout@Output ...@Org@Shipout \box \@cclv 
                                                   
-l.319 
-       <../img/bert_embeddings.png (PNG copy)>]
-<../img/bert_input.pdf, id=812, 551.1792pt x 189.8292pt>
-File: ../img/bert_input.pdf Graphic file (type pdf)
-<use ../img/bert_input.pdf>
-Package pdftex.def Info: ../img/bert_input.pdf  used on input line 322.
-(pdftex.def)             Requested size: 412.56496pt x 142.09346pt.
- [23pdfTeX warning (ext4): destination with the same identifier (name{figure.1.
-17}) has been already used, duplicate ignored
+l.312 \paragraph
+                {Position embeddings}pdfTeX warning (ext4): destination with th
+e same identifier (name{figure.1.17}) has been already used, duplicate ignored
 
 \@EveryShipout@Output ...@Org@Shipout \box \@cclv 
                                                   
-l.337 
-       <../img/bert_input.pdf>] [24]) [25]
+l.312 \paragraph
+                {Position embeddings} <../img/bert_embeddings.png (PNG copy)> <
+../img/bert_input.pdf>] [25] [26pdfTeX warning (ext4): destination with the sam
+e identifier (name{table.1.1}) has been already used, duplicate ignored
+
+\@EveryShipout@Output ...@Org@Shipout \box \@cclv 
+                                                  
+l.354 \end{itemize}
+                   ]
+Overfull \hbox (14.1083pt too wide) in paragraph at lines 364--368
+ []\OT1/lmr/bx/n/12 ERNIE[] \OT1/lmr/m/n/12 (= En-hanced Lan-guage Rep-re-sen-t
+a-tion with In-for-ma-tive En-ti-ties) ([]Zhang|
+ []
+
+[27] [28] [29]) [30]
 \openout2 = `chaplemtag.aux'.
 
  (./chaplemtag.tex
@@ -1415,11 +1439,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 43--54
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-) [26
+) [31
 
 
 
-] [27pdfTeX warning (ext4): destination with the same identifier (name{table.2.
+] [32pdfTeX warning (ext4): destination with the same identifier (name{table.2.
 1}) has been already used, duplicate ignored
 
 \@EveryShipout@Output ...@Org@Shipout \box \@cclv 
@@ -1441,17 +1465,17 @@ Underfull \hbox (badness 10000) in paragraph at lines 37--40
 
  []
 
-[28
+[33
 
 
 
 ]
-<../img/distribution.pdf, id=908, 1084.05pt x 361.35pt>
+<../img/distribution.pdf, id=1036, 1084.05pt x 361.35pt>
 File: ../img/distribution.pdf Graphic file (type pdf)
 <use ../img/distribution.pdf>
 Package pdftex.def Info: ../img/distribution.pdf  used on input line 57.
 (pdftex.def)             Requested size: 412.56496pt x 137.51843pt.
-<../img/distribution_all.pdf, id=911, 462.52798pt x 346.89601pt>
+<../img/distribution_all.pdf, id=1039, 462.52798pt x 346.89601pt>
 File: ../img/distribution_all.pdf Graphic file (type pdf)
 <use ../img/distribution_all.pdf>
 Package pdftex.def Info: ../img/distribution_all.pdf  used on input line 66.
@@ -1460,7 +1484,7 @@ Package pdftex.def Info: ../img/distribution_all.pdf  used on input line 66.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<../img/confusion_matrix.png, id=913, 336.7782pt x 291.2481pt>
+<../img/confusion_matrix.png, id=1041, 336.7782pt x 291.2481pt>
 File: ../img/confusion_matrix.png Graphic file (type png)
 <use ../img/confusion_matrix.png>
 Package pdftex.def Info: ../img/confusion_matrix.png  used on input line 100.
@@ -1468,19 +1492,19 @@ Package pdftex.def Info: ../img/confusion_matrix.png  used on input line 100.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[29pdfTeX warning (ext4): destination with the same identifier (name{figure.3.1
+[34pdfTeX warning (ext4): destination with the same identifier (name{figure.3.1
 }) has been already used, duplicate ignored
 
 \@EveryShipout@Output ...@Org@Shipout \box \@cclv 
                                                   
 l.124 
-       <../img/distribution.pdf>]) [30pdfTeX warning (ext4): destination with t
+       <../img/distribution.pdf>]) [35pdfTeX warning (ext4): destination with t
 he same identifier (name{figure.3.2}) has been already used, duplicate ignored
 
 \@EveryShipout@Output ...@Org@Shipout \box \@cclv 
                                                   
 l.141 \include{chapsentiment}
-                              <../img/distribution_all.pdf>] [31pdfTeX warning 
+                              <../img/distribution_all.pdf>] [36pdfTeX warning 
 (ext4): destination with the same identifier (name{figure.3.3}) has been alread
 y used, duplicate ignored
 
@@ -1493,7 +1517,7 @@ l.141 \include{chapsentiment}
 
 (./chapmodeling.tex
 Chapter 4.
-) [32
+) [37
 
 
 
@@ -1554,27 +1578,27 @@ Overfull \hbox (12.7806pt too wide) in paragraph at lines 17--17
 \OT1/lmr/m/n/12 definice  |
  []
 
-[33
+[38
 
 
 
 ]
-<../img/taggermodel.pdf, id=1015, 598.15468pt x 845.07718pt>
+<../img/taggermodel.pdf, id=1142, 598.15468pt x 845.07718pt>
 File: ../img/taggermodel.pdf Graphic file (type pdf)
 <use ../img/taggermodel.pdf>
 Package pdftex.def Info: ../img/taggermodel.pdf  used on input line 70.
 (pdftex.def)             Requested size: 412.56496pt x 582.89757pt.
- [34] [35 <../img/taggermodel.pdf
+ [39] [40 <../img/taggermodel.pdf
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ../img/taggermodel.pdf): PDF
  inclusion: invalid other resource which is no dict (key 'ProcSets', type <arra
 y>); ignored.
->]) [36]
+>]) [41]
 \openout2 = `chap04.aux'.
 
  (./chap04.tex
 Chapter 6.
-) [37
+) [42
 
 
 
@@ -1583,7 +1607,7 @@ Chapter 6.
 
  (./chap03.tex
 Chapter 7.
-) [38
+) [43
 
 
 
@@ -1593,7 +1617,7 @@ as been already used, duplicate ignored
 \@EveryShipout@Output ...@Org@Shipout \box \@cclv 
                                                   
 l.145 \include{chap03}
-                      ] [39pdfTeX warning (ext4): destination with the same ide
+                      ] [44pdfTeX warning (ext4): destination with the same ide
 ntifier (name{table.7.2}) has been already used, duplicate ignored
 
 \@EveryShipout@Output ...@Org@Shipout \box \@cclv 
@@ -1608,7 +1632,7 @@ l.145 \include{chap03}
                       ]
 \openout2 = `epilog.aux'.
 
- (./epilog.tex) [40
+ (./epilog.tex) [45
 
 
 
@@ -1616,152 +1640,147 @@ l.145 \include{chap03}
 \openout2 = `bibliography.aux'.
 
  (./bibliography.tex (./thesis.bbl
-LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 13.
-
-
-(/usr/local/texlive/2019/texmf-dist/tex/latex/lm/ot1lmtt.fd
-File: ot1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-) [41
+[46
 
 
 
-]
-Underfull \hbox (badness 10000) in paragraph at lines 165--173
+] [47]
+Underfull \hbox (badness 10000) in paragraph at lines 245--253
 []\OT1/lmr/m/n/12 [Hochreiter and Ur-gen Schmid-hu-ber 1997]  \OT1/lmr/m/sc/12 
 Hochre-iter\OT1/lmr/m/n/12 , Sepp ;
  []
 
 
-Underfull \hbox (badness 4060) in paragraph at lines 165--173
+Underfull \hbox (badness 4060) in paragraph at lines 245--253
 \OT1/lmr/m/sc/12 Ur-gen Schmid-hu-ber\OT1/lmr/m/n/12 , J J.:  Long short-term m
 em-ory.  URL
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 165--173
+Underfull \hbox (badness 10000) in paragraph at lines 245--253
 []$\OT1/lmtt/m/n/12 http : / / www7 . informatik . tu-[]muenchen . de / {[]}hoc
 hreithttp : / / www .
  []
 
 
-Underfull \hbox (badness 6284) in paragraph at lines 201--208
+Underfull \hbox (badness 6284) in paragraph at lines 288--295
 []\OT1/lmr/m/n/12 [Hutchins 1996]  \OT1/lmr/m/sc/12 Hutchins\OT1/lmr/m/n/12 , J
 ohn:  AL-PAC: the (in)famous re-
  []
 
 
-Underfull \hbox (badness 1783) in paragraph at lines 201--208
+Underfull \hbox (badness 1783) in paragraph at lines 288--295
 \OT1/lmr/m/n/12 port.  The MIT Press, 1996.  -- Forschungs-bericht. --  131--13
 5 S.
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 201--208
+Underfull \hbox (badness 10000) in paragraph at lines 288--295
 \OT1/lmr/m/n/12 --  URL []$\OT1/lmtt/m/n/12 https : / / books . google . com / 
 books ? hl = cs{&}lr = {&}id =
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 201--208
+Underfull \hbox (badness 10000) in paragraph at lines 288--295
 \OT1/lmtt/m/n/12 yx3lEVJMBmMC{&}oi = fnd{&}pg = PA131{&}dq = alpac + report{&}o
 ts =
  []
 
-[42]
-Underfull \hbox (badness 4954) in paragraph at lines 252--258
+[48]
+Underfull \hbox (badness 4954) in paragraph at lines 373--379
 []\OT1/lmr/m/n/12 [Marcus et al. 1993]  \OT1/lmr/m/sc/12 Mar-cus\OT1/lmr/m/n/12
  , Mitchell ; \OT1/lmr/m/sc/12 San-torini\OT1/lmr/m/n/12 , Beat-rice ;
  []
 
 
-Underfull \hbox (badness 2103) in paragraph at lines 269--277
+Underfull \hbox (badness 2103) in paragraph at lines 397--405
 []\OT1/lmr/m/n/12 [Mikolov et al. 2013]  \OT1/lmr/m/sc/12 Mikolov\OT1/lmr/m/n/1
 2 , Tomas ; \OT1/lmr/m/sc/12 Chen\OT1/lmr/m/n/12 , Kai ; \OT1/lmr/m/sc/12 Cor-r
 ado\OT1/lmr/m/n/12 ,
  []
 
 
-Underfull \hbox (badness 2302) in paragraph at lines 269--277
+Underfull \hbox (badness 2302) in paragraph at lines 397--405
 \OT1/lmr/m/n/12 Greg ; \OT1/lmr/m/sc/12 Dean\OT1/lmr/m/n/12 , Jef-frey:  Dis-tr
 ibuted Rep-re-sen-ta-tions of Words and
  []
 
-
-Underfull \hbox (badness 4492) in paragraph at lines 279--285
+[49]
+Underfull \hbox (badness 4492) in paragraph at lines 407--413
 []\OT1/lmr/m/n/12 [Minsky and Pa-pert 2017]  \OT1/lmr/m/sc/12 Min-sky\OT1/lmr/m
 /n/12 , M ; \OT1/lmr/m/sc/12 Pa-pert\OT1/lmr/m/n/12 , SA:  Per-cep-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 279--285
+Underfull \hbox (badness 10000) in paragraph at lines 407--413
 []$\OT1/lmtt/m/n/12 https : / / www . google . com / books ? hl = cs{&}lr = {&}
 id = PLQ5DwAAQBAJ{&}oi =
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 279--285
+Underfull \hbox (badness 10000) in paragraph at lines 407--413
 \OT1/lmtt/m/n/12 fnd{&}pg = PR5{&}dq = perceptrons + an + introduction + to + c
 omputational +
  []
 
-[43] [44]
-Underfull \hbox (badness 7981) in paragraph at lines 459--468
+[50] [51]
+Underfull \hbox (badness 7981) in paragraph at lines 654--663
 []\OT1/lmr/m/n/12 [Szegedy et al. 2015]  \OT1/lmr/m/sc/12 Szegedy\OT1/lmr/m/n/1
 2 , Chris-tian ; \OT1/lmr/m/sc/12 Liu\OT1/lmr/m/n/12 , Wei ; \OT1/lmr/m/sc/12 J
 ia\OT1/lmr/m/n/12 ,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 459--468
+Underfull \hbox (badness 10000) in paragraph at lines 654--663
 \OT1/lmr/m/n/12 Yangqing ; \OT1/lmr/m/sc/12 Ser-manet\OT1/lmr/m/n/12 , Pierre ;
  \OT1/lmr/m/sc/12 Reed\OT1/lmr/m/n/12 , Scott ; \OT1/lmr/m/sc/12 Anguelov\OT1/l
 mr/m/n/12 ,
  []
 
 
-Underfull \hbox (badness 7649) in paragraph at lines 459--468
+Underfull \hbox (badness 7649) in paragraph at lines 654--663
 \OT1/lmr/m/n/12 Dragomir ; \OT1/lmr/m/sc/12 Er-han\OT1/lmr/m/n/12 , Du-mitru ; 
 \OT1/lmr/m/sc/12 Van-houcke\OT1/lmr/m/n/12 , Vin-cent ; \OT1/lmr/m/sc/12 Ra-bi-
 
  []
 
 
-Underfull \hbox (badness 1648) in paragraph at lines 459--468
+Underfull \hbox (badness 1648) in paragraph at lines 654--663
 \OT1/lmr/m/sc/12 novich\OT1/lmr/m/n/12 , An-drew:  Go-ing Deeper with Con-vo-lu
 -tions.  URL []$\OT1/lmtt/m/n/12 https :
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 459--468
+Underfull \hbox (badness 10000) in paragraph at lines 654--663
 \OT1/lmtt/m/n/12 / / www . cv-[]foundation . org / openaccess / content{_}cvpr{
 _}2015 / html /
  []
 
 
-Underfull \hbox (badness 4518) in paragraph at lines 459--468
+Underfull \hbox (badness 4518) in paragraph at lines 654--663
 \OT1/lmtt/m/n/12 Szegedy{_}Going{_}Deeper{_}With{_}2015{_}CVPR{_}paper . html$[
 ]\OT1/lmr/m/n/12 , 2015.
  []
 
 
-Underfull \hbox (badness 2065) in paragraph at lines 479--489
+Underfull \hbox (badness 2065) in paragraph at lines 674--684
 \OT1/lmr/m/n/12 --  URL []$\OT1/lmtt/m/n/12 https : / / rss . onlinelibrary . w
 iley . com / doi / full / 10 . 1111 / j .
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 479--489
+Underfull \hbox (badness 10000) in paragraph at lines 674--684
 \OT1/lmtt/m/n/12 2517-[]6161 . 1996 . tb02080 . xhttps : / / rss . onlinelibrar
 y . wiley . com / doi /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 479--489
+Underfull \hbox (badness 10000) in paragraph at lines 674--684
 \OT1/lmtt/m/n/12 abs / 10 . 1111 / j . 2517-[]6161 . 1996 . tb02080 . xhttps : 
 / / rss . onlinelibrary .
  []
 
-[45])) [46] (./thesis.lof [47
+[52])) [53] (./thesis.lof [54
 
 
 ]
@@ -1782,19 +1801,19 @@ Overfull \hbox (72.99208pt too wide) in paragraph at lines 15--15
 github.io/illustrated- |
  []
 
-[48])
+[55])
 \tf@lof=\write10
 \openout10 = `thesis.lof'.
 
- [49] (./thesis.lot)
+ [56] (./thesis.lot)
 \tf@lot=\write11
 \openout11 = `thesis.lot'.
 
- [50
+ [57
 
 ]
 Appendix A.
-[51
+[58
 
 ]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 177.
@@ -1805,19 +1824,22 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 177.
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 177.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 177.
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 4182036E55108DF3D2116BDE59FC1EF3;6388.
+(rerunfilecheck)             Checksum: 4AD3F4C74F7611A949028B2DE0947DD8;6181.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 177.
  ) 
 Here is how much of TeX's memory you used:
- 29309 strings out of 492616
- 496963 string characters out of 6129480
- 602543 words of memory out of 5000000
- 32343 multiletter control sequences out of 15000+600000
- 84935 words of font info for 76 fonts, out of 8000000 for 9000
+ 29419 strings out of 492616
+ 498601 string characters out of 6129480
+ 606228 words of memory out of 5000000
+ 32407 multiletter control sequences out of 15000+600000
+ 85246 words of font info for 77 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  62i,10n,81p,2390b,2327s stack positions out of 5000i,500n,10000p,200000b,80000s
-pdfTeX warning (dest): name{glo:ai} has been referenced but does not exist, r
-eplaced by a fixed one
+pdfTeX warning (dest): name{Hfootnote.13} has been referenced but does not ex
+ist, replaced by a fixed one
+
+pdfTeX warning (dest): name{glo:ai} has been referenced but does not exist, rep
+laced by a fixed one
 
 pdfTeX warning (dest): name{glo:sota} has been referenced but does not exist, r
 eplaced by a fixed one
@@ -1843,11 +1865,12 @@ ve/2019/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/texlive/2019/te
 xmf-dist/fonts/type1/public/lm/lmri12.pfb></usr/local/texlive/2019/texmf-dist/f
 onts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1
 /public/lm/lmsy8.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/lm/
-lmtt12.pfb>
-Output written on thesis.pdf (55 pages, 2206997 bytes).
+lmtt10.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/lm/lmtt12.pfb
+>
+Output written on thesis.pdf (62 pages, 2261937 bytes).
 PDF statistics:
- 1433 PDF objects out of 1440 (max. 8388607)
- 1192 compressed objects within 12 object streams
- 219 named destinations out of 1000 (max. 500000)
- 591 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1614 PDF objects out of 1728 (max. 8388607)
+ 1358 compressed objects within 14 object streams
+ 264 named destinations out of 1000 (max. 500000)
+ 583 words of extra memory for PDF output out of 10000 (max. 10000000)
 

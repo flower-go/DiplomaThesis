@@ -234,88 +234,71 @@ A self-attention mechanism is supposed to select the most important words to be 
 \label{sub:models}
 Transfer learning is a very important idea because it allows, as the name suggests, to transfer learned knowledge between different tasks. 
 %According to bla bla it is leading in industry
-Reusing the knowledge can lead to lower training times with fewer demands on technical resources (GPU, CPU) and training data size. It even allows to successfully apply automatic processing into domains where labeled data are not available by transferring the knowledge from another domain with enough training examples. In addition, usage of underlying common knowledge between different tasks can also improve the results of learning algorithms on each task. %TODO{as can be seen where?}
-
-One of the first big successes of transfer learning comes from the computer vision field by using models pretrained on ImageNet (currently also on other datasets). ImageNet %TODO cite ImageNet Large Scale Visual Recognition Challenge 
-is a big dataset of labeled pictures. %TODO jak vypadají labely 
-Many large deep models were trained on this dataset and then applied to different computer vision tasks with great success \citep{Huh}. %TODO nekam ze proc to funguje a co vsechno se uci se stale zkouma
-%TODO Ruder obrázek taxonomie transfer learningu
+Reusing the knowledge can lead to lower training times with fewer demands on technical resources (GPU, CPU) and training data size. It even allows to successfully apply automatic processing into domains where labeled data are not available by transferring the knowledge from another domain with enough training examples. In addition, usage of underlying common knowledge between different tasks can also improve the results of learning algorithms on each task. %Decaf 
+One of the first big successes of transfer learning comes from the computer vision field by using models pretrained on ImageNet (currently also on other datasets). ImageNet \citep{Russakovsky2015} is a big dataset of pictures. Every picture is labeled by one of one thousand classes. Many large deep models were trained on this dataset and then applied to different computer vision tasks with great success \citep{Huh}.  %TODO nekam ze proc to funguje a co vsechno se uci se stale zkouma
+\par
 Following the taxonomy in figure \ref{pic:tl_taxonomy}, currently most important transfer learning applications in NLP falls into \textit{sequential transfer learning} category. Machine learning models are first trained on some tasks, and the trained result is then used in many different tasks.
-
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.7\columnwidth]{../img/tl_taxonomy}
-\caption{Figure from \protect\citep{Ruder2019} offers possible taxonomy for transfer learning. %TODO co je to domena
-Transfer learning allows the use of trained models on tasks with different sets of labels or different input data's nature. Input data can vary in domain they come from (wikipedia text versus a novel or a social network posts), they can learn from different features (e.g. different languages) or the distribution of classes is different than it was in the training data (so some highly presented classes in training data are rare in this new task and others are quite common but previously not seen too many times).
+\caption{Figure from \protect\citep{Ruder2019} offers possible taxonomy for transfer learning. %TODO co je to domena, tohle predelat
+Following definiton in \citep{Pan2009}, transfer learning's goal is to improve the performance on task $T_1$ from domain $D_1$ by learning knowledge on task $T_0$ from domain $D_0$. Domain is defined as $D = {\chi,P(X)}$, where $X \in \chi$, $\chi$ is a feature space and $P(X)$ is a marginal probability distribution over the feature space. Transfer learning allows the use of trained models on tasks with different sets of labels or different input data's nature. Input data can vary in the source they come from (wikipedia text versus a novel or a social network posts), they can learn from different features (e.g. different languages) or the distribution of classes is different than it was in the training data (so some highly presented classes in training data are rare in this new task and others are quite common but previously not seen too many times).
 }
 \label{pic:tl_taxonomy}
 \end{figure}
 For natural language processing, transfer learning is currently mainly represented by contextualized embeddings obtained from pretrained language models.
-Contextualization of embeddings is not important only because it solves the problem of homonyms but also because they are supposed to store knowledge independent of any language.  \citep{Feijo2020}.  %TODO proč? : (Liu et al., 2019a; Hewitt and Liang, 2019; Hewitt and Manning, 2019; Tenney et al., 2019a) demonstrate across languages
-
-Contextualized embeddings can be obtained by supervised or unsupervised learning \citep{Liu2020}. This work focuses on unsupervised learning, as it is currently a promising field according to recent results and because unsupervised learning does not depend on large manually created datasets. \footnote{This is a slight terminology inaccuracy. In section \ref{sub:ml}, unsupervised learning was defined as a task where data does not contain correct answer. BERT and derived models, however, use pretraining tasks where the input does not need the manual annotation, but in training itself, individual experiences are provided with the correct answer.} Supervised methods use machine translation, which is the classic NLP task, but also natural language inference or other tasks with the potential to capture general knowledge about language.
-
+Contextualization of embeddings is not important only because it solves the problem of homonyms but also because they are supposed to store knowledge independent of any language \citep{Feijo2020}, \citep{Hewitt2020}. Contextualized embeddings can be obtained by supervised or unsupervised learning \citep{Liu2020}. This work focuses on unsupervised learning, as it is currently a promising field according to recent results and because unsupervised learning does not depend on large manually created datasets\footnote{This is a slight terminology inaccuracy. In section \ref{sub:ml}, unsupervised learning was defined as a task where data does not contain correct answer. BERT and derived models, however, use pretraining tasks where the input does not need the manual annotation, but in training itself, individual experiences are provided with the correct answer.}. Supervised methods use machine translation, which is the classic NLP task, but also natural language inference or other tasks with the potential to capture general knowledge about language.
+\par
 Unsupervised learning tries to learn a language model -- a probability distribution over a sequence of tokens given by the following equation:
  \begin{equation*}
   p(t_1, t_2,...,t_N) =\prod_{i=1}^{N} p(t_i | t_1, t_2, ..., t_{i-1})
-\end{equation*} \citep{Liu2020}. To reduce this problem, it is possible to consider only fixed size sequences of $n-1$ previous words for every word probability called \textit{n-grams} \citep{Bengio2003}.
-%TODO kromě liu ještě nějaký zdroj na language modelling - bengio2003
-To achieve the goal of learning a language model, one can use many different tasks, which are believed to force the network to learn useful knowledge about language. 
-First attempts were made with autoencoders (read the text, encode and decode back) \citep{Dai2015} and machine translation \citep{Ramachandran2017}, but later papers come with better architectures and various new objectives which are described later in sectio \ref{sec:bert}. %TODO ze to bude lepe popsane pozdeji
-
-%TODO predelat tabulku z Liu2020 aby tam byly i jména atd.
-
-%TODO pridat jak se to pouziva:  nebo jak by mohlo
-%\citep{Howard2018} 
-There are generally two ways to transfer learned knowledge \citep{Feijo2020}: extract some representation from the model and use it in another model statically or modify a model by changing the head and \textit{finetunne} the whole newly created model for a specific task. There is also a possibility to combine both approaches and, at first, take static features as an input for training, and then when the head starts to perform well, fine-tune the whole model with this better head, so the original weights converge more efficiently to the wanted solution. More detail is offered in \ref{sub:howto}.
-
-
-%TODO a \citep{Sun} finetunning
+\end{equation*} \citep{Liu2020}. To reduce this problem, it is possible to consider only fixed size sequences of $n-1$ previous words for every word probability called \textit{n-grams} \citep{Bengio2003}. To achieve the goal of learning a language model, one can use many different tasks, which are believed to force the network to learn useful knowledge about language. First attempts were made with autoencoders (read the text, encode and decode back) \citep{Dai2015} and machine translation \citep{Ramachandran2017}, but later papers come with better architectures and various new objectives which are described later in section \ref{sec:bert}.  There are generally two ways to transfer learned knowledge \citep{Feijo2020}: extract some representation from the model and use it in another model statically or modify a model by changing the head and \textit{finetune} the whole newly created model for a specific task. There is also a possibility to combine both approaches and, at first, take static features as an input for training, and then when the head starts to perform well, fine-tune the whole model with this better head, so the original weights converge more efficiently to the wanted solution. More detail is offered in \ref{sub:howto}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Relevant methods
-\section{BERT explanation}
+\section{BERT and its descendants}
 \label{sec:bert}
-This work mainly relies on Bidirectional Encoder Representations from Transformers (BERT) \citep{Devlin2019} and its variants, so this section describes and explains the main features of this model. BERT is a pre-trained language model that is then fine-tuned for many other tasks, so it is an example of transfer learning (see \ref{sub:models}).
-For the purpose of training a language model, BERT is trained on two tasks -- next sentence prediction and masked language modeling. These two tasks are just a way to teach a model something important about language in general, the same way as training on ImageNet classification helps computer vision models the power to solve more sophisticated tasks. Result BERT model can be used for almost every NLP task just by changing the classification head. BERT is very successful in solving NLP tasks, although it was overcome in many tasks by later derived models. 
-%TODO proč je to dobré, nějaké výsledky!!!!
+%TODO vsechno je to vlastne learning z raw textu
+BERT-like models belong into a family of contextualized embeddings together with e.g., Contextualize Word Vectors (CoVe) \citep{McCann2017}, \citep{Peters2017}, ELMo \citep{Peters2018}, Flair \citep{Akbik2018}, OpenAI GPT  , and series of Generative Pretrained Transformers (GPT) models \citep{Radfort2018}, \citep{RadfordAlec2019}, \citep{Brown2020}. These models are important steps in NLP progression, which led to BERT family of models. BERT, representing a very effective way of contextual embeddings, shown better ability to capture the language knowledge and meant a turning point in the NLP history %TODO vazne? 
+\paragraph{First attempts} to contextual embeddings appeared with two models: CoVe \citep{McCann2017}, which uses supervised machine translation and unsupervised language modeling \citep{Peters2017}. Both these models are used for extracting embeddings. These embeddings concatenated to the non-contextual embeddings (i.e., GloVe) for the target NLP tasks. CoVe uses machine translation task (it needs parallel bilingual dataset) and biLSTM encoder-decoder architecture.  biLSTM are bidirectional LSTMs, which are described in more details in Figure  %TODO  obrázek.
+CoVe therefore uses supervised learning, in contrast to following presented models, which took the path of unsupervised learning as learning from the raw text has a big potential due to easy access to a big amount of unlabelled text data (in opposite to labeled datasets, where is almost always not enough data).
+\citep{Peters2017} uses unsupervised method -- language modeling (see section %TODO).
+Uses concatenation of forward and backward RNN (similarly to CoVe, but uses both GRU and LSTM depending on the task). Both models uses last layer as an embedding representation. 
+\paragraph{ELMo} is third in the series of biLSTM architecture models and builds on \citep{Peters2017}, but it uses deeper representation of words. Embeddings are created from weighted combination of all network layers (in the case of original ELMo only 2 layers). This deeper combination was led by the assumption that different layers of the network are capturing different (but useful) knowledge. Experiments with weights shown, that lower layers tends to capture syntactic information and therefore are more important for syntactic task, while higher layers are important for semantic tasks. 
+\paragraph{Flair} uses also unsupervised LM, but the smallest unit of an input is a character, not a word. In the probabilistic description of language modelling, Flair models the probability of the n-th character given the previous characters. An output is again a word embedding, but this time combined from a representation of its characters. The authors chose this approach to eliminate problems with unknown words.
+\paragraph{GPT} by OpenAI (actually in version 3) also uses language modelling for pretraining, but the difference is this time in the architecture. Instead of LSTM-based RNN network, GPT variants use decoder part of transformer together with the attention mechanism. GTP also presented deeper architecture than all previously presented methods. GTP 2 version proposes 4 models sizes with the smallest one having 12 layers and the deepest one with 48 layers. Each layer is a transformer decoder with the self-attention as described in section %TODO dodat.
+GTP is deeper than ELMo and others, but only takes into account a left context of the word, as the text is processed sequentially in only one direction.
+\par
+On the top of all this contextual embedding models stands BERT with the depth comparable to GPT 2, but using different part of transformers. It has modified pretraining tasks compare to other classical language modelling and has a context from both sides. %TODO truly
+%TODO vsechny obrazek
 
-The second part of its popularity is the transfer learning feature of BERT. Google %todo autoři článku, 
-published pre-trained models for English and later also for Chinese and multilingual model and other monolingual models were also published by other authors. ( %TODO jak bert?)
-Training of the language model requires a considerable amount of data 
-and computational time, but it is needed to be done just once. When the model is trained, it can be used for many tasks by changing the classification head and training only newly added layers and/or training all layers (but in this case only for a few episodes and with smaller data) and still performing on the state-of-the-art level. %TODO presny popis 
-% The performance of multilingual model can be doubt, especially in the case of smaller languages, so more monolingual models were published all over the world after that. This is very important feature. 
-% nejake jsou primo v BERTovi
-
-%TODO jak je super, že to je bidirectional narozdíl od...
-
-%TODO jak se používá ta multilingual verze a jaké jsou jazykové verze
-
-%TODO dky se to objevil ten transfer learning, v čem se bert neliší a v čem ano.
+\subsection{BERT}
+This work mainly relies on Bidirectional Encoder Representations from Transformers (BERT) \citep{Devlin2019} and its variants, so this section describes and explains the main features of this model. BERT is a pre-trained language model that is fine-tuned for many other tasks, so it is an example of transfer learning (see \ref{sub:models}).
+For the purpose of training a language model, original BERT is trained on two tasks -- next sentence prediction and masked language modeling. BERT is proceeding both sides context simultaneously, and due to architecture, in \textit{every layer} every transformer block potentially has information from every other block (and thus from every other word). That is why BERT is called \textbf{deeply} bidirectional or non-directional (because there is no right-to-left or left-to-right direction of processing). Result BERT model can be used for almost every NLP task just by changing the classification head. BERT is very successful in solving NLP tasks, although it was overcome in many tasks by later derived models. 
+%TODO tabulky ci graf se zlepsenim za pouziti berta - poslední sota bez berta, první bert a aktuální sota
+%TODO nejake vysledky jsou zminene v Erniem
+The second part of its popularity is the transfer learning feature of BERT. The authors
+published pre-trained models for English and later also for Chinese and multilingual model and other monolingual models were also published by other authors \footnote{Some published models, which can be used in popular python library Tranformers from HugginFace\footnote{https://huggingface.co/}, can be found here: \url{https://huggingface.co/models}}. Training of the language model requires a considerable amount of data and computational time, but it is needed to be done just once. When the model is trained, it can be used for many tasks by changing the classification head and training only newly added layers and/or training all layers (but in this case only for a few episodes and with smaller data) and still performing on the state-of-the-art level. 
+\par
 The core of BERT algorithm is based on these three features
 \begin{itemize}
 \item two unsupervised task for pretraining,
-\item input embeddings
-\item transformers encoder architecture
+\item input embeddings,
+\item transformers encoder architecture,
 \end{itemize}
-, which will be described in the following sections.
-
-\subsection{Input embeddings}
-%todo obrazek
-BERT uses the concatenation of three types of embeddings as an input representation -- token embeddings, position embeddings, and segment embeddings. %todo figura z berta
-
+which will be described in the following sections.
+\subsubsection{Input embeddings}
+BERT uses the concatenation of three types of embeddings as an input representation -- token embeddings, position embeddings, and segment embeddings.
 \begin{figure}[h]
 \centering
 \includegraphics[width=1\columnwidth]{../img/bert_embeddings}
-\protect\caption{ Input is representing using tree kinds of embeddings.
+\protect\caption{ Input is representing using tree kinds of embeddings for every input word. Every sequence is also decorated by beggining and ending marker (CLS and SEP token), which are also encoded using a combination of all three embedding types.
 Source: \textit{\citep{Devlin2019}}.}
 \label{pic:bert_emb}
 \end{figure}
-
-\subsubsection*{Token embeddings}
-The BERT model input can be one or two sequences (not necessarily two sentences, but e.g., also paragraphs) \footnote{Different terminology is used here than in the original paper. In \citep{Devlin2019}, \textit{sentence} is a term for a whole part of input (fist or second), while a term \textit{sequence} is used for whole bert input compound from one or two \textit{sentences}}. All words are split into tokens and converted into embeddings with the use of a pretrained embeddings model. One word can be tokenized into more tokens because BERT uses WordPiece %todo zdroj
-embeddings \citep{Wu2016}. WordPiece pretrained embedding algorithm was originaly created for the task of Google voice search for Asian languages and is designed to minimize unknown word tokens. %TODO někam napsat proč se tohle děje
-WordPiece model was not pretrained as a part of BERT paper experiments, but represents a quite interesting solution, so the idea will be briefly explained here.
-
-It is impossible to prepare embeddings for every possible word in a language because this would cause an intractably long embedding size. Every word which is not a part of the selected embedding set is encoded in the same way as an unknown word. This situation is not desired because we lost information about words. WordPiece deals with this problem in the following manner: In the first iteration of training, the model creates embeddings only for characters. In every other iteration, some existing model words are concatenated together in a way that causes the highest likelihood of input text. As a result of this method, some words will be embedded as one word, and some will be split into more tokens, as can be seen in figure \ref{pic:bert_inp}.
+\paragraph{Token embeddings}
+The BERT model input can be one or two sequences (not necessarily two sentences, but e.g., also paragraphs) \footnote{Different terminology is used here than in the original paper. In \citep{Devlin2019}, \textit{sentence} is a term for a whole part of input (fist or second), while a term \textit{sequence} is used for whole bert input compound from one or two \textit{sentences}.}. All words are split into tokens and converted into embeddings with the use of a pretrained embeddings model. One word can be tokenized into more tokens because BERT uses WordPiece
+embeddings \citep{Wu2016}. WordPiece pretrained embedding algorithm was originaly created for the task of Google voice search for Asian languages and is designed to minimize unknown word tokens. WordPiece model was not pretrained as a part of BERT paper experiments, but represents a quite interesting solution, so the idea will be briefly explained here.
+\par
+It is impossible to prepare embeddings for every possible word in a language because this would cause an intractably long embedding size. Every word which is not a part of the selected embedding set is encoded in the same way (as an unknown word). This situation is not desired because we lost information about words. WordPiece deals with this problem in the following manner: In the first iteration of training, the model creates embeddings only for characters. In every other iteration, some existing model words are concatenated together in a way that causes the highest likelihood of input text. As a result of this method, some words will be embedded as one word, and some will be split into more tokens, as can be seen in figure \ref{pic:bert_inp}.
 
 \begin{figure}[h]
 \centering
@@ -323,71 +306,181 @@ It is impossible to prepare embeddings for every possible word in a language bec
 \protect\caption{This figure illustrates a transformation of one input sentence (from PDT3) to suit bert input expectations. The sentence is divided into words and then into tokens from wordpiece tokenizer vocabulary. Accents may be removed depending on the used model. The sentence is decorated with special CLS and SEP tokens to mark the beginning and the end of the sentence. All tokens are then converted into numbers. }
 \label{pic:bert_inp}
 \end{figure}
-
-
 \par
 Three other tokens are added after this step -- CLS, END, SEP. 
-CLS token is added at the beginning of the input and is used as the first sequence embedding for classification tasks (as sentence analysis). SEP token separates both sequences, and END token is appended at the end. Whole input transformation can be seen on figure \ref{pic:bert_emb}. %TODO nejsem si jistá tím END
-
-\subsubsection*{Position embeddings}
+CLS token is added at the beginning of the input and is used as the first sequence embedding for classification tasks (as sentence analysis). SEP token separates both sequences, and END token is appended at the end. Whole input transformation can be seen on figure \ref{pic:bert_emb}.
+\paragraph{Position embeddings}
 All input tokens are processed simultaneously. That is the reason why BERT is often called \textit{undirectional} rather than \textit{bidirectional}. This feature causes an absence of information about the order of tokens. However, the nature of the language is sequential. A bunch of words without an order has no language meaning, and capturing this problem led to recurrent neural networks at first. In BERT is no recurrent cell, and instead, position embeddings solve this problem. They have the same shape as token embeddings (and as segment embeddings), and they are learned the same way as other embedding layers. The original BERT's maximum input size is 512, so this embedding layer should represent positions from 1 to 512. This learning is different from original transformers, where the position was also encoded as embeddings, but embeddings were fixed, not learned.
-
-\subsubsection*{Segment embeddings}
+\paragraph{Segment embeddings}
 These embeddings indicate whether the token belongs to the first or second part of the input. It has the same dimension as position and token embeddings, and they are also learned. Because BERT input can consist of at most two parts, segment embeddings encode whether the token belongs to the first or second part.
 
-\subsection{Pretraining tasks}
-
-%TODO narozdil od jinych modelu co jsou trenovane jednosmerne blabla...
+\subsubsection{Pretraining tasks}
 BERT is pretrained on two unsupervised tasks -- Next Sentence Prediction (NSP) and Masked language modeling (MLM). These two tasks were chosen because BERT's authors believe they can force language models to learn general and valuable knowledge about language.
-
-\subsubsection{Next Sentence Prediction}
+\paragraph{Next Sentence Prediction}
 The input of the BERT model for this task is two sentences, A and B. In 50\% of cases, sentence B is the sentence that follows sentence A in the source text. Otherwise, it is a random sentence from the text. A goal of the task is whether sentence B is following or random, i.e., binary classification. The motivation for this task is a need to represent relationships between sentences, not only between words. Experiments in \citep{
-Devlin2019} showed its usefulness for text tasks as question answering. Sentence-level classification with BERT, as in this case, can be performed by using the last hidden representation of CLS token (the first token of every input example). Authors assumed that this token could work as a summary of the whole sentence, although later work has shown better approaches. %TODO nejake zdroje
-
-\subsubsection{Masked Language Modeling}
+Devlin2019} showed its usefulness for text tasks as question answering. Sentence-level classification with BERT, as in this case, can be performed by using the last hidden representation of CLS token (the first token of every input example). Authors assumed that this token could work as a summary of the whole sentence, although later work has shown better approaches (i.e., \citep{Liu2019}). 
+\paragraph{Masked Language Modeling}
 Masked Language Modeling or in other words Cloze task \citep{Taylor1953}
-consist of prediction of some missing words in the text. In BERT's case, its implementing in the following way: 15\% of tokens in each sequence is chosen. For each of these chosen tokens, there is 80\% chance to be replaced by a MASK token, 10\% chance to be replaced by a random token or it will remain unchanged with 10\% probability. This way of masking ensures that the model will try to predict tokens not only in MASK token presence. For backpropagation, only predictions of the MASK token are taken into account. Prediction is made by a softmax function whose input is the last hidden representation of the respective token, and softmax layer outputs a probability distribution for predicting every possible word. %TODO to je včetně appendixu
+consist of prediction of some missing words in the text. In BERT's case, its implementing in the following way: 15\% of tokens in each sequence is chosen. For each of these chosen tokens, there is 80\% chance to be replaced by a MASK token, 10\% chance to be replaced by a random token or it will remain unchanged with 10\% probability. This way of masking ensures that the model will try to predict tokens not only in MASK token presence. For backpropagation, only predictions of the MASK token are taken into account. Prediction is made by a softmax function whose input is the last hidden representation of the respective token, and softmax layer outputs a probability distribution for predicting every possible word. 
 
-\subsection{Transformers encoder architecture}
+\subsubsection{Architecture}
+%TODO sem rozdíl s GTP
 BERT adapts encoder part of architecture from original Transformers paper   \citep{Vaswani2017} (see section \ref{sub:transformers}).
-BERT uses its encoder architecture for each layer, 
- so L encoder layers are finished with one fully connected layer for a specific task. The original paper presents two sizes of architecture: base and large. Their comparison can be seen in figure %TODO dodelat obrazek staci z paperu
- 
-  
+BERT uses its encoder architecture for each layer, so L encoder layers are finished with one fully connected layer for a specific task. The original paper presents two sizes of architecture, base and large, in the dependence on the number of layers (L), size of the hidden layer (H) and a number of heads in multi-head self-attention (A). An output of before the classification head is a vector of size H for each of the input words. Original paper proposes two main architecture hyperparameters version, base and large (see table \ref{Tab:base_large}).
+\begin{table}
+\centering
 
- %TODO obrazek architektury
- 
- %TODO hyperparametry 
- %TODO dalsi modely - model compression je popsaná v článku Liu2020
+\begin{tabular}{ |c|c|c| } 
+ \hline
+    & BERT Base &BERT Large \\ 
+ \hline \hline
+ L & 12 & 24 \\ \hline
+ H & 768 & 1024 \\ \hline
+  A & 12 & 16\\ \hline
+Total Parameters & 110M & 340M \\\hline
+\end{tabular}
+\caption{Difference between base and large version of BERT model, as published in 
+\citep{Devlin2019}.
+} 
+\label{Tab:base_large}
+\end{table}
+
+\subsection{Derived models}
+After BERT, many other models built on similar architecture appeared. They all aims to improve original BERT paper in (at least) one of this three methods:
+\begin{itemize}
+\item A more efficiency -- original BERT models was trained for about 4 days on 4/16 TPU for base and large version respectively and is quite memory intensive. Many methods for shortening the training time, memory consumption or inference time while preserving results were succesfully implemented - some of them even outperformed SOTA results stated by BERT.
+\item An extension of applicability -- BERT model works nice for tasks requiring sentence or token classification, but is unable of language generation. Original model also does not offer a possibility of connecting a knowledge out of the processed text. Both of these problems were explored with well-performing adjusted model architectures as result. %TODO ernie
+\item A results improvements -- Larger models, longer training times, more data,  better pretraining objectives and evolved architecture can lead to a big improvement. Some models only demonstrate scalability with more data, while others win over BERT with more creative pretraining tasks or with combination of many changes. There is another reason behind these models. It is not completely clear why BERT should work so well so many authors offers a deep study of individual BERT component's impact on the performance, theoretical explanations and possible improvements. %TODO XLNet, RoBERTa
+\end{itemize}
+ Most famous and important BERT's derivates will be presented in more detail in following paragraphs.
+ %TODO predelat tabulku z Liu2020 aby tam byly i jména atd. 
  %TODO liu2020 predstavuje co potrebujeme vedet - co by se dalo zkoumat
- %TODO v cem jsou dobre
- 
- \subsection{How to use BERT}
+\paragraph{XLNet} \citep{Yang2019a} solves to theoretical BERT's problems:
+\begin{itemize}
+\item MASK token, used in BERT's MLM objective, never occurs in real texts, therefore training data are substantially different from desired practical use, and
+\item BERT uses assumption of independence between MASK tokens, given the unmask words, which does not hold. There definitely could be strong relationship between two masked tokens in the sequence, even if they are not near to each other. And it is desired for the model to learn such relationships.
+\end{itemize}
+XLNet presents three basic differences from BERT: presents new training objective (permutation language modeling), uses Transforemers-XL \citep{Dai2019} architecture instead of original Transformers encoders (from this come the name) and uses two-stream self-attention. The latter is a consequence of used objective, which will be briefly explained now. XLNet uses permutations of input sequence's tokens to model the probability of each token given the rest of the sequence (bidirectionally). To put it simply, few of every possible permutations are selected and than the model learns the probability of given word depending on the previous words in the permuted sentence. As any of words is masked, we need to hide the content (=segment and token embeddings) of the chosen token from the network, but keep position information. Two-stream self-attention process these two kinds of information separately, so it is possible to mask out content information. XLNet presents new state-of-the-art results over previous BERT achievements -- not only with best presented models (trained on more data than BERT and with four times more training time) but also with comparable setting (both model and training data sizes).
+\paragraph{ERNIE} (= Enhanced Language Representation with Informative Entities) \citep{Zhang2019} enriches BERT with knowledge graphs. This contains knowledge presentation and a selection of objective, which will be able to work with knowledge as well as language information. As for encoding, ERNIE finds all named entities, links them into the knowledge graph, encodes knowledge graph using knowledge embeddings %TODO zdro
+which forms the input into ERNIE. BERT architecture with transformer encoders is supplemented with knowledge encoders (K-encoders) stacked on the top of text encoders (T-encoders) and the output of the whole model are embeddings for words and for entities. Pretraining objective for language is same as for BERT (NSP and MLM) and authors also presents MLM-like objective for knowledge: masking of entities. This model outperforms BERT on knowledge-based tasks (entity typing and relation classification and achieves results comparable to BERT on other NLP tasks.
+ %TODO pridat obrázek 2 
+%114M total parameters, N = 6,M = 6, 
+
+\paragraph{RoBERTa} )= robustly optimized BERT approach) \citep{Liu2019} fall into the third category of BERT family. Great results are result of thorough exploration of choices made for original BERT model. RoBERTa uses larger models with more training data (145 GB of uncompressed text more than BERT, which has only 16 GB) and longer training time, but also offers at least partial explanation of influence of architecture, training settings and objectives on BERT's success. Main differences from BERT are:
+\begin{itemize}
+\item removing NSP objective, which surprisingly increases the performance,
+\item FULL-SENTENCES sampling from the dataset: Every input sample contains of full sentences sampled sequentially from data till the maximum size (512) is reached.  Samples may cross boundaries of documents,
+\item bigger batch size (2K comparing to 256 of BERT)
+\item Byte-level tokens encodings instead of WordPiece, with larger vocabulary size
+\item dynamic masking: masks are not selected in advance before pretraining but created always before data enters the model.
+\end{itemize}
+Resulting architecture is better than BERT even trained on the same amount of data for the same time.
+
+\paragraph{UNiLM} (= Unified Language Model \citep{Dong2019} enables BERT to generate text. Model architecture coresponds to $BERT_{large}$ but it combined bidirectional BERT training with objectives strenghtening usage of a left context, which is important for language generation and the model also uses NSP. Training objectives are selected by this rule: 1/3 of time, MLM objective (same as BERT) is used, 1/3 of time model uses sequence-to-sequence language modeling (using previous sentence and all words form left context) and unidirectional language modeling (righ-to-left and left-to-right) objectives are used with 1/6 probability. Results are comparable to BERT, with no significant improvement, but the model is able to reach new state-of-the art on several language generation tasks.
+%TODO obrazek s maskami
+
+\paragraph{ELECTRA} (= Efficiently Learning an Encoder that Classifies Token Replacements Accurately) \citep{Clark2020}. ELECTRA presents both more efficiency in training time and improvement on pretraining task. Problem of BERT's MLM task as identified by ELECTRA is its waste of training data. As BERT masks 15\% of tokens, almost 85\% of training data are unused. To solve this problem, ELECTRA proposes new training task, which is defined over all input tokens -- selected tokens are replaced by their alternatives (generated by additional small network) and the goal for each token is to decide whether it is original or replaced token. Model has therefore two parts -- generator and discriminator (loosely on spored by Generative Adversial Networks) It significantly decreases training time, because data are used more efficiently. Even with shorter training time, ELELCTRA outperforms both XLNet and RoBERTa.
+%MASS - to je úprava hlavne pro sequence generation
+\paragraph{T5} (= “Text-to-Text Transfer Transformer” ) \citep{Raffel2019a} is another approach to langauge generating and also another deep study of various parameters' influence.The training objective is similar to BERT, they choose 15\% of tokens and replace them by the mask token. One change is presented -- it showed to be useful to select whole spans of text of length 3 and replace them with one mask token rather than randomly select only words. Final architecture implements encoder-decoder pattern with 5 different model sizes. Only the two largest models achieved results comparable to BERT and in the case of the largest one (%TODO nejakej porovnani) 
+even outperformed previous state-of-the-art. T5 model uses text-to-text input format. Text-to-text format means that every input is in the text form and also every output. This is natural for some tasks like question answering or translation, but here also tasks with another output type are converted into text and the format is unified for all tasks. Unified format allows same architecture and training for all tasks and also easy multitask training.   %TODO infilioing mozna neni pravda
+ %longer training, multitask pretraining 
+%TODO size
+%allows us to directly apply the same model, objective, training procedure, and decoding process to every task we consider
+%aky tam jsou transformers bloky, GLUE, SQUad a nejaky prekladyw
+%training objective is similar to BERT, they choose 15\% of tokens and replace them by something. OUtput is than only the missing words (figure 2 z clanku) a nebo klasicky langauge modelling
+%používají zjednodušenou BERT objective - 
+%zkouseli taky cele spany a nakonec používají délku 3
+%ruzne typy ladeni a nakonec nejlepsi je ladit vse
+%1 million steps on a batch size of 211 sequences of length 512, c
+%1 trilion pretraining tokens
+\paragraph{BART} (= Bidirectional and Auto-Regressive Transformers) \citep{Lewis2019} is an improvement over BERT, which offers generalization upon previous BERT-like models in terms of training objective and architecture. BART presents good result in both classification and text generation tasks. BART, similarly to T5, implements encoder-decoder architecture, in this case uniting bidirectional encoder (like BERT) with left-to-right decoder (like in GPT). Main benefit of BART architecture is that it allows arbitrary noising of the input text. Encoder first process the noised input and than decoder tries to reproduce original (not damaged) text. Among many studied possible noises, sentence shuffling and text infilling provided to be the best, although for different task the performance of various pretraining objectives varied. First objective simply change the position of sentences. Text infilling replace randomly chosen span of text and replaces it by MASK token. Size of the span is chosen from Poison distribution with $\lambda$ equal to 3 (in contrast to T5, where the size was fixed) and can be zero. Size is comparable to BERT (10\% more parameters). It reaches the performance of BERT and RoBERTa  for comparable tasks and presents new state-of-the-art on language generation tasks.
+%TODO figure 1 ukazuje, jak je related s bertem
+\paragraph{Compression of BERT} In addition to models mentioned above, there is a wide range of compression efforts.  In the \citep{Ganesh2020}, authors offers a overview of possible compression methods:
+\begin{itemize}
+\item data quantization: using less bits to represent weights
+\item various types of prunning: removing less important weights or components (encoder layers, attention heads)
+\item knowledge distillation: involves the large model as a teacher and a smaller model (possibly with completely different architecture) as a student. Student model can learn to imitate different settings of the teacher model (i.e., encoder outputs or output logits)
+\item architecture compression: sharing some weights across the model or decrease the vocabulary size of embeddings.
+\end{itemize}
+This study showed a possibility of reducing BERT to the quarter of original size while preserving performance. One of the famous smaller models is ALBERT (=A Lite BERT) \citep{Lan2019}. ALBERT uses to reduction techniques -- reduces the size of embedding matrix by approximating it with two smaller matrices, and parameters sharing across the layers. In addition to this, ALBERT presents a modification to NSP objective: sentence-order prediction (SOP).
+
+\subsection{How to use language models}
  \label{sub:howto}
- For using on a new tasks, there are basically two possibilities:
+ %TODO bert to delá takto:The learning rate is warmed up over the first 10,000 steps to a peak value of 1e-4, and then linearly decayed fakt?
+ %TODO why finetune:  https://arxiv.org/abs/1908.05620
+ %TODO jak se používá ta multilingual verze a jaké jsou jazykové verze
+ %TODO a neměla bych to dát do toho obecného? nebo do diskuze? nebo až představím ty ostatní modely?
+ %TODO a \citep{Sun} finetuning
+ %TODO cite ulmfit
+
+ For using BERT-like models in new tasks, there are three possible ways \citep{Liu2020}: 
  \begin{itemize}
- \item one data pass through BERT to generate embeddings
- \item add new classification head(s) and train whole model
+ \item feature-based: one data pass through BERT to generate embeddings
+ \item fine-tuning: add new classification head(s) and train the whole model
+ \item adapter methods: adding task-specific layers between BERT layers and train them for target tasks with other BERT layers frozen \citep{Stickland2019}.
  \end{itemize}.
- In the first case, the model is used only once to generate embeddings for all input data. These embeddings are stored and later fed to any other NLP model like regular embeddings. Technically this can be achieved by stacking the second model on the top of BERT and freeze (disable training) on BERT layers, but whit would be time and memory more consuming. This method is valid, the results will more likely be improved by using BERT embeddings over some other types, but as BERT paper suggests, this method loses some language model potential. %TODO jake jsou moznosti vytvorit ty embeddings?
-%Semi-supervised Sequence Learning and ULMFiT.
- In the second case, a typical scenario based on  
- is following:
- Classification head or more sophisticated model is stacked on the top of BERT. In the first phase, this whole new model is trained as if it was using only BERT embeddings, i.e., BERT part is frozen. This phase takes a fair amount of episodes %TODO  co je typicke
- and typical learning rate around %TODO doplnit. 
- After that, when the model is not a totally random mess and returns quite decent results, the whole model, including BERT layers, is further trained (finetunned) for few episodes and with a significantly smaller learning rate, e.g. %TODO doplnit.
- This training practice's motivation is the belief that the original language model captured many generally applicable information about the language and is better than random initialization. Because the model is large and supervised data are usually not so big, it is undesirable to train the whole model, as it can take a long time to convergence and randomly mess up with the trained model's knowledge. After the first training phase, however, the classification head knows the right direction, figuratively speaking, and with the small learning rate, the goal is just to customize the language model a bit for current tasks. %TODO ZDROJE!!!
+In the first case, the model is used only once to generate embeddings for all input data. These embeddings are stored and later fed to any other NLP model like regular embeddings. Technically this can be achieved by stacking the second model on the top of BERT and freeze (disable training) on BERT layers, but whit would be time and memory more consuming. This method is valid, the results will more likely be improved by using BERT embeddings over some other types, even the study in the BERT paper shows that using concatenation of last four layers can achieve comparable performance to fine-tuned BERT, but this method still seem to loose some potential of language models compared to learning the model on specific task.
+
+ %In the second case, a typical scenario based on is following: %TODO ot je fakt typické?
+ %Classification head or more sophisticated model is stacked on the top of BERT. In the first phase, this whole new model is trained as if it was using only BERT embeddings, i.e., BERT part is frozen. This phase takes a fair amount of episodes 
+ %and typical learning rate around %TODO doplnit. 
+% After that, when the model is not a totally random mess and returns quite decent results, the whole model, including BERT layers, is further trained (finetuned) for few episodes and with a significantly smaller learning rate, e.g. %TODO doplnit.
+ %This training practice's motivation is the belief that the original language model captured many generally applicable information about the language and is better than random initialization. Because the model is large and supervised data are usually not so big, it is undesirable to train the whole model, as it can take a long time to convergence and randomly mess up with the trained model's knowledge. After the first training phase, however, the classification head knows the right direction, figuratively speaking, and with the small learning rate, the goal is just to customize the language model a bit for current tasks. %TODO ZDROJE!!!
+ 
+ 
+ %Training method can vary depending on the task type - if the goal is sentence classification, CLS token was firstly used as an representation of the whole sentence (specifically its representation from the last hidden layer). %TODO a jeslti je něco lepšího 
+
+ 
+ During the training, selecting the right learning rate strategy is the essential thing. \citep{Ruder2018}?? and \citep{Sun} propose selecting different learning rates for different BERT layers during finetuning. 
+ 
+ Another possibility is a further pretraining on the domain specific data \citep{Sun} with original BERT objectives.
+ 
+%Interesting thing actually useful in this work is multitask learning. Sharing Some part of the network between different task can, same as transfer learning, lead to better performance due to sharing useful general information between these two tasks.
 
  \subsection{Why is BERT so special?}
  \label{sub:specialBert}
  %napsat ze je special a proc -- vysledky, asi v teorii a odkaz dát sem
-For deep learning architectures, it is quite common that why they work (especially why they work so well compared to other possibilities) is not visible at first sight. The authors offer the following explanation. In contrast to other SOTA league language models, BERT uses both contexts of words. In the figure %todo obrazek z berta
-is a comaprison of two other such models - ELMo and GTP %todo zdroje
-. GTP is also based on Transformers architecture, but unlike BERT, it uses decoder part of Transformer. 
-GTP uses just the left context of the word, as a sentence is processed sequentially. ELMo uses LSTM %todo odkaz
-with both left-to-right and right-to-left training and concatenates results at the end. BERT is proceeding both sides context simultaneously, and due to architecture, in \textit{every layer} every transformer block potentially has information from every other block (and thus from every other word). That is why BERT is called \textbf{deeply} bidirectional or non-directional (because there is no right-to-left or left-to-right direction of processing).
+For deep learning architectures, it is quite common that why they work (especially why they work so well compared to other possibilities) is not visible at first sight. The authors offer the following explanation. 
 \par
 Responses to questions why and how BERT works are, however, not so simple. There are many papers on how BERT works, what BERT learns and knows, how BERT architecture can be simplified and so on. There appeared new term "bertology" for this area of research.
+
+
+ %TODO jake jsou moznosti vytvorit ty embeddings - jake brat vrstvy a jak spojovat
+%it is possible to take last layer, all layers, select some of them and another question is how t combine them together \citep{Ruder2018}. %(Yosinski et al., 2014; Howard and Ruder, 2018)
+
+
+%GPT uceni z raw rextu je nice, pouziva transformers, pouzivaji LM, during finetunig incorporates auxilliary ML objective, decoder only transformer, cosine lr schedule, We use a linear learning rate decay schedule with warmup over 0.2% of training. λ
+
+%TODO neni jasne na jakych objectives to trenovat a jak to potom transferovat
+
+%TODO jsou zminene GloVe u word2vec? 
+
+%TODO self-supervised Yann lecun !!! lepsi nez unsupervised
+
+%TODO GPT 2 je vetsi nez bert large\textbf{•}
+
+%TODO Dai and Le (2015) se objevuje často, asi ho budu muset zmínit
  
+%TODO tohle z T5 jsou sota. (Devlin et al., 2018; Yang et al., 2019; Dong et al., 2019; Liu et al., 2019c; Lan et al., 2019
+
+
+%TODO tabulka - jmeno, training objectives, architecture, bidirectional?, kolik dat, kolik dní, kolik parametrů, jake vsechny tasky
+
+
+%TODO tabulka s treninkovymi casi tu: https://www.borealisai.com/en/blog/understanding-xlnet/
+
+%TODO do lingvisticke casti pospat taky typicke benchmarky squad a glue
+
+%TODO nice obrazek bert architektury v Ganesh2020
+
+%self attention má obrázek tady:  https://arxiv.org/abs/1908.05620
+
+
+%srovnani pretrainingu:  https://arxiv.org/abs/1905.00537
+
+%prezentace tady: http://speech.ee.ntu.edu.tw/~tlkagk/courses/DLHLP20/BERT%20train%20(v8).pdf
+
+
+%Turing NLG a megatron, pouzivaji attention (ale je tam limitation na self attention, proc?) a predict next token
 
 

@@ -112,10 +112,14 @@
 \newlabel{pic:rnn}{{1.11}{18}{Basic Recurent neural network architecture. It is composed by one rnn cell which recurrently uses informations from previous seen input. For better illustration of working in the time, RNN can be visualised as a chain of cells connected by a result of previous cell. source: \textit {Picture from https://medium.com/deeplearningbrasilia/deep-learning-recurrent-neural-networks-f9482a24d010}}{figure.1.11}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {1.12}{\ignorespaces Comparison of LSTM and GRU architecture \textit  {http://dprogrammer.org/rnn-lstm-gru}.}}{18}{figure.1.12}\protected@file@percent }
 \newlabel{pic:lstm_gru}{{1.12}{18}{Comparison of LSTM and GRU architecture \textit {http://dprogrammer.org/rnn-lstm-gru}}{figure.1.12}{}}
+\citation{Russakovsky2015}
 \citation{Huh}
 \citation{Ruder2019}
+\citation{Pan2009}
 \citation{Ruder2019}
+\citation{Pan2009}
 \citation{Feijo2020}
+\citation{Hewitt2020}
 \citation{Liu2020}
 \@writefile{lof}{\contentsline {figure}{\numberline {1.13}{\ignorespaces This picture describes design of one transformers layer. source: http://jalammar.github.io/illustrated-transformer }}{19}{figure.1.13}\protected@file@percent }
 \newlabel{pic:enco_deco}{{1.13}{19}{This picture describes design of one transformers layer. source: http://jalammar.github.io/illustrated-transformer}{figure.1.13}{}}
@@ -128,52 +132,99 @@
 \citation{Feijo2020}
 \@writefile{lof}{\contentsline {figure}{\numberline {1.14}{\ignorespaces  In transformers, encoder and decoder parts are both composed by many of block of respective types. The input goes first through a series of encoders and than the output of encoder part is put into every decoder in the decoder part. source: http://jalammar.github.io/illustrated-transformer/ }}{20}{figure.1.14}\protected@file@percent }
 \newlabel{pic:enco_deco_all}{{1.14}{20}{In transformers, encoder and decoder parts are both composed by many of block of respective types. The input goes first through a series of encoders and than the output of encoder part is put into every decoder in the decoder part. source: http://jalammar.github.io/illustrated-transformer/}{figure.1.14}{}}
+\citation{McCann2017}
+\citation{Peters2017}
+\citation{Peters2018}
+\citation{Akbik2018}
+\citation{Radfort2018}
+\citation{RadfordAlec2019}
+\citation{Brown2020}
+\citation{McCann2017}
+\citation{Peters2017}
+\citation{Peters2017}
+\@writefile{lof}{\contentsline {figure}{\numberline {1.15}{\ignorespaces Figure from \citep {Ruder2019} offers possible taxonomy for transfer learning. Following definiton in \citep  {Pan2009}, transfer learning's goal is to improve the performance on task $T_1$ from domain $D_1$ by learning knowledge on task $T_0$ from domain $D_0$. Domain is defined as $D = {\chi ,P(X)}$, where $X \in \chi $, $\chi $ is a feature space and $P(X)$ is a marginal probability distribution over the feature space. Transfer learning allows the use of trained models on tasks with different sets of labels or different input data's nature. Input data can vary in the source they come from (wikipedia text versus a novel or a social network posts), they can learn from different features (e.g. different languages) or the distribution of classes is different than it was in the training data (so some highly presented classes in training data are rare in this new task and others are quite common but previously not seen too many times). }}{21}{figure.1.15}\protected@file@percent }
+\newlabel{pic:tl_taxonomy}{{1.15}{21}{Figure from \protect \citep {Ruder2019} offers possible taxonomy for transfer learning. Following definiton in \citep {Pan2009}, transfer learning's goal is to improve the performance on task $T_1$ from domain $D_1$ by learning knowledge on task $T_0$ from domain $D_0$. Domain is defined as $D = {\chi ,P(X)}$, where $X \in \chi $, $\chi $ is a feature space and $P(X)$ is a marginal probability distribution over the feature space. Transfer learning allows the use of trained models on tasks with different sets of labels or different input data's nature. Input data can vary in the source they come from (wikipedia text versus a novel or a social network posts), they can learn from different features (e.g. different languages) or the distribution of classes is different than it was in the training data (so some highly presented classes in training data are rare in this new task and others are quite common but previously not seen too many times)}{figure.1.15}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {1.3}BERT and its descendants}{21}{section.1.3}\protected@file@percent }
+\newlabel{sec:bert}{{1.3}{21}{BERT and its descendants}{section.1.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{First attempts}{21}{section*.10}\protected@file@percent }
+\citation{Peters2017}
 \citation{Devlin2019}
-\@writefile{lof}{\contentsline {figure}{\numberline {1.15}{\ignorespaces Figure from \citep {Ruder2019} offers possible taxonomy for transfer learning. Transfer learning allows the use of trained models on tasks with different sets of labels or different input data's nature. Input data can vary in domain they come from (wikipedia text versus a novel or a social network posts), they can learn from different features (e.g. different languages) or the distribution of classes is different than it was in the training data (so some highly presented classes in training data are rare in this new task and others are quite common but previously not seen too many times). }}{21}{figure.1.15}\protected@file@percent }
-\newlabel{pic:tl_taxonomy}{{1.15}{21}{Figure from \protect \citep {Ruder2019} offers possible taxonomy for transfer learning. Transfer learning allows the use of trained models on tasks with different sets of labels or different input data's nature. Input data can vary in domain they come from (wikipedia text versus a novel or a social network posts), they can learn from different features (e.g. different languages) or the distribution of classes is different than it was in the training data (so some highly presented classes in training data are rare in this new task and others are quite common but previously not seen too many times)}{figure.1.15}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {1.3}BERT explanation}{21}{section.1.3}\protected@file@percent }
-\newlabel{sec:bert}{{1.3}{21}{BERT explanation}{section.1.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{ELMo}{22}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Flair}{22}{section*.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{GPT}{22}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3.1}BERT}{22}{subsection.1.3.1}\protected@file@percent }
 \citation{Devlin2019}
 \citation{Devlin2019}
 \citation{Devlin2019}
 \citation{Wu2016}
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.3.1}Input embeddings}{22}{subsection.1.3.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1.16}{\ignorespaces  Input is representing using tree kinds of embeddings. Source: \textit  {\citep  {Devlin2019}}.}}{22}{figure.1.16}\protected@file@percent }
-\newlabel{pic:bert_emb}{{1.16}{22}{Input is representing using tree kinds of embeddings. Source: \textit {\citep {Devlin2019}}}{figure.1.16}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1.17}{\ignorespaces This figure illustrates a transformation of one input sentence (from PDT3) to suit bert input expectations. The sentence is divided into words and then into tokens from wordpiece tokenizer vocabulary. Accents may be removed depending on the used model. The sentence is decorated with special CLS and SEP tokens to mark the beginning and the end of the sentence. All tokens are then converted into numbers. }}{23}{figure.1.17}\protected@file@percent }
-\newlabel{pic:bert_inp}{{1.17}{23}{This figure illustrates a transformation of one input sentence (from PDT3) to suit bert input expectations. The sentence is divided into words and then into tokens from wordpiece tokenizer vocabulary. Accents may be removed depending on the used model. The sentence is decorated with special CLS and SEP tokens to mark the beginning and the end of the sentence. All tokens are then converted into numbers}{figure.1.17}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Input embeddings}{23}{section*.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Token embeddings}{23}{section*.15}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1.16}{\ignorespaces  Input is representing using tree kinds of embeddings for every input word. Every sequence is also decorated by beggining and ending marker (CLS and SEP token), which are also encoded using a combination of all three embedding types. Source: \textit  {\citep  {Devlin2019}}.}}{24}{figure.1.16}\protected@file@percent }
+\newlabel{pic:bert_emb}{{1.16}{24}{Input is representing using tree kinds of embeddings for every input word. Every sequence is also decorated by beggining and ending marker (CLS and SEP token), which are also encoded using a combination of all three embedding types. Source: \textit {\citep {Devlin2019}}}{figure.1.16}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1.17}{\ignorespaces This figure illustrates a transformation of one input sentence (from PDT3) to suit bert input expectations. The sentence is divided into words and then into tokens from wordpiece tokenizer vocabulary. Accents may be removed depending on the used model. The sentence is decorated with special CLS and SEP tokens to mark the beginning and the end of the sentence. All tokens are then converted into numbers. }}{24}{figure.1.17}\protected@file@percent }
+\newlabel{pic:bert_inp}{{1.17}{24}{This figure illustrates a transformation of one input sentence (from PDT3) to suit bert input expectations. The sentence is divided into words and then into tokens from wordpiece tokenizer vocabulary. Accents may be removed depending on the used model. The sentence is decorated with special CLS and SEP tokens to mark the beginning and the end of the sentence. All tokens are then converted into numbers}{figure.1.17}{}}
 \citation{Devlin2019}
+\citation{Liu2019}
 \citation{Taylor1953}
+\@writefile{toc}{\contentsline {paragraph}{Position embeddings}{25}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Segment embeddings}{25}{section*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Pretraining tasks}{25}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Next Sentence Prediction}{25}{section*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Masked Language Modeling}{25}{section*.20}\protected@file@percent }
 \citation{Vaswani2017}
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.3.2}Pretraining tasks}{24}{subsection.1.3.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Next Sentence Prediction}{24}{section*.13}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Masked Language Modeling}{24}{section*.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.3.3}Transformers encoder architecture}{24}{subsection.1.3.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.3.4}How to use BERT}{25}{subsection.1.3.4}\protected@file@percent }
-\newlabel{sub:howto}{{1.3.4}{25}{How to use BERT}{subsection.1.3.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.3.5}Why is BERT so special?}{25}{subsection.1.3.5}\protected@file@percent }
-\newlabel{sub:specialBert}{{1.3.5}{25}{Why is BERT so special?}{subsection.1.3.5}{}}
+\citation{Devlin2019}
+\citation{Devlin2019}
+\@writefile{lot}{\contentsline {table}{\numberline {1.1}{\ignorespaces Difference between base and large version of BERT model, as published in \citep  {Devlin2019}. }}{26}{table.1.1}\protected@file@percent }
+\newlabel{Tab:base_large}{{1.1}{26}{Difference between base and large version of BERT model, as published in \citep {Devlin2019}}{table.1.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Architecture}{26}{section*.21}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3.2}Derived models}{26}{subsection.1.3.2}\protected@file@percent }
+\citation{Yang2019a}
+\citation{Dai2019}
+\citation{Zhang2019}
+\citation{Liu2019}
+\@writefile{toc}{\contentsline {paragraph}{XLNet}{27}{section*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{ERNIE}{27}{section*.23}\protected@file@percent }
+\citation{Dong2019}
+\citation{Clark2020}
+\citation{Raffel2019a}
+\@writefile{toc}{\contentsline {paragraph}{RoBERTa}{28}{section*.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{UNiLM}{28}{section*.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{ELECTRA}{28}{section*.26}\protected@file@percent }
+\citation{Lewis2019}
+\citation{Ganesh2020}
+\citation{Lan2019}
+\@writefile{toc}{\contentsline {paragraph}{T5}{29}{section*.27}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{BART}{29}{section*.28}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Compression of BERT}{29}{section*.29}\protected@file@percent }
+\citation{Liu2020}
+\citation{Ruder2018}
+\citation{Sun}
+\citation{Sun}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3.3}How to use language models}{30}{subsection.1.3.3}\protected@file@percent }
+\newlabel{sub:howto}{{1.3.3}{30}{How to use language models}{subsection.1.3.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3.4}Why is BERT so special?}{30}{subsection.1.3.4}\protected@file@percent }
+\newlabel{sub:specialBert}{{1.3.4}{30}{Why is BERT so special?}{subsection.1.3.4}{}}
 \@setckpt{chap01}{
-\setcounter{page}{26}
+\setcounter{page}{31}
 \setcounter{equation}{1}
 \setcounter{enumi}{0}
 \setcounter{enumii}{0}
 \setcounter{enumiii}{0}
 \setcounter{enumiv}{0}
-\setcounter{footnote}{12}
+\setcounter{footnote}{14}
 \setcounter{mpfootnote}{0}
 \setcounter{part}{0}
 \setcounter{chapter}{1}
 \setcounter{section}{3}
-\setcounter{subsection}{5}
+\setcounter{subsection}{4}
 \setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
 \setcounter{figure}{17}
-\setcounter{table}{0}
+\setcounter{table}{1}
 \setcounter{Item}{0}
-\setcounter{Hfootnote}{12}
-\setcounter{bookmark@seq@number}{21}
+\setcounter{Hfootnote}{14}
+\setcounter{bookmark@seq@number}{20}
 \setcounter{@todonotes@numberoftodonotes}{0}
 \setcounter{section@level}{2}
 \setcounter{parentequation}{0}

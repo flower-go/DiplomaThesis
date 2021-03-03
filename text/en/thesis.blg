@@ -39,6 +39,7 @@ Warning--no proper publisher, using url in Hochreiter1997
 Warning--empty note in Hochreiter1997
 Warning--no publisher, address, url or date in Horsmann
 Warning--empty note in Horsmann
+Warning--empty pages in Ruder2018
 Warning--no publisher, address, url or date in Huh
 Warning--empty note in Huh
 Warning--no publisher, address, url or date in Hutchins
@@ -49,12 +50,14 @@ Warning--empty note in Li
 Warning--no proper publisher, using url in Libovicky
 Warning--empty note in Libovicky
 Warning--empty note in Ling
+Warning--empty pages in McCann2017
 Warning--no proper publisher, using url in McCulloch
 Warning--empty note in McCulloch
 Warning--no proper publisher, using url in Mikolov2013
 Warning--empty note in Mikolov2013
 Warning--no proper publisher, using url in Pennington
 Warning--empty note in Pennington
+Warning--empty pages in Peters2017
 Warning--no proper publisher, using url in Plank
 Warning--empty note in Plank
 Warning--no publisher, address, url or date in Plisson
@@ -67,49 +70,51 @@ Warning--empty note in Russell1995
 Warning--empty note in Schwenk2006
 Warning--no proper publisher, using url in Straka2019b
 Warning--empty note in Straka2019b
+Warning--no proper publisher, using url in Sun
+Warning--empty note in Sun
 Warning--no proper publisher, using url in Szegedy2015
 Warning--empty note in Szegedy2015
 Warning--empty note in Turian2010
 Warning--empty note in Wilks
-You've used 64 entries,
+You've used 85 entries,
             3552 wiz_defined-function locations,
-            1216 strings with 19464 characters,
-and the built_in function-call counts, 59019 in all, are:
-= -- 7272
-> -- 966
-< -- 1933
-+ -- 2455
-- -- 757
-* -- 5700
-:= -- 10208
-add.period$ -- 88
-call.type$ -- 64
-change.case$ -- 429
-chr.to.int$ -- 61
-cite$ -- 117
-duplicate$ -- 1236
-empty$ -- 3545
-format.name$ -- 1276
-if$ -- 10893
-int.to.chr$ -- 3
+            1331 strings with 24586 characters,
+and the built_in function-call counts, 86124 in all, are:
+= -- 10676
+> -- 1491
+< -- 3058
++ -- 3893
+- -- 1209
+* -- 8361
+:= -- 15155
+add.period$ -- 110
+call.type$ -- 85
+change.case$ -- 639
+chr.to.int$ -- 81
+cite$ -- 143
+duplicate$ -- 1750
+empty$ -- 4725
+format.name$ -- 2038
+if$ -- 15535
+int.to.chr$ -- 4
 int.to.str$ -- 1
-missing$ -- 67
-newline$ -- 423
-num.names$ -- 252
-pop$ -- 547
+missing$ -- 116
+newline$ -- 559
+num.names$ -- 336
+pop$ -- 808
 preamble$ -- 1
-purify$ -- 429
+purify$ -- 639
 quote$ -- 0
-skip$ -- 2687
+skip$ -- 3985
 stack$ -- 0
-substring$ -- 4926
-swap$ -- 373
-text.length$ -- 238
+substring$ -- 6956
+swap$ -- 580
+text.length$ -- 385
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 689
-warning$ -- 51
-while$ -- 608
+type$ -- 920
+warning$ -- 56
+while$ -- 870
 width$ -- 0
-write$ -- 724
-(There were 51 warnings)
+write$ -- 959
+(There were 56 warnings)
