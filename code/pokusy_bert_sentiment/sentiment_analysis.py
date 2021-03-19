@@ -34,13 +34,21 @@ class Network:
         if args.freeze:
             self.bert.trainable = False
 
-        # vezmu posledni vrstvu
-        # TODO mohla bych vzít jen cls tokeny
+        # TODO nebo attention
         bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
+        print("shape of output")
+        print(bert_output.shape())
+        bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2]
+        weights = tf.Variable(tf.zeros([12]), trainable=True)
+        output = 0
+        softmax_weights = tf.nn.softmax(weights)
+
+        for i in range(12):
+            output = softmax_weights[i]*bert_output[i]
         if args.freeze:
             print("freeze " + str(args.freeze))
             bert_output.trainable = False
-        dropout = tf.keras.layers.Dropout(args.dropout)(bert_output)
+        dropout = tf.keras.layers.Dropout(args.dropout)(output)
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
 
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
