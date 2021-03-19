@@ -34,7 +34,7 @@ class Network:
         if args.freeze:
             self.bert.trainable = False
 
-        # TODO nebo attention
+        #TODO att
         bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
         print("shape of output")
         print(bert_output.shape())
@@ -44,11 +44,13 @@ class Network:
         softmax_weights = tf.nn.softmax(weights)
 
         for i in range(12):
-            output = softmax_weights[i]*bert_output[i]
+            output += softmax_weights[i]*bert_output[i]
         if args.freeze:
             print("freeze " + str(args.freeze))
             bert_output.trainable = False
-        dropout = tf.keras.layers.Dropout(args.dropout)(output)
+        dropout = tf.keras.layers.Dropout(args.dropout, activation=tf.nn.tanh)(output[0]) #chci vzit jen ten cls token
+        print("dropout")
+        print(dropout.shape)
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
 
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
