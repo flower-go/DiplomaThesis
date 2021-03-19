@@ -270,7 +270,7 @@ if __name__ == "__main__":
         imdb_ex, imdb_lab = dataset.get_dataset("imdb")
         imdb_ex = np.array(imdb_ex)
         imdb_lab = np.array(imdb_lab)
-        size = min(len(data_result.train._data["tokens"])*args.english, len(imdb_ex))
+        size = min(len(data_result.train._data["tokens"])*args.english, len(imdb_ex))/len(imdb_ex)
         imdb_ex, _,imdb_lab,_, = train_test_split(imdb_ex,imdb_lab, train_size=size, shuffle=True, stratify=imdb_lab)
 
         data_result.train._data["tokens"].append(imdb_ex)
