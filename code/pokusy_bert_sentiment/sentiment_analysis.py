@@ -11,7 +11,7 @@ import math
 from keras import backend as b
 import pandas as pd
 from sklearn.model_selection import train_test_split
-#from transformers import WarmUp
+from transformers import WarmUp
 from sklearn.metrics import f1_score
 from sklearn.metrics import confusion_matrix
 
@@ -37,18 +37,21 @@ class Network:
         #TODO att
         bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
         print("shape of output")
-        print(bert_output.shape())
-        bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2]
+        print(bert_output.shape)
+        bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[1]
         weights = tf.Variable(tf.zeros([12]), trainable=True)
         output = 0
         softmax_weights = tf.nn.softmax(weights)
-
+ 
+        print("new")
+        print(str(len(bert_output)))
         for i in range(12):
             output += softmax_weights[i]*bert_output[i]
         if args.freeze:
             print("freeze " + str(args.freeze))
             bert_output.trainable = False
-        dropout = tf.keras.layers.Dropout(args.dropout, activation=tf.nn.tanh)(output[0]) #chci vzit jen ten cls token
+        output = tf.keras.layers.Dense(3,activation=tf.nn.tanh)(output[0])
+        dropout = tf.keras.layers.Dropout(args.dropout)(output) #chci vzit jen ten cls token
         print("dropout")
         print(dropout.shape)
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
@@ -280,7 +283,7 @@ if __name__ == "__main__":
         imdb_ex, imdb_lab = dataset.get_dataset("imdb")
         imdb_ex = np.array(imdb_ex)
         imdb_lab = np.array(imdb_lab)
-        size = min(len(data_result.train._data["tokens"])*args.english, len(imdb_ex))
+        size = min(len(data_result.train._data["tokens"])*args.english, len(imdb_ex))/len(imdb_ex)
         imdb_ex, _,imdb_lab,_, = train_test_split(imdb_ex,imdb_lab, train_size=size, shuffle=True, stratify=imdb_lab)
 
         data_result.train._data["tokens"].append(imdb_ex)

@@ -22,7 +22,7 @@ class SentimentDataset():
             if self.tokenizer is not None:
                 return TextClassificationDataset(path + "/" + "czech_facebook", tokenizer=self.tokenizer.encode)
             else:
-                return self._load_facebook(path + "/" + "czech_facebook")
+                return self._load_facebook(path + "/" + "czech_facebook.zip")
         if dataset_name == "imdb":
             return self._return_imdb(self.tokenizer)
         if dataset_name == "csfd":
