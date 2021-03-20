@@ -55,6 +55,7 @@ class Network:
         print("dropout")
         print(dropout.shape)
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
+        print(predictions.shape)
 
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
         self.optimizer=tf.optimizers.Adam()
@@ -78,7 +79,11 @@ class Network:
             tvs = tvs
             loss = 0.0
 
-
+            print("info")
+            print(str(self.labels))
+            print(str(len(probabilities)))
+            print(str(len(gold_data)))
+            print(str(len(inputs)))
             if args.label_smoothing:
                 loss += self.loss(tf.one_hot(gold_data, self.labels) * (1 - args.label_smoothing)
                     + args.label_smoothing /  self.labels, probabilities)

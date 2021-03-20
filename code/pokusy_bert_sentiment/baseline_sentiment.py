@@ -74,48 +74,45 @@ if __name__ == "__main__":
             print(data.head())
             data_result = pd.concat([data_result, data])
 
-
-    # if data_result is not None:
-    #     res_x = np.concatenate((np.array(data_result.train._data["tokens"]),np.array(data_result.dev._data["tokens"]),np.array(data_result.test._data["tokens"])))
-    #     res_y = np.concatenate((np.array(data_result.train._data["labels"]),np.array(data_result.dev._data["labels"]),np.array(data_result.test._data["labels"])))
-    #     data_result = pd.DataFrame({"Post": res_x, "Sentiment": res_y})
+    if args.english > 0:
+        imdb_ex, imdb_lab = dataset.get_dataset("imdb")
+        imdb_ex = np.array(imdb_ex)
+        imdb_lab = np.array(imdb_lab)
+        imdb_ex, _, imdb_lab, _, = train_test_split(imdb_ex, imdb_lab, train_size=args.english, shuffle=True,
+                                                    stratify=imdb_lab)
+        data_result.train._data["tokens"].append(imdb_ex)
+        data_result.train._data["labels"].append(imdb_lab + 1)
+        
+    data_result["Sentiment"] = data_result["Sentiment"].astype("int")
+        
+    print(data_result.head())
+    
+    ##preprocessings bag of word model
+    from sklearn.feature_extraction.text import CountVectorizer
     #
-    # if args.english > 0:
-    #     imdb_ex, imdb_lab = dataset.get_dataset("imdb")
-    #     imdb_ex = np.array(imdb_ex)
-    #     imdb_lab = np.array(imdb_lab)
-    #     imdb_ex, _, imdb_lab, _, = train_test_split(imdb_ex, imdb_lab, train_size=args.english, shuffle=True,
-    #                                                 stratify=imdb_lab)
-    #
-    #     data_result.train._data["tokens"].append(imdb_ex)
-    #     data_result.train._data["labels"].append(imdb_lab + 1)
-    #
-    # ##preprocessings bag of word model
-    # from sklearn.feature_extraction.text import CountVectorizer
-    #
-    # vectorizer = CountVectorizer(max_features=1500, min_df=5, max_df=0.7, stop_words=stopwords.words('english'))
+    vectorizer = CountVectorizer(max_features=1500, min_df=5, max_df=0.7, stop_words=stopwords.words('english'))
     # #print(data_result["Post"])
-    # X = vectorizer.fit_transform(data_result["Post"]).toarray()
+    X = vectorizer.fit_transform(data_result["Post"]).toarray()
     #
     #
-    # from sklearn.feature_extraction.text import TfidfTransformer
+    from sklearn.feature_extraction.text import TfidfTransformer
     #
-    # tfidfconverter = TfidfTransformer()
-    # X = tfidfconverter.fit_transform(X).toarray()
-    # X_train, X_test, y_train, y_test = train_test_split(X, data_result["Sentiment"], test_size=0.2, random_state=0, stratify=data_result["Sentiment"])
+    tfidfconverter = TfidfTransformer()
+    X = tfidfconverter.fit_transform(X).toarray()
+    X_train, X_test, y_train, y_test = train_test_split(X, data_result["Sentiment"], test_size=0.2, random_state=0, stratify=data_result["Sentiment"])
     #
     #
-    # #Training data
-    # classifier = RandomForestClassifier(n_estimators=1000, random_state=0)
-    # classifier.fit(X_train, y_train)
+    #Training data
+    classifier = RandomForestClassifier(n_estimators=1000, random_state=0)
+    classifier.fit(X_train, y_train)
     #
-    # y_pred = classifier.predict(X_test)
+    y_pred = classifier.predict(X_test)
     #
-    # from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+    from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
     #
-    # print(confusion_matrix(y_test, y_pred))
-    # print(classification_report(y_test, y_pred))
-    # print(accuracy_score(y_test, y_pred))
+    print(confusion_matrix(y_test, y_pred))
+    print(classification_report(y_test, y_pred))
+    print(accuracy_score(y_test, y_pred))
 
 
 
