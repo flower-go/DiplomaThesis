@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 import argparse
 import datetime
@@ -36,26 +37,20 @@ class Network:
 
         #TODO att
         bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
-        print("shape of output")
-        print(bert_output.shape)
         bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[1]
         weights = tf.Variable(tf.zeros([12]), trainable=True)
         output = 0
         softmax_weights = tf.nn.softmax(weights)
- 
-        print("new")
-        print(str(len(bert_output)))
         for i in range(12):
-            output += softmax_weights[i]*bert_output[i]
+            result = softmax_weights[i]*bert_output[i]
+            output += result
+            print(result.shape)
         if args.freeze:
             print("freeze " + str(args.freeze))
             bert_output.trainable = False
-        output = tf.keras.layers.Dense(3,activation=tf.nn.tanh)(output[0])
+        output = tf.keras.layers.Dense(3,activation=tf.nn.tanh)(output[:,0,:])
         dropout = tf.keras.layers.Dropout(args.dropout)(output) #chci vzit jen ten cls token
-        print("dropout")
-        print(dropout.shape)
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
-        print(predictions.shape)
 
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
         self.optimizer=tf.optimizers.Adam()
