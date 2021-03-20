@@ -35,21 +35,22 @@ class Network:
         if args.freeze:
             self.bert.trainable = False
 
-        #TODO att
-        bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
-        bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[1]
-        weights = tf.Variable(tf.zeros([12]), trainable=True)
-        output = 0
-        softmax_weights = tf.nn.softmax(weights)
-        for i in range(12):
-            result = softmax_weights[i]*bert_output[i]
-            output += result
-            print(result.shape)
+        output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
+
+        if args.layers == "att" and not args.freeze:
+            bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[1]
+            weights = tf.Variable(tf.zeros([12]), trainable=True)
+            output = 0
+            softmax_weights = tf.nn.softmax(weights)
+            for i in range(12):
+                result = softmax_weights[i]*bert_output[i+1]
+                output += result
+                print(result.shape)
+            output = tf.keras.layers.Dense(3, activation=tf.nn.tanh)(output[:, 0, :])  # chci vzit jen ten cls token
         if args.freeze:
             print("freeze " + str(args.freeze))
             bert_output.trainable = False
-        output = tf.keras.layers.Dense(3,activation=tf.nn.tanh)(output[:,0,:])
-        dropout = tf.keras.layers.Dropout(args.dropout)(output) #chci vzit jen ten cls token
+        dropout = tf.keras.layers.Dropout(args.dropout)(output)
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
 
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
@@ -229,6 +230,7 @@ if __name__ == "__main__":
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose TF logging.")
     parser.add_argument("--debug", default=True, type=int, help="use small debug data")
     parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
+    parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
     parser.add_argument("--warmup_decay", default=0, type=int, help="Number of warmup steps, than will be applied inverse square root decay")
     args = parser.parse_args([] if "__file__" not in globals() else None)
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
