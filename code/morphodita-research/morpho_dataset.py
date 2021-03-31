@@ -37,7 +37,7 @@ class MorphoDataset:
                                                                       '<unk>': MorphoDataset.UNK}
                 self.alphabet = train.alphabet if train else ['<pad>', '<unk>']
                 self.charseqs_map = {'<pad>': MorphoDataset.PAD, '<unk>': MorphoDataset.UNK}
-                self.charseqs = [[MorphoDataset.PAD], [MorphoDataset.UNK]]
+                self.charseqs = [[MorphoDataset.UNK], [MorphoDataset.UNK]]
                 self.charseq_ids = []
 
     class FactorBatch:
