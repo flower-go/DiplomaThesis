@@ -247,10 +247,10 @@ class Network:
             probabilities, mask = self.evaluate_batch(inp, factors)
 
 
-        if len(args.factors) == 2:
-            predictions_raw = [np.argmax(p, axis=2) for p in probabilities]
-            self.metrics["LemmasTagsRaw"](
-            np.logical_and(factors[0] == predictions_raw[0], factors[1] == predictions_raw[1]), mask)
+            if len(args.factors) == 2:
+                predictions_raw = [np.argmax(p, axis=2) for p in probabilities]
+                self.metrics["LemmasTagsRaw"](
+                np.logical_and(factors[0] == predictions_raw[0], factors[1] == predictions_raw[1]), mask)
         metrics = {name: metric.result() for name, metric in self.metrics.items()}
         with self._writer.as_default():
             for name, value in metrics.items():
