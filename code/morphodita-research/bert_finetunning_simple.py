@@ -129,6 +129,9 @@ class Network:
             print("kolik je maskovanych " + str(np.sum(batch[dataset.data.FACTORS_MAP["Lemmas"]].word_ids == 0, axis=1)))
             print("kolik neni " + str(np.sum(batch[dataset.data.FACTORS_MAP["Lemmas"]].word_ids != 0, axis=1)))
             inp = [batch[dataset.data.FORMS].word_ids, batch[dataset.data.FORMS].charseqs,batch[dataset.data.FORMS].charseq_ids,]
+            #print("WI", batch[dataset.data.FORMS].word_ids)
+            #print("CS", batch[dataset.data.FORMS].charseqs)
+            #print("CSI", batch[dataset.data.FORMS].charseq_ids, flush=True)
             print('train epoch')
 
             #TODO neměla bych prumerovat metriky?
