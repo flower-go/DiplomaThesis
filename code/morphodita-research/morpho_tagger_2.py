@@ -27,9 +27,6 @@ class BertModel:
 
 class Network:
 
-    def join_accuracy(self, labels, probabilities):
-        ...
-
     def __init__(self, args, num_words, num_chars, factor_words, model):
 
         self.factors = args.factors
@@ -141,7 +138,17 @@ class Network:
                 inp2.append(subwords)
 
                 self.bert = model.model
-                model_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2][-4:]
+                if args.layers == "att":
+                    bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2]
+                    weights = tf.Variable(tf.zeros([12]), trainable=True)
+                    output = 0
+                    softmax_weights = tf.nn.softmax(weights)
+                    for i in range(12):
+                        result = softmax_weights[i] * bert_output[i + 1]
+                        output += result
+                    model_output = output
+                else:
+                    model_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2][-4:]
                 bert_output = tf.math.reduce_mean(
                     model_output
                     , axis=0) # prumerovani vrstev
@@ -492,11 +499,15 @@ if __name__ == "__main__":
     parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
     parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
     parser.add_argument("--warmup_decay", default=0, type=int, help="Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
 
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
     args.cont = args.cont == 1
-    #args.accu = args.accu == 1
+    # Postprocess args
+    args.factors = args.factors.split(",")
+    args.epochs = [(int(epochs), float(lr)) for epochs, lr in
+                   (epochs_lr.split(":") for epochs_lr in args.epochs.split(","))]
 
 
     # TODO vyřešit
@@ -532,10 +543,7 @@ if __name__ == "__main__":
 
     # TODO write summaries using logdir
 
-    # Postprocess args
-    args.factors = args.factors.split(",")
-    args.epochs = [(int(epochs), float(lr)) for epochs, lr in
-                   (epochs_lr.split(":") for epochs_lr in args.epochs.split(","))]
+
 
     # Load embeddings
     if args.embeddings:
