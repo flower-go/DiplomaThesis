@@ -48,7 +48,18 @@ class Network:
 
         inp = [subwords, charseqs, charseq_ids]
         bert = model.model
-        bert_output = bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
+        #TODO dopsat att
+        if args.layers == "att":
+            bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2]
+            weights = tf.Variable(tf.zeros([12]), trainable=True)
+            output = 0
+            softmax_weights = tf.nn.softmax(weights)
+            for i in range(12):
+                result = softmax_weights[i] * bert_output[i + 1]
+                output += result
+            bert_output = output
+        else:
+            bert_output = bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
         self.labels = labels
         dropout = tf.keras.layers.Dropout(rate=args.dropout)(bert_output)
 
@@ -301,6 +312,7 @@ if __name__ == "__main__":
     parser.add_argument("--warmup_decay", default=0, type=int,help="Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--word_dropout", default=0, type=float, help="Word dropout rate")
     parser.add_argument("data", type=str, help="Input data")
+    parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
 
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
