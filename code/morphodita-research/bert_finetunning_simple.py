@@ -24,8 +24,11 @@ class BertModel:
         self.name = name
         self.config = transformers.BertConfig.from_pretrained(name)
         self.config.output_hidden_states = True
-        self.tokenizer = transformers.BertTokenizer.from_pretrained(name)
-        self.model = transformers.TFBertModel.from_pretrained(name,
+        if name == "roberta":
+            self.tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer("robeczech/robeczech/noeol-210323/tokenizer")
+        else:
+            self.tokenizer = transformers.BertTokenizer.from_pretrained(name)
+        self.model = transformers.TFAutoModel.from_pretrained(name,
                                                               config=self.config)
         self.embeddings_only = True if args.bert else False
 
