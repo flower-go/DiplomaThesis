@@ -231,6 +231,7 @@ class MorphoDataset:
                         bert_subwords.append([])
                         for i_w, w in enumerate(s):
                             w_e = self.tokenizer.encode(w, add_special_tokens=False)
+                            print(w_e.type)
                             bert_segments[-1].extend([i_w] * len(w_e))
                             bert_subwords[-1].extend(w_e)
 
