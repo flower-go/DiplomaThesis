@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import sys
+sys.path.append("robeczech/noeol-210323/")
+import tokenizer.robeczech_tokenizer
 import collections
 import json
 import math
@@ -22,13 +25,16 @@ from keras.models import load_model
 class BertModel:
     def __init__(self, name, args):
         self.name = name
-        self.config = transformers.BertConfig.from_pretrained(name)
-        self.config.output_hidden_states = True
+
         if name == "roberta":
-            self.tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer("robeczech/robeczech/noeol-210323/tokenizer")
+            self.path = "robeczech/noeol-210323/"
+            self.tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer(self.path + "tokenizer")
+            self.model = transformers.TFAutoModel.from_pretrained(self.path + "tf", output_hidden_states=True)
         else:
             self.tokenizer = transformers.BertTokenizer.from_pretrained(name)
-        self.model = transformers.TFAutoModel.from_pretrained(name,
+            self.config = transformers.BertConfig.from_pretrained(name)
+            self.config.output_hidden_states = True
+            self.model = transformers.TFAutoModel.from_pretrained(name,
                                                               config=self.config)
         self.embeddings_only = True if args.bert else False
 
