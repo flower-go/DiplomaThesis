@@ -1,0 +1,32 @@
+import sys
+sys.path.append("robeczech/robeczech/noeol-210323/")
+
+
+#!/usr/bin/env python3
+import numpy as np
+import tensorflow as tf
+import transformers
+
+import tokenizer.robeczech_tokenizer
+
+tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer("robeczech/robeczech/noeol-210323/tokenizer")
+
+encoded_text = [tokenizer.encode("Praha je hlavní město České republiky")["input_ids"]]
+encoded_text = np.array(encoded_text)
+print(encoded_text)
+
+# It is possible to use TFAutoModel or any other TFAutoModel* variant
+model = transformers.TFAutoModelWithLMHead.from_pretrained("robeczech/robeczech/noeol-210323/tf")
+
+for mask in range(1, len(encoded_text[0]) - 1):
+    original = int(encoded_text[0][mask])
+    print("Original='{}'".format(tokenizer.decode([original], skip_special_tokens=False)))
+    for masked in [0, 1]:
+        if masked:
+            encoded_text[0][mask] = tokenizer.mask_index
+
+        p = model(encoded_text)
+        [logits] = model(encoded_text).logits
+        argsorted_logits = np.argsort(-logits.numpy(), axis=1)
+        print(" ", *[tokenizer.decode([argsorted_logits[mask][i]], skip_special_tokens=False) for i in range(16)])
+    encoded_text[0][mask] = original

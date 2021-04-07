@@ -53,7 +53,7 @@ class Network:
         bert = model.model
         #TODO dopsat att
         if args.layers == "att":
-            bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2]
+            bert_output = bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2]
             weights = tf.Variable(tf.zeros([12]), trainable=True)
             output = 0
             softmax_weights = tf.nn.softmax(weights)
