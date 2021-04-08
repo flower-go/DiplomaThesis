@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import sys
+sys.path.append("robeczech/noeol-210323/")
+import tokenizer.robeczech_tokenizer
 import collections
 import json
 import math
@@ -17,11 +20,17 @@ from transformers import WarmUp
 class BertModel:
     def __init__(self, name, args):
         self.name = name
-        self.config = transformers.AutoConfig.from_pretrained(name)
-        self.config.output_hidden_states = True
-        self.tokenizer = transformers.AutoTokenizer.from_pretrained(name)
-        self.model = transformers.TFAutoModel.from_pretrained(name,
-                                                              config=self.config)
+
+        if "rob" in name:
+            self.path = name
+            self.tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer(self.path + "tokenizer")
+            self.model = transformers.TFAutoModel.from_pretrained(self.path + "tf", output_hidden_states=True)
+        else:
+            self.config = transformers.AutoConfig.from_pretrained(name)
+            self.config.output_hidden_states = True
+            self.tokenizer = transformers.AutoTokenizer.from_pretrained(name)
+            self.model = transformers.TFAutoModel.from_pretrained(name,
+                                                                  config=self.config)
         self.embeddings_only=True if args.bert else False
 
 
