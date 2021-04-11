@@ -41,9 +41,22 @@ class Network:
         self.factors = args.factors
         self.factor_words = factor_words
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
-        if args.warmup_decay > 0:
-            self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],warmup_steps=args.warmup_decay,
+        num_training_steps = math.floor(len(train.factors[1].word_strings) / args.batch_size)*args.epochs[0][0]
+        #predpokladam ze bude jen jeden typ lr a celkovy pocet kroku je tedy takto
+        if args.decay_type is not None:
+            if args.decay_type == "i":
+                self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],warmup_steps=args.warmup_decay,
                                                    decay_schedule_fn=lambda step: 1 / math.sqrt(step))
+            elif args.decay_type =="c":
+                def lr_lambda(step):
+                    num_cycles = 0.5
+                    progress = step/ float(
+                        max(1, num_training_steps  - args.warmup_decay))
+                    return max(0.0, 0.5 * (1.0 + math.cos(math.pi * float(num_cycles) * 2.0 * progress)))
+
+                self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
+                                                       warmup_steps=args.warmup_decay,
+                                                       decay_schedule_fn=lr_lambda)
         if args.fine_lr > 0:
             self._fine_optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
@@ -230,13 +243,15 @@ class Network:
 
 
     def train_epoch(self, dataset, args, learning_rate):
-        if args.warmup_decay == 0:
+        if args.decay_type is None:
             if args.accu > 0:
                 self._optimizer.learning_rate = learning_rate/args.accu
             else:
                 self._optimizer.learning_rate = learning_rate
         if args.fine_lr > 0:
             self._fine_optimizer.learning_rate = args.fine_lr
+
+        #TODO a když mám decay?
 
 
         num_gradients = 0
@@ -507,7 +522,7 @@ if __name__ == "__main__":
     parser.add_argument("--test_only", default=None, type=str, help="Only test evaluation")
     parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
     parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
-    parser.add_argument("--warmup_decay", default=0, type=int, help="Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--warmup_decay", default=0, type=str, help="Type i or c. Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
 
     args = parser.parse_args()
@@ -517,6 +532,13 @@ if __name__ == "__main__":
     args.factors = args.factors.split(",")
     args.epochs = [(int(epochs), float(lr)) for epochs, lr in
                    (epochs_lr.split(":") for epochs_lr in args.epochs.split(","))]
+
+    if args.warmup_decay is not None:
+        args.warmup_decay = args.warmup_decay.split(":")
+        args.decay_type = args.warmup_decay[0]
+        args.warmup_decay = args.warmup_decay[1]
+    else:
+        args.decay_type = None
 
 
     # TODO vyřešit
@@ -624,8 +646,9 @@ if __name__ == "__main__":
 
     #TODO nacitat velikost
     args.bert_size = 768
-    if args.warmup_decay > 0:
-        args.warmup_decay = math.floor(len(train.factors[1].word_strings)/args.batch_size)
+    if args.decay_type != None:
+        if args.decay_type == "i":
+            args.warmup_decay = math.floor(len(train.factors[1].word_strings)/args.batch_size) #TODO proč? chci to ovladat parametrem, to je clkovy počet kroků v jedne epoše
     # Construct the network
     network = Network(args=args,
                       num_words=len(train.factors[train.FORMS].words),
