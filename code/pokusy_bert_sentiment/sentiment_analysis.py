@@ -35,7 +35,8 @@ class Network:
         if args.freeze:
             self.bert.trainable = False
 
-        output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
+
+        #output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
 
         if args.layers == "att" and not args.freeze:
             bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[1]
@@ -46,7 +47,9 @@ class Network:
                 result = softmax_weights[i]*bert_output[i+1]
                 output += result
                 print(result.shape)
-            output = tf.keras.layers.Dense(3, activation=tf.nn.tanh)(output[:, 0, :])  # chci vzit jen ten cls token
+            output = tf.keras.layers.Dense(768, activation=tf.nn.tanh)(output[:, 0, :])  # ješět jedna vrstva!
+        else:
+            output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
         if args.freeze:
             print("freeze " + str(args.freeze))
             bert_output.trainable = False
@@ -256,7 +259,10 @@ if __name__ == "__main__":
         ",".join(("{}={}".format(re.sub("(.)[^_]*_?", r"\1", key), value) for key, value in sorted(vars(args).items())))
     ))
 
-    tokenizer = transformers.AutoTokenizer.from_pretrained(args.bert)
+    if not "rob" in args.bert:
+        tokenizer = transformers.AutoTokenizer.from_pretrained(args.bert)
+    else:
+        ... #TODO dopsat
 
     dataset = SentimentDataset(tokenizer)
     data_result = None
@@ -285,11 +291,19 @@ if __name__ == "__main__":
         imdb_ex, imdb_lab = dataset.get_dataset("imdb")
         imdb_ex = np.array(imdb_ex)
         imdb_lab = np.array(imdb_lab)
-        size = min(len(data_result.train._data["tokens"])*args.english, len(imdb_ex))/len(imdb_ex)
-        imdb_ex, _,imdb_lab,_, = train_test_split(imdb_ex,imdb_lab, train_size=size, shuffle=True, stratify=imdb_lab)
+        if args.english < 100:
+            size = min(len(data_result.train._data["tokens"])*args.english, len(imdb_ex))/len(imdb_ex)
+            imdb_ex, _, imdb_lab, _, = train_test_split(imdb_ex, imdb_lab, train_size=size, shuffle=True,
+                                                        stratify=imdb_lab)
 
-        data_result.train._data["tokens"].append(imdb_ex)
-        data_result.train._data["labels"].append(imdb_lab + 1)
+            data_result.train._data["tokens"].append(imdb_ex)
+            data_result.train._data["labels"].append(imdb_lab + 1)
+        else: #zero shot
+            size = len(imdb_ex)
+            data_result.train._data["tokens"] = imdb_ex
+            data_result.train._data["labels"]= imdb_lab + 1
+
+
     if args.warmup_decay > 0:
         args.warmup_decay = math.floor(len(data_result.train._data["tokens"]) / args.batch_size)
 

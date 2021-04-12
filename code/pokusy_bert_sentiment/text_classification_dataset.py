@@ -4,6 +4,7 @@ import urllib.request
 import zipfile
 
 import numpy as np
+import pickle
 
 # Loads a text classification dataset in a vertical format.
 #
@@ -105,13 +106,14 @@ class TextClassificationDataset:
             if not os.path.exists(path):
                 print("Downloading dataset {}...".format(dataset), file=sys.stderr)
                 urllib.request.urlretrieve("{}/{}".format(self._URL, path), filename=path)
-
-            with zipfile.ZipFile(path, "r") as zip_file:
-                for dataset in ["train", "dev", "test"]:
-                    with zip_file.open("{}_{}.txt".format(os.path.splitext(path)[0].split("/")[-1], dataset), "r") as dataset_file:
-                        setattr(self, dataset, self.Dataset(dataset_file, tokenizer,
+            if tokenizer is not None:
+                with zipfile.ZipFile(path, "r") as zip_file:
+                    for dataset in ["train", "dev", "test"]:
+                        with zip_file.open("{}_{}.txt".format(os.path.splitext(path)[0].split("/")[-1], dataset), "r") as dataset_file:
+                            setattr(self, dataset, self.Dataset(dataset_file, tokenizer,
                                                             train=self.train if dataset != "train" else None,
                                                             shuffle_batches=dataset == "train"))
+
 
     def from_array(self, data, tokenizer):
         for i,dataset in enumerate(["train", "dev", "test"]):

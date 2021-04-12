@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import sys
-sys.path.append("robeczech/noeol-210323/")
-import tokenizer.robeczech_tokenizer
+
 import collections
 import json
 import math
@@ -26,8 +25,8 @@ class BertModel:
     def __init__(self, name, args):
         self.name = name
 
-        if name == "roberta":
-            self.path = "robeczech/noeol-210323/"
+        if "rob" in name:
+            self.path = name
             self.tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer(self.path + "tokenizer")
             self.model = transformers.TFAutoModel.from_pretrained(self.path + "tf", output_hidden_states=True)
         else:
@@ -36,7 +35,6 @@ class BertModel:
             self.config.output_hidden_states = True
             self.model = transformers.TFAutoModel.from_pretrained(name,
                                                               config=self.config)
-        self.embeddings_only = True if args.bert else False
 
 
 class Network:
@@ -327,6 +325,10 @@ if __name__ == "__main__":
     args.debug_mode = args.debug_mode == 1
     args.freeze = args.freeze == 1
     args.cont = args.cont == 1
+
+    if args.bert is not None and "rob" in args.bert:
+        sys.path.append("robeczech/noeol-210323/")
+        import tokenizer.robeczech_tokenizer
 
     # TODO vyřešit
     # tf.config.threading.set_inter_op_parallelism_threads(args.threads)
