@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 import sys
-sys.path.append("robeczech/noeol-210323/")
-import tokenizer.robeczech_tokenizer
 import collections
 import json
 import math
@@ -539,6 +537,10 @@ if __name__ == "__main__":
         args.warmup_decay = args.warmup_decay[1]
     else:
         args.decay_type = None
+
+    if args.bert is not None and "rob" in args.bert:
+        sys.path.append("robeczech/noeol-210323/")
+        import tokenizer.robeczech_tokenizer
 
 
     # TODO vyřešit
