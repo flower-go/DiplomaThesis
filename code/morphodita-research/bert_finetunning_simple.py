@@ -57,9 +57,9 @@ class Network:
         inp = [subwords, charseqs, charseq_ids]
         bert = model.model
         #TODO dopsat att
+        mask = subwords != 0
+        mask[0] = True
         if args.layers == "att":
-            mask = subwords != 0
-            mask[0] = True
             bert_output = bert(subwords, attention_mask=tf.cast(mask, tf.float32))[2]
             weights = tf.Variable(tf.zeros([12]), trainable=True)
             output = 0
