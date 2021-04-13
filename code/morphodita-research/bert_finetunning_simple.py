@@ -35,6 +35,7 @@ class BertModel:
             self.config.output_hidden_states = True
             self.model = transformers.TFAutoModel.from_pretrained(name,
                                                               config=self.config)
+        self.embeddings_only = True if args.bert else False                                                     
 
 
 class Network:
@@ -327,7 +328,7 @@ if __name__ == "__main__":
     args.cont = args.cont == 1
 
     if args.bert is not None and "rob" in args.bert:
-        sys.path.append("robeczech/noeol-210323/")
+        sys.path.append(args.bert)
         import tokenizer.robeczech_tokenizer
 
     # TODO vyřešit
