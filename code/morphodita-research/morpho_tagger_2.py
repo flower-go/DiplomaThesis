@@ -44,7 +44,7 @@ class Network:
         if args.decay_type is not None:
             if args.decay_type == "i":
                 self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],warmup_steps=args.warmup_decay,
-                                                   decay_schedule_fn=lambda step: 1 / math.sqrt(step))
+                                                   decay_schedule_fn=lambda step: 1 / math.sqrt(step+1))
             elif args.decay_type =="c":
                 def lr_lambda(step):
                     num_cycles = 0.5
