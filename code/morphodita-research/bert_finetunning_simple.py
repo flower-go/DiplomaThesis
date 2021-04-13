@@ -58,7 +58,9 @@ class Network:
         bert = model.model
         #TODO dopsat att
         if args.layers == "att":
-            bert_output = bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2]
+            mask = subwords != 0
+            mask[0] = True
+            bert_output = bert(subwords, attention_mask=tf.cast(mask, tf.float32))[2]
             weights = tf.Variable(tf.zeros([12]), trainable=True)
             output = 0
             softmax_weights = tf.nn.softmax(weights)
@@ -67,7 +69,7 @@ class Network:
                 output += result
             bert_output = output
         else:
-            bert_output = bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
+            bert_output = bert(subwords, attention_mask=tf.cast(mask, tf.float32))[0]
         self.labels = labels
         dropout = tf.keras.layers.Dropout(rate=args.dropout)(bert_output)
 
@@ -101,6 +103,7 @@ class Network:
     def train_batch(self, inputs, factors):
         print("train")
         tags_mask = tf.not_equal(factors[0],0)
+        tags_mask[0]=True
         with tf.GradientTape() as tape:
 
             probabilities = self.model(inputs, training=True)
@@ -236,6 +239,7 @@ class Network:
     @tf.function(experimental_relax_shapes=True)
     def evaluate_batch(self, inputs, factors):
         t1 = tf.not_equal(factors[0], 0)
+        t1[0]=True
         tags_mask = t1
         probabilities = self.model(inputs, training=False)
         loss = 0
