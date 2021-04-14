@@ -39,18 +39,21 @@ class Network:
         self.factors = args.factors
         self.factor_words = factor_words
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
-        num_training_steps = math.floor(len(train.factors[1].word_strings) / args.batch_size)*args.epochs[0][0]
+        num_steps_in_epoch = math.floor(len(train.factors[1].word_strings) / args.batch_size)
         #predpokladam ze bude jen jeden typ lr a celkovy pocet kroku je tedy takto
         if args.decay_type is not None:
             if args.decay_type == "i":
-                initial_learning_rate = args.epoch[0][0]
+                initial_learning_rate = args.epoch[0][1]
                 decay_steps = 1.0
                 decay_rate = 0.5
                 learning_rate_fn = tf.keras.optimizers.schedules.InverseTimeDecay(initial_learning_rate, decay_steps, decay_rate)
             elif args.decay_type =="c":
-                learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1],1000)
+                decay_steps = num_steps_in_epoch * args.epochs[0][0] - args.warmup_decay
+                learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
             
-            self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],warmup_steps=args.warmup_decay,decay_schedule_fn=lr_lambda)
+            self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
+                                                   warmup_steps=args.warmup_decay*num_steps_in_epoch,
+                                                   decay_schedule_fn=learning_rate_fn)
         if args.fine_lr > 0:
             self._fine_optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
