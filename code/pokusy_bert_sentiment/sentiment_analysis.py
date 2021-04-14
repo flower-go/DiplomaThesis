@@ -35,8 +35,7 @@ class Network:
         if args.freeze:
             self.bert.trainable = False
 
-
-        #output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[0]
+        print(type(self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))))
 
         if args.layers == "att" and not args.freeze:
             bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[1]
