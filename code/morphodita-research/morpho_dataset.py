@@ -212,6 +212,10 @@ class MorphoDataset:
                 batch_size_bert = 16
 
                 model = bert.model
+                if "rob" in bert.name:
+                    rob = True
+                else:
+                    rob =False
                 sentences_words = self._factors[self.FORMS].word_strings
                 sentences_count = len(sentences_words)
 
@@ -230,12 +234,14 @@ class MorphoDataset:
                         bert_segments.append([])
                         bert_subwords.append([])
                         for i_w, w in enumerate(s):
+                            if i_w > 0 and rob:
+                                w = " " + w
                             w_e = self.tokenizer.encode(w, add_special_tokens=False)
                             #print("w_E " + str(w_e))
                             #print("i _w " + str(i_w))
                             if type(w_e) is dict:
                                 w_e=w_e["input_ids"]
-                                print(w_e)                                
+                            print(w_e)                                
                             bert_segments[-1].extend([i_w] * len(w_e))
                             bert_subwords[-1].extend(w_e)
 

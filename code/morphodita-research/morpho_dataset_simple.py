@@ -95,7 +95,7 @@ class SimpleDataset():
         return train
 
     def next_batch(self, batch_size,train=0):
-        print("mask token" + str(self.data.tokenizer.mask_token_id))
+       
         batch_size = min(batch_size, len(self._permutation))
         batch_perm = self._permutation[:batch_size]
         self._permutation = self._permutation[batch_size:]

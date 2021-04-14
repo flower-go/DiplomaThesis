@@ -57,10 +57,7 @@ class Network:
         inp = [subwords, charseqs, charseq_ids]
         bert = model.model
         #TODO dopsat att
-        print(type(subwords))
-        mask = subwords != 0
-        print(type(mask))
-        mask = mask[0].assign(True)
+        mask = tf.pad(subwords[:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
         if args.layers == "att":
             bert_output = bert(subwords, attention_mask=tf.cast(mask, tf.float32))[2]
             weights = tf.Variable(tf.zeros([12]), trainable=True)
@@ -104,8 +101,7 @@ class Network:
     @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, factors):
         print("train")
-        tags_mask = tf.not_equal(factors[0],0)
-        tags_mask[0]=True
+        tags_mask = tf.pad(factors[0][:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
         with tf.GradientTape() as tape:
 
             probabilities = self.model(inputs, training=True)
@@ -240,9 +236,7 @@ class Network:
 
     @tf.function(experimental_relax_shapes=True)
     def evaluate_batch(self, inputs, factors):
-        t1 = tf.not_equal(factors[0], 0)
-        t1[0]=True
-        tags_mask = t1
+        tags_mask =  tf.pad(factors[0][:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
         probabilities = self.model(inputs, training=False)
         loss = 0
 
