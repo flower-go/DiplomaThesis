@@ -88,7 +88,6 @@ class Network:
             self.model.load_weights(args.model)
         # compile model
         self.optimizer=tf.optimizers.Adam()
-        num_steps_in_epoch = math.floor(len(train.factors[1].word_strings) / args.batch_size)
         if args.decay_type is not None:
             if args.decay_type == "i":
                 initial_learning_rate = args.epochs[0][1]
@@ -97,11 +96,11 @@ class Network:
                 learning_rate_fn = tf.keras.optimizers.schedules.InverseTimeDecay(initial_learning_rate, decay_steps,
                                                                                   decay_rate)
             elif args.decay_type == "c":
-                decay_steps = num_steps_in_epoch * args.epochs[0][0] - args.warmup_decay
+                decay_steps = args.epochs[0][0] * (args.steps_in_epoch * - args.warmup_decay)
                 learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
 
-            self.optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
-                                                   warmup_steps=args.warmup_decay * num_steps_in_epoch,
+            self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
+                                                   warmup_steps=args.warmup_decay * args.steps_in_epoch,
                                                    decay_schedule_fn=learning_rate_fn)
         if args.label_smoothing:
             self.loss = tf.losses.CategoricalCrossentropy()
@@ -350,7 +349,7 @@ if __name__ == "__main__":
     if args.warmup_decay is not None:
         args.warmup_decay = args.warmup_decay.split(":")
         args.decay_type = args.warmup_decay[0]
-        args.warmup_decay = args.warmup_decay[1]
+        args.warmup_decay = int(args.warmup_decay[1])
     else:
         args.decay_type = None
 
@@ -399,8 +398,7 @@ if __name__ == "__main__":
     #train_segments = train.bert_segments
     #labels_unique = len(train.factors[train.TAGS].words)
     if args.decay_type != None:
-        if args.decay_type == "i":
-            args.warmup_decay = math.floor(len(dataset.data.factors[1].word_strings)/args.batch_size) #TODO proč? chci to ovladat parametrem, to je clkovy počet kroků v jedne epoše
+        args.steps_in_epoch = math.floor(len(dataset.data.factors[1].word_strings) / args.batch_size)
     network = Network(args=args,
                       model=model_bert, labels=[dataset.NUM_LEMMAS,dataset.NUM_TAGS], num_chars=dataset.num_chars)
 
