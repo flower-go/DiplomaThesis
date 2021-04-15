@@ -99,7 +99,7 @@ class Network:
                 decay_steps = args.epochs[0][0] * (args.steps_in_epoch * - args.warmup_decay)
                 learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
 
-            self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
+            self.optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
                                                    warmup_steps=args.warmup_decay * args.steps_in_epoch,
                                                    decay_schedule_fn=learning_rate_fn)
         if args.label_smoothing:
@@ -117,6 +117,8 @@ class Network:
     def train_batch(self, inputs, factors):
         print("train")
         tags_mask = tf.pad(factors[0][:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
+        #print("lr")
+        ##print(self.optimizer.learning_rate)
         with tf.GradientTape() as tape:
 
             probabilities = self.model(inputs, training=True)
@@ -160,9 +162,9 @@ class Network:
             for f in args.factors:
                 words = batch[dataset.data.FACTORS_MAP[f]].word_ids
                 factors.append(words)
-            print("tvar " + str(batch[dataset.data.FACTORS_MAP["Lemmas"]].word_ids.shape))
-            print("kolik je maskovanych " + str(np.sum(batch[dataset.data.FACTORS_MAP["Lemmas"]].word_ids == 0, axis=1)))
-            print("kolik neni " + str(np.sum(batch[dataset.data.FACTORS_MAP["Lemmas"]].word_ids != 0, axis=1)))
+            #print("tvar " + str(batch[dataset.data.FACTORS_MAP["Lemmas"]].word_ids.shape))
+            #print("kolik je maskovanych " + str(np.sum(batch[dataset.data.FACTORS_MAP["Lemmas"]].word_ids == 0, axis=1)))
+            #print("kolik neni " + str(np.sum(batch[dataset.data.FACTORS_MAP["Lemmas"]].word_ids != 0, axis=1)))
             inp = [batch[dataset.data.FORMS].word_ids, batch[dataset.data.FORMS].charseqs,batch[dataset.data.FORMS].charseq_ids,]
             #print("WI", batch[dataset.data.FORMS].word_ids)
             #print("CS", batch[dataset.data.FORMS].charseqs)
