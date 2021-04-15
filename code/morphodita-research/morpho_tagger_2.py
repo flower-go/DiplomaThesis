@@ -43,7 +43,7 @@ class Network:
         #predpokladam ze bude jen jeden typ lr a celkovy pocet kroku je tedy takto
         if args.decay_type is not None:
             if args.decay_type == "i":
-                initial_learning_rate = args.epoch[0][1]
+                initial_learning_rate = args.epochs[0][1]
                 decay_steps = 1.0
                 decay_rate = 0.5
                 learning_rate_fn = tf.keras.optimizers.schedules.InverseTimeDecay(initial_learning_rate, decay_steps, decay_rate)
