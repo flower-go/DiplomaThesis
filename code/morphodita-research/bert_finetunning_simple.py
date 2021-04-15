@@ -399,7 +399,7 @@ if __name__ == "__main__":
     #labels_unique = len(train.factors[train.TAGS].words)
     if args.decay_type != None:
         if args.decay_type == "i":
-            args.warmup_decay = math.floor(len(dataset.factors[1].word_strings)/args.batch_size) #TODO proč? chci to ovladat parametrem, to je clkovy počet kroků v jedne epoše
+            args.warmup_decay = math.floor(len(dataset.data.factors[1].word_strings)/args.batch_size) #TODO proč? chci to ovladat parametrem, to je clkovy počet kroků v jedne epoše
     network = Network(args=args,
                       model=model_bert, labels=[dataset.NUM_LEMMAS,dataset.NUM_TAGS], num_chars=dataset.num_chars)
 
