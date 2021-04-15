@@ -14,6 +14,7 @@ import morpho_dataset
 import morpho_dataset_simple as mds
 import pickle
 import warnings
+from transformers import WarmUp
 
 from keras.models import load_model
 
@@ -87,6 +88,20 @@ class Network:
             self.model.load_weights(args.model)
         # compile model
         self.optimizer=tf.optimizers.Adam()
+        if args.decay_type is not None:
+            if args.decay_type == "i":
+                initial_learning_rate = args.epoch[0][1]
+                decay_steps = 1.0
+                decay_rate = 0.5
+                learning_rate_fn = tf.keras.optimizers.schedules.InverseTimeDecay(initial_learning_rate, decay_steps,
+                                                                                  decay_rate)
+            elif args.decay_type == "c":
+                decay_steps = num_steps_in_epoch * args.epochs[0][0] - args.warmup_decay
+                learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
+
+            self.optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
+                                                   warmup_steps=args.warmup_decay * num_steps_in_epoch,
+                                                   decay_schedule_fn=learning_rate_fn)
         if args.label_smoothing:
             self.loss = tf.losses.CategoricalCrossentropy()
         else:
@@ -132,7 +147,7 @@ class Network:
         return gradients
 
     def train_epoch(self, dataset, args, learning_rate):
-        if args.warmup_decay == 0:
+        if args.decay_type is None:
             self.optimizer.learning_rate = learning_rate
             if args.accu>0:                                                             
                 self.optimizer.learning_rate = self.optimizer.learning_rate/args.accu
@@ -317,7 +332,7 @@ if __name__ == "__main__":
     parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
     parser.add_argument("--model", default=None, type=str, help="Model for loading")
     parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
-    parser.add_argument("--warmup_decay", default=0, type=int,help="Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--warmup_decay", default=None, type=str,help="Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--word_dropout", default=0, type=float, help="Word dropout rate")
     parser.add_argument("data", type=str, help="Input data")
     parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
@@ -330,6 +345,13 @@ if __name__ == "__main__":
     if args.bert is not None and "rob" in args.bert:
         sys.path.append(args.bert)
         import tokenizer.robeczech_tokenizer
+
+    if args.warmup_decay is not None:
+        args.warmup_decay = args.warmup_decay.split(":")
+        args.decay_type = args.warmup_decay[0]
+        args.warmup_decay = args.warmup_decay[1]
+    else:
+        args.decay_type = None
 
     # TODO vyřešit
     # tf.config.threading.set_inter_op_parallelism_threads(args.threads)
@@ -375,6 +397,9 @@ if __name__ == "__main__":
     #train_tag_labels = train._factors[train.TAGS].word_ids
     #train_segments = train.bert_segments
     #labels_unique = len(train.factors[train.TAGS].words)
+    if args.decay_type != None:
+        if args.decay_type == "i":
+            args.warmup_decay = math.floor(len(dataset.factors[1].word_strings)/args.batch_size) #TODO proč? chci to ovladat parametrem, to je clkovy počet kroků v jedne epoše
     network = Network(args=args,
                       model=model_bert, labels=[dataset.NUM_LEMMAS,dataset.NUM_TAGS], num_chars=dataset.num_chars)
 
