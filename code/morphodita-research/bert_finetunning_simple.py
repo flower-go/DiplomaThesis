@@ -88,9 +88,10 @@ class Network:
             self.model.load_weights(args.model)
         # compile model
         self.optimizer=tf.optimizers.Adam()
+        num_steps_in_epoch = math.floor(len(train.factors[1].word_strings) / args.batch_size)
         if args.decay_type is not None:
             if args.decay_type == "i":
-                initial_learning_rate = args.epoch[0][1]
+                initial_learning_rate = args.epochs[0][1]
                 decay_steps = 1.0
                 decay_rate = 0.5
                 learning_rate_fn = tf.keras.optimizers.schedules.InverseTimeDecay(initial_learning_rate, decay_steps,
