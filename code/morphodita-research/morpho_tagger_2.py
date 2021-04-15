@@ -39,7 +39,6 @@ class Network:
         self.factors = args.factors
         self.factor_words = factor_words
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
-        num_steps_in_epoch = math.floor(len(train.factors[1].word_strings) / args.batch_size)
         #predpokladam ze bude jen jeden typ lr a celkovy pocet kroku je tedy takto
         if args.decay_type is not None:
             if args.decay_type == "i":
@@ -48,11 +47,11 @@ class Network:
                 decay_rate = 0.5
                 learning_rate_fn = tf.keras.optimizers.schedules.InverseTimeDecay(initial_learning_rate, decay_steps, decay_rate)
             elif args.decay_type =="c":
-                decay_steps = num_steps_in_epoch * args.epochs[0][0] - args.warmup_decay
+                decay_steps = args.epochs[0][0] * (args.steps_in_epoch * - args.warmup_decay)
                 learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
             
             self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
-                                                   warmup_steps=args.warmup_decay*num_steps_in_epoch,
+                                                   warmup_steps=args.warmup_decay*args.steps_in_epoch,
                                                    decay_schedule_fn=learning_rate_fn)
         if args.fine_lr > 0:
             self._fine_optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
@@ -519,7 +518,7 @@ if __name__ == "__main__":
     parser.add_argument("--test_only", default=None, type=str, help="Only test evaluation")
     parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
     parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
-    parser.add_argument("--warmup_decay", default=0, type=str, help="Type i or c. Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--warmup_decay", default=None, type=str, help="Type i or c. Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
 
     args = parser.parse_args()
@@ -648,9 +647,7 @@ if __name__ == "__main__":
     #TODO nacitat velikost
     args.bert_size = 768
     if args.decay_type != None:
-        if args.decay_type == "i":
-            args.warmup_decay = math.floor(len(train.factors[1].word_strings)/args.batch_size) #TODO proč? chci to ovladat parametrem, to je clkovy počet kroků v jedne epoše
-    # Construct the network
+        args.steps_in_epoch = math.floor(len(train.factors[1].word_strings) / args.batch_size)
     network = Network(args=args,
                       num_words=len(train.factors[train.FORMS].words),
                       num_chars=len(train.factors[train.FORMS].alphabet),
