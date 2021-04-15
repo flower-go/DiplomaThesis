@@ -49,6 +49,9 @@ class Network:
             output = tf.keras.layers.Dense(768, activation=tf.nn.tanh)(output[:, 0, :])  # ješět jedna vrstva!
         else:
             output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[1][-4:]
+            output = tf.math.reduce_mean(
+                output
+                , axis=0)  # prumerovani vrstev
         if args.freeze:
             print("freeze " + str(args.freeze))
             output.trainable = False
