@@ -46,7 +46,6 @@ class Network:
                 result = softmax_weights[i]*bert_output[i+1]
                 output += result
                 print(result.shape)
-            output = tf.keras.layers.Dense(768, activation=tf.nn.tanh)(output[:, 0, :])  # ješět jedna vrstva!
         else:
             output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[1][-4:]
             output = tf.math.reduce_mean(
@@ -55,6 +54,7 @@ class Network:
         if args.freeze:
             print("freeze " + str(args.freeze))
             output.trainable = False
+        output = tf.keras.layers.Dense(768, activation=tf.nn.tanh)(output[:, 0, :])  # ješět jedna vrstva!
         dropout = tf.keras.layers.Dropout(args.dropout)(output)
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
 
