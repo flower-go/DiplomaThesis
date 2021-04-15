@@ -532,7 +532,7 @@ if __name__ == "__main__":
     if args.warmup_decay is not None:
         args.warmup_decay = args.warmup_decay.split(":")
         args.decay_type = args.warmup_decay[0]
-        args.warmup_decay = args.warmup_decay[1]
+        args.warmup_decay = int(args.warmup_decay[1])
     else:
         args.decay_type = None
 
