@@ -60,9 +60,21 @@ class Network:
 
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
         self.optimizer=tf.optimizers.Adam()
-        if args.warmup_decay > 0:
-            self.optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],warmup_steps=args.warmup_decay,
-                                                   decay_schedule_fn=lambda step: 1 / math.sqrt(step))
+
+        if args.decay_type is not None:
+            if args.decay_type == "i":
+                initial_learning_rate = args.epochs[0][1]
+                decay_steps = 1.0
+                decay_rate = 0.5
+                learning_rate_fn = tf.keras.optimizers.schedules.InverseTimeDecay(initial_learning_rate, decay_steps,
+                                                                                  decay_rate)
+            elif args.decay_type == "c":
+                decay_steps = args.epochs[0][0] * (args.steps_in_epoch * - args.warmup_decay)
+                learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
+
+            self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
+                                                   warmup_steps=args.warmup_decay * args.steps_in_epoch,
+                                                   decay_schedule_fn=learning_rate_fn)
         if args.model != None:
             self.model.load_weights(args.model)
         if args.label_smoothing:
@@ -157,7 +169,7 @@ class Network:
 
     def train(self, data, args):
         for e, lr in args.epochs:
-            if args.warmup_decay == 0:
+            if args.decay_type is None:
                 if args.accu > 0:
                     lr = lr / args.accu
             b.set_value(self.optimizer.learning_rate, lr)
@@ -254,6 +266,13 @@ if __name__ == "__main__":
     if not args.verbose:
         os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
+    if args.warmup_decay is not None:
+        args.warmup_decay = args.warmup_decay.split(":")
+        args.decay_type = args.warmup_decay[0]
+        args.warmup_decay = int(args.warmup_decay[1])
+    else:
+        args.decay_type = None
+
     # Create logdir name
     args.logdir = os.path.join("logs", "{}-{}-{}".format(
         os.path.basename(globals().get("__file__", "notebook")),
@@ -311,6 +330,8 @@ if __name__ == "__main__":
 
     print("Delka datasetu " + str(len(data_result.train._data)))
 
+    if args.decay_type != None:
+        args.steps_in_epoch = math.floor(len(data_result.train._data["tokens"]) / args.batch_size)
     # Create the network and train
     network = Network(args, len(data_result.train.LABELS))
 
