@@ -72,7 +72,7 @@ class Network:
                 decay_steps = args.epochs[0][0] * (args.steps_in_epoch * - args.warmup_decay)
                 learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
 
-            self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
+            self.optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
                                                    warmup_steps=args.warmup_decay * args.steps_in_epoch,
                                                    decay_schedule_fn=learning_rate_fn)
         if args.model != None:
@@ -161,8 +161,8 @@ class Network:
                         tg1 = gradients[0: args.lr_split]
                         tg2 = gradients[args.lr_split:]
 
-                        self._optimizer.apply_gradients(zip(tg2, var2))
-                        self._fine_optimizer.apply_gradients(zip(tg1, var1))
+                        self.optimizer.apply_gradients(zip(tg2, var2))
+                        self.fine_optimizer.apply_gradients(zip(tg1, var1))
                     else:
                         self.optimizer.apply_gradients(zip(gradients, tvs))
                     num_gradients = 0
@@ -172,7 +172,7 @@ class Network:
             if args.decay_type is None:
                 if args.accu > 0:
                     lr = lr / args.accu
-            b.set_value(self.optimizer.learning_rate, lr)
+                b.set_value(self.optimizer.learning_rate, lr)
             for i in range(e):
                 print("epoch " + str(i))
                 network.train_epoch(data.train, args)
@@ -248,7 +248,7 @@ if __name__ == "__main__":
     parser.add_argument("--debug", default=True, type=int, help="use small debug data")
     parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
     parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
-    parser.add_argument("--warmup_decay", default=0, type=int, help="Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--warmup_decay", default=None, type=str, help="Number of warmup steps, than will be applied inverse square root decay")
     args = parser.parse_args([] if "__file__" not in globals() else None)
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
                    [epochslr.split(":")]]
@@ -325,7 +325,7 @@ if __name__ == "__main__":
             data_result.train._data["labels"]= imdb_lab + 1
 
 
-    if args.warmup_decay > 0:
+    if args.decay_type is not None:
         args.warmup_decay = math.floor(len(data_result.train._data["tokens"]) / args.batch_size)
 
     print("Delka datasetu " + str(len(data_result.train._data)))
