@@ -4,7 +4,7 @@ import argparse
 import datetime
 import os
 import re
-
+import sys
 import numpy as np
 import tensorflow as tf
 import transformers
@@ -29,16 +29,18 @@ class Network:
         self.labels = labels
 
         # bert model
-        config = transformers.AutoConfig.from_pretrained(args.bert)
-        config.output_hidden_states = True
-        self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained(args.bert, config=config)
+        if "rob" not in args.bert:
+            config = transformers.AutoConfig.from_pretrained(args.bert)
+            config.output_hidden_states = True
+            self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained(args.bert, config=config)
+        else:
+            self.bert = transformers.TFAutoModel.from_pretrained(self.path + "tf", output_hidden_states=True)
         if args.freeze:
             self.bert.trainable = False
 
-        print(type(self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))))
-
+        mask = tf.pad(subwords[:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
         if args.layers == "att" and not args.freeze:
-            bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[1]
+            bert_output = self.bert(subwords, attention_mask=tf.cast(mask, tf.float32))[1]
             weights = tf.Variable(tf.zeros([12]), trainable=True)
             output = 0
             softmax_weights = tf.nn.softmax(weights)
@@ -47,14 +49,14 @@ class Network:
                 output += result
                 print(result.shape)
         else:
-            output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[1][-4:]
+            output = self.bert(subwords, attention_mask=tf.cast(mask, tf.float32))[1][-4:]
             output = tf.math.reduce_mean(
                 output
                 , axis=0)  # prumerovani vrstev
         if args.freeze:
             print("freeze " + str(args.freeze))
             output.trainable = False
-        output = tf.keras.layers.Dense(768, activation=tf.nn.tanh)(output[:, 0, :])  # ješět jedna vrstva!
+        output = tf.keras.layers.Dense(768, activation=tf.nn.tanh)(output[:, 0, :])
         dropout = tf.keras.layers.Dropout(args.dropout)(output)
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
 
@@ -280,10 +282,13 @@ if __name__ == "__main__":
         ",".join(("{}={}".format(re.sub("(.)[^_]*_?", r"\1", key), value) for key, value in sorted(vars(args).items())))
     ))
 
+    if args.bert is not None and "rob" in args.bert:
+        sys.path.append(args.bert)
+        import tokenizer.robeczech_tokenizer
     if not "rob" in args.bert:
         tokenizer = transformers.AutoTokenizer.from_pretrained(args.bert)
     else:
-        ... #TODO dopsat
+        tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer(args.bert + "tokenizer")
 
     dataset = SentimentDataset(tokenizer)
     data_result = None

@@ -156,8 +156,9 @@ class Network:
                 inp2.append(subwords)
 
                 self.bert = model.model
+                mask = tf.pad(subwords[:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
                 if args.layers == "att":
-                    bert_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2]
+                    bert_output = self.bert(subwords, attention_mask=tf.cast(mask, tf.float32))[2]
                     weights = tf.Variable(tf.zeros([12]), trainable=True)
                     output = 0
                     softmax_weights = tf.nn.softmax(weights)
@@ -166,7 +167,7 @@ class Network:
                         output += result
                     model_output = output
                 else:
-                    model_output = self.bert(subwords, attention_mask=tf.cast(subwords != 0, tf.float32))[2][-4:]
+                    model_output = self.bert(subwords, attention_mask=tf.cast(mask, tf.float32))[2][-4:]
                 bert_output = tf.math.reduce_mean(
                     model_output
                     , axis=0) # prumerovani vrstev
@@ -537,7 +538,7 @@ if __name__ == "__main__":
         args.decay_type = None
 
     if args.bert is not None and "rob" in args.bert:
-        sys.path.append("robeczech/noeol-210323/")
+        sys.path.append(args.bert)
         import tokenizer.robeczech_tokenizer
 
 
