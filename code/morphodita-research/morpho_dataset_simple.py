@@ -117,6 +117,7 @@ class SimpleDataset():
         factors = []
         factors.append(self.FactorBatch(np.zeros([batch_size, max_sentence_len], np.int32)))
         for i in range(batch_size):
+            print("delka vety" + str(batch_sentence_lens[i]))
             factors[-1].word_ids[i, 0:batch_sentence_lens[i]] = self.data.bert_subwords[batch_perm[i]]
             if train > 0:
                 start = s
