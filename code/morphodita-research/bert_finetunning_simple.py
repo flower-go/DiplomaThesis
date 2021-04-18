@@ -115,12 +115,11 @@ class Network:
 
     @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, factors):
-        print("train")
         tags_mask = tf.pad(factors[0][:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
-        print("mask")
+        tf.print("factors")
+        tf.print(factors[0])
+        tf.print("masky")
         tf.print(tags_mask, summarize=-1)
-        #print("lr")
-        ##print(self.optimizer.learning_rate)
         with tf.GradientTape() as tape:
 
             probabilities = self.model(inputs, training=True)
