@@ -236,6 +236,7 @@ class MorphoDataset:
                         for i_w, w in enumerate(s):
                             if i_w > 0 and rob:
                                 w = " " + w
+                            print(w.encode("utf-8"))
                             w_e = self.tokenizer.encode(w, add_special_tokens=False)
                             #print("w_E " + str(w_e))
                             #print("i _w " + str(i_w))
@@ -247,6 +248,7 @@ class MorphoDataset:
 
                         bert_subwords[-1] = np.array(self.tokenizer.build_inputs_with_special_tokens(bert_subwords[-1]),
                                                      dtype=np.int32)
+                        print(bert_subwords[-1])
 
                         bert_segments[-1] = np.array(bert_segments[-1], dtype=np.int32)
 

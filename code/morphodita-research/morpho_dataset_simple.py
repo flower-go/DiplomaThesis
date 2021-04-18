@@ -159,6 +159,7 @@ class SimpleDataset():
             factors[f].charseqs = np.zeros([len(charseqs), np.max(factors[f].charseq_lens)], np.int32)
             for i in range(len(charseqs)):
                 factors[f].charseqs[i, 0:len(charseqs[i])] = charseqs[i]
+        print(factors[0].word_ids)
 
         return batch_sentence_lens, factors
 
