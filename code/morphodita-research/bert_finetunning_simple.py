@@ -117,7 +117,7 @@ class Network:
     def train_batch(self, inputs, factors):
         tags_mask = tf.pad(factors[0][:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
         tf.print("factors")
-        tf.print(factors[0])
+        tf.print(factors[0],summarize=-1)
         tf.print("masky")
         tf.print(tags_mask, summarize=-1)
         with tf.GradientTape() as tape:

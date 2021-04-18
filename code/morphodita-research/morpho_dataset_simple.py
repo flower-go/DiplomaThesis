@@ -143,7 +143,7 @@ class SimpleDataset():
         for i in range(batch_size):
             factors[-1].word_ids[i, 0:batch_sentence_lens[i]] = factor.word_ids[batch_perm[i]]
 
-
+        tf.print(factor.word_ids[batch_perm[i]], summarize=-1)
         # Character-level data
         for f, factor in enumerate(self.data._factors):
             if not factor.characters: continue
