@@ -42,6 +42,10 @@ class SimpleDataset():
         for doc_labels, s in zip(labels, segments):
             # create an empty array of 0 is used in the place of other-than-first subtokens of word
             doc_enc_labels = np.zeros(len(s)+2, dtype=int)
+            print("encoding magic")
+            print(np.diff(s))
+            print(np.r_[1, np.diff(s)])
+            print(np.nonzero(np.r_[1, np.diff(s)]))
             first_indices = np.nonzero(np.r_[1, np.diff(s)])[0]
             first_indices = first_indices + 1
 
