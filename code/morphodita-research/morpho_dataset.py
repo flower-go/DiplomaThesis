@@ -242,13 +242,13 @@ class MorphoDataset:
                             #print("i _w " + str(i_w))
                             if type(w_e) is dict:
                                 w_e=w_e["input_ids"]
-                            print(w_e)                                
+                            #print(w_e)                                
                             bert_segments[-1].extend([i_w] * len(w_e))
                             bert_subwords[-1].extend(w_e)
 
                         bert_subwords[-1] = np.array(self.tokenizer.build_inputs_with_special_tokens(bert_subwords[-1]),
                                                      dtype=np.int32)
-                        print(bert_subwords[-1])
+                        #print(bert_subwords[-1])
 
                         bert_segments[-1] = np.array(bert_segments[-1], dtype=np.int32)
 

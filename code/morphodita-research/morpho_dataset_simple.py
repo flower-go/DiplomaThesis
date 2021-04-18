@@ -119,6 +119,8 @@ class SimpleDataset():
         for i in range(batch_size):
             print("delka vety" + str(batch_sentence_lens[i]))
             factors[-1].word_ids[i, 0:batch_sentence_lens[i]] = self.data.bert_subwords[batch_perm[i]]
+            print(factors[-1].word_ids[i,0:batch_sentence_lens[i]])
+            print(self.data.bert_subwords[batch_perm[i]])
             if train > 0:
                 start = s
                 print("start " + str(start))
@@ -160,7 +162,6 @@ class SimpleDataset():
             factors[f].charseqs = np.zeros([len(charseqs), np.max(factors[f].charseq_lens)], np.int32)
             for i in range(len(charseqs)):
                 factors[f].charseqs[i, 0:len(charseqs[i])] = charseqs[i]
-        print(factors[0].word_ids)
 
         return batch_sentence_lens, factors
 
