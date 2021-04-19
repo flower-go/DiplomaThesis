@@ -1,4 +1,5 @@
 
+
 #!/usr/bin/env python3
 import argparse
 import datetime
@@ -56,6 +57,8 @@ class Network:
         if args.freeze:
             print("freeze " + str(args.freeze))
             output.trainable = False
+        tf.print("shape")
+        tf.print(output.shape)
         output = tf.keras.layers.Dense(768, activation=tf.nn.tanh)(output[:, 0, :])
         dropout = tf.keras.layers.Dropout(args.dropout)(output)
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
