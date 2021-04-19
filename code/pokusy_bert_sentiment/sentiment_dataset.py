@@ -8,7 +8,6 @@ import zipfile
 
 class SentimentDataset():
 
-
     def __init__(self, tokenizer):
 
         self.labels = {'n': 1, '0': 0, 'p': 2, 'b': 'BIP'}
@@ -73,7 +72,10 @@ class SentimentDataset():
             if len(data[i]) > 512:
                 data[i] = data[i][0:512]
 
-            data[i] = tokenizer.encode(data[i].decode('latin1'))
+            encoded = tokenizer.encode(data[i].decode('latin1'))
+            if type(encoded) is dict:
+                encoded = encoded["input_ids"]
+            data[i] = encoded
         return data
 
     def load_gold_data(self,directory, filter_out):
