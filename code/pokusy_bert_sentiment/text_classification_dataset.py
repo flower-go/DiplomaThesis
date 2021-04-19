@@ -36,7 +36,10 @@ class TextClassificationDataset:
                         self.LABELS.append(label)
                     label = self._label_map.get(label, -1)
 
-                    self._data["tokens"].append(tokenizer(text))
+                    encoded = tokenizer(text)
+                    if type(encoded) is dict:
+                        encoded = encoded["input_ids"]
+                    self._data["tokens"].append(encoded)
                     self._data["labels"].append(label)
             else:
                 for i,row in data_file.iterrows():
@@ -50,8 +53,10 @@ class TextClassificationDataset:
                         self._label_map[label] = len(self._label_map)
                         self.LABELS.append(label)
                     label = self._label_map.get(label, -1)
-
-                    self._data["tokens"].append(tokenizer(text))
+                    encoded = tokenizer(text)
+                    if type(encoded) is dict:
+                        encoded = encoded["input_ids"]
+                    self._data["tokens"].append(encoded)
                     self._data["labels"].append(label)
 
 
