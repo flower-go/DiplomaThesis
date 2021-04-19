@@ -101,9 +101,9 @@ class Network:
             print(str(len(inputs)))
             if args.label_smoothing:
                 loss += self.loss(tf.one_hot(gold_data, self.labels) * (1 - args.label_smoothing)
-                    + args.label_smoothing /  self.labels, probabilities)
+                    + args.label_smoothing /  self.labels, probabilities,probabilities._keras_mask)
             else:
-                loss += self.loss(tf.convert_to_tensor(gold_data), probabilities)
+                loss += self.loss(tf.convert_to_tensor(gold_data), probabilities, probabilities._keras_mask)
 
         gradients = tape.gradient(loss, tvs)
 
@@ -198,9 +198,9 @@ class Network:
 
 
         if args.label_smoothing:
-            loss += self.loss(tf.one_hot(factors, self.labels), probabilities)
+            loss += self.loss(tf.one_hot(factors, self.labels), probabilities, probabilities._keras_mask)
         else:
-            loss += self.loss(tf.convert_to_tensor(factors), probabilities)
+            loss += self.loss(tf.convert_to_tensor(factors), probabilities, probabilities._keras_mask)
 
         self.metrics["loss"](loss)
 
