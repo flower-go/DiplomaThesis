@@ -34,7 +34,7 @@ class Network:
             config.output_hidden_states = True
             self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained(args.bert, config=config)
         else:
-            self.bert = transformers.TFAutoModel.from_pretrained(self.path + "tf", output_hidden_states=True)
+            self.bert = transformers.TFAutoModel.from_pretrained(args.bert + "tf", output_hidden_states=True)
         if args.freeze:
             self.bert.trainable = False
 
