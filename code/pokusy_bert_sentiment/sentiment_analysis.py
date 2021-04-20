@@ -16,6 +16,7 @@ from sklearn.model_selection import train_test_split
 from transformers import WarmUp
 from sklearn.metrics import f1_score
 from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import KFold
 
 from text_classification_dataset import TextClassificationDataset
 
@@ -183,10 +184,11 @@ class Network:
             for i in range(e):
                 print("epoch " + str(i))
                 network.train_epoch(data.train, args)
-                network.evaluate(data.dev, "dev", args)
-                metrics = {name: metric.result() for name, metric in self.metrics.items()}
-                metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
-                print("Dev, epoch {}, lr {}, {}".format(i, lr, metrics_log))
+                if args.kfold <= 0:
+                    network.evaluate(data.dev, "dev", args)
+                    metrics = {name: metric.result() for name, metric in self.metrics.items()}
+                    metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
+                    print("Dev, epoch {}, lr {}, {}".format(i, lr, metrics_log))
 
 
     def predict(self, dataset, args):
@@ -255,6 +257,7 @@ if __name__ == "__main__":
     parser.add_argument("--debug", default=True, type=int, help="use small debug data")
     parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
     parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
+    parser.add_argument("--kfold", default=None, type=str, help="Number of folds for cross-validation and the index of the fold")
     parser.add_argument("--warmup_decay", default=None, type=str, help="Number of warmup steps, than will be applied inverse square root decay")
     args = parser.parse_args([] if "__file__" not in globals() else None)
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
@@ -262,6 +265,9 @@ if __name__ == "__main__":
 
     args.debug = args.debug == 1
     args.freeze = args.freeze == 1
+    args.kfold = args.kfold.split(":")
+    args.fold = args.kfold[1]
+    args.fold = args.kfold[0]
 
     # Fix random seeds and threads
     np.random.seed(args.seed)
@@ -303,20 +309,80 @@ if __name__ == "__main__":
             data = dataset.get_dataset(d,path="../../../datasets",debug=args.debug)
             if str(type(data)) != "<class 'text_classification_dataset.TextClassificationDataset'>":
 
-                data_other = pd.concat([data_other, data])
+                data_other = pd.concat([data_other, data]) #nedostane se sem None?
             else:
 
                 data_result = data
 
 
+        if args.kfold > 0:
+            len_data = 0
+            all_data_tokens = []
+            all_data_labels = []
+            if data_other is not None:
+                len_o = len(data_other)
+                len_data += len_o
+                all_data_tokens.append(data_other["Post"])
+                all_data_labels.append(data_other["Sentiment"])
+            if data_result is not None:
+                l_train = len(data_result.train._data["tokens"])
+                l_dev = len(data_result.dev._data["tokens"])
+                l_test = len(data_result.test._data["tokens"])
+                len_r =  l_train + l_dev + l_test
+                len_data += len_r
+                all_data_tokens.append(data_result.train._data["tokens"])
+                all_data_tokens.append(data_result.dev._data["tokens"])
+                all_data_tokens.append(data_result.test._data["tokens"])
+                all_data_labels.append(data_result.train._data["labels"])
+                all_data_labels.append(data_result.dev._data["labels"])
+                all_data_labels.append(data_result.test._data["labels"])
+            kf = KFold(n_splits=args.kfold)
+            train, test = kf.split(np.array(range(len_data))) #TODO resit ty jednotlive iterace
+            train = train[args.fold]
+            test = test[args.fold]
+
         if data_other is not None:
-            train, test = train_test_split(data_other, test_size=0.3, shuffle=True, stratify=data_other["Sentiment"])
-            dev, test = train_test_split(test, test_size=0.5, stratify=test["Sentiment"])
+            print(type(data_other))
+            if args.kfold >0:
+                i_o = [i for i in train if i < len_o]
+                train = data_other[i_o]
+                i_o = [i for i in test if i < len_o]
+                test = data_other[i_o]
+                dev = [] #TODO doresit
+            else:
+                train, test = train_test_split(data_other, test_size=0.3, shuffle=True, stratify=data_other["Sentiment"])
+                dev, test = train_test_split(test, test_size=0.5, stratify=test["Sentiment"])
         if data_result == None:
             data_result = TextClassificationDataset().from_array([train,dev,test], tokenizer.encode)
         elif data_other is not None:
-            data_other = TextClassificationDataset().from_array([train,dev,test], tokenizer.encode)
-            data_result.append_dataset(data_other)
+            data_other = TextClassificationDataset().from_array([train, dev, test], tokenizer.encode)
+            if args.kfold <= 0:
+
+                data_result.append_dataset(data_other)
+            else:
+                i_train= [i for i in train if i < l_train]
+                i_dev = [i for i in train if i < l_dev]
+                i_test = [i for i in train if i < l_test]
+
+                #train
+                data_result.train._data["tokens"] = data_result.train._data["tokens"][i_train]
+                data_result.train._data["labels"] = data_result.train._data["labels"][i_train]
+                data_result.train._data["tokens"].append(data_result.dev._data["tokens"][i_dev])
+                data_result.train._data["labels"].append(data_result.dev._data["labels"][i_dev])
+                data_result.train._data["tokens"].append(data_result.train._data["tokens"][i_test])
+                data_result.train._data["labels"].append(data_result.train._data["labels"][i_test])
+
+                #test
+                i_train= [i for i in test if i < l_train]
+                i_dev = [i for i in test if i < l_dev]
+                i_test = [i for i in test if i < l_test]
+
+                data_result.test._data["tokens"] = data_result.train._data["tokens"][i_train]
+                data_result.test._data["labels"] = data_result.train._data["labels"][i_train]
+                data_result.test._data["tokens"].append(data_result.dev._data["tokens"][i_dev])
+                data_result.test._data["labels"].append(data_result.dev._data["labels"][i_dev])
+                data_result.test._data["tokens"].append(data_result.train._data["tokens"][i_test])
+                data_result.test._data["labels"].append(data_result.train._data["labels"][i_test])
 
     if args.english > 0:
         imdb_ex, imdb_lab = dataset.get_dataset("imdb")
