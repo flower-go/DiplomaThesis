@@ -35,7 +35,7 @@ class Network:
             config.output_hidden_states = True
             self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained(args.bert, config=config)
         else:
-            self.bert = transformers.TFAutoModel.from_pretrained(args.bert + "tf", output_hidden_states=True)
+            self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained(args.bert + "tf", output_hidden_states=True)
         if args.freeze:
             self.bert.trainable = False
 
@@ -130,6 +130,8 @@ class Network:
 
         # if args.freeze:
         #     tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
+        tf.print("batch")
+        tf.print(args.batch_size)
         for batch in dataset.batches(size=args.batch_size):
             tg = self.train_batch(
                 batch[0],
