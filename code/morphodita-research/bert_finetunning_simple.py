@@ -115,7 +115,8 @@ class Network:
 
     @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, factors):
-        tags_mask = tf.pad(inputs[0][:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
+        #tags_mask = tf.pad(inputs[0][:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
+        tags_mask =  tf.not_equal(factors[0],0)
         tf.print("factors")
         tf.print(inputs[0],summarize=-1)
         tf.print("masky")
@@ -254,7 +255,8 @@ class Network:
 
     @tf.function(experimental_relax_shapes=True)
     def evaluate_batch(self, inputs, factors):
-        tags_mask =  tf.pad(factors[0][:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
+        #tags_mask =  tf.pad(factors[0][:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
+        tags_mask = tf.not_equal(factors[0],0)
         #print("mask")
         #tf.print(tags_mask)
         probabilities = self.model(inputs, training=False)
