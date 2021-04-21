@@ -76,6 +76,8 @@ class TextClassificationDataset:
             print( len(self._data["tokens"]))
             data_tokens = self._data["tokens"]
             data_labels = self._data["labels"]
+            print(data_tokens)
+            print(data_labels)
 
             while len(permutation):
                 batch_size = min(size or np.inf, len(permutation))
@@ -87,6 +89,10 @@ class TextClassificationDataset:
                 tokens = np.zeros([batch_size, max_sentence_len], np.int32)
                 labels = np.zeros([batch_size], np.int32)
                 for i in range(batch_size):
+                    print("batch size " + str(batch_size))
+                    print("max" + str(max_sentence_len))
+                    print("i" + str(i))
+                    print("len " + str(len(data_tokens[batch_perm[i]])))
                     tokens[i, :len(data_tokens[batch_perm[i]])] = data_tokens[batch_perm[i]]
                     labels[i] = data_labels[batch_perm[i]]
 
