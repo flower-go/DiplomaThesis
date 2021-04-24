@@ -1,14 +1,14 @@
 from datetime import datetime
 
 models = [
-    '"bert-base-multilingual-uncased"',
+    '"bert-base-multilingual-cased"',
     '"jplu/tf-xlm-roberta-base"']
 ls = "0.03"
 lr = "5e-5"
 lr_list = ["5e-5", "3e-5", "2e-5", "8e-6", "1e-6"]
 debug = False
 test = True
-model = '"bert-base-multilingual-uncased"'
+model = '"bert-base-multilingual-cased"'
 batch = 64
 fine_lr = 0
 warmup = 0
@@ -17,7 +17,7 @@ rescheck = None
 
 s1 = "qsub -cwd"
 s2 = "-q gpu.q -l gpu=1,mem_free=16G,h_data=16G -pe smp 2 $HOME/env_diplomka/bin/python3 morpho_tagger_2.py ~doubrap1/pdt/pdt-3.5 --embeddings ~doubrap1/embeddings/cs_lindat4gw/forms.vectors-w5-d300-ns5.npz --threads 2"
-
+s3 = "-q gpu.q -l gpu=2,mem_free=32G,h_data=32G -pe smp 2 $HOME/env_diplomka/bin/python3 bert_finetunning_simple.py ~doubrap1/pdt/pdt-3.5 --threads 2"
 
 class Experiment:
     def __init__(self, name):
@@ -80,6 +80,17 @@ def generate_bertfine(model):
         output.append("--fine_lr " + str(fine_lr))
 
     return output
+
+def generate_bertsimple(model, epochs_lr):
+    name = "simple"
+    output = generate(name)
+    output.append("--label_smoothing " + ls)
+    output.append("--bert " + model)
+    output.append('--factors "Lemmas,Tags"')
+    output.append("--epochs " + epochs_lr)
+    output.append("--batch_size " + str(batch))
+    output.append("--accu 16")
+    output.append("--freeze 1")
 
 
 def generate_id(expe):
