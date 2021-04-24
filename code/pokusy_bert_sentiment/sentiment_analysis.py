@@ -265,9 +265,10 @@ if __name__ == "__main__":
 
     args.debug = args.debug == 1
     args.freeze = args.freeze == 1
-    args.kfold = args.kfold.split(":")
-    args.fold = args.kfold[1]
-    args.fold = args.kfold[0]
+    if args.kfold is not None:
+        args.kfold = args.kfold.split(":")
+        args.fold = args.kfold[1]
+        args.fold = args.kfold[0]
 
     # Fix random seeds and threads
     np.random.seed(args.seed)
@@ -308,6 +309,7 @@ if __name__ == "__main__":
         for d in args.datasets.split(","):
             data = dataset.get_dataset(d,path="../../../datasets",debug=args.debug)
             if str(type(data)) != "<class 'text_classification_dataset.TextClassificationDataset'>":
+                print(str(type(data)))
 
                 data_other = pd.concat([data_other, data]) #nedostane se sem None?
             else:
