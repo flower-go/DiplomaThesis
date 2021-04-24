@@ -55,9 +55,6 @@ class Network:
             output = tf.math.reduce_mean(
                 output
                 , axis=0)  # prumerovani vrstev
-        if args.freeze:
-            print("freeze " + str(args.freeze))
-            output.trainable = False
         tf.print("shape")
         tf.print(output.shape)
         output = tf.keras.layers.Dense(768, activation=tf.nn.tanh)(output[:, 0, :])
@@ -105,9 +102,9 @@ class Network:
             print(str(len(inputs)))
             if args.label_smoothing:
                 loss += self.loss(tf.one_hot(gold_data, self.labels) * (1 - args.label_smoothing)
-                    + args.label_smoothing /  self.labels, probabilities,probabilities._keras_mask)
+                    + args.label_smoothing /  self.labels, probabilities)
             else:
-                loss += self.loss(tf.convert_to_tensor(gold_data), probabilities, probabilities._keras_mask)
+                loss += self.loss(tf.convert_to_tensor(gold_data), probabilities)
 
         gradients = tape.gradient(loss, tvs)
 
