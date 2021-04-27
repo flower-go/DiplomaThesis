@@ -49,7 +49,6 @@ class Network:
             for i in range(12):
                 result = softmax_weights[i]*bert_output[i+1]
                 output += result
-                print(result.shape)
         else:
             output = self.bert(subwords, attention_mask=tf.cast(mask, tf.float32))[1][-4:]
             output = tf.math.reduce_mean(
@@ -304,7 +303,6 @@ if __name__ == "__main__":
         for d in args.datasets.split(","):
             data = dataset.get_dataset(d,path="../../../datasets",debug=args.debug)
             if str(type(data)) != "<class 'text_classification_dataset.TextClassificationDataset'>":
-                print(str(type(data)))
 
                 data_other = pd.concat([data_other, data]) #nedostane se sem None?
             else:
@@ -339,7 +337,6 @@ if __name__ == "__main__":
             test = test[args.fold]
 
         if data_other is not None:
-            print(type(data_other))
             if args.kfold >0:
                 i_o = [i for i in train if i < len_o]
                 train = data_other[i_o]
