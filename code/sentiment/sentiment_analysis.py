@@ -69,7 +69,7 @@ class Network:
                 learning_rate_fn = tf.keras.optimizers.schedules.InverseTimeDecay(initial_learning_rate, decay_steps,
                                                                                   decay_rate)
             elif args.decay_type == "c":
-                decay_steps = args.epochs[0][0] * (args.steps_in_epoch * - args.warmup_decay)
+                decay_steps = args.epochs[0][0] * (args.steps_in_epoch - args.warmup_decay)
                 learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
 
             self.optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
@@ -395,8 +395,8 @@ if __name__ == "__main__":
             data_result.train._data["labels"]= imdb_lab + 1
 
 
-    if args.decay_type is not None:
-        args.warmup_decay = math.floor(len(data_result.train._data["tokens"]) / args.batch_size)
+    #if args.decay_type is not None:
+     #   args.warmup_decay = math.floor(len(data_result.train._data["tokens"]) / args.batch_size)
 
     print("Delka datasetu " + str(len(data_result.train._data)))
 
