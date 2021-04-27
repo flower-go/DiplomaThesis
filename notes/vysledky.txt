@@ -1,5 +1,0 @@
-baseline - bez label smoothingu a vseho
-Test, epoch 20, lr 0.0001, loss: 8.42, TagsRaw: 97.13, TagsDict: 97.36, LemmasRaw: 98.52, LemmasDict: 98.79
-
-s label smoothingem
-Test, epoch 20, lr 0.0001, loss: 8.51, TagsRaw: 97.17, TagsDict: 97.36, LemmasRaw: 98.52, LemmasDict: 98.80

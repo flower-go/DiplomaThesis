@@ -55,8 +55,6 @@ class Network:
             output = tf.math.reduce_mean(
                 output
                 , axis=0)  # prumerovani vrstev
-        tf.print("shape")
-        tf.print(output.shape)
         output = tf.keras.layers.Dense(768, activation=tf.nn.tanh)(output[:, 0, :])
         dropout = tf.keras.layers.Dropout(args.dropout)(output)
         predictions = tf.keras.layers.Dense(labels, activation=tf.nn.softmax)(dropout)
@@ -95,11 +93,11 @@ class Network:
             tvs = tvs
             loss = 0.0
 
-            print("info")
-            print(str(self.labels))
-            print(str(len(probabilities)))
-            print(str(len(gold_data)))
-            print(str(len(inputs)))
+            #print("info")
+            #print(str(self.labels))
+            #print(str(len(probabilities)))
+            #print(str(len(gold_data)))
+            #print(str(len(inputs)))
             if args.label_smoothing:
                 loss += self.loss(tf.one_hot(gold_data, self.labels) * (1 - args.label_smoothing)
                     + args.label_smoothing /  self.labels, probabilities)
@@ -122,14 +120,12 @@ class Network:
     def train_epoch(self, dataset, args):
         num_gradients = 0
         tvs = self.model.trainable_variables
-        print("trainable")
-        print(str(len(tvs)))
-        print(str(len(self.model.trainable_weights)))
+        #print("trainable")
+        #print(str(len(tvs)))
+        #print(str(len(self.model.trainable_weights)))
 
         # if args.freeze:
         #     tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
-        tf.print("batch")
-        tf.print(args.batch_size)
         for batch in dataset.batches(size=args.batch_size):
             tg = self.train_batch(
                 batch[0],
@@ -202,9 +198,9 @@ class Network:
 
 
         if args.label_smoothing:
-            loss += self.loss(tf.one_hot(factors, self.labels), probabilities, probabilities._keras_mask)
+            loss += self.loss(tf.one_hot(factors, self.labels), probabilities)
         else:
-            loss += self.loss(tf.convert_to_tensor(factors), probabilities, probabilities._keras_mask)
+            loss += self.loss(tf.convert_to_tensor(factors), probabilities)
 
         self.metrics["loss"](loss)
 
@@ -227,7 +223,7 @@ class Network:
             data.append(i + [0]*max_l)
         
         res = np.asarray(data)
-        print("prevedeno")
+        #print("prevedeno")
         
         return res
 
@@ -262,9 +258,12 @@ if __name__ == "__main__":
 
     args.debug = args.debug == 1
     args.freeze = args.freeze == 1
-    args.kfold = args.kfold.split(":")
-    args.fold = args.kfold[1]
-    args.fold = args.kfold[0]
+    if args.kfold is not None:
+        args.kfold = args.kfold.split(":")
+        args.fold = args.kfold[1]
+        args.fold = args.kfold[0]
+    else:
+        args.kfold = 0
 
     # Fix random seeds and threads
     np.random.seed(args.seed)
@@ -305,6 +304,7 @@ if __name__ == "__main__":
         for d in args.datasets.split(","):
             data = dataset.get_dataset(d,path="../../../datasets",debug=args.debug)
             if str(type(data)) != "<class 'text_classification_dataset.TextClassificationDataset'>":
+                print(str(type(data)))
 
                 data_other = pd.concat([data_other, data]) #nedostane se sem None?
             else:
@@ -409,7 +409,6 @@ if __name__ == "__main__":
     network = Network(args, len(data_result.train.LABELS))
 
     network.train(data_result, args)
-    print("train ended")
 
     # Generate test set annotations, but to allow parallel execution, create it
     # in in args.logdir if it exists.

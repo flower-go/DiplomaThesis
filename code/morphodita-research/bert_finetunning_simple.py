@@ -49,10 +49,10 @@ class Network:
         charseqs = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
 
 
-        cle = tf.keras.layers.Embedding(num_chars, args.cle_dim, mask_zero=True)(charseqs)
-        cle = tf.keras.layers.Dropout(rate=args.dropout)(cle)
-        cle = tf.keras.layers.Bidirectional(tf.keras.layers.GRU(args.cle_dim), merge_mode="concat")(cle)
-        cle = tf.gather(1 * cle, charseq_ids)
+        #cle = tf.keras.layers.Embedding(num_chars, args.cle_dim, mask_zero=True)(charseqs)
+        #cle = tf.keras.layers.Dropout(rate=args.dropout)(cle)
+        #cle = tf.keras.layers.Bidirectional(tf.keras.layers.GRU(args.cle_dim), merge_mode="concat")(cle)
+        #cle = tf.gather(1 * cle, charseq_ids)
 
 
         inp = [subwords, charseqs, charseq_ids]
@@ -73,9 +73,9 @@ class Network:
         self.labels = labels
         dropout = tf.keras.layers.Dropout(rate=args.dropout)(bert_output)
 
-        inputs = [dropout,cle]
-        hidden = tf.keras.layers.Concatenate()(inputs)
-        hidden = tf.keras.layers.Dropout(rate=args.dropout)(hidden)
+        #inputs = [dropout,cle]
+        #hidden = tf.keras.layers.Concatenate()(inputs)
+        hidden = tf.keras.layers.Dropout(rate=args.dropout)(dropout)
         #TODO co s tim teď?
         # dense s softmaxem
         predictions_tags = tf.keras.layers.Dense(labels[1], activation=tf.nn.softmax)(dropout)
@@ -117,10 +117,10 @@ class Network:
     def train_batch(self, inputs, factors):
         #tags_mask = tf.pad(inputs[0][:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
         tags_mask =  tf.not_equal(factors[0],0)
-        tf.print("factors")
-        tf.print(inputs[0],summarize=-1)
-        tf.print("masky")
-        tf.print(tags_mask, summarize=-1)
+        #tf.print("factors")
+        #tf.print(inputs[0],summarize=-1)
+        #tf.print("masky")
+        #tf.print(tags_mask, summarize=-1)
         with tf.GradientTape() as tape:
 
             probabilities = self.model(inputs, training=True)
