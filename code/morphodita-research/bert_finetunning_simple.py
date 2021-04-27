@@ -337,12 +337,12 @@ if __name__ == "__main__":
     parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
     parser.add_argument("--freeze", default=0, type=bool, help="Freezing bert layers")
     parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
+    parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
     parser.add_argument("--model", default=None, type=str, help="Model for loading")
     parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--warmup_decay", default=None, type=str,help="Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--word_dropout", default=0, type=float, help="Word dropout rate")
     parser.add_argument("data", type=str, help="Input data")
-    parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
 
     args = parser.parse_args()
     args.debug_mode = args.debug_mode == 1
