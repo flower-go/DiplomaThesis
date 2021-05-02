@@ -235,22 +235,23 @@ if __name__ == "__main__":
     parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
     parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
     parser.add_argument("--bert", default="bert-base-multilingual-uncased", type=str, help="BERT model.")
-    parser.add_argument("--datasets", default="csfd", type=str, help="Dataset for use")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout.")
-    parser.add_argument("--english", default=0, type=float, help="add some english data for training.")
     parser.add_argument("--epochs", default="10:5e-5,1:2e-5", type=str, help="Number of epochs.")
-    parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
-    parser.add_argument("--freeze", default=0, type=int, help="Freezing bert layers")
+    parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
+    parser.add_argument("--warmup_decay", default=None, type=str,
+                        help="Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
+    parser.add_argument("--debug", default=True, type=int, help="use small debug data")
     parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
     parser.add_argument("--model", default=None, type=str, help="Model for loading")
+
+    parser.add_argument("--datasets", default="csfd", type=str, help="Dataset for use")
+    parser.add_argument("--english", default=0, type=float, help="add some english data for training.")
+    parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
+    parser.add_argument("--freeze", default=0, type=int, help="Freezing bert layers")
     parser.add_argument("--seed", default=42, type=int, help="Random seed.")
-    parser.add_argument("--threads", default=1, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose TF logging.")
-    parser.add_argument("--debug", default=True, type=int, help="use small debug data")
-    parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
-    parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
     parser.add_argument("--kfold", default=None, type=str, help="Number of folds for cross-validation and the index of the fold")
-    parser.add_argument("--warmup_decay", default=None, type=str, help="Number of warmup steps, than will be applied inverse square root decay")
     args = parser.parse_args([] if "__file__" not in globals() else None)
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
                    [epochslr.split(":")]]
@@ -260,7 +261,7 @@ if __name__ == "__main__":
     if args.kfold is not None:
         args.kfold = args.kfold.split(":")
         args.fold = args.kfold[1]
-        args.fold = args.kfold[0]
+        args.kfold = args.kfold[0]
     else:
         args.kfold = 0
 
@@ -382,7 +383,7 @@ if __name__ == "__main__":
         imdb_ex, imdb_lab = dataset.get_dataset("imdb")
         imdb_ex = np.array(imdb_ex)
         imdb_lab = np.array(imdb_lab)
-        if args.english < 100:
+        if args.english < 1:
             size = min(len(data_result.train._data["tokens"])*args.english, len(imdb_ex))/len(imdb_ex)
             imdb_ex, _, imdb_lab, _, = train_test_split(imdb_ex, imdb_lab, train_size=size, shuffle=True,
                                                         stratify=imdb_lab)
