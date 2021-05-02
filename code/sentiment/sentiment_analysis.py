@@ -31,7 +31,7 @@ class Network:
         self.labels = labels
 
         # bert model
-        if "rob" not in args.bert:
+        if "robeczech" not in args.bert:
             config = transformers.AutoConfig.from_pretrained(args.bert)
             config.output_hidden_states = True
             self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained(args.bert, config=config)
@@ -288,10 +288,10 @@ if __name__ == "__main__":
         ",".join(("{}={}".format(re.sub("(.)[^_]*_?", r"\1", key), value) for key, value in sorted(vars(args).items())))
     ))
 
-    if args.bert is not None and "rob" in args.bert:
+    if args.bert is not None and "robeczech" in args.bert:
         sys.path.append(args.bert)
         import tokenizer.robeczech_tokenizer
-    if not "rob" in args.bert:
+    if not "robeczech" in args.bert:
         tokenizer = transformers.AutoTokenizer.from_pretrained(args.bert)
     else:
         tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer(args.bert + "tokenizer")
