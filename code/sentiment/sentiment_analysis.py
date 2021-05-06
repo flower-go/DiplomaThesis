@@ -395,6 +395,7 @@ if __name__ == "__main__":
             size = len(imdb_ex)
             data_result.train._data["tokens"] = imdb_ex
             data_result.train._data["labels"]= imdb_lab + 1
+            data_result._size = len(imdb_ex)
 
 
     #if args.decay_type is not None:
