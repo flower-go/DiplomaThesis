@@ -386,8 +386,8 @@ if __name__ == "__main__":
         if args.english < 1:
             print("less than one")
             size = min(len(data_result.train._data["tokens"])*args.english, len(imdb_ex))/len(imdb_ex)
-            print("split size" + str(size))
-            imdb_ex, _, imdb_lab, _, = train_test_split(imdb_ex, imdb_lab, train_size=size, shuffle=True,
+            if size < 1:
+                imdb_ex, _, imdb_lab, _, = train_test_split(imdb_ex, imdb_lab, train_size=size, shuffle=True,
                                                         stratify=imdb_lab)
 
             data_result.train._data["tokens"].append(imdb_ex)
@@ -397,8 +397,6 @@ if __name__ == "__main__":
             data_result.train._data["tokens"] = imdb_ex
             data_result.train._data["labels"]= imdb_lab + 1
             data_result.train._size = len(imdb_ex)
-            print("size zmenena")
-            print(len(imdb_ex))
 
 
     #if args.decay_type is not None:
