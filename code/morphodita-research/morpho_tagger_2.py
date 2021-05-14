@@ -19,7 +19,7 @@ class BertModel:
     def __init__(self, name, args):
         self.name = name
 
-        if "rob" in name:
+        if "robeczech" in name:
             self.path = name
             self.tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer(self.path + "tokenizer")
             self.model = transformers.TFAutoModel.from_pretrained(self.path + "tf", output_hidden_states=True)
@@ -56,8 +56,8 @@ class Network:
         if args.fine_lr > 0:
             self._fine_optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
-        if args.bert_model and os.path.exists(args.bert_model):
-            self.model = load_model(args.bert_model)
+        if args.bert_load and os.path.exists(args.bert_load):
+            self.model = load_model(args.bert_load)
         else:
 
 
@@ -131,12 +131,12 @@ class Network:
 
             self.model = tf.keras.Model(inputs=inp, outputs=outputs)
 
-            print(str(self.model.weights[0][6][1]))
-            if args.test_only:
-                self.model.load_weights(args.test_only)
-                print("model inputs:  " + str(self.model._feed_input_names))
+            #print(str(self.model.weights[0][6][1]))
+            if args.model_load:
+                self.model.load_weights(args.model_load)
+            #   print("model inputs:  " + str(self.model._feed_input_names))
 
-                print(str(self.model.weights[0][6][1]))
+             #   print(str(self.model.weights[0][6][1]))
 
 
             if args.bert_model:
@@ -488,42 +488,42 @@ if __name__ == "__main__":
 
     # Parse arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("data", type=str, help="Input data")
+    #parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
+    parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
     parser.add_argument("--batch_size", default=64, type=int, help="Batch size.")
+    parser.add_argument("--bert", default=None, type=str, help="Bert model for embeddings")
+    parser.add_argument("--bert_model", default=None, type=str, help="Bert model for training")
     parser.add_argument("--beta_2", default=0.99, type=float, help="Adam beta 2")
     parser.add_argument("--char_dropout", default=0, type=float, help="Character dropout")
+    parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
     parser.add_argument("--cle_dim", default=256, type=int, help="Character-level embedding dimension.")
+    parser.add_argument("--cont", default=0, type=int, help="load finetuned model and continue training?")
+    parser.add_argument("--debug", default=0, type=int, help="debug on small dataset")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
     parser.add_argument("--embeddings", default=None, type=str, help="External embeddings to use.")
     parser.add_argument("--epochs", default="40:1e-3,20:1e-4", type=str, help="Epochs and learning rates.")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
-    parser.add_argument("--factors", default="Lemmas,Tags", type=str, help="Factors to predict.")
     parser.add_argument("--factor_layers", default=1, type=int, help="Per-factor layers.")
+    parser.add_argument("--factors", default="Lemmas,Tags", type=str, help="Factors to predict.")
+    parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
     parser.add_argument("--label_smoothing", default=0.00, type=float, help="Label smoothing.")
+    parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
     parser.add_argument("--lemma_re_strip", default=r"(?<=.)(?:`|_|-[^0-9]).*$", type=str,
                         help="RE suffix to strip from lemma.")
     parser.add_argument("--lemma_rule_min", default=2, type=int, help="Minimum occurences to keep a lemma rule.")
-    parser.add_argument("--min_epoch_batches", default=300, type=int, help="Minimum number of batches per epoch.")
+    #parser.add_argument("--min_epoch_batches", default=300, type=int, help="Minimum number of batches per epoch.")
     parser.add_argument("--predict", default=None, type=str, help="Predict using the passed model.")
     parser.add_argument("--rnn_cell", default="LSTM", type=str, help="RNN cell type.")
     parser.add_argument("--rnn_cell_dim", default=512, type=int, help="RNN cell dimension.")
     parser.add_argument("--rnn_layers", default=3, type=int, help="RNN layers.")
-    parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
+    parser.add_argument("--test_only", default=None, type=str, help="Only test evaluation")
+    parser.add_argument("--warmup_decay", default=None, type=str, help="Type i or c. Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
-    parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
-    parser.add_argument("--bert", default=None, type=str, help="Bert model for embeddings")
-    parser.add_argument("--bert_model", default=None, type=str, help="Bert model for training")
-    parser.add_argument("--cont", default=0, type=int, help="load finetuned model and continue training?")
-    parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
-    parser.add_argument("--test_only", default=None, type=str, help="Only test evaluation")
-    parser.add_argument("--fine_lr", default=0, type=float, help="Learning rate for bert layers")
-    parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
-    parser.add_argument("--warmup_decay", default=None, type=str, help="Type i or c. Number of warmup steps, than will be applied inverse square root decay")
-    parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
+    parser.add_argument("data", type=str, help="Input data")
 
     args = parser.parse_args()
-    args.debug_mode = args.debug_mode == 1
+    args.debug = args.debug == 1
     args.cont = args.cont == 1
     # Postprocess args
     args.factors = args.factors.split(",")
@@ -537,7 +537,7 @@ if __name__ == "__main__":
     else:
         args.decay_type = None
 
-    if args.bert is not None and "rob" in args.bert:
+    if args.bert is not None and "robeczech" in args.bert:
         sys.path.append(args.bert)
         import tokenizer.robeczech_tokenizer
 
@@ -593,7 +593,7 @@ if __name__ == "__main__":
     else:
         # Load input data
         data_paths = [None] * 3
-        if args.debug_mode:
+        if args.debug:
             print("DEBUG MODE")
             data_paths[0] = "{}-train-small.txt".format(args.data)
             data_paths[1] = "{}-dev-small.txt".format(args.data)
@@ -608,10 +608,16 @@ if __name__ == "__main__":
             warnings.warn("embeddings and whole bert model training are both selected.")
 
 
-        #TODO model musi byt dva aprametry - na ten vnoreny a vnejsi. Respektive na bert model a adresa toho ulozeneho
         model_bert = None
         if args.bert or args.bert_model or args.test_only:
             if args.bert_model:
+                name = args.bert_model.split(";")
+                args.bert_load = None
+                if len(name) > 1:
+                    args.bert_load = name[0]
+                    args.bert_model = name[1]
+                else:
+                    args.bert_model = name[0]
                 name = args.bert_model
             elif args.bert:
                 name = args.bert
@@ -619,10 +625,8 @@ if __name__ == "__main__":
                 #name = "bert-base-multilingual-uncased"
             #else:
                # name = args.bert_model
-            print("model: " + name)
             model_bert = BertModel(name, args)
 
-        #TODO udelat cyklus
         train = morpho_dataset.MorphoDataset(data_paths[0],
                                              embeddings=args.embeddings_words if args.embeddings else None,
                                              bert=model_bert,
@@ -655,7 +659,7 @@ if __name__ == "__main__":
                       factor_words=dict(
                           (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors),
                       model=model_bert)
-    if args.debug_mode:
+    if args.debug:
         ...
         #tf.keras.utils.plot_model(network.outer_model, "my_first_model_with_shape_info.svg", show_shapes=True)
 
