@@ -19,7 +19,7 @@ class BertModel:
     def __init__(self, name, args):
         self.name = name
 
-        if "rob" in name:
+        if "robeczech" in name:
             self.path = name
             self.tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer(self.path + "tokenizer")
             self.model = transformers.TFAutoModel.from_pretrained(self.path + "tf", output_hidden_states=True)
@@ -537,7 +537,7 @@ if __name__ == "__main__":
     else:
         args.decay_type = None
 
-    if args.bert is not None and "rob" in args.bert:
+    if args.bert is not None and "robeczech" in args.bert:
         sys.path.append(args.bert)
         import tokenizer.robeczech_tokenizer
 
