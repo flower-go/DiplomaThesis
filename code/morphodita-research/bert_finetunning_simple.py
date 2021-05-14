@@ -84,8 +84,8 @@ class Network:
         # model(inputs, outputs)
         self.model = tf.keras.Model(inputs=inp, outputs=out)
 
-        if args.model != None:
-            self.model.load_weights(args.model)
+        if args.bert_model != None:
+            self.model.load_weights(args.bert_model)
         # compile model
         self.optimizer=tf.optimizers.Adam()
         if args.decay_type is not None:
@@ -329,7 +329,7 @@ if __name__ == "__main__":
     parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
     parser.add_argument("--cle_dim", default=256, type=int, help="Character-level embedding dimension.")
     parser.add_argument("--cont", default=0, type=int, help="load finetuned model and continue training?")
-    parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
+    parser.add_argument("--debug", default=0, type=int, help="debug on small dataset")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
     parser.add_argument("--epochs", default="40:1e-3,20:1e-4", type=str, help="Epochs and learning rates.")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")
@@ -338,7 +338,7 @@ if __name__ == "__main__":
     parser.add_argument("--freeze", default=0, type=bool, help="Freezing bert layers")
     parser.add_argument("--label_smoothing", default=0.03, type=float, help="Label smoothing.")
     parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
-    parser.add_argument("--model", default=None, type=str, help="Model for loading")
+    parser.add_argument("--bert_model", default=None, type=str, help="Model for loading")
     parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--warmup_decay", default=None, type=str,help="Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--word_dropout", default=0, type=float, help="Word dropout rate")
