@@ -609,10 +609,10 @@ if __name__ == "__main__":
 
 
         model_bert = None
+        args.bert_load = None
         if args.bert or args.bert_model or args.test_only:
             if args.bert_model:
                 name = args.bert_model.split(";")
-                args.bert_load = None
                 if len(name) > 1:
                     args.bert_load = name[0]
                     args.bert_model = name[1]
