@@ -26,7 +26,7 @@ class BertModel:
     def __init__(self, name, args):
         self.name = name
 
-        if "rob" in name:
+        if "robeczech" in name:
             self.path = name
             self.tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer(self.path + "tokenizer")
             self.model = transformers.TFAutoModel.from_pretrained(self.path + "tf", output_hidden_states=True)
@@ -329,7 +329,7 @@ if __name__ == "__main__":
     parser.add_argument("--checkp", default=None, type=str, help="Checkpoint name")
     parser.add_argument("--cle_dim", default=256, type=int, help="Character-level embedding dimension.")
     parser.add_argument("--cont", default=0, type=int, help="load finetuned model and continue training?")
-    parser.add_argument("--debug", default=0, type=int, help="debug on small dataset")
+    parser.add_argument("--debug_mode", default=0, type=int, help="debug on small dataset")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout")
     parser.add_argument("--epochs", default="40:1e-3,20:1e-4", type=str, help="Epochs and learning rates.")
     parser.add_argument("--exp", default=None, type=str, help="Experiment name.")

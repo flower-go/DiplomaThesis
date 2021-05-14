@@ -56,6 +56,7 @@ class Network:
         if args.fine_lr > 0:
             self._fine_optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
+        print(args.bert_model)
         if args.bert_load and os.path.exists(args.bert_load):
             self.model = load_model(args.bert_load)
         else:
@@ -132,6 +133,7 @@ class Network:
             self.model = tf.keras.Model(inputs=inp, outputs=outputs)
 
             #print(str(self.model.weights[0][6][1]))
+            print(args.model_load)
             if args.model_load:
                 self.model.load_weights(args.model_load)
             #   print("model inputs:  " + str(self.model._feed_input_names))
@@ -626,6 +628,9 @@ if __name__ == "__main__":
             #else:
                # name = args.bert_model
             model_bert = BertModel(name, args)
+        print(args.bert_load)
+        print("load")
+        print(name)
 
         train = morpho_dataset.MorphoDataset(data_paths[0],
                                              embeddings=args.embeddings_words if args.embeddings else None,
@@ -648,7 +653,8 @@ if __name__ == "__main__":
         else:
             test = None
 
-
+    print(args.bert_load)
+    print("again")
     #TODO nacitat velikost
     args.bert_size = 768
     if args.decay_type != None:
