@@ -132,7 +132,7 @@ class Network:
 
             #print(str(self.model.weights[0][6][1]))
             print(args.bert_load)
-            if args.bert_load:
+            if args.bert_load and os.path.exists(args.bert_load):
                 self.model.load_weights(args.bert_load)
             #   print("model inputs:  " + str(self.model._feed_input_names))
 

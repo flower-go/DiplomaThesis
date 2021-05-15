@@ -84,7 +84,7 @@ class Network:
         # model(inputs, outputs)
         self.model = tf.keras.Model(inputs=inp, outputs=out)
 
-        if args.bert_model != None:
+        if args.bert_model != None and os.path.exists(args.bert_model):
             self.model.load_weights(args.bert_model)
         # compile model
         self.optimizer=tf.optimizers.Adam()
