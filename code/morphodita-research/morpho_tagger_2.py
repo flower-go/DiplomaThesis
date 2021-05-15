@@ -619,12 +619,11 @@ if __name__ == "__main__":
                 else:
                     args.bert_model = name[0]
                 name = args.bert_model
+                print("name " + name)
             elif args.bert:
                 name = args.bert
-            #elif args.test_only:
-                #name = "bert-base-multilingual-uncased"
-            #else:
-               # name = args.bert_model
+
+            print(name)
             model_bert = BertModel(name, args)
         print(args.bert_load)
         print("load")
