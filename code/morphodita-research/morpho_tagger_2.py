@@ -56,9 +56,7 @@ class Network:
         if args.fine_lr > 0:
             self._fine_optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
-        print(args.bert_model)
-        if args.bert_load and os.path.exists(args.bert_load):
-            self.model = load_model(args.bert_load)
+
         else:
 
 
@@ -133,9 +131,9 @@ class Network:
             self.model = tf.keras.Model(inputs=inp, outputs=outputs)
 
             #print(str(self.model.weights[0][6][1]))
-            print(args.model_load)
-            if args.model_load:
-                self.model.load_weights(args.model_load)
+            print(args.bert_load)
+            if args.bert_load:
+                self.model.load_weights(args.bert_load)
             #   print("model inputs:  " + str(self.model._feed_input_names))
 
              #   print(str(self.model.weights[0][6][1]))
