@@ -387,10 +387,8 @@ if __name__ == "__main__":
     args.factors = args.factors.split(",")
     args.epochs = [(int(epochs), float(lr)) for epochs, lr in
                    (epochs_lr.split(":") for epochs_lr in args.epochs.split(","))]
-    if args.bert != None:
-        model_bert = BertModel(args.bert, args)
-    else:
-        model_bert = BertModel(args.bert_model, args)
+
+    model_bert = BertModel(args.bert, args)
 
 
     dataset = mds.SimpleDataset(args.debug_mode, args.data,"train", model_bert)
