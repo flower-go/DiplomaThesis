@@ -84,8 +84,8 @@ class Network:
         # model(inputs, outputs)
         self.model = tf.keras.Model(inputs=inp, outputs=out)
 
-        if args.bert_model != None and os.path.exists(args.bert_model):
-            self.model.load_weights(args.bert_model)
+        if args.bert_load != None and os.path.exists(args.bert_load):
+            self.model.load_weights(args.bert_load)
         # compile model
         self.optimizer=tf.optimizers.Adam()
         if args.decay_type is not None:
@@ -388,7 +388,18 @@ if __name__ == "__main__":
     args.epochs = [(int(epochs), float(lr)) for epochs, lr in
                    (epochs_lr.split(":") for epochs_lr in args.epochs.split(","))]
 
-    model_bert = BertModel(args.bert, args)
+    if args.bert or args.bert_model:
+        if args.bert_model:
+            name = args.bert_model.split(";")
+            if len(name) > 1:
+                args.bert_load = name[0]
+                args.bert_model = name[1]
+            else:
+                args.bert_model = name[0]
+            name = args.bert_model
+            print("name " + name)
+        elif args.bert:
+            name = args.bert
 
 
     dataset = mds.SimpleDataset(args.debug_mode, args.data,"train", model_bert)
