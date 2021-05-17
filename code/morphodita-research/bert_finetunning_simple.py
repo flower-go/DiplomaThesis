@@ -390,16 +390,15 @@ if __name__ == "__main__":
 
     if args.bert or args.bert_model:
         if args.bert_model:
-            name = args.bert_model.split(";")
-            if len(name) > 1:
-                args.bert_load = name[0]
-                args.bert_model = name[1]
+            args.bert_model = args.bert_model.split(";")
+            if len(args.bert_model) > 1:
+                args.bert_load = args.bert_model[0]
+                args.bert_model = args.bert_model[1]
             else:
-                args.bert_model = name[0]
-            name = args.bert_model
-            print("name " + name)
+                model_bert = args.bert_model[0]
+            print("name " + args.bert_model)
         elif args.bert:
-            name = args.bert
+            model_bert = args.bert
 
 
     dataset = mds.SimpleDataset(args.debug_mode, args.data,"train", model_bert)
