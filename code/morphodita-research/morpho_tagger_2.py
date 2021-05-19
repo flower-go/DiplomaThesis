@@ -47,7 +47,7 @@ class Network:
                 decay_rate = 0.5
                 learning_rate_fn = tf.keras.optimizers.schedules.InverseTimeDecay(initial_learning_rate, decay_steps, decay_rate)
             elif args.decay_type =="c":
-                decay_steps = args.epochs[0][0] * (args.steps_in_epoch * - args.warmup_decay)
+                decay_steps = (args.epochs[0][0] - args.warmup_decay)*args.steps_in_epoch
                 learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
             
             self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
