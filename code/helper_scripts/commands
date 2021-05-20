@@ -1,23 +1,26 @@
 from datetime import datetime
 
 models = [
-    '"bert-base-multilingual-cased"',
-    '"jplu/tf-xlm-roberta-base"']
+    '"bert-base-multilingual-uncased"',
+    '"jplu/tf-xlm-roberta-base"',
+    '"./robeczech/noeol-210323/"']
 ls = "0.03"
 lr = "5e-5"
-lr_list = ["5e-5", "3e-5", "2e-5", "8e-6", "1e-6"]
+lr_list = ["1e-5","2e-5","5e-5"]
 debug = False
-test = True
+test = False
 model = '"bert-base-multilingual-cased"'
 batch = 64
 fine_lr = 0
 warmup = 0
 checkp = 0
-rescheck = None
+layers = None
+
+schedules = [None, '"c:1"', '"i:1"']
 
 s1 = "qsub -cwd"
-s2 = "-q gpu.q -l gpu=1,mem_free=16G,h_data=16G -pe smp 2 $HOME/env_diplomka/bin/python3 morpho_tagger_2.py ~doubrap1/pdt/pdt-3.5 --embeddings ~doubrap1/embeddings/cs_lindat4gw/forms.vectors-w5-d300-ns5.npz --threads 2"
-s3 = "-q gpu.q -l gpu=2,mem_free=32G,h_data=32G -pe smp 2 $HOME/env_diplomka/bin/python3 bert_finetunning_simple.py ~doubrap1/pdt/pdt-3.5 --threads 2"
+s2 = "-q gpu.q -l gpu=1,mem_free=16G,h_data=16G -pe smp 2 $HOME/env_diplomka/bin/python3 morpho_tagger_2.py ~doubrap1/pdt/pdt-3.5 --embeddings ~doubrap1/embeddings/cs_lindat4gw/forms.vectors-w5-d300-ns5.npz"
+s3 = "-q gpu.q -l gpu=2,mem_free=32G,h_data=32G -pe smp 2 $HOME/env_diplomka/bin/python3 bert_finetunning_simple.py ~doubrap1/pdt/pdt-3.5"
 
 class Experiment:
     def __init__(self, name):
@@ -30,16 +33,26 @@ def generate(name):
     e = Experiment(name)
     global checkp
     output = [s1]
-    output.append("-o " + e.name + "_o")
-    output.append("-e " + e.name + "_e")
+    output.append("-o " + e.name + "_o" + str(checkp))
+    output.append("-e " + e.name + "_e" + str(checkp))
+    output.append("-N " + "tl_" + str(checkp))
 
-    output.append(s2)
+
+    if name == "simple":
+        output.append(s3)
+    else:
+        output.append(s2)
 
     if debug:
-        output.append("--debug_mode 1")
+        output.append("--debug 1")
 
     output.append("--checkp " + '"ch' + str(checkp) + '"')
     checkp = checkp + 1
+    if layers != None:
+        output.append("--layers " + '"' + layers + '"' )
+
+    if warmup != None and warmup != 0:
+        output.append("--warmup_decay " + warmup)
     return output
 
 
@@ -62,23 +75,29 @@ def generate_bertemb(model):
     output.append("--label_smoothing " + ls)
     output.append("--bert " + model)
 
+    if warmup != None:
+        output.append("--epochs 60:1e-3")
+    else:
+        output.append("--epochs 40:1e-3,20:1e-4")
     return output
 
-
-def generate_bertfine(model):
+def generate_bertfine(model,lr=None):
     name = "bertfine"
+    if len(model.split(":")) == 1:
+        name = "full"
     output = generate(name)
     output.append("--label_smoothing " + ls)
     output.append("--bert_model " + model)
     output.append("--cont " + "1")
-    output.append('--epochs "4:' + lr + '"')
+    if lr is  None:
+        if warmup != None:
+            output.append('--epochs "5:3e-5"')
+        else:
+            output.append('--epochs "2:1e-6"')
+    else:
+        output.append('--epochs "10:' + str(lr) + '"')
     output.append("--accu " + "16")
     output.append("--batch_size " + str(batch))
-    if test:
-        output.append('--test_only "checkpoints/ch' + str(rescheck) + '"')
-    if fine_lr > 0:
-        output.append("--fine_lr " + str(fine_lr))
-
     return output
 
 def generate_bertsimple(model, epochs_lr):
@@ -86,12 +105,12 @@ def generate_bertsimple(model, epochs_lr):
     output = generate(name)
     output.append("--label_smoothing " + ls)
     output.append("--bert " + model)
+    output.append("--cont " + "1")
     output.append('--factors "Lemmas,Tags"')
     output.append("--epochs " + epochs_lr)
     output.append("--batch_size " + str(batch))
     output.append("--accu 16")
-    output.append("--freeze 1")
-
+    return output
 
 def generate_id(expe):
     output = []
@@ -106,7 +125,7 @@ def generate_id(expe):
 
     if (fine_lr > 0):
         output.append('"f' + str(fine_lr) + '"')
-    elif (warmup > 0):
+    elif (warmup != None):
         output.append('"warm"')
     else:
         output.append('"base"')
@@ -122,46 +141,54 @@ def generate_id(expe):
 
 #TODO warmup a optimizers
 ####################### bez bertů #######################################
-# print(" ".join(generate_baseline()))
-# generate_id('"base"')
-# print(" ".join(generate_LS()))
-# generate_id('"ls"')
+print(" ".join(generate_baseline()))
+#generate_id('"base"')
+print(" ".join(generate_LS()))
+#generate_id('"ls"')
 
-####################### pro každý model ###################################
+################### embeddings ########################################
 for m in models:
-    warmup = 0
     fine_lr = 0
     model = m
     batch = 64
     ################### embeddings ########################################
-    print(" ".join(generate_bertemb(model)))
-    generate_id('"embed"')
-    rescheck = checkp - 1
-
-    ################### all learning rates, 4 epochs ######################
-    batch = 4
-    for l in lr_list:
-        lr = l
-        print(" ".join(generate_bertfine(model)))
-        generate_id('"fine"')
-
-    ################### two optimizers ####################
-
-    fine_lr = 8e-6
-    lr = "5e-3"
-
-    print(" ".join(generate_bertfine(model)))
-    generate_id('"fine"')
-
-    ################## warmup ###########################
+    for w in schedules:
+        warmup = w
+        print(" ".join(generate_bertemb(model)))
+        #generate_id('"embed"')
 
 
-    arr = ["2e-5", "3e-5", "4e-5", "5e-5"]
-    fine_lr = 0
+################### finetunning ######################
+for l in [None, "att"]:
+    layers = l
+    for m in models:
+        model = m
+        for w in schedules:
+            warmup = w
+            batch = 4
+            print(" ".join(generate_bertfine('"checkpoints/ch' + str(checkp - len(models)*len(schedules)) +  ":" + model[1:-1] + '"')))
+            #generate_id('"fine"')
 
-    for l in arr:
-        lr = l
-        warmup = 1
+################### simple ######################
+layers = None
+for m in models:
+    model = m
+    #TODO k modelu pridat jeste cestu k checkpointu
+    for w in [None, '"c:1"', '"i:1"']:
+        warmup = w
+        batch = 4
+        print(" ".join(generate_bertsimple(model, '"5:3e-5"')))
+        #generate_id('"fine"')
 
-        print(" ".join(generate_bertfine(model)))
-        generate_id('"fine"')
+
+################### full ######################
+
+layers = None
+for l in lr_list:
+    for m in models:
+        model = m
+        for w in schedules:
+            warmup = w
+            batch = 4
+            print(" ".join(generate_bertfine(model, l)))
+            #generate_id('"fine"')
