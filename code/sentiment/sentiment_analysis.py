@@ -60,18 +60,14 @@ class Network:
 
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
         self.optimizer=tf.optimizers.Adam()
-
+        decay_steps = args.steps_in_epoch * (args.epochs[0][0] - args.warmup_decay)
         if args.decay_type is not None:
             if args.decay_type == "i":
                 initial_learning_rate = args.epochs[0][1]
-                decay_steps = 1.0
-                decay_rate = 0.5
-                learning_rate_fn = tf.keras.optimizers.schedules.InverseTimeDecay(initial_learning_rate, decay_steps,
-                                                                                  decay_rate)
+                learning_rate_fn = tf.keras.optimizers.schedules.PolynomialDecay(initial_learning_rate, decay_steps,
+                                                                                 end_learning_rate=5e-5, power=0.5)
             elif args.decay_type == "c":
-                decay_steps = args.epochs[0][0] * (args.steps_in_epoch - args.warmup_decay)
                 learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
-
             self.optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
                                                    warmup_steps=args.warmup_decay * args.steps_in_epoch,
                                                    decay_schedule_fn=learning_rate_fn)
@@ -130,7 +126,7 @@ class Network:
                 batch[0],
                 batch[1], tvs)
 
-            if not args.accu:
+            if args.accu < 2:
                 self.optimizer.apply_gradients(zip(tg, tvs))
             else:
                 if num_gradients == 0:
@@ -170,7 +166,7 @@ class Network:
     def train(self, data, args):
         for e, lr in args.epochs:
             if args.decay_type is None:
-                if args.accu > 0:
+                if args.accu > 1:
                     lr = lr / args.accu
                 b.set_value(self.optimizer.learning_rate, lr)
             for i in range(e):
@@ -232,7 +228,7 @@ if __name__ == "__main__":
     # Parse arguments
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
+    parser.add_argument("--accu", default=1, type=int, help="accumulate batch size")
     parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
     parser.add_argument("--bert", default="bert-base-multilingual-uncased", type=str, help="BERT model.")
     parser.add_argument("--dropout", default=0.5, type=float, help="Dropout.")
@@ -405,7 +401,7 @@ if __name__ == "__main__":
     print("Delka datasetu " + str(len(data_result.train._data)))
 
     if args.decay_type != None:
-        args.steps_in_epoch = math.floor(len(data_result.train._data["tokens"]) / args.batch_size)
+        args.steps_in_epoch = math.floor(len(data_result.train._data["tokens"]) / (args.batch_size*args.accu))
     # Create the network and train
     network = Network(args, len(data_result.train.LABELS))
 
