@@ -25,14 +25,16 @@ from keras.models import load_model
 class BertModel:
     def __init__(self, name, args):
         self.name = name
+        print(name)
+        print("name")
 
         if "robeczech" in name:
             self.path = name
             self.tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer(self.path + "tokenizer")
             self.model = transformers.TFAutoModel.from_pretrained(self.path + "tf", output_hidden_states=True)
         else:
-            self.tokenizer = transformers.BertTokenizer.from_pretrained(name)
-            self.config = transformers.BertConfig.from_pretrained(name)
+            self.tokenizer = transformers.AutoTokenizer.from_pretrained(name)
+            self.config = transformers.AutoConfig.from_pretrained(name)
             self.config.output_hidden_states = True
             self.model = transformers.TFAutoModel.from_pretrained(name,
                                                               config=self.config)
@@ -349,10 +351,6 @@ if __name__ == "__main__":
     args.freeze = args.freeze == 1
     args.cont = args.cont == 1
 
-    if args.bert is not None and "rob" in args.bert:
-        sys.path.append(args.bert)
-        import tokenizer.robeczech_tokenizer
-
     if args.warmup_decay is not None:
         args.warmup_decay = args.warmup_decay.split(":")
         args.decay_type = args.warmup_decay[0]
@@ -390,15 +388,25 @@ if __name__ == "__main__":
 
     if args.bert or args.bert_model:
         if args.bert_model:
-            args.bert_model = args.bert_model.split(";")
+            print("před parsovanim")
+            print(args.bert_model)
+            args.bert_model = args.bert_model.split(":")
             if len(args.bert_model) > 1:
                 args.bert_load = args.bert_model[0]
+                print(args.bert_load)
+                print("load")
                 args.bert_model = args.bert_model[1]
             else:
-                model_bert = args.bert_model[0]
-            print("name " + args.bert_model)
+                args.bert_model = args.bert_model[0]
+            name = args.bert_model
         elif args.bert:
-            model_bert = args.bert
+            name = args.bert
+            
+    if "robeczech" in name:
+        sys.path.append(name)
+        import tokenizer.robeczech_tokenizer
+    
+    model_bert = BertModel(name, args)
 
 
     dataset = mds.SimpleDataset(args.debug_mode, args.data,"train", model_bert)
