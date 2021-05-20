@@ -40,14 +40,13 @@ class Network:
         self.factor_words = factor_words
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
         #predpokladam ze bude jen jeden typ lr a celkovy pocet kroku je tedy takto
+        decay_steps = args.steps_in_epoch * (args.epochs[0][0] - args.warmup_decay)
         if args.decay_type is not None:
             if args.decay_type == "i":
                 initial_learning_rate = args.epochs[0][1]
-                decay_steps = 1.0
-                decay_rate = 0.5
-                learning_rate_fn = tf.keras.optimizers.schedules.InverseTimeDecay(initial_learning_rate, decay_steps, decay_rate)
-            elif args.decay_type =="c":
-                decay_steps = (args.epochs[0][0] - args.warmup_decay)*args.steps_in_epoch
+                learning_rate_fn = tf.keras.optimizers.schedules.PolynomialDecay(initial_learning_rate, decay_steps,
+                                                                                 end_learning_rate=5e-5, power=0.5)
+            elif args.decay_type == "c":
                 learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
             
             self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
@@ -241,7 +240,7 @@ class Network:
 
     def train_epoch(self, dataset, args, learning_rate):
         if args.decay_type is None:
-            if args.accu > 0:
+            if args.accu > 1:
                 self._optimizer.learning_rate = learning_rate/args.accu
             else:
                 self._optimizer.learning_rate = learning_rate
@@ -275,7 +274,7 @@ class Network:
 
             p, tg = self.train_batch(inp, factors)
 
-            if not args.accu:
+            if args.accu < 2:
 
                 if args.fine_lr > 0:
                     variables = self.outer_model.trainable_variables
@@ -489,7 +488,7 @@ if __name__ == "__main__":
     # Parse arguments
     parser = argparse.ArgumentParser()
     #parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
-    parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
+    parser.add_argument("--accu", default=1, type=int, help="accumulate batch size")
     parser.add_argument("--batch_size", default=64, type=int, help="Batch size.")
     parser.add_argument("--bert", default=None, type=str, help="Bert model for embeddings")
     parser.add_argument("--bert_model", default=None, type=str, help="Bert model for training")
@@ -655,7 +654,7 @@ if __name__ == "__main__":
     #TODO nacitat velikost
     args.bert_size = 768
     if args.decay_type != None:
-        args.steps_in_epoch = math.floor(len(train.factors[1].word_strings) / args.batch_size)
+        args.steps_in_epoch = math.floor(len(train.factors[1].word_strings) / (args.batch_size*args.accu))
     network = Network(args=args,
                       num_words=len(train.factors[train.FORMS].words),
                       num_chars=len(train.factors[train.FORMS].alphabet),

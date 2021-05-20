@@ -90,15 +90,13 @@ class Network:
             self.model.load_weights(args.bert_load)
         # compile model
         self.optimizer=tf.optimizers.Adam()
+        decay_steps = args.steps_in_epoch * (args.epochs[0][0] - args.warmup_decay)
         if args.decay_type is not None:
             if args.decay_type == "i":
                 initial_learning_rate = args.epochs[0][1]
-                decay_steps = 1.0
-                decay_rate = 0.5
-                learning_rate_fn = tf.keras.optimizers.schedules.InverseTimeDecay(initial_learning_rate, decay_steps,
-                                                                                  decay_rate)
+                learning_rate_fn = tf.keras.optimizers.schedules.PolynomialDecay(initial_learning_rate, decay_steps,
+                                                                                 end_learning_rate=5e-5, power=0.5)
             elif args.decay_type == "c":
-                decay_steps = args.epochs[0][0] * (args.steps_in_epoch * - args.warmup_decay)
                 learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
 
             self.optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
@@ -155,7 +153,7 @@ class Network:
     def train_epoch(self, dataset, args, learning_rate):
         if args.decay_type is None:
             self.optimizer.learning_rate = learning_rate
-            if args.accu>0:                                                             
+            if args.accu>1:
                 self.optimizer.learning_rate = self.optimizer.learning_rate/args.accu
 
         num_gradients = 0
@@ -179,7 +177,7 @@ class Network:
 
             tg = self.train_batch(inp, factors)
 
-            if not args.accu:
+            if args.accu < 2:
                 self.optimizer.apply_gradients(zip(tg, self.model.trainable_variables))
             else:
                 if num_gradients == 0:
@@ -324,7 +322,7 @@ if __name__ == "__main__":
     # Parse arguments
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--accu", default=0, type=int, help="accumulate batch size")
+    parser.add_argument("--accu", default=1, type=int, help="accumulate batch size")
     parser.add_argument("--batch_size", default=64, type=int, help="Batch size.")
     parser.add_argument("--bert", default=None, type=str, help="Bert model for embeddings")
     parser.add_argument("--beta_2", default=0.99, type=float, help="Adam beta 2")
@@ -425,7 +423,7 @@ if __name__ == "__main__":
     #train_segments = train.bert_segments
     #labels_unique = len(train.factors[train.TAGS].words)
     if args.decay_type != None:
-        args.steps_in_epoch = math.floor(len(dataset.data.factors[1].word_strings) / args.batch_size)
+        args.steps_in_epoch = math.floor(len(dataset.data.factors[1].word_strings) / (args.batch_size*args.accu))
     network = Network(args=args,
                       model=model_bert, labels=[dataset.NUM_LEMMAS,dataset.NUM_TAGS], num_chars=dataset.num_chars)
 
