@@ -384,6 +384,7 @@ if __name__ == "__main__":
     args.epochs = [(int(epochs), float(lr)) for epochs, lr in
                    (epochs_lr.split(":") for epochs_lr in args.epochs.split(","))]
 
+    args.bert_load = None
     if args.bert or args.bert_model:
         if args.bert_model:
             print("před parsovanim")
