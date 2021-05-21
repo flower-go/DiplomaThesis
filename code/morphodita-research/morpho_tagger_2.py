@@ -40,8 +40,8 @@ class Network:
         self.factor_words = factor_words
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
         #predpokladam ze bude jen jeden typ lr a celkovy pocet kroku je tedy takto
-        decay_steps = args.steps_in_epoch * (args.epochs[0][0] - args.warmup_decay)
         if args.decay_type is not None:
+            decay_steps = args.steps_in_epoch * (args.epochs[0][0] - args.warmup_decay)
             if args.decay_type == "i":
                 initial_learning_rate = args.epochs[0][1]
                 learning_rate_fn = tf.keras.optimizers.schedules.PolynomialDecay(initial_learning_rate, decay_steps,

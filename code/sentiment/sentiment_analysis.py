@@ -60,8 +60,8 @@ class Network:
 
         self.model = tf.keras.Model(inputs=inp, outputs=predictions)
         self.optimizer=tf.optimizers.Adam()
-        decay_steps = args.steps_in_epoch * (args.epochs[0][0] - args.warmup_decay)
         if args.decay_type is not None:
+            decay_steps = args.steps_in_epoch * (args.epochs[0][0] - args.warmup_decay)
             if args.decay_type == "i":
                 initial_learning_rate = args.epochs[0][1]
                 learning_rate_fn = tf.keras.optimizers.schedules.PolynomialDecay(initial_learning_rate, decay_steps,
