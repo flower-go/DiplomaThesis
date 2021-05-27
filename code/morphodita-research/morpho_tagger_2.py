@@ -624,9 +624,7 @@ if __name__ == "__main__":
 
             print(name)
             model_bert = BertModel(name, args)
-        print(args.bert_load)
-        print("load")
-        print(name)
+
 
         train = morpho_dataset.MorphoDataset(data_paths[0],
                                              embeddings=args.embeddings_words if args.embeddings else None,
