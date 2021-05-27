@@ -536,8 +536,25 @@ if __name__ == "__main__":
     else:
         args.decay_type = None
 
-    if args.bert is not None and "robeczech" in args.bert:
-        sys.path.append(args.bert)
+    args.bert_load = None
+    if args.bert or args.bert_model:
+        if args.bert_model:
+            print("před parsovanim")
+            print(args.bert_model)
+            args.bert_model = args.bert_model.split(":")
+            if len(args.bert_model) > 1:
+                args.bert_load = args.bert_model[0]
+                print(args.bert_load)
+                print("load")
+                args.bert_model = args.bert_model[1]
+            else:
+                args.bert_model = args.bert_model[0]
+            name = args.bert_model
+        elif args.bert:
+            name = args.bert
+
+    if "robeczech" in name:
+        sys.path.append(name)
         import tokenizer.robeczech_tokenizer
 
 
@@ -605,28 +622,8 @@ if __name__ == "__main__":
         # Nechceme to vsechno dohromady
         if args.bert and args.bert_model:
             warnings.warn("embeddings and whole bert model training are both selected.")
-
-
-        model_bert = None
-        args.bert_load = None
-        if args.bert or args.bert_model or args.test_only:
-            if args.bert_model:
-                name = args.bert_model.split(";")
-                if len(name) > 1:
-                    args.bert_load = name[0]
-                    args.bert_model = name[1]
-                else:
-                    args.bert_model = name[0]
-                name = args.bert_model
-                print("name " + name)
-            elif args.bert:
-                name = args.bert
-
-            print(name)
+        if args.bert or args.bert_model:
             model_bert = BertModel(name, args)
-        print(args.bert_load)
-        print("load")
-        print(name)
 
         train = morpho_dataset.MorphoDataset(data_paths[0],
                                              embeddings=args.embeddings_words if args.embeddings else None,
