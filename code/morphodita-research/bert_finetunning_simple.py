@@ -452,6 +452,11 @@ if __name__ == "__main__":
     for i, (epochs, learning_rate) in enumerate(args.epochs):
         for epoch in range(epochs):
             print("train epoch {}".format(epoch))
+            #chceme vzdy jednu epochu bez berta
+            if i == 0:
+                args.freeze = 1
+            else:
+                args.freeze = 0
             network.train_epoch(dataset, args, learning_rate)
 
             if dev:
