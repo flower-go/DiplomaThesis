@@ -55,139 +55,129 @@ class Network:
         if args.fine_lr > 0:
             self._fine_optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
 
+        word_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+        charseq_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+        charseqs = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
 
+        # INPUTS - create all embeddings
+        # ASK co to je?
+        inputs = []
+        if args.we_dim:
+            inputs.append(tf.keras.layers.Embedding(num_words, args.we_dim, mask_zero=True)(word_ids))
+
+        cle = tf.keras.layers.Embedding(num_chars, args.cle_dim, mask_zero=True)(charseqs)
+        cle = tf.keras.layers.Dropout(rate=args.dropout)(cle)
+        cle = tf.keras.layers.Bidirectional(tf.keras.layers.GRU(args.cle_dim), merge_mode="concat")(cle)
+        cle = tf.gather(1 * cle, charseq_ids)
+
+        # If CLE dim is half WE dim, we add them together, which gives
+        # better results; otherwise we concatenate CLE and WE.
+        # ASK proč?
+        if 2 * args.cle_dim == args.we_dim:
+            inputs[-1] = tf.keras.layers.Add()([inputs[-1], cle])
         else:
+            inputs.append(cle)
 
+        # func Pretrained embeddings
+        if args.embeddings:
+            embeddings = tf.keras.layers.Input(shape=[None, args.embeddings_size], dtype=tf.float32)
+            inputs.append(tf.keras.layers.Dropout(args.word_dropout, noise_shape=[None, None, 1])(embeddings))
 
-            word_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-            charseq_ids = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-            charseqs = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+        # func bert embeddings
+        if args.bert or args.bert_model:
+            bert_embeddings = tf.keras.layers.Input(shape=[None, args.bert_size], dtype=tf.float32)
+            inputs.append(tf.keras.layers.Dropout(args.word_dropout, noise_shape=[None, None, 1])(bert_embeddings))
 
-            # INPUTS - create all embeddings
-            # ASK co to je?
-            inputs = []
-            if args.we_dim:
-                inputs.append(tf.keras.layers.Embedding(num_words, args.we_dim, mask_zero=True)(word_ids))
+        if len(inputs) > 1:
+            hidden = tf.keras.layers.Concatenate()(inputs)
+        else:
+            hidden = inputs[0]
 
-            cle = tf.keras.layers.Embedding(num_chars, args.cle_dim, mask_zero=True)(charseqs)
-            cle = tf.keras.layers.Dropout(rate=args.dropout)(cle)
-            cle = tf.keras.layers.Bidirectional(tf.keras.layers.GRU(args.cle_dim), merge_mode="concat")(cle)
-            cle = tf.gather(1 * cle, charseq_ids)
+        # FUNC RNN cells
 
-            # If CLE dim is half WE dim, we add them together, which gives
-            # better results; otherwise we concatenate CLE and WE.
-            # ASK proč?
-            if 2 * args.cle_dim == args.we_dim:
-                inputs[-1] = tf.keras.layers.Add()([inputs[-1], cle])
-            else:
-                inputs.append(cle)
+        hidden = tf.keras.layers.Dropout(rate=args.dropout)(hidden)
 
-            # func Pretrained embeddings
-            if args.embeddings:
-                embeddings = tf.keras.layers.Input(shape=[None, args.embeddings_size], dtype=tf.float32)
-                inputs.append(tf.keras.layers.Dropout(args.word_dropout, noise_shape=[None, None, 1])(embeddings))
-
-            # func bert embeddings
-            if args.bert or args.bert_model:
-                bert_embeddings = tf.keras.layers.Input(shape=[None, args.bert_size], dtype=tf.float32)
-                inputs.append(tf.keras.layers.Dropout(args.word_dropout, noise_shape=[None, None, 1])(bert_embeddings))
-
-            if len(inputs) > 1:
-                hidden = tf.keras.layers.Concatenate()(inputs)
-            else:
-                hidden = inputs[0]
-
-            # FUNC RNN cells
-
+        for i in range(args.rnn_layers):
+            previous = hidden
+            rnn_layer = getattr(tf.keras.layers, args.rnn_cell)(args.rnn_cell_dim, return_sequences=True)
+            hidden = tf.keras.layers.Bidirectional(rnn_layer, merge_mode="sum")(hidden)
             hidden = tf.keras.layers.Dropout(rate=args.dropout)(hidden)
+            if i:
+                hidden = tf.keras.layers.Add()([previous, hidden])
 
-            for i in range(args.rnn_layers):
-                previous = hidden
-                rnn_layer = getattr(tf.keras.layers, args.rnn_cell)(args.rnn_cell_dim, return_sequences=True)
-                hidden = tf.keras.layers.Bidirectional(rnn_layer, merge_mode="sum")(hidden)
-                hidden = tf.keras.layers.Dropout(rate=args.dropout)(hidden)
-                if i:
-                    hidden = tf.keras.layers.Add()([previous, hidden])
+        # FUNC outputs
 
-            # FUNC outputs
+        outputs = []
+        for factor in args.factors:
+            factor_layer = hidden
+            for _ in range(args.factor_layers):
+                factor_layer = tf.keras.layers.Add()([factor_layer, tf.keras.layers.Dropout(rate=args.dropout)(
+                    tf.keras.layers.Dense(args.rnn_cell_dim, activation=tf.nn.tanh)(factor_layer))])
+            if factor == "Lemmas":
+                factor_layer = tf.keras.layers.Concatenate()([factor_layer, cle])
+            outputs.append(tf.keras.layers.Dense(factor_words[factor], activation=tf.nn.softmax)(factor_layer))
 
-            outputs = []
-            for factor in args.factors:
-                factor_layer = hidden
-                for _ in range(args.factor_layers):
-                    factor_layer = tf.keras.layers.Add()([factor_layer, tf.keras.layers.Dropout(rate=args.dropout)(
-                        tf.keras.layers.Dense(args.rnn_cell_dim, activation=tf.nn.tanh)(factor_layer))])
-                if factor == "Lemmas":
-                    factor_layer = tf.keras.layers.Concatenate()([factor_layer, cle])
-                outputs.append(tf.keras.layers.Dense(factor_words[factor], activation=tf.nn.softmax)(factor_layer))
+        inp = [word_ids, charseq_ids, charseqs]
+        if (args.embeddings):
+            inp.append(embeddings)
+        if args.bert or args.bert_model:
+            inp.append(bert_embeddings)
 
-            inp = [word_ids, charseq_ids, charseqs]
+        self.model = tf.keras.Model(inputs=inp, outputs=outputs)
+
+        print(args.bert_load)
+        if args.bert_load and os.path.exists(args.bert_load):
+            print("nacteni modelu")
+            self.model.load_weights(args.bert_load)
+        #   print("model inputs:  " + str(self.model._feed_input_names))
+         #   print(str(self.model.weights[0][6][1]))
+
+        if args.bert_model:
+            # FUNC nove vstupy
+            word_ids2 = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+            charseq_ids2 = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+            charseqs2 = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+            embeddings2 = tf.keras.layers.Input(shape=[None, args.embeddings_size], dtype=tf.float32)
+
+            inp2 = [word_ids2, charseq_ids2, charseqs2]
             if (args.embeddings):
-                inp.append(embeddings)
-            if args.bert or args.bert_model:
-                inp.append(bert_embeddings)
+                inp2.append(embeddings2)
 
-            self.model = tf.keras.Model(inputs=inp, outputs=outputs)
+            segments = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+            subwords = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
+            inp2.append(segments)
+            inp2.append(subwords)
 
-            #print(str(self.model.weights[0][6][1]))
-            print(args.bert_load)
-            if args.bert_load and os.path.exists(args.bert_load):
-                self.model.load_weights(args.bert_load)
-            #   print("model inputs:  " + str(self.model._feed_input_names))
-
-             #   print(str(self.model.weights[0][6][1]))
-
-
-            if args.bert_model:
-                # FUNC nove vstupy
-                word_ids2 = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-                charseq_ids2 = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-                charseqs2 = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-                embeddings2 = tf.keras.layers.Input(shape=[None, args.embeddings_size], dtype=tf.float32)
-
-                inp2 = [word_ids2, charseq_ids2, charseqs2]
-                if (args.embeddings):
-                    inp2.append(embeddings2)
-
-                segments = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-                subwords = tf.keras.layers.Input(shape=[None], dtype=tf.int32)
-                inp2.append(segments)
-                inp2.append(subwords)
-
-                self.bert = model.model
-                mask = tf.pad(subwords[:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
-                if args.layers == "att":
-                    bert_output = self.bert(subwords, attention_mask=tf.cast(mask, tf.float32))[2]
-                    weights = tf.Variable(tf.zeros([12]), trainable=True)
-                    output = 0
-                    softmax_weights = tf.nn.softmax(weights)
-                    for i in range(12):
-                        result = softmax_weights[i] * bert_output[i + 1]
-                        output += result
-                    model_output = output
-                else:
-                    model_output = self.bert(subwords, attention_mask=tf.cast(mask, tf.float32))[2][-4:]
-                bert_output = tf.math.reduce_mean(
-                    model_output
-                    , axis=0) # prumerovani vrstev
-
-                bert_output = tf.slice(bert_output, [0,1, 0], [-1,-1, -1]) #odeberu prvni sloupec
-                bert_output = tf.keras.layers.Lambda(
-                    lambda subseq:
-                    tf.map_fn(lambda subseq:
-                              tf.math.segment_mean(subseq[0], subseq[1]), subseq, dtype=tf.float32))(
-                    [bert_output, segments])
-
-                bert_output = bert_output[:, :-1] # tady se dava pryc sep
-
-                print("model len: " + str(len(inp2[:-2] + [bert_output])))
-                self.outer_model = tf.keras.Model(inputs=inp2, outputs=self.model(inp2[:-2] + [bert_output]))
+            self.bert = model.model
+            mask = tf.pad(subwords[:, 1:] != 0, [[0, 0], [1, 0]], constant_values=True)
+            if args.layers == "att":
+                bert_output = self.bert(subwords, attention_mask=tf.cast(mask, tf.float32))[2]
+                weights = tf.Variable(tf.zeros([12]), trainable=True)
+                output = 0
+                softmax_weights = tf.nn.softmax(weights)
+                for i in range(12):
+                    result = softmax_weights[i] * bert_output[i + 1]
+                    output += result
+                model_output = output
             else:
-                self.outer_model = self.model
+                model_output = self.bert(subwords, attention_mask=tf.cast(mask, tf.float32))[2][-4:]
+            bert_output = tf.math.reduce_mean(
+                model_output
+                , axis=0) # prumerovani vrstev
 
+            bert_output = tf.slice(bert_output, [0,1, 0], [-1,-1, -1]) #odeberu prvni sloupec
+            bert_output = tf.keras.layers.Lambda(
+                lambda subseq:
+                tf.map_fn(lambda subseq:
+                          tf.math.segment_mean(subseq[0], subseq[1]), subseq, dtype=tf.float32))(
+                [bert_output, segments])
 
+            bert_output = bert_output[:, :-1] # tady se dava pryc sep
 
-
+            print("model len: " + str(len(inp2[:-2] + [bert_output])))
+            self.outer_model = tf.keras.Model(inputs=inp2, outputs=self.model(inp2[:-2] + [bert_output]))
+        else:
+            self.outer_model = self.model
 
         if args.label_smoothing:
             self._loss = tf.losses.CategoricalCrossentropy()
@@ -246,10 +236,6 @@ class Network:
                 self._optimizer.learning_rate = learning_rate
         if args.fine_lr > 0:
             self._fine_optimizer.learning_rate = args.fine_lr
-
-        #TODO a když mám decay?
-
-
         num_gradients = 0
 
         while not train.epoch_finished():
