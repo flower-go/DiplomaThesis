@@ -682,7 +682,8 @@ if __name__ == "__main__":
 
         for i, (epochs, learning_rate) in enumerate(args.epochs):
             for epoch in range(epochs):
-
+                if i == 0:
+                    test_eval()
                 network.train_epoch(train, args, learning_rate)
 
                 if dev:
