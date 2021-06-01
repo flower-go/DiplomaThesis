@@ -537,6 +537,14 @@ if __name__ == "__main__":
                 args.bert_model = args.bert_model[0]
             name = args.bert_model
         elif args.bert:
+            args.bert = args.bert.split(":")
+            if len(args.bert) > 1:
+                args.bert_load = args.bert_model[0]
+                print(args.bert_load)
+                print("load")
+                args.bert = args.bert[1]
+            else:
+                args.bert = args.bert[0]
             name = args.bert
 
     if "robeczech" in name:
