@@ -681,9 +681,11 @@ if __name__ == "__main__":
 
 
         for i, (epochs, learning_rate) in enumerate(args.epochs):
+            tf.summary.experimental.set_step(0)
+            epoch = 0
+            learning_rate = 0
+            test_eval()
             for epoch in range(epochs):
-                if i == 0:
-                    test_eval()
                 network.train_epoch(train, args, learning_rate)
 
                 if dev:
