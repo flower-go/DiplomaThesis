@@ -711,8 +711,8 @@ if __name__ == "__main__":
             else:
                 checkp = args.logdir.split("/")[1]
 
-            network.outer_model.save_weights('./checkpoints/' + checkp)
-            print(args.logdir.split("/")[1])
+        network.outer_model.save_weights('./checkpoints/' + checkp)
+        print(args.logdir.split("/")[1])
 
         if test:
             test_eval()
