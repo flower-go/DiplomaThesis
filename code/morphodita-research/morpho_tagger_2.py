@@ -48,6 +48,16 @@ class Network:
                                                                                  end_learning_rate=5e-5, power=0.5)
             elif args.decay_type == "c":
                 learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
+
+            elif args.decay_type == "n":
+                epochs_lr = map(list, zip(*[(1, 2), (3, 4), (5, 6)]))
+                boundaries = epochs_lr[0]
+                boundaries = np.array(boundaries, dtype=np.int32)*args.steps_in_epoch
+                print("boundaries")
+                print(boundaries)
+                values = epochs_lr[1]
+                values.append(values[-1])
+                learning_rate_fn = tf.keras.optimizers.schedules.PiecewiseConstantDecay(boundaries, values)
             
             self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
                                                    warmup_steps=args.warmup_decay*args.steps_in_epoch,
@@ -126,7 +136,7 @@ class Network:
         self.model = tf.keras.Model(inputs=inp, outputs=outputs)
 
         print(args.bert_load)
-        if args.bert_load and os.path.exists(args.bert_load):
+        if args.bert_load:
             print("nacteni modelu")
             self.model.load_weights(args.bert_load)
         #   print("model inputs:  " + str(self.model._feed_input_names))
@@ -502,7 +512,7 @@ if __name__ == "__main__":
     parser.add_argument("--rnn_cell_dim", default=512, type=int, help="RNN cell dimension.")
     parser.add_argument("--rnn_layers", default=3, type=int, help="RNN layers.")
     parser.add_argument("--test_only", default=None, type=str, help="Only test evaluation")
-    parser.add_argument("--warmup_decay", default=None, type=str, help="Type i or c. Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--warmup_decay", default="n:1", type=str, help="Type i or c. Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
     parser.add_argument("data", type=str, help="Input data")
