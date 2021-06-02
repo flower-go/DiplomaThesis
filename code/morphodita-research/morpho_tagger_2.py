@@ -539,7 +539,7 @@ if __name__ == "__main__":
         elif args.bert:
             args.bert = args.bert.split(":")
             if len(args.bert) > 1:
-                args.bert_load = args.bert_model[0]
+                args.bert_load = args.bert[0]
                 print(args.bert_load)
                 print("load")
                 args.bert = args.bert[1]
@@ -689,9 +689,10 @@ if __name__ == "__main__":
 
 
         for i, (epochs, learning_rate) in enumerate(args.epochs):
+            tf.summary.experimental.set_step(0)
+            epoch = 0
+            test_eval()
             for epoch in range(epochs):
-                if i == 0:
-                    test_eval()
                 network.train_epoch(train, args, learning_rate)
 
                 if dev:
