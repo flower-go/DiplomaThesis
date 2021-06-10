@@ -350,7 +350,7 @@ if __name__ == "__main__":
     parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
     parser.add_argument("--bert_model", default=None, type=str, help="Model for loading")
     parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
-    parser.add_argument("--warmup_decay", default="n:1", type=str,help="Number of warmup steps, than will be applied decay")
+    parser.add_argument("--warmup_decay", default="None", type=str,help="Number of warmup steps, than will be applied decay")
     parser.add_argument("--word_dropout", default=0, type=float, help="Word dropout rate")
     parser.add_argument("data", type=str, help="Input data")
 

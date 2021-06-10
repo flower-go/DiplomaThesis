@@ -512,7 +512,7 @@ if __name__ == "__main__":
     parser.add_argument("--rnn_cell_dim", default=512, type=int, help="RNN cell dimension.")
     parser.add_argument("--rnn_layers", default=3, type=int, help="RNN layers.")
     parser.add_argument("--test_only", default=None, type=str, help="Only test evaluation")
-    parser.add_argument("--warmup_decay", default="n:1", type=str, help="Type i or c. Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--warmup_decay", default="None", type=str, help="Type i or c. Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
     parser.add_argument("data", type=str, help="Input data")
