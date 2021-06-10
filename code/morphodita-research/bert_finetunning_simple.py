@@ -99,6 +99,16 @@ class Network:
             elif args.decay_type == "c":
                 learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
 
+            elif args.decay_type == "n":
+                epochs_lr = list(map(list, zip(*[(1, 2), (3, 4), (5, 6)])))
+                boundaries = epochs_lr[0]
+                boundaries = np.array(boundaries, dtype=np.int32)*args.steps_in_epoch
+                print("boundaries")
+                print(boundaries)
+                values = epochs_lr[1]
+                values.append(values[-1])
+                learning_rate_fn = tf.keras.optimizers.schedules.PiecewiseConstantDecay(boundaries, values)
+
             self.optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
                                                    warmup_steps=args.warmup_decay * args.steps_in_epoch,
                                                    decay_schedule_fn=learning_rate_fn)
@@ -340,7 +350,7 @@ if __name__ == "__main__":
     parser.add_argument("--layers", default=None, type=str, help="Which layers should be used")
     parser.add_argument("--bert_model", default=None, type=str, help="Model for loading")
     parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
-    parser.add_argument("--warmup_decay", default=None, type=str,help="Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--warmup_decay", default="n:1", type=str,help="Number of warmup steps, than will be applied decay")
     parser.add_argument("--word_dropout", default=0, type=float, help="Word dropout rate")
     parser.add_argument("data", type=str, help="Input data")
 
@@ -455,9 +465,11 @@ if __name__ == "__main__":
             #chceme vzdy jednu epochu bez berta
             if i == 0:
                 args.freeze = 1
+                lr = 1e-3
             else:
                 args.freeze = 0
-            network.train_epoch(dataset, args, learning_rate)
+                lr = learning_rate
+            network.train_epoch(dataset, args, lr)
 
             if dev:
                 print("evaluate")
