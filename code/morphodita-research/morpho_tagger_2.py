@@ -50,7 +50,7 @@ class Network:
                 learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
 
             elif args.decay_type == "n":
-                epochs_lr = map(list, zip(*[(1, 2), (3, 4), (5, 6)]))
+                epochs_lr = list(map(list, zip(*[(1, 2), (3, 4), (5, 6)])))
                 boundaries = epochs_lr[0]
                 boundaries = np.array(boundaries, dtype=np.int32)*args.steps_in_epoch
                 print("boundaries")
