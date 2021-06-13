@@ -286,6 +286,7 @@ if __name__ == "__main__":
     ))
 
     if args.bert is not None and "robeczech" in args.bert:
+        print("append path")
         sys.path.append(args.bert)
         import tokenizer.robeczech_tokenizer
     if not "robeczech" in args.bert:
