@@ -99,13 +99,17 @@ class Network:
             elif args.decay_type == "c":
                 learning_rate_fn = tf.keras.experimental.CosineDecay(args.epochs[0][1], decay_steps)
 
+
             elif args.decay_type == "n":
-                epochs_lr = list(map(list, zip(*[(1, 2), (3, 4), (5, 6)])))
-                boundaries = epochs_lr[0]
-                boundaries = np.array(boundaries, dtype=np.int32)*args.steps_in_epoch
+                boundaries = []
+                values = []
+                for b, v in args.epochs:
+                    boundaries.append(b)
+                    values.append(v)
+                boundaries = np.array(boundaries, dtype=np.int32) * args.steps_in_epoch
                 print("boundaries")
                 print(boundaries)
-                values = epochs_lr[1]
+                print(values)
                 values.append(values[-1])
                 learning_rate_fn = tf.keras.optimizers.schedules.PiecewiseConstantDecay(boundaries, values)
 
