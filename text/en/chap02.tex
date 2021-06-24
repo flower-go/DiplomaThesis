@@ -1,84 +1,177 @@
 \chapter{Implementation analysis}
-This chapter describes an implementation of all language models and other related code. Following a logical code structure, this chapter is divided into three sections. First section covers lemmatization and POS tagging task, which shares same neural network model.
+The main purpose of this chapter is to offer the technical description of the code accompanying this work for better reproducibility and possible further experiments on every of presented tasks. This chapter describes an implementation of all language models and other related code. It also presents all used libraries and technologies and this chapter is concluded with a presentation of experiment types common for training of both tasks presented in following chapters.
+\par
+All code forms an attachment of this work and is also publicly available in GitHub \footnote{https://github.com/flower-go/DiplomaThesis}.
 
-
-%co delam a jak to delam
-The practical part of this work is focused on these tasks:
+\section{Experiments}
+Firstly, all possibilities of experiment settings will be presented as the rest of the chapter serves for a specification of their implementation and running. Theoretical possibilities of training settings are described in detail in the previous section \ref{sub:howto}, but this part will describe particular training experiment settings, that are same for both downstream tasks \footnote{Name in the bracket in titles and name of options refers to the name used in the tables of results and graphs.}. 
+\subsection{General experiment settings (EXPE)}
+Training is performed in one of following settings:
 \begin{itemize}
-\item POS tagging \\
-\textit{input}: a word \\
-\textit{output}: part-of-speech tags -- as noun, pronoun, punctuation mark etc.
-\item lemmatization \\
-\textit{input:} a word \\
-\textit{output:} lemma -- a base form of a given words, meaning for example nominative of singular for nouns or infinitive for verbs. 
-\item sentiment analysis \\
-\textit{input:} a sentence or a sequence of sentences \\
-\textit{output:} prevailing sentiment of the input from categories: neutral, positive, negative.
-\todo{doplnit diskuzi o ruzných možnostech definice}
-\end{itemize}.
-\label{chap:impl}
-This chapter describes implemented linguistic models. As mentioned before, this work implements models for three Czech NLP tasks: tagging, lemmatization and sentiment analysis. Common model for first two tasks develops on the paper by \cite[]{straka2019czech} focused on application of contextual embeddings produced by language models as Bert %todo cite
- or Flair. %todo cite. 
- Third task, sentiment analysis, is performed by adding only one fully-connected layer at the top of bert model. So in the opposite to previous tasks, no sophisticated handcrafted pipeline is built and model relies only on the network powers of language structure representation.
- \section{POS tagging and lemmatization model}
-The model for this part is build upon a model (and a code) for previous work on Czech NLP processing with contextual embeddings \cite[]{straka2019czech}. Data preparation %todo trida s odkazem do github
-pipeline - tokenization and sentence segmentation is taken over from the paper as well as base structure of lemmatizer and tagger network. 
-
-
-\subsection{Dataset and preprocessing}
-Dataset for these tasks is based on Prague Dependency Treebank (PDT), specifically version 3.5, which is PDT edition from year 2018. Dataset is divided into three parts - train, dtest and etest. Second one is used as development set while the third one as a test set for validation. %todo citace %jak vypadaji vstupni data - ukazka z tech dat co mam primo!!!
-Data consists of sentences with lemmas and tags.Input sentences are preprocessed as follows:
+\item \textbf{base}: Baseline implementation (described separately for each task, typically without using advanced language models).
+\item \textbf{ls}: This uses same setting as baseline implementation but with label smoothing.
+\item \textbf{embed}: BERT-like language model is used only to generate static embeddings in advanced. These embeddings are not further trained.
+\item \textbf{fine}: Fine-tuning consist in dividing the training time into two parts. Firstly, rest of the model is trained with BERT layers frozen (not trained), so it is same as the \textit{embed} settings. In the second part, the whole model is fine-tuned together.
+\item \textbf{simpl}e: Model architecture is reduced to bert layers with a simple classification head. This is basic setting for all sentiment analysis experiments but for tagging and lemmatization all previous choices, in contrast to this setting, are performed with more sophisticated classification head.
+\item \textbf{full}: This options means training the whole model from the beginning (in contrast to \textit{fine} option), but the classification head is not simplified (in contrast \textit{simple} option).
+\end{itemize}
+%TODO zmenit u sentimentu mít všude simple nebo full a jinej sloupec na data?
+\subsection{Training data}
+Tagging and lemmatization tasks use same set of data for every experiments, co there is no need for separate description. Sentiment analysis task, however, uses three possible options for a selection of training data:
 \begin{itemize}
-\item white space deletion
-\item mapping characters -- all unknown dev and test characters are then mapped into one \textit{unk} token. 
-\item mapping  words from train into integers -- all unknown dev and test words are then mapped into one \textit{unk} token. 
+\item \textbf{mall|facebook|csfd}: Model is trained and evaluated on the (sub)set of czech datasets.
+\item \textbf{zero}: Model is trained on english sentiment analysis dataset, but evaluated on czech data.
+\item \textbf{eng}: Model is trained on the combination of czech and english training data (and evaluated again on the czech data). %TODO pridat jeste jednotlive ceske datasety
+\end{itemize}
+\subsection{Learning rate scheduling type (LRTYPE)}
+Most experiments are expected to perform better with some kind of learning rate scheduling. This work implements three types of learning rate scheduling:
+\begin{itemize}
+\item \textbf{simple} \textit{Simple} option indicates no more complex learning rate scheduling than setting in advance different learning rates for different epochs.
+\item \textbf{isrd} %TODO citovat 
+\textit{isrd} means inverse square root learning rate decay defined by formula: $1/\sqrt{max(n,k)}$ where $k$ is the number of so-called \textit{warmup steps} and $n$ is the current iteration. This leads to constant learning rate for first $k$ steps and decayed learning rate in rest of iterations.
+\item \textbf{cos}: Another learning rate scheduling used in this work is \textit{cosine decay} %TODO citovat
+which applies following formula: $$lr=lr_{min}^{i} + \frac{1}{2}(lr_{max}^{i} - lr_{min}^{i})(1+cos(\frac{T_{curr}}{T_i}\pi)),$$ where $lr_{min}^{i}$ and $lr_{min}^{i}$ is the range of the learning rate, $T_i$ is the number of epochs after which the learning rate is restarted, i.e. increased to the $lr_{max}^{i}$ value and $T_{curr}$ is the current epoch number.
 \end{itemize}
 
-
-%jak vypadají vstupní data?
-
-%jaky je preprocessing dat
-	%odebrani mezer (rstrip)
-	%co je analyses?
-	%co je lemma rule
-	%mapovani pismen jen ta co byla v train, jinak unk, totez slova
-	%tedy parsování na slova a věty
-	%bertí embeddingy
-		%precomputed
-		%bert segments ... ke ktere vete a slovu segmenty patri
-		%bert subwords .. subwordy - proc subwordy a ze jsou v kontextu a proto musim s vetou celou!!
-		%udelat z toho tensor
-		
-\subsection{Network}
-Lemmatization as well as tagging are considered to be classification tasks (same as in \cite[]{straka2019czech}), i.e. lemmatization classification target are lemma generating rules and tagging target is tag, of course. Both tasks share one network.
-
-Script allows training of these model variants:
+\subsection{Model layers selected for embeddings (LAYERS)}
+As discussed in the previous chapter, is unclear how to extract best embeddings from the language model, especially which layers to take into account. By selecting the most promising ways, following two hyperparameters are used in this work:
 \begin{itemize}
-\item baseline model -- original implementation %todo zdroj
-of network as described in figure %todo obrazek a zdroj co to dela
-\\ \textbf{Embeddings:} %TODO popsat poradne tvar
-Model contains potentially embeddings of four types -- pretrained word2vec embeddings %todo zdroj
-, word embeddings trained with network, bert embeddings (just in some models as described later) and character-level embeddings.
-\item label smoothing -- baseline model with label smoothing %todo zdroj na label smoothing a zdroj na vysvetleni v nektere casti
-\item bert embeddings -- model can take precomputed bert embeddings as an input, otherwise embeddings are computed at the beginning and also saved for further use. In this case, data are tokenized by BERT tokenizer. Same principle is used for unknown words as before. Embeddings for word segments are averaged for each original input word, as BERT word segments and sentence words does not correspond to each other one to one. These embeddings serves as additional input to the network as in figure %TODO  %TODO see sectionBert embeddings are contextualized %see section so whole sentence is input into BERT tokenizer.
-\item BERT finetunning -- In contrast to the BERT embeddings model, in this case BERT embeddings are also trained during network training, i.e. whole BERT network is chained to baseline network instead of embedding numbers only, gradients are backpropagated throw whole new network and weights are updated also in the BERT part of network.
+\item \textbf{four}: Last four of the model are averaged to obtain final embeddings.
+\item \textbf{att}: This setting performs weighted sum of all model layers and the weights are trained during training together with the rest of the model.
 \end{itemize}
-All classification can be done with or without use of a morphological dictionary MorFlex %todo reference
-. If the option with dictionary is used, generated tags and lemmas are chosen just from the dictionary. So it is selected lemma and/or tag with maximal likelihood, but just from those presented in the dictionary.
+Experiments are also performed with different learning rates (LR), batch size (BATCH) and a number of epochs (EPOCH). 
+Following section will explain technical details needed for running scripts.
 
+\section{Code description}
+This section will describe the code -- technologies and hardware used for experiments, where to find scripts for replicating experiments and how to run them.
+\subsection{Technologies description}
+All code is implemented in Python (v3.6.9). All dependencies and used libraries are listed in the requirements.txt file,
+%TODO odkaz a pridat do githubu
+%TODO něco o pythonu - jakoze se hodne pouziva ve statistice
+but I should specifically mention some used libraries. Python is a popular language for machine learning, because of easy use and many available libraries, which allows to focus on high-level problem solving instead of technical details.
+\subsubsection{Tensorflow and Keras}
+The main library used for developing models in this work is Tensorflow \citep{tensorflow2015-whitepaper}. This library provides lots of tools for machine learning, especially for neural networks. Keras is a wrapper library over Tensorflow and provides easy use of the most common machine learning scenarios \citep{keras}. Tensorflow together with PyTorch \citep{NEURIPS2019_9015} is probably the most frequently used library for deep learning, both providing similar functionality. The reason behind this choice of Tensorflow is the fact, that this thesis builds on the previous work and uses the code developed in Tensorflow.
+\subsubsection{Transformers} 
+One of the most useful libraries in this work is Transformers library from Hugging Face \citep{Wolf2019HuggingFacesTS}, which contains pretrained BERT models and tools for their usage as tokenizers.
+\subsubsection{Pandas}
+Pandas library \citep{reback2020pandas} serves well for data analysis as it provides data structures like DataFrame, that provides named columns, advanced data indexation, selection, merging, joining, reshaping and other functionality similar to tools provided by e.g.. SQL databases. It does not only provide a rich set of tools but they are also developed with an emphasis on performance optimization.
+\subsubsection{Scikit-learn}
+Scikit-learn \citep{scikit-learn}  is another useful python library specialized on machine learning. In contrast to tensorflow, scikit-learn focuses on classical machine learning, not on neural networks, providing all important variants of machine learning models as well as supporting tools for training, e.g. cross validation or various metrics.
+\subsubsection{Numpy}
+Numpy \citep{harris2020array} is an library which provides powerful multidimensional arrays with many predefined operations. It is fast and it is common to use it for numerical operations over number arrays.
+\subsubsection{Jupyter Notebook}
+Jupyter notebook \citep{jupyter} is a web application for development. In this work, jupyter notebook is used for providing the trained models for exploration. %TODO doplnit odkaz na tu kapitolu
+Jupyter suits well for this purpose because it, in addition to a possibility of running a separate parts of code in different cells, also supports visualisations and markdown formatted text and it can be useful especially for explanatory purposes.
+\subsubsection{Artificial Intelligence Cluster}
+%TODO dopsat neco o tom
+\subsubsection{Other Resources}
+%TODO coze?
+
+\subsection{code structure}
+All code belonging to each of tasks is in the separate directory as can be seen on picture. %TODO udelat obrazek s adresarovou strukturou a barevne oznacit co se ma spoustet
+\subsubsection{Runnable scripts}
+All code for \textbf{tagging and lemmatization} is placed in folder \texttt{morphodita\_research}. Main files are \texttt{morpho\_tagger\_2.py} and \texttt{bert\_finetunning\_simple.py}, which serves for running all experiments relating to tagging and lemmatization. Script arguments are described in more detail in tables \ref{Tab:com_args}, \ref{Tab:mt_com_args} and \ref{Tab:mt2_args}.
+
+%spolecne pro vsechny:
+\begin{table}
 \centering
-\includegraphics[width=\columnwidth]{../img/taggermodel.pdf}
+\label{Tab:com_args}
+\begin{tabular}{ |p{3cm}|p{3,5cm}|p{6cm}| } 
+ \hline
+ Argument & Values & Description \\ 
+ \hline \hline
+ accu & int & Accumulation of gradient. Effective batch size is batch\_size * accu.  \\\hline
+batch\_size & int & Batch size (without accumulation). \\ \hline
+bert & string & Name of the bert model (from huggingFace library) or path to the model.  \\ \hline
+  checkp & String & Name of the saved model weights. Saving weights is used instead of the whole model because of some technical issues.  \\ \hline
+  debug & 0/1 & Debug mode loads small debug data if available. \\ \hline
+  label\_smoothing & decimal number & Coefficient for label smoothing. \\ \hline
+  dropout & float &  Dropout amount applied on various places of the network.  \\ \hline
+ epochs & "x:l1,y:l2"  & This will perform x epochs with learning rate l1 and y epochs with learning rate l2.   \\ \hline
+ layers & None/"att" & If "att", all bert-like model layers are combined with learned weights.  \\ \hline
+ warmup\_decay & None /"i:x"/"c:x" & If not None, training will incorporate inverse square root decay or cosine decay for x episodes.  \\ \hline
+ fine\_lr & float & Different learning rate for the classification head.  \\ \hline
+ \hline
+\end{tabular}
+\caption{A list of arguments common to all scripts.} 
+\end{table}
 
-Metric used for evaluation of the model is accuracy.
-\subsection{Python implementation}
-Model is implemented in Python (specifcally python version 3.6.9). All dependencies and used libraries are listed in the requirements.txt file,  %todo odkaz a udela 
-but I should specifically mention library Transformers %todo okdaz 
-, which contains pretrained bert models and tools for their usage as tokenizer. (%todo napsat a vyzkoušet ruzné modely)
-In this model, I used uncased version of multilingual models %todo jake
-.
 
-Code for all models is available as an attachement of the work.
-%použité knihovny - transformers
+\begin{table}
+\centering
+\label{Tab:mt_com_args}
+\begin{tabular}{ |p{3cm}|p{3,5cm}|p{6cm}| } 
+ \hline
+ Argument & Values & Description \\ 
+ \hline \hline
+ beta\_2 & float & An argument for the optimizer. \\ \hline
+ cle\_dim & int & Dimension of character-level embeddings.  \\ \hline
+ cont & 0/1 & Evaluating on the test data every epoch.  \\ \hline
+ exp & string & Name of logs files.  \\ \hline
+ factors & "Lemmas,Tags" & Factors to be predicted -- Lemmas, Tags or both. \\ \hline
+word\_dropout & float & Probability of masking a word in the sentence during training.  \\ \hline
+
+\hline
+
+\end{tabular}
+\caption{A list of arguments common to both scripts for tagging and lemmatization.} 
+\end{table}
+
+
+\begin{table}
+\centering
+\label{Tab:mt2_args}
+\begin{tabular}{ |p{3cm}|p{3,5cm}|p{6cm}| } 
+ \hline
+ Argument & Values & Description \\ 
+ \hline \hline
+ data & string &  Input data directory. Data are supposed to be divided into train, dev and test \texttt{.txt} files. \\ \hline
+ char\_dropout &  float &  Dropout for characters. \\ \hline
+embeddings & string & Path to pre-comuputed embeddings for use. \\ \hline
+factor\_layers & int & Number of dense-and-dropout blocks for each of factors.  \\ \hline
+lemma\_re\_strip &  string & Regular expression for suffix to be stripped from lemma. \\ \hline
+lemma\_rule\_min & int & Minimal occurences to keep a lemma.  \\ \hline
+predict & string & Script returns only a prediction with model from the path given in this argument.  \\ \hline
+rnn\_cell & "LSTM"/"GRU" & Type of rnn cell to use. \\ \hline
+rnn\_cell\_dim & int & Dimension for rnn cells.  \\ \hline
+rnn\_layers& int & Number of recurrent cell layers.  \\ \hline
+we\_dim & int & Dimension of word embeddings.  \\ \hline  
+
+
+bert\_model & string & Trained checkpoint for loading. Training will continue from this checkpoint. \\ \hline
+
+test\_only & string & Path to the model, which will be load and weights will be printed.  \\ \hline
+ \hline
+\end{tabular}
+\caption{A list of arguments specific to morpho\_tagger\_2.py, with detailed description.} 
+\end{table}
+
+\textbf{Sentiment analysis} experiments are runnable from \texttt{sentiment\_analysis.py} with arguments as described in tables \ref{Tab:com_args} and \ref{Tab:sent_args}.
+
+\begin{table}
+\centering
+\label{Tab:sent_args}
+\begin{tabular}{ |p{2cm}|p{4,5cm}|p{6cm}| } 
+ \hline
+ Argument & Values & Description \\ 
+ \hline \hline
+ datasets & \{mall,csfd,facebook\} &  Names of the input czech datasets, separated by comma. \\ \hline
+ english & float & A percentage of result training data which should be formed by english IMDB dataset.\\ \hline
+ 
+ freeze & {0,1} & 1 means, that bert layers will not be trained. \\ \hline
+ seed & int & Inicialization of random seed. \\ \hline
+ kfold & "k:i" & Data will be splitted into k folds and i-th fold will be used for test. It serves for running k-fold cross-validation in parallel runs. \\ \hline
+ 
+ \hline
+\end{tabular}
+\caption{Arguments for \texttt{sentiment\_analysis.py} script.} 
+\end{table}
+
+
+\section{User guide}
+
+
+
 
 
 

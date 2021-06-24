@@ -35,6 +35,7 @@
 \usepackage{lmodern}
 \usepackage{hyperref}
 
+
 \DeclareUnicodeCharacter{00B4}{}
 
 
@@ -100,15 +101,15 @@ Dedication.
 }
 
 % Abstract (recommended length around 80-200 words; this is not a copy of your thesis assignment!)
-\def\Abstract{%
-Recently, several methods for unsupervised pre-training of contextualized word embeddings have been proposed, most importantly the BERT model (Devlin et al., 2018). Such contextualized representations have been extremely useful as additional features in many NLP tasks like morphological or syntactic analysis, entity recognition or text classification.
+\def\Abstract{
+%Recently, several methods for unsupervised pre-training of contextualized word embeddings have been proposed, most importantly the BERT model (Devlin et al., 2018). Such contextualized representations have been extremely useful as additional features in many NLP tasks like morphological or syntactic analysis, entity recognition or text classification.
 
-Most of the evaluation have been carried out on English. However, several of the released models have been pre-trained on many languages including Czech, like multilingual BERT or XLM-RoBERTa (Conneau et al, 2019). Therefore, the goal of this thesis is to perform experiments quantifying improvements of employing pre-trained contextualized representation in Czech natural language processing.
+%Most of the evaluation have been carried out on English. However, several of the released models have been pre-trained on many languages including Czech, like multilingual BERT or XLM-RoBERTa (Conneau et al, 2019). Therefore, the goal of this thesis is to perform experiments quantifying improvements of employing pre-trained contextualized representation in Czech natural language processing.
 }
 
 % 3 to 5 keywords (recommended), each enclosed in curly braces
 \def\Keywords{%
-{key} {words}
+{Natural Language Processing} {BERT} {Bidirectional Encoder Representations from Transformers} 
 }
 
 %% The hyperref package for clickable links in PDF and also for storing
@@ -139,7 +140,7 @@ Most of the evaluation have been carried out on English. However, several of the
 \include{chap01}
 \include{chaplemtag}
 \include{chapsentiment}
-\include{chapmodeling}
+%\include{chapmodeling}
 \include{chap02}
 \include{chap04}
 \include{chap03}

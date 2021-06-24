@@ -1,37 +1,28 @@
 \chapter{Task 2: Sentiment Analysis}
 \label{chap:sent}
-
-
 \section{Task definition}
-In this work, sentiment analysis tasks consist of classification of czech texts into three categories -- positive, neutral and negative. Although it is possible to predict also a subjectivity part of sentiment analysis or other characteristics (e.g. irony) ( %TODO see )
-it is not included in this work, mainly because the lack of labelled data in Czech. This work primary tries to improve existing tasks and show the ability of contextualized embeddings to improve results, so tasks with existing data and results were selected. %TODO zjistit jaká by k tomu eventuelně data byla
+As stated in \citep{Veselovska}: "Sentiment analysis, also known as opinion mining, is an automatic detection of a positive or negative polarity, or neutrality of ... a text sequence", which is exactly as the sentiment analysis is understood in this work, although there are some other definitions consisting of e.g. opinion extraction, irony or stance \citep{Montoyo2012}. Another tasks related to sentiment analysis is a subjectivity analysis (whether the presented opinion is objective or highly subjective), which is also not included in this work, mainly because the lack of labelled data for Czech. It is possible to analyze individual expressions, sentences or whole documents \citep{Veselovska} and this work focuses on the document level classification.
+%TODO zjistit jaka jsou na to porovnavaci data This work primary tries to improve existing tasks and show the ability of contextualized embeddings to improve results, so tasks with existing data and results were selected.  %TODO why?
 
-%TODO ze jsou tri moznosti jak analyzoat - expresion, sentence, document Veselovska77
-
-
-
+\section{Related Work}
 citace:
 \citep{Cano2019}
+\citep{Kittask2020} .. estonian
+\citep{Lenc2016} sentiment in czech
 \citep{Hercig2018}
 \citep{Li}
 \citep{Libovicky} presents state-of-the art results in three czech NLP tasks including sentiment analysis. They use only CSFD dataset with resulting accuracy 80.8 .1 which is still not so good as Brychcín (81.5.3). The second mentioned paper, however, uses quite complicated method for classification incorporating the fact of which movie is reviewed. 
-
 
 Bachelor thesis which aplies bert on sentiment analysis in czech:
 %https://dspace.cvut.cz/bitstream/handle/10467/83127/F8-BP-2019-Langr-Lukas-thesis.pdf?sequence=-1&isAllowed=y
 results are accuracy 84 with tfidf and about 81 with bert and they used mall dataset.
 
 \section{Datasets}
-There are three available czech datasets - user reviews from MALL.cz, film reviews from csfd.cz and facebook.  %TODO dodat jako footnote adresy a co je facebook
-
-%TODO rozlozeni trid
-
-%TODO jak vypdaji orginalne ty labely
+Four main Czech datasets with sentiment annotation are available - user reviews from MALL.cz, film reviews from csfd.cz, news from Aktualne.cz and posts from czech branch pages on facebook. As Aktualnecz dataset turned out to be problematical as the text were ambiguous for annotators, and its authors later used other mentioned datasets \citep{Veselovska}, this work also focuses only on the three other data sources -- MALL, CSFD and Facebook \footnote{All three datasets are all available here: http://liks.fav.zcu.cz/sentiment/}. Following part summarize each of used datasets.
 \subsection{Facebook}
 Length: 9752\\
 From: ? \\
 Labels: neutral, positive, negative
-
 
 \subsection{csfd}
 Length: 91304 \\
@@ -41,6 +32,7 @@ Labels: negative, positive ? \\
 \subsection{mallcz}
 Length: 145306 \\
 From: \\
+Domain: domestic appliance reviews \\
 Labels: negative, neutral, positive
 
 \subsection{imdb}
@@ -48,9 +40,9 @@ Length: 25000 \\
 From:
 Labels: negative, positive
 
+%TODO rozlozeni trid
 
-On addition to previously mentioned datasets, there also exist dataset of anotated articles from aktualne.cz %TODO cite veselovska.
-
+%TODO jak vypdaji orginalne ty labely
 
 \begin{figure}[h]
 \centering

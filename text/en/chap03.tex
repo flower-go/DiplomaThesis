@@ -2,10 +2,46 @@
 \label{chap:diss}
 
 
+ 
 \section{Experiments}
 This section offers a description of all performed experiments.
 For tagging and lemmatization exist two main experiment settings: with (morphodita) pipeline on top of bert embedding and simple version with bert plus simple classification head. Both networks can finetune ( %TODO dodelat popis v teorii) 
 or can freeze bert layers.
+
+jak trenovat (ktere vrstvy)?
+- netrenovat berta (jen embeddings)
+- vsechny
+- napred head a pak dotrenovat berta
+
+Jaky zvolit learning rate?
+- stejny pro vse
+- jiny pro berta
+- schedulingy
+
+jak vybrat vrstvy?
+- vybrat vse
+- 4 poslední
+- poslední
+- dynamicky (trénovat váhy) (-layers opšna att)
+
+Velikost batche
+ktery berti model
+jaka data poskladat
+
+%modely provided by google and huggin face (v Rogers2020)
+
+%TODO optimizers a catastrophic forgetting  vysvetleni?
+ 
+%TODO Interesting thing actually useful in this work is multitask learning. Sharing Some part of the network between different task can, same as transfer learning, lead to better performance due to sharing useful general information between these two tasks.
+
+%TODO language mutations - slavic bert 
+%\citep{Arkhipov2019}
+%\citep{Virtanen2019} finnish a jeste je nekde estonian
+%\citep{Wu2020} multilingual equals?
+
+
+
+
 
 
 
