@@ -35,7 +35,7 @@ opinion (both positive or negative) is objective or the author is personally int
 Data of many kinds can serve as an input into natural language processing, and this data can be categorized by a form or by source.
 As for form, we can work with corpora or datasets of various sizes, containing data from many sources. A corpus is a large collection of texts, aiming to be a representative sample of a language. This is not entirely possible, mainly because the selection of examples in the corpus is limited compared to language diversity. Despite these limitations, corpora are a valuable source of language information and are widely used in \acrshort{nlp}. The most famous linguistic corpora are co-called Brown corpus \citep{francis79browncorpus} -- first electronic corpus mixed from newspaper articles and fiction literature, and PennTreebank \citep{Marcus1993}, which is the first syntactically annotated corpus but has quite a domain limited source - articles from Wall Street Journal. Corporas can differ in an internal structure. One of corpora's type is a treebank. A treebank is a corpus with many possible types of annotations that uses trees to represent dependencies. An example of such trees can be seen in figure \ref{fig:trees} and an example of a treebank is presented in picture \ref{fig:pdt}.
 The question arises as to what is the difference between a corpus and a "simple" dataset. Sometimes these terms can be interchangeable in the sense that the usage of both can be the same. Both types of data can be used for the same task, but the difference can be seen in a purpose of a collection. A corpus's idea is to collect a somehow representative sample of a language with annotations on many levels, which allows the performance of various analysis upon this data. Dataset is typically created on a restricted domain and they are annotated for one type of task, e.g. tweets on US Airlines pages \footnote{https://www.kaggle.com/crowdflower/twitter-airline-sentiment} or movie reviews \footnote{https://www.kaggle.com/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews}, which are an example of such sentiment analysis datasets.
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
 \includegraphics[width=1\textwidth]{../img/syntax_dependency_trees.pdf}
 \protect\caption[LoF entry]{
@@ -67,7 +67,7 @@ In current times, neural networks are applied to machine translation and almost 
 The history of learning algorithms inspired by a human brain started in the 1940s under the name \textit{cybernetics} \citep{Goodfellow-et-al-2016}, \citep{McCulloch}. The first such architecture was a perceptron \citep{Rosenblatt1958}.
 Perceptron, invented in 1958, is the most straightforward neural network with just one layer serving for binary classification (see Fig. \ref{pic:perceptron}). A perceptron's input is a vector of features describing an input example, and output is a classification into class 0 or 1.
 
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.8\columnwidth]{../img/perceptron}
 \caption{A one-layer perceptron architecture. The result is formed by the application of the activation function on a weighted sum of inputs. Weights are updated during training till it returns satisfactory results. }
@@ -89,10 +89,10 @@ Many ideas which are currently frequently used are quite old - like backpropagat
 The basic type of DNN is a multilayer perceptron (see picture \ref{pic:multilayer}).
 It is combined with neurons; every neuron has an \textit{activation function}, which is applied to its input. Input to every, but the first layer is a weighted combination of (possibly selection of) neurons from a previous layer. 
 Different NN types differ by number and shape of layers, activation functions, and connections between neurons. (see Fig. \ref{pic:multilayer}).
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/multilayer}
-\caption{Multilayer perceptron (or feed-forward neural network) is formed of input and output layer and a variable number of hidden layers with different sizes. In every layer, the chosen application function is applied to a weighted sum of inputs from the previous layer.}
+\caption{Multilayer perceptron (or feed-forward neural network) is formed of input and output layer and a variable number of hidden layers with different sizes. In every layer, the chosen application function is applied to a weighted sum of inputs from the previous layer. In the illustration, an output is a probability for each of both classes in binary classification.}
 \label{pic:multilayer}
 \end{figure}
 \par
@@ -104,10 +104,10 @@ Language data are, however, different because their nature is sequential. Word a
 Machine learning is a computer science field dealing with algorithms which can learn from experience and improve itself. More precisely, "A computer program is said to learn from experience E with respect to some class of tasks T and performance measure P, if its performance at tasks in T, as measured by P, improves with experience E." \citep{Mitchell1997}. For the techniques examined in this work, experiences are language data -- every single experience is a text. To provide some measure, it is needed to know the ML algorithm's correct output. Many deep learning methods are constructed as \textit{supervised}, which means that every experience has a corresponding label with a correct response (so-called gold data). Metrics used in this case reflect the portion of correctly predicted labels. \citep{Russell1995} Such data structure is handy for the machine learning, but it is hard to obtain them in the required amount because they are usually created manually by humans \footnote{Obviously, if it were already possible to create labels by computers, there would not be necessary to learn it.}. Opposite to this approach are \textit{unsupervised} methods, where no labeled data exists, and metrics are based on different result features (e.g., the compactness of resulting groups). As for tasks, it is possible to distinguish them by the desired outcome between two basic categories: classification and regression. The classification consists of sorting data into one of the predefined classes (e.g., noun, adjective, verb); meanwhile, regression's goal is to predict a numerical result (e.g., expected number of borrowed books in a school library this year).
 \par
 To be precise, supervised machine learning goal is not to predict all labels correctly in an example data (it would be enough to memorize them), but to predict correctly all possible inputs from the same distribution example data are taken from (find some general features for correct performance). During training, there can appear a problem called \textit{overfitting}. As showed in Figure \ref{pic:overfitting}, overfitting problem is that the result prediction function practically memorized all training data examples and can minimize the error on them very nicely, but probably will not perform well on previously unseen data. A regularization is a tool for preventing such issues. Well known regularization techniques like lasso regression \citep{Tibshirani1996} or ridge regression \citep{Hoerl1970}, which are used for linear regression, work by adding some new members into the sum for the loss function, which should be minimized.
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.7\columnwidth]{../img/overfitting}
-\caption{Figure A) presents overfitting scenario. Figure B) illustrates possible well-generalized solution. }
+\includegraphics[width=1\columnwidth]{../img/overfitting}
+\caption{Figure A) presents overfitting scenario and Figure B) illustrates possible well-generalized solution for data with two variables. }
 \label{pic:overfitting}
 \end{figure}
 Another classification regularization method, which is also used in this work, is label smoothing. Label smoothing \citep{Szegedy2015} is an idea applicable to every classification problem, therefore is not limited to an \acrshort{nlp} only.
@@ -147,15 +147,17 @@ As embeddings are trained after the input is encoded into one-hot vectors, it is
 \label{sub:attention}
 Attention mechanism \citep{Bahdanau} is widely used in \acrshort{nlp} as a tool for extracting relevant information from word sequences. For example, when generating a sentence translation, each word in the target language corresponds to just a few words in the source sentence, not to a whole sentence. Attention gives weights to words, which represents this connections (see picture \ref{pic:att_trans}).
 
-\begin{figure}[ht]
-\includegraphics[width=0.7\columnwidth]{../img/attention_translate}
+\begin{center}
+\begin{figure}[H]
+\includegraphics[width=1\columnwidth]{../img/attention_translate}
 \caption{Figure 3 of \citep{Bahdanau} presents the use of the attention for machine translation. Axis show words of a sentences in English and French. The importance for a translation between a pair of words is represented by a lightness (more lighter = more important).
 }
 \label{pic:att_trans}
 \end{figure}
+\end{center}
 When the task is a question answering, attention can help a model focus on a relevant part of the text, where the answer is located \citep{Santos2016}.
 
-%\begin{figure}[ht]
+%\begin{figure}[H]
 %\centering
 %\includegraphics[width=0.7\columnwidth]{../img/attention_cnn}
 %\caption{Figure 3 of \citep{Santos2016}
@@ -164,19 +166,19 @@ When the task is a question answering, attention can help a model focus on a rel
 %\end{figure}
 
 The same idea can be applied to computer vision, where it imitates human behavior. Humans also focus on (or \textit{attend to}) just a few parts of their visual input when they are, for example, recognizing things in pictures.
-Modification to an attention concept, called self-attention \citep{Cheng}, deals with relationships inside one part of the text (e.g., a sentence). This variant of attention does not connect one part of the text (like a question) to another distinct part of the text (like an answer) but only models relationships inside one part. For more explanation, see picture \ref{pic:att_self}
-\begin{figure}[ht]
+Modification to an attention concept, called self-attention \citep{Cheng}, deals with relationships inside one part of the text (e.g., a sentence). This variant of attention does not connect one part of the text (like a question) to another distinct part of the text (like an answer) but only models relationships inside one part. For more explanation, see picture \ref{pic:att_self}.
+\begin{figure}[H]
 \centering
-\includegraphics[width=1\columnwidth]{../img/self_attention1}
+\includegraphics[width=1\columnwidth]{../img/self_attention1.pdf}
 \caption{Self-attention mechanism scheme for one selected query vector. The result is an embedding, which is improved by the context of the word. This picture illustrates the result for the embedding %TODO jak jako embedding
 of the first word (l1) in a four-word long text. Input words are denoted as l1 to l4. Keys , values, and a query are all multiplied by their respective weights ($W_k$, $W_v$, and $W_q$) before any other operation with them. These weights are trained during learning. Dot products between every word and a query are computed. A result is a number for every input word, so four numbers at the end. These numbers are normalized, so the sum of them is equal to 1. These numbers serve as a weight ($M_x$), which indicates the relationship between the query and every other word. The resulting better embedding for the query is then obtained as a sum of the word embeddings weighted by these obtained weights. %zdroj: 10This video series helped me a lot with an understanding of the self-attention concept: https://youtube.com/playlist?list=PL75e0qA87dlG-za8eLI6t0 Pbxafk-cxb
 }
 \label{pic:att_self}
 \end{figure}
 An improvement to the self-attention -- \textit{multihead attention} \citep{Vaswani2017} also tries to model relationships between the words in the same sequence. As it is multiheaded, it can, for one word, pay attention to more words (or their parts) (see figure \ref{pic:att_multi}).
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
-\includegraphics[width=1\columnwidth]{../img/attention_multi}
+\includegraphics[width=1\columnwidth]{../img/attention_multi1}
 \caption{Figure 2 from \citep{Vaswani2017} describes the attention mechanism used in Transformers. Scaled Dot-Product Attention, as authors call it, is basically the same architecture as described in the previous figure (\ref{pic:att_self}). The dimension of values ($d_v$) is different from query and keys dimensions ($d_k$). As the normalization serves scaling (division by the number of input dimensions) and than softmax function, which ensures the sum of all weights to be equal to one. Multi-head attention just perform Scaled Dot-Product Attention in parallel and result is then concatenated.
 }
 \label{pic:att_multi}
@@ -193,7 +195,7 @@ Based on the above mentioned, the construction of neural networks than can captu
 \end{itemize}
 The first problem was solved by simple Recurrent Neural Networks (RNN). To represent an ordering and a continuity of input words, basic RNN takes the output for previous word as a part of input for the next word (see picture \ref{pic:rnn}). 
  
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/rnn}
 \protect\caption{Basic Recurrent neural network architecture is showed on the left side of the figure. It is composed by one rnn cell which recurrently uses informations from previously seen input. $X$ is the input of the cell, e.g. a word, $O$ is the output for the given word (e.g. its translation or next word prediction), $V$ is the state passed into another time step. For better illustration of working in the time, RNN can be visualised as a chain of cells connected by a result of previous cell as can be seen on the left side of the figure. Source: \textit{Picture from https://medium.com/deeplearningbrasilia/deep-learning-recurrent-neural-networks-f9482a24d010}.}
@@ -205,7 +207,7 @@ The latter problem needs a more complicated approach. There are three attempts t
 Both LSTM and GRU uses an idea of gating. Term \textit{gate} refers to a weight (multiplication factor) for previous informations and new input. Gate determines which information from previous words should be remembered and which should be forgotten. For regulating the memory, the gate is formed by the sigmoid activation function, ranging from 0 to 1 and presenting a portion of remembered information. Previous information is encoded in a cell state and a hidden state %TODO co je cell a hidden state
 , both passed from cell to cell (with the application of gates). Comparison of both architectures can be found in figure \ref{pic:lstm_gru}.
 
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/rnn_lstm_gru}
 \protect\caption{Comparison of LSTM and GRU architecture. $x_t$ is the current input (current word),  Source: \textit{http://dprogrammer.org/rnn-lstm-gru}.}
@@ -213,7 +215,7 @@ Both LSTM and GRU uses an idea of gating. Term \textit{gate} refers to a weight 
 \end{figure}
 \subsubsection*{LSTM} LSTM cell uses three gates: input, output and forget gate. Every gate is composed by a sigmoid function with an actual input and a previous hidden state as inputs.
 \textit{Forget gate} filters information from previous cell state. \textit{Input gate} decides which parts of input will affect the results. \textit{Output gate} then selects which part of the result will be actually part of a result. Detailed description can be seen on Figure \ref{pic:lstm_gates}.
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/lstm_gates}
 \protect\caption{An architecture of the LSTM cell, epsecially its gating mechanism. A LSTM cell carry through the time, in addition to a hidden state, also a cell state, which serves as a long-term memory. \textit{A forget gate} is responsible for choosing the amount of cell state, therefore the information from previous inputs, to be preserved. It uses sigmoid function which returns the output between 0 and 1. \textit{An input gate} controls the addition of new information from the input to the memory. \textit{An output gate} produces the output hidden state which is passed to the next cell. }
@@ -223,7 +225,7 @@ Both LSTM and GRU uses an idea of gating. Term \textit{gate} refers to a weight 
 \subsubsection*{GRU}
 GRU also uses gates: reset gate and update gate.
 The reset gate is responsible for how much of the previous state will take in the new state. Update gate serves as a weight for a combination of previous and current states, which form the new output. For more detailes see Figure \ref{pic:gru_gates}.
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/gru_gates}
 \protect\caption{An architecture of GRU cell. \textit{An update gate (A)} computes how much of previous information should be passed to next cell based on previous hidden state and the current time input. \textit{A reset gate (B)} uses the same formula (although the input and the previous hidden state have different weights) but serves to a different purpose -- it decides which to forget. \textit{(C)} previous hidden state is weighted by the reset gate before concatenating with current input and normalized via tanh function (to be between $-1$ and $1$) Finally, \textit{new hidden state} is computed as an affine combination of previous hidden state and "normalized" hidden state from previous step.}
@@ -235,14 +237,14 @@ The transformers solve the same problem as RNNs but proposes a different archite
 Tranformers uses encoder-decoder architecture, which was simultaneously published in 2014 by \citep{Cho2014}, \citep{Sutskever2014} and \citep{Wu2016}. This architecture's basic idea is following: 
 This architecture serves to processing of variable-length sequences. Encoder and decoder are connected by a vector of fixed size (context vector), which aims to be a good representation of the input. %TODO pridat obrazek pro porovnani s transformers kde to neni, hlavni zmena v tom paperu
 The encoder reads its input and tries to learn such weights that the encoder's final representation of the input contains all important information. This context vector serves as an input into the decoder, which tries to reconstruct the best results. This architecture was first used for machine translation, so the decoder's output, in this case, is a sentence in the target language with the same meaning as an original input (see figures \ref{pic:enco_deco}  and \ref{pic:enco_deco_all}).
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/trans_arch}
 \protect\caption{This picture describes design of one encoder-decoder block in detail. Every encoder layer consist of self-attention and feed-forward layer supplied with normalization and residual connections. Source: http://jalammar.github.io/illustrated-transformer }
 \label{pic:enco_deco}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/encoder_decoder_all}
 \protect\caption{ In transformers, encoder and decoder parts are both composed by many of block of respective types. The input goes first through a series of encoders and than the output of encoder part is put into every decoder in the decoder part. %TODO říct proč
@@ -259,7 +261,7 @@ Reusing the knowledge can lead to lower training times with fewer demands on tec
 One of the first big successes of transfer learning comes from the computer vision field by using models pretrained on ImageNet (currently also on other datasets). ImageNet \citep{Russakovsky2015} is a big dataset of pictures. Every picture is labeled by one of one thousand classes. Many large deep models were trained on this dataset and then applied to different computer vision tasks with a great success \citep{Huh}.  %TODO nekam ze proc to funguje a co vsechno se uci se stale zkouma
 \par
 Following the taxonomy in figure \ref{pic:tl_taxonomy}, currently most important transfer learning applications in \acrshort{nlp} falls into \textit{sequential transfer learning} category. Machine learning models are first trained on a training objective, and the trained result is then used for a wider set of tasks.
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.7\columnwidth]{../img/tl_taxonomy}
 \caption{Figure from \protect\citep{Ruder2019} offers possible taxonomy for transfer learning. %TODO co je to domena, tohle predelat
@@ -305,7 +307,7 @@ The core of BERT algorithm is based on these three features
 and all of them will be described in the following sections.
 \subsubsection{Input embeddings}
 BERT uses the concatenation of three types of embeddings as an input representation -- token embeddings, position embeddings, and segment embeddings.
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/bert_embeddings}
 \protect\caption{ An input is represented using three kinds of embeddings for every input word. Every sequence is also marked off by beginning and ending markers (CLS and SEP token), which are also encoded using a combination of all three embedding stypes.
@@ -319,7 +321,7 @@ embeddings \citep{Wu2016}. WordPiece pre-trained embedding algorithm was origina
 It is impossible to prepare embeddings for every possible word in a language because this would cause an intractably long embedding size. %TODO proc vlastne u tech co nejsou one-hot? %TODO nekde u layer pouzit shape
 Every word which is not a part of the selected embedding set is encoded in the same way (as an unknown word). This situation is not desired because we lost information about words. WordPiece deals with this problem in the following manner: In the first iteration of training, the model creates embeddings only for characters. In every other iteration, some existing model words are concatenated together in a way that causes the highest likelihood of input text. As a result of this method, some words will be embedded as one word, and some will be split into more tokens, as can be seen in figure \ref{pic:bert_inp}.
 
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/bert_input}
 \protect\caption{This figure illustrates a transformation of one input sentence (from PDT3) to suit bert input expectations. The sentence is divided into words and then into tokens from wordpiece tokenizer vocabulary. Accents may be removed depending on the used model. The sentence is decorated with special CLS and SEP tokens to mark the beginning and the end of the sentence. All tokens are then converted into numbers. }
@@ -336,7 +338,7 @@ These embeddings indicate whether the token belongs to the first or second part 
 BERT adapts encoder part of architecture from original Transformers paper   \citep{Vaswani2017} (see section \ref{sub:transformers}).
 BERT uses its encoder architecture for each layer, so L encoder layers are finished with one fully connected layer for a specific task (see Fig. \ref{pic:bert_arch}).
 
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.8\columnwidth]{../img/bert_arch}
 \caption{A figure from \citep{Ganesh2020} describes BERT architecture in detail.}
