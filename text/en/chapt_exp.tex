@@ -1,0 +1,40 @@
+\chapter{Experiments}
+This chapter presents all possibilities of experiment setup. Theoretical possibilities of training settings are described in detail in the previous section \ref{sub:howto}, but this part will describe particular training experiment settings, that are same for all tasks. 
+\section{A description of training hyperparameters}
+\subsection{General experiment setup (EXPE)}
+Training is performed in one of following settings:
+\begin{itemize}
+\item \textbf{base}: Baseline implementation (described separately for each task, typically without using advanced language models).
+\item \textbf{ls}: This uses same setting as baseline implementation but with label smoothing.
+\item \textbf{embed}: BERT-like language model is used only to generate static embeddings in advanced. These embeddings are not further trained.
+\item \textbf{fine}: Fine-tuning consist in dividing the training time into two parts. Firstly, rest of the model is trained with BERT layers frozen (not trained), so it is same as the \textit{embed} settings. In the second part, the whole model is fine-tuned together.
+\item \textbf{simpl}e: Model architecture is reduced to bert layers with a simple classification head. This is basic setting for all sentiment analysis experiments but for tagging and lemmatization all previous choices, in contrast to this setting, are performed with more sophisticated classification head.
+\item \textbf{full}: This options means training the whole model from the beginning (in contrast to \textit{fine} option), but the classification head is not simplified (in contrast \textit{simple} option).
+\end{itemize}
+%TODO zmenit u sentimentu mít všude simple nebo full a jinej sloupec na data?
+\subsection{Training data}
+Tagging and lemmatization tasks use same set of data for every experiments, co there is no need for separate description. Sentiment analysis task, however, uses three possible options for a selection of training data:
+\begin{itemize}
+\item \textbf{mall|facebook|csfd}: Model is trained and evaluated on the (sub)set of czech datasets.
+\item \textbf{zero}: Model is trained on english sentiment analysis dataset, but evaluated on czech data.
+\item \textbf{eng}: Model is trained on the combination of czech and english training data (and evaluated again on the czech data). %TODO pridat jeste jednotlive ceske datasety
+\end{itemize}
+\subsection{Learning rate scheduling type (LRTYPE)}
+Most experiments are expected to perform better with some kind of learning rate scheduling. This work implements three types of learning rate scheduling:
+\begin{itemize}
+\item \textbf{simple} \textit{Simple} option indicates no more complex learning rate scheduling than setting in advance different learning rates for different epochs.
+\item \textbf{isrd} %TODO citovat 
+\textit{isrd} means inverse square root learning rate decay defined by formula: $1/\sqrt{max(n,k)}$ where $k$ is the number of so-called \textit{warmup steps} and $n$ is the current iteration. This leads to constant learning rate for first $k$ steps and decayed learning rate in rest of iterations.
+\item \textbf{cos}: Another learning rate scheduling used in this work is \textit{cosine decay} %TODO citovat
+which applies following formula: $$lr=lr_{min}^{i} + \frac{1}{2}(lr_{max}^{i} - lr_{min}^{i})(1+cos(\frac{T_{curr}}{T_i}\pi)),$$ where $lr_{min}^{i}$ and $lr_{min}^{i}$ is the range of the learning rate, $T_i$ is the number of epochs after which the learning rate is restarted, i.e. increased to the $lr_{max}^{i}$ value and $T_{curr}$ is the current epoch number.
+\end{itemize}
+
+\subsection{Model layers selected for embeddings (LAYERS)}
+As discussed in the previous chapter, is unclear how to extract best embeddings from the language model, especially which layers to take into account. By selecting the most promising ways, following two hyperparameters are used in this work:
+\begin{itemize}
+\item \textbf{four}: Last four of the model are averaged to obtain final embeddings.
+\item \textbf{att}: This setting performs weighted sum of all model layers and the weights are trained during training together with the rest of the model.
+\end{itemize}
+Experiments are also performed with different learning rates (LR), batch size (BATCH) and a number of epochs (EPOCH). 
+Following section will explain technical details needed for running scripts.
+
