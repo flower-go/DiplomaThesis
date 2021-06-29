@@ -1,41 +1,39 @@
-\section{Task 2: Sentiment Analysis}
+\section{Sentiment Analysis}
 \label{chap:sent}
-\section{Task definition}
+\subsection{Task definition}
+\begin{itemize}
+\item POS tagging \\
+\textit{input}: a word \\
+\textit{output}: part-of-speech tags -- as noun, pronoun, punctuation mark etc.
+\item lemmatization \\
+\textit{input:} a word \\
+\textit{output:} lemma -- a base form of a given words, meaning for example nominative of singular for nouns or infinitive for verbs. 
+\item sentiment analysis \\
+\textit{input:} a sentence or a sequence of sentences \\
+\textit{output:} prevailing sentiment of the input from categories: neutral, positive, negative.
+\todo{doplnit diskuzi o ruzných možnostech definice}
+\end{itemize}.
 As stated in \citep{Veselovska}: "Sentiment analysis, also known as opinion mining, is an automatic detection of a positive or negative polarity, or neutrality of ... a text sequence", which is exactly as the sentiment analysis is understood in this work, although there are some other definitions consisting of e.g. opinion extraction, irony or stance \citep{Montoyo2012}. Another tasks related to sentiment analysis is a subjectivity analysis (whether the presented opinion is objective or highly subjective), which is also not included in this work, mainly because the lack of labelled data for Czech. It is possible to analyze individual expressions, sentences or whole documents \citep{Veselovska} and this work focuses on the document level classification.
 %TODO zjistit jaka jsou na to porovnavaci data This work primary tries to improve existing tasks and show the ability of contextualized embeddings to improve results, so tasks with existing data and results were selected.  %TODO why?
-
-\section{Related Work}
-citace:
-\citep{Cano2019}
-\citep{Kittask2020} .. estonian
-\citep{Lenc2016} sentiment in czech
-\citep{Hercig2018}
-\citep{Li}
-\citep{Libovicky} presents state-of-the art results in three czech NLP tasks including sentiment analysis. They use only CSFD dataset with resulting accuracy 80.8 .1 which is still not so good as Brychcín (81.5.3). The second mentioned paper, however, uses quite complicated method for classification incorporating the fact of which movie is reviewed. 
-
-Bachelor thesis which aplies bert on sentiment analysis in czech:
-%https://dspace.cvut.cz/bitstream/handle/10467/83127/F8-BP-2019-Langr-Lukas-thesis.pdf?sequence=-1&isAllowed=y
-results are accuracy 84 with tfidf and about 81 with bert and they used mall dataset.
-
-\section{Datasets}
+\subsection{Dataset and Preprocessing}
 Four main Czech datasets with sentiment annotation are available - user reviews from MALL.cz, film reviews from csfd.cz, news from Aktualne.cz and posts from czech branch pages on facebook. As Aktualnecz dataset turned out to be problematical as the text were ambiguous for annotators, and its authors later used other mentioned datasets \citep{Veselovska}, this work also focuses only on the three other data sources -- MALL, CSFD and Facebook \footnote{All three datasets are all available here: http://liks.fav.zcu.cz/sentiment/}. Following part summarize each of used datasets.
-\subsection{Facebook}
+\subsubsection{Facebook}
 Length: 9752\\
 From: ? \\
 Labels: neutral, positive, negative
 
-\subsection{csfd}
+\subsubsection{csfd}
 Length: 91304 \\
 From: \\
 Labels: negative, positive ? \\
 
-\subsection{mallcz}
+\subsubsection{mallcz}
 Length: 145306 \\
 From: \\
 Domain: domestic appliance reviews \\
 Labels: negative, neutral, positive
 
-\subsection{imdb}
+\subsubsection{imdb}
 Length: 25000 \\
 From:
 Labels: negative, positive
@@ -64,8 +62,23 @@ shows, that the resulting dataset is highly unbalanced, which causes divergence 
 learning rate of $2e-3$ for 10 epochs. This ended with predicting only one class (positive). Some progress showed the followign approach:"2:5e-5,1:2e-5, unfreezed" for facebook data only (which are balanced). This results are above 71 for accuracy (Test accuracy: 0.726
 F1 metrics: 0.7077061630227595 weighted).
 
+\subsection{Related Work}
+citace:
+\citep{Cano2019}
+\citep{Kittask2020} .. estonian
+\citep{Lenc2016} sentiment in czech
+\citep{Hercig2018}
+\citep{Li}
+\citep{Libovicky} presents state-of-the art results in three czech NLP tasks including sentiment analysis. They use only CSFD dataset with resulting accuracy 80.8 .1 which is still not so good as Brychcín (81.5.3). The second mentioned paper, however, uses quite complicated method for classification incorporating the fact of which movie is reviewed. 
 
-\subsection{Experiments}
+Bachelor thesis which aplies bert on sentiment analysis in czech:
+%https://dspace.cvut.cz/bitstream/handle/10467/83127/F8-BP-2019-Langr-Lukas-thesis.pdf?sequence=-1&isAllowed=y
+results are accuracy 84 with tfidf and about 81 with bert and they used mall dataset.
+
+
+
+
+\subsection{Experiments and Architecture}
 I tried another approach:
 Because the facebook dataset is balanced, I pretrained the model first on facebook and after reaching a decent accuracy, i further trained the model on the join data:
 for ten epochs with learning rate 5e-5 and an effecctive batch size 48.
@@ -94,6 +107,7 @@ see \ref{pic:conf1}
 \label{pic:conf1}
 \end{figure}
 
+\subsection{Results}
 
 My baseline is tf-idf method, which resulted in 
 [[ 4310   102  3015]

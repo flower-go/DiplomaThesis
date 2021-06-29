@@ -1,14 +1,14 @@
 \chapter{Experiments}
-This chapter presents all possibilities of experiment setup. Theoretical possibilities of training settings are described in detail in the previous section \ref{sub:howto}, but the first part of this chapter will describe particular training experiment settings, that are same for all tasks. This general description is followed by a detailed description of performed work for each for tasks together with results presentation.
+This chapter describes all experiments and their results. First part is dedicated to presentation of different experiement hyperparameters, which are in many cases common to all tasks, followed by the analysis of each task -- definition, related work, datasets, a description of according model and results.
 \section{A description of training hyperparameters}
 \subsection{General experiment setup (EXPE)}
 Training is performed in one of following settings:
 \begin{itemize}
 \item \textbf{base}: Baseline implementation (described separately for each task, typically without using advanced language models).
-\item \textbf{ls}: This uses same setting as baseline implementation but with label smoothing.
+\item \textbf{ls}: This setup uses same setting as baseline implementation but with label smoothing.
 \item \textbf{embed}: BERT-like language model is used only to generate static embeddings in advanced. These embeddings are not further trained.
-\item \textbf{fine}: Fine-tuning consist in dividing the training time into two parts. Firstly, rest of the model is trained with BERT layers frozen (not trained), so it is same as the \textit{embed} settings. In the second part, the whole model is fine-tuned together.
-\item \textbf{simpl}e: Model architecture is reduced to bert layers with a simple classification head. This is basic setting for all sentiment analysis experiments but for tagging and lemmatization all previous choices, in contrast to this setting, are performed with more sophisticated classification head.
+\item \textbf{fine}: Fine-tuning consist in dividing the training time into two parts. Firstly, rest of the model is trained with BERT layers frozen (not trained), so it is same as the \textit{embed} settings. In the second part, the whole model is trained together.
+\item \textbf{simple}: Model architecture is reduced to bert layers with a simple classification head. This is basic setting for all sentiment analysis experiments.\footnote{For tagging and lemmatization, all previously mentioned EXPE setups are performed with more sophisticated classification head than in \textit{simple} version.} 
 \item \textbf{full}: This options means training the whole model from the beginning (in contrast to \textit{fine} option), but the classification head is not simplified (in contrast \textit{simple} option).
 \end{itemize}
 %TODO zmenit u sentimentu mít všude simple nebo full a jinej sloupec na data?
@@ -36,7 +36,8 @@ As discussed in the previous chapter, is unclear how to extract best embeddings 
 \item \textbf{att}: This setting performs weighted sum of all model layers and the weights are trained during training together with the rest of the model.
 \end{itemize}
 Experiments are also performed with different learning rates (LR), batch size (BATCH) and a number of epochs (EPOCH). 
-Following section will explain technical details needed for running scripts.
-
+Technical details needed for running scripts can be found in chapter \ref{chap:impl}.
+\newpage
 \input{chaplemtag}
+\newpage
 \input{chapsentiment}

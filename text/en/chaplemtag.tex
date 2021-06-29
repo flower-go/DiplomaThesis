@@ -1,15 +1,33 @@
-\section{Task 1: Lemmatization and part-of-speech tagging}
+\section{Lemmatization and part-of-speech tagging}
 \label{chap:tag}
-%TODO definice
-Czech morphology developement is dated from 1989 %TODO zdroj Hajič.
-and in description of words uses 15-places morphological tags \citep{Hana2005}.
-A more detailed description of each position can be seen in table \ref{Tab:tagset}.
+Lemmatization and \acrlong{pos} tagging tasks are often categorized as morphological analysis, shares same architecture and trained network, so they will be described together in this section.
+\subsection{Task Definition}
+%co chci presne delat - vstup, vystup, metrika
+
+\paragraph{\textbf{POS tagging}} \mbox{}\\
+\textit{input}: a word \\
+\textit{output}: tag, which contains not only part-of-speech (e.g. noun, pronoun, punctuation mark) but also other morphological analysis (case, tense, etc) corresponding to 15-places morphological tagging system by \cite{Hajic2004}. Description of each position can be found in Figure \ref{Tab:tagset}.
+
+\paragraph{\textbf{Lemmatization}} \mbox{}\\
+\textit{input:} a word \\
+\textit{output:} lemma -- a base form of a given words, meaning for example nominative of singular for nouns or infinitive for verbs. In this work, lemmatization is treated as a classification problem with classes coresponding to generating rules which transform an input word into target lemma. For example of such rules see Figure \ref{fig:lemma_rules}. \\
+
+
+Metric used for evaluation of the model is an accuracy reported separately for several options -- only tags/lemmas, accuracy of joint classification of tags and lemmas, and  also for all variants with an usage of dictionary (this option is described in more detail in \ref{sub:dataset}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{../img/lemma_rules}
+\protect\caption{
+Table 1 from \citep{Straka2019b} presents 10 most common lemma generating rules in English EWT corpus. Each rule has two parts -- casing script for transforming uppercase and lowercase letters, and edit script. Edit script can transform prefix, suffix, or also a root of the word.
+}
+\label{fig:lemma_rules}
+\end{figure}
 
 \begin{table}
 \centering
 \label{Tab:tagset}
 \begin{tabular}{ |c|c|c| } 
-
 
  \hline
  Position & Name & Description \\ 
@@ -32,12 +50,53 @@ A more detailed description of each position can be seen in table \ref{Tab:tagse
  \hline
 
 \end{tabular}
-\caption{Table from \citep{Hana2005} describes all 15 positions of Czech morphological tagging.
-} 
+\caption{Czech morphology developement is dated from 1989 %TODO zdroj Hajič
+and in description of words uses 15-places morphological tags as described in this table taken from \citep{Hana2005}} 
 \end{table}
-%TODO related work
-%TODO sota
+
+\subsection{Dataset and Preprocessing}
+\label{sub:dataset}
+Dataset for these tasks is based on Prague Dependency Treebank (PDT) \cite{PDT35}, specifically version 3.5, which is PDT edition from year 2018. Dataset is divided into three parts - train, developement and test.  %TODO jak vypadaji vstupni data - ukazka z tech dat co mam primo!!!
+Data consists of sentences with lemmas and tags. For ambiguous words, data contain all possible analysis. For example, Czech word "psa" have one possible lemma ("pes") but two possible tags because it could be one of two possible grammatical cases -- genitive or accusative. Input data for such word looks as follows: \\
+\begin{center}
+psa pes NNMS2-----A---- NNMS4-----A----
+\end{center}, where analysis correspond to 
+
+Input sentences are preprocessed as follows: %TODO mozna az do site? opsat vse z UDPipe2.0 !!!
+\begin{itemize}
+\item white space deletion
+\item mapping characters -- all unknown development and test datasets' characters are then mapped into one \textit{UNK} token. 
+\item mapping  words from train into integers -- Simply number from one to number of unique words.
+%bertí embeddingy
+		%precomputed
+		%bert segments ... ke ktere vete a slovu segmenty patri
+		%bert subwords .. subwordy - proc subwordy a ze jsou v kontextu a proto musim s vetou celou!!
+		%udelat z toho tensor
+\end{itemize}
+
+%jaky je preprocessing dat
+	%co je analyses?
+	%co je lemma rule
+
+	%tedy parsování na slova a věty
+	
+
+\subsection{Related Work}
 This work aims to improve previously published SOTA results for contextualized embeddings in czech lemmatization and tagging \citep{Straka2019}. 
+
+as described in table \ref{Tab:tagset}.  %TODO a ja pouzivam ty samy? 
+
+
+%\citep{Horsmann}
+%\citep{Plank}
+%\citep{Plisson}
+%\citep{Straka2019b}
+%\citep{Straka2019a}
+%\citep{Toutanova2003}
+%\citep{Wang2015}
+%\citep{Huang2015}
+%\citep{Collobert2011} ... preprocessing
+
 
 \begin{table}[!h]
   \begin{tabular}{|l||c|c|c||c|c|c|}
@@ -53,68 +112,16 @@ This work aims to improve previously published SOTA results for contextualized e
   \caption{%TODO cite
   Straka2019B is the best solution from \citep{Straka2019} paper. Straka2019C is a comparable solution  (BERT embeddings only), which was transformed into TF2 in this work.} 
 \end{table}
-%TODO jak jsem to udelala
-%TODO  vysledky
 
-\citep{Horsmann}
-\citep{Plank}
-\citep{Plisson}
-\citep{Straka2019b}
-\citep{Straka2019a}
-\citep{Toutanova2003}
-\citep{Wang2015}
-\citep{Huang2015}
-\citep{Collobert2011} ... preprocessing
-
-%co delam a jak to delam
-The practical part of this work is focused on these tasks:
-\begin{itemize}
-\item POS tagging \\
-\textit{input}: a word \\
-\textit{output}: part-of-speech tags -- as noun, pronoun, punctuation mark etc.
-\item lemmatization \\
-\textit{input:} a word \\
-\textit{output:} lemma -- a base form of a given words, meaning for example nominative of singular for nouns or infinitive for verbs. 
-\item sentiment analysis \\
-\textit{input:} a sentence or a sequence of sentences \\
-\textit{output:} prevailing sentiment of the input from categories: neutral, positive, negative.
-\todo{doplnit diskuzi o ruzných možnostech definice}
-\end{itemize}.
-\label{chap:impl}
+\subsection{Experiments and Architecture}
 This chapter describes implemented linguistic models. As mentioned before, this work implements models for three Czech NLP tasks: tagging, lemmatization and sentiment analysis. Common model for first two tasks develops on the paper by \cite[]{straka2019czech} focused on application of contextual embeddings produced by language models as Bert %todo cite
  or Flair. %todo cite. 
  Third task, sentiment analysis, is performed by adding only one fully-connected layer at the top of bert model. So in the opposite to previous tasks, no sophisticated handcrafted pipeline is built and model relies only on the network powers of language structure representation.
- \section{POS tagging and lemmatization model}
-The model for this part is build upon a model (and a code) for previous work on Czech NLP processing with contextual embeddings \cite[]{straka2019czech}. Data preparation %todo trida s odkazem do github
+
+The model for this part is build upon a model (and a code) for previous work on Czech NLP processing with contextual embeddings \citep{straka2019czech}. Data preparation %todo trida s odkazem do github
 pipeline - tokenization and sentence segmentation is taken over from the paper as well as base structure of lemmatizer and tagger network. 
 
-
-\subsection{Dataset and preprocessing}
-Dataset for these tasks is based on Prague Dependency Treebank (PDT), specifically version 3.5, which is PDT edition from year 2018. Dataset is divided into three parts - train, dtest and etest. Second one is used as development set while the third one as a test set for validation. %todo citace %jak vypadaji vstupni data - ukazka z tech dat co mam primo!!!
-Data consists of sentences with lemmas and tags.Input sentences are preprocessed as follows:
-\begin{itemize}
-\item white space deletion
-\item mapping characters -- all unknown dev and test characters are then mapped into one \textit{unk} token. 
-\item mapping  words from train into integers -- all unknown dev and test words are then mapped into one \textit{unk} token. 
-\end{itemize}
-
-
-%jak vypadají vstupní data?
-
-%jaky je preprocessing dat
-	%odebrani mezer (rstrip)
-	%co je analyses?
-	%co je lemma rule
-	%mapovani pismen jen ta co byla v train, jinak unk, totez slova
-	%tedy parsování na slova a věty
-	%bertí embeddingy
-		%precomputed
-		%bert segments ... ke ktere vete a slovu segmenty patri
-		%bert subwords .. subwordy - proc subwordy a ze jsou v kontextu a proto musim s vetou celou!!
-		%udelat z toho tensor
-		
-\subsection{Network}
-Lemmatization as well as tagging are considered to be classification tasks (same as in \cite[]{straka2019czech}), i.e. lemmatization classification target are lemma generating rules and tagging target is tag, of course. Both tasks share one network.
+. Both tasks share one network.
 
 Script allows training of these model variants:
 \begin{itemize}
@@ -130,8 +137,9 @@ Model contains potentially embeddings of four types -- pretrained word2vec embed
 All classification can be done with or without use of a morphological dictionary MorFlex %todo reference
 . If the option with dictionary is used, generated tags and lemmas are chosen just from the dictionary. So it is selected lemma and/or tag with maximal likelihood, but just from those presented in the dictionary.
 
-\includegraphics[width=\columnwidth]{../img/taggermodel.pdf}
+\includegraphics[width=1\columnwidth]{../img/taggermodel.pdf}
 
-Metric used for evaluation of the model is accuracy.
+
+\subsection{Results}
 
 
