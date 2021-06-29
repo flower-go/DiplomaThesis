@@ -6,7 +6,7 @@ Lemmatization and \acrlong{pos} tagging tasks are often categorized as morpholog
 
 \paragraph{\textbf{POS tagging}} \mbox{}\\
 \textit{input}: a word \\
-\textit{output}: tag, which contains not only part-of-speech (e.g. noun, pronoun, punctuation mark) but also other morphological analysis (case, tense, etc) corresponding to 15-places morphological tagging system by \cite{Hajic2004}. Description of each position can be found in Figure \ref{Tab:tagset}.
+\textit{output}: tag, which contains not only part-of-speech (e.g. noun, pronoun, punctuation mark) but also other morphological analysis (case, tense, etc) corresponding to 15-places morphological tagging system by \cite{Hajic2004}. Description of each position can be found in Table \ref{Tab:tagset}.
 
 \paragraph{\textbf{Lemmatization}} \mbox{}\\
 \textit{input:} a word \\
@@ -54,33 +54,6 @@ Table 1 from \citep{Straka2019b} presents 10 most common lemma generating rules 
 and in description of words uses 15-places morphological tags as described in this table taken from \citep{Hana2005}} 
 \end{table}
 
-\subsection{Dataset and Preprocessing}
-\label{sub:dataset}
-Dataset for these tasks is based on Prague Dependency Treebank (PDT) \cite{PDT35}, specifically version 3.5, which is PDT edition from year 2018. Dataset is divided into three parts - train, developement and test.  %TODO jak vypadaji vstupni data - ukazka z tech dat co mam primo!!!
-Data consists of sentences with lemmas and tags. For ambiguous words, data contain all possible analysis. For example, Czech word "psa" have one possible lemma ("pes") but two possible tags because it could be one of two possible grammatical cases -- genitive or accusative. Input data for such word looks as follows: \\
-\begin{center}
-psa pes NNMS2-----A---- NNMS4-----A----
-\end{center}, where analysis correspond to 
-
-Input sentences are preprocessed as follows: %TODO mozna az do site? opsat vse z UDPipe2.0 !!!
-\begin{itemize}
-\item white space deletion
-\item mapping characters -- all unknown development and test datasets' characters are then mapped into one \textit{UNK} token. 
-\item mapping  words from train into integers -- Simply number from one to number of unique words.
-%bertí embeddingy
-		%precomputed
-		%bert segments ... ke ktere vete a slovu segmenty patri
-		%bert subwords .. subwordy - proc subwordy a ze jsou v kontextu a proto musim s vetou celou!!
-		%udelat z toho tensor
-\end{itemize}
-
-%jaky je preprocessing dat
-	%co je analyses?
-	%co je lemma rule
-
-	%tedy parsování na slova a věty
-	
-
 \subsection{Related Work}
 This work aims to improve previously published SOTA results for contextualized embeddings in czech lemmatization and tagging \citep{Straka2019}. 
 
@@ -96,6 +69,33 @@ as described in table \ref{Tab:tagset}.  %TODO a ja pouzivam ty samy?
 %\citep{Wang2015}
 %\citep{Huang2015}
 %\citep{Collobert2011} ... preprocessing
+
+\subsection{Dataset and Preprocessing}
+\label{sub:dataset}
+Dataset for these tasks is taken from data of Prague Dependency Treebank (PDT) \citep{PDT35}, specifically version 3.5, which is PDT version from year 2018. %Dataset is divided into three parts - train, developement and test.  %TODO jak vypadaji vstupni data - ukazka z tech dat co mam primo!!!
+Data consists of sentences with lemmas and tags. For ambiguous words, data contain all possible analysis. For example, Czech word "psa" have one possible lemma ("pes") but two possible tags because it could be one of two possible grammatical cases -- genitive or accusative. Input data for such word looks as follows: \\
+\begin{center}
+psa pes NNMS2-----A---- NNMS4-----A----
+\end{center}.
+
+Dataset is divided into tree parts - train, development and test. Input sentences are preprocessed as follows: %TODO mozna az do site? opsat vse z UDPipe2.0 !!!
+\begin{itemize}
+\item white space deletion
+\item mapping characters and words into numbers --  mapping  words/characters which were found in train dataset into integers (from one to the number of unique words). This means, that the network has no information about words/characters which appears only in test or development dataset. All newly appeared words/characters are mapped into one same number (typically $0$) for \textit{UNK} token/character. 
+\item 
+%bertí embeddingy
+		%precomputed
+		%bert segments ... ke ktere vete a slovu segmenty patri
+		%bert subwords .. subwordy - proc subwordy a ze jsou v kontextu a proto musim s vetou celou!!
+		%udelat z toho tensor
+		%todo to asi nechci popisocat?
+\end{itemize}
+
+
+	%tedy parsování na slova a věty
+	
+
+
 
 
 \begin{table}[!h]
@@ -114,6 +114,15 @@ as described in table \ref{Tab:tagset}.  %TODO a ja pouzivam ty samy?
 \end{table}
 
 \subsection{Experiments and Architecture}
+
+%For POS tagging, we applied a straightforward model in the lines of Ling et al. (2015) – first rep- resenting each word with its embedding, contextu- alizing them with bidirectional RNNs (Graves and Schmidhuber, 2005), and finally using a softmax classifier to predict the tags. z UDpipe2
+
+%??? We perform tokenization, sentence segmentation and multi-word token splitting with the baseline UDPipe 1.2 approach. In a nutshell, input charac- ters are first embedded using trained embeddings, then fixed size input segments (of 50 characters) are processed by a bidirectional GRU (Cho et al., 2014), and each character is classified into three classes – a) there is a sentence break after this character, b) there is a token break after this char- acter, and c) there is no break after this character.
+
+%reprezentation: tři typy embeddings - pretrained, trained, character-level a ještě berti
+
+%TODO popisovat vice ty pravidla?
+
 This chapter describes implemented linguistic models. As mentioned before, this work implements models for three Czech NLP tasks: tagging, lemmatization and sentiment analysis. Common model for first two tasks develops on the paper by \cite[]{straka2019czech} focused on application of contextual embeddings produced by language models as Bert %todo cite
  or Flair. %todo cite. 
  Third task, sentiment analysis, is performed by adding only one fully-connected layer at the top of bert model. So in the opposite to previous tasks, no sophisticated handcrafted pipeline is built and model relies only on the network powers of language structure representation.
@@ -122,6 +131,8 @@ The model for this part is build upon a model (and a code) for previous work on 
 pipeline - tokenization and sentence segmentation is taken over from the paper as well as base structure of lemmatizer and tagger network. 
 
 . Both tasks share one network.
+
+
 
 Script allows training of these model variants:
 \begin{itemize}
