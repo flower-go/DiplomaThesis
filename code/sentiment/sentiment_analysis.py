@@ -122,6 +122,7 @@ class Network:
         # if args.freeze:
         #     tvs = [tvar for tvar in tvs if not tvar.name.startswith('bert')]
         for batch in dataset.batches(size=args.batch_size):
+            tf.print(batch[0])
             tg = self.train_batch(
                 batch[0],
                 batch[1], tvs)
@@ -146,6 +147,7 @@ class Network:
                                 g.append((ng.values.numpy(), ng.indices.numpy()))
                             else:
                                 g += ng.numpy()
+                tf.print("num gradients " + str(num_gradients))
                 num_gradients += 1
                 if num_gradients == args.accu:
                     gradients = [tf.IndexedSlices(*map(np.concatenate, zip(*g))) if isinstance(g, list) else g for g in
