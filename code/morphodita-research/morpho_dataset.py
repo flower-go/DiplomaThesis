@@ -212,7 +212,7 @@ class MorphoDataset:
                 batch_size_bert = 16
 
                 model = bert.model
-                if "rob" in bert.name:
+                if "robeczech" in bert.name:
                     rob = True
                 else:
                     rob =False
@@ -236,7 +236,6 @@ class MorphoDataset:
                         for i_w, w in enumerate(s):
                             if i_w > 0 and rob:
                                 w = " " + w
-                            print(w.encode("utf-8"))
                             w_e = self.tokenizer.encode(w, add_special_tokens=False)
                             #print("w_E " + str(w_e))
                             #print("i _w " + str(i_w))

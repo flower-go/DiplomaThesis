@@ -56,6 +56,7 @@ class Network:
                     boundaries.append(b)
                     values.append(v)
                 boundaries = np.array(boundaries, dtype=np.int32)*args.steps_in_epoch
+                boundaries = boundaries.tolist()
                 print("boundaries")
                 print(boundaries)
                 print(values)
@@ -174,11 +175,9 @@ class Network:
                 model_output = output
             else:
                 model_output = self.bert(subwords, attention_mask=tf.cast(mask, tf.float32))[2][-4:]
-            bert_output = tf.math.reduce_mean(
-                model_output
-                , axis=0) # prumerovani vrstev
+                model_output = tf.math.reduce_mean( model_output, axis=0) # prumerovani vrstev
 
-            bert_output = tf.slice(bert_output, [0,1, 0], [-1,-1, -1]) #odeberu prvni sloupec
+            bert_output = tf.slice(model_output, [0,1, 0], [-1,-1, -1]) #odeberu prvni sloupec
             bert_output = tf.keras.layers.Lambda(
                 lambda subseq:
                 tf.map_fn(lambda subseq:
@@ -515,7 +514,7 @@ if __name__ == "__main__":
     parser.add_argument("--rnn_cell_dim", default=512, type=int, help="RNN cell dimension.")
     parser.add_argument("--rnn_layers", default=3, type=int, help="RNN layers.")
     parser.add_argument("--test_only", default=None, type=str, help="Only test evaluation")
-    parser.add_argument("--warmup_decay", default="None", type=str, help="Type i or c. Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--warmup_decay", default=None, type=str, help="Type i or c. Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
     parser.add_argument("data", type=str, help="Input data")
@@ -529,6 +528,8 @@ if __name__ == "__main__":
                    (epochs_lr.split(":") for epochs_lr in args.epochs.split(","))]
 
     if args.warmup_decay is not None:
+        print("decay is not none")
+        print(args.warmup_decay)
         args.warmup_decay = args.warmup_decay.split(":")
         args.decay_type = args.warmup_decay[0]
         args.warmup_decay = int(args.warmup_decay[1])

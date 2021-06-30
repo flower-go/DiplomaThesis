@@ -107,6 +107,7 @@ class Network:
                     boundaries.append(b)
                     values.append(v)
                 boundaries = np.array(boundaries, dtype=np.int32) * args.steps_in_epoch
+                boudaries = boundaries.tolist()
                 print("boundaries")
                 print(boundaries)
                 print(values)
