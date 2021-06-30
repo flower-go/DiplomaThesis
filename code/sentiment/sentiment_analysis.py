@@ -382,6 +382,9 @@ if __name__ == "__main__":
         imdb_ex, imdb_lab = dataset.get_dataset("imdb")
         imdb_ex = np.array(imdb_ex)
         imdb_lab = np.array(imdb_lab)
+        print("delka imdb")
+        print(len(imdb_lab))
+        print(len(imdb_ex))
         if args.english < 1:
             print("less than one")
             size = min(len(data_result.train._data["tokens"])*args.english, len(imdb_ex))/len(imdb_ex)
@@ -395,6 +398,10 @@ if __name__ == "__main__":
             size = len(imdb_ex)
             data_result.train._data["tokens"] = imdb_ex
             data_result.train._data["labels"]= imdb_lab + 1
+            mask = data_result.test._data["labels"] != 0
+            print(type(data_result.test._data["labels"]))
+
+
             data_result.train._size = len(imdb_ex)
 
 
