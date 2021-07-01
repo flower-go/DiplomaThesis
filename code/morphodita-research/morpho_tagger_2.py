@@ -15,6 +15,7 @@ from keras.models import load_model
 
 from transformers import WarmUp
 
+
 class BertModel:
     def __init__(self, name, args):
         self.name = name
@@ -29,7 +30,7 @@ class BertModel:
             self.tokenizer = transformers.AutoTokenizer.from_pretrained(name)
             self.model = transformers.TFAutoModel.from_pretrained(name,
                                                                   config=self.config)
-        self.embeddings_only=True if args.bert else False
+        self.embeddings_only = True if args.bert else False
 
 
 class Network:
@@ -39,7 +40,7 @@ class Network:
         self.factors = args.factors
         self.factor_words = factor_words
         self._optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
-        #predpokladam ze bude jen jeden typ lr a celkovy pocet kroku je tedy takto
+        # predpokladam ze bude jen jeden typ lr a celkovy pocet kroku je tedy takto
         if args.decay_type is not None:
             decay_steps = args.steps_in_epoch * (args.epochs[0][0] - args.warmup_decay)
             if args.decay_type == "i":
@@ -52,19 +53,19 @@ class Network:
             elif args.decay_type == "n":
                 boundaries = []
                 values = []
-                for b,v in args.epochs:
+                for b, v in args.epochs:
                     boundaries.append(b)
                     values.append(v)
-                boundaries = np.array(boundaries, dtype=np.int32)*args.steps_in_epoch
+                boundaries = np.array(boundaries, dtype=np.int32) * args.steps_in_epoch
                 boundaries = boundaries.tolist()
                 print("boundaries")
                 print(boundaries)
                 print(values)
                 values.append(values[-1])
                 learning_rate_fn = tf.keras.optimizers.schedules.PiecewiseConstantDecay(boundaries, values)
-            
+
             self._optimizer.learning_rate = WarmUp(initial_learning_rate=args.epochs[0][1],
-                                                   warmup_steps=args.warmup_decay*args.steps_in_epoch,
+                                                   warmup_steps=args.warmup_decay * args.steps_in_epoch,
                                                    decay_schedule_fn=learning_rate_fn)
         if args.fine_lr > 0:
             self._fine_optimizer = tfa.optimizers.LazyAdam(beta_2=args.beta_2)
@@ -144,7 +145,7 @@ class Network:
             print("nacteni modelu")
             self.model.load_weights(args.bert_load)
         #   print("model inputs:  " + str(self.model._feed_input_names))
-         #   print(str(self.model.weights[0][6][1]))
+        #   print(str(self.model.weights[0][6][1]))
 
         if args.bert_model:
             # FUNC nove vstupy
@@ -175,16 +176,16 @@ class Network:
                 model_output = output
             else:
                 model_output = self.bert(subwords, attention_mask=tf.cast(mask, tf.float32))[2][-4:]
-                model_output = tf.math.reduce_mean( model_output, axis=0) # prumerovani vrstev
+                model_output = tf.math.reduce_mean(model_output, axis=0)  # prumerovani vrstev
 
-            bert_output = tf.slice(model_output, [0,1, 0], [-1,-1, -1]) #odeberu prvni sloupec
+            bert_output = tf.slice(model_output, [0, 1, 0], [-1, -1, -1])  # odeberu prvni sloupec
             bert_output = tf.keras.layers.Lambda(
                 lambda subseq:
                 tf.map_fn(lambda subseq:
                           tf.math.segment_mean(subseq[0], subseq[1]), subseq, dtype=tf.float32))(
                 [bert_output, segments])
 
-            bert_output = bert_output[:, :-1] # tady se dava pryc sep
+            bert_output = bert_output[:, :-1]  # tady se dava pryc sep
 
             print("model len: " + str(len(inp2[:-2] + [bert_output])))
             self.outer_model = tf.keras.Model(inputs=inp2, outputs=self.model(inp2[:-2] + [bert_output]))
@@ -202,7 +203,6 @@ class Network:
         if len(self.factors) == 2:
             self._metrics["LemmasTagsRaw"] = tf.metrics.Mean()
             self._metrics["LemmasTagsDict"] = tf.metrics.Mean()
-
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
@@ -224,10 +224,9 @@ class Network:
                 else:
                     loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
 
-
         gradients = tape.gradient(loss, tvs)
 
-        tf.summary.experimental.set_step(self._optimizer.iterations) #TODO  co to je?
+        tf.summary.experimental.set_step(self._optimizer.iterations)  # TODO  co to je?
         with self._writer.as_default():
             for name, metric in self._metrics.items():
                 metric.reset_states()
@@ -237,13 +236,12 @@ class Network:
 
             for name, metric in self._metrics.items():
                 tf.summary.scalar("train/{}".format(name), metric.result())
-        return probabilities,gradients
-
+        return probabilities, gradients
 
     def train_epoch(self, dataset, args, learning_rate):
         if args.decay_type is None:
             if args.accu > 1:
-                self._optimizer.learning_rate = learning_rate/args.accu
+                self._optimizer.learning_rate = learning_rate / args.accu
             else:
                 self._optimizer.learning_rate = learning_rate
         if args.fine_lr > 0:
@@ -288,7 +286,7 @@ class Network:
             else:
                 if num_gradients == 0:
                     gradients = []
-                    for index ,g in enumerate(tg):
+                    for index, g in enumerate(tg):
                         if g == None:
                             gradients.append(None)
                         elif not isinstance(g, tf.IndexedSlices):
@@ -296,12 +294,12 @@ class Network:
                         else:
                             gradients.append([(g.values.numpy(), g.indices.numpy())])
 
-                    #gradients = [
-                     #   g.numpy() if not isinstance(g, tf.IndexedSlices) else [(g.values.numpy(), g.indices.numpy())] for g
-                     #   in tg]
+                    # gradients = [
+                    #   g.numpy() if not isinstance(g, tf.IndexedSlices) else [(g.values.numpy(), g.indices.numpy())] for g
+                    #   in tg]
                 else:
-                    
-                    for g,ng in zip(gradients,tg):
+
+                    for g, ng in zip(gradients, tg):
                         if ng != None:
                             if isinstance(g, list):
                                 g.append((ng.values.numpy(), ng.indices.numpy()))
@@ -325,11 +323,8 @@ class Network:
                         self._optimizer.apply_gradients(zip(gradients, self.outer_model.trainable_variables))
                     num_gradients = 0
 
-
-
-
-    #TODO create inputs jako jednu metodu pro train i evaluate!
-    #TODO vytvareni modelu jako jedna metoda pro outer i inner model
+    # TODO create inputs jako jednu metodu pro train i evaluate!
+    # TODO vytvareni modelu jako jedna metoda pro outer i inner model
     def _compute_bert(self, batch, dataset, lenghts):
 
         # max_len = np.max([len(batch[dataset.BERT].word_ids[i]) for i in range(len(batch[dataset.BERT].word_ids))])
@@ -382,7 +377,7 @@ class Network:
 
         return probabilities, [probabilities[f]._keras_mask for f in range(len(self.factors))]
 
-    def evaluate(self, dataset, dataset_name, args):
+    def evaluate(self, dataset, dataset_name, args, predict=None):
         for metric in self._metrics.values():
             metric.reset_states()
         while not dataset.epoch_finished():
@@ -404,7 +399,6 @@ class Network:
             if args.bert_model:
                 inp.append(batch[dataset.SEGMENTS].word_ids)
                 inp.append(batch[dataset.SUBWORDS].word_ids)
-
 
             probabilities, mask = self.evaluate_batch(inp, factors)
 
@@ -454,9 +448,18 @@ class Network:
                                                          mask[fc])
             if len(self.factors) == 2:
                 predictions_raw = [np.argmax(p, axis=2) for p in probabilities]
-                self._metrics["LemmasTagsDict"](np.logical_and(factors[0] == predictions[0], factors[1] == predictions[1]),mask[0])
+                self._metrics["LemmasTagsDict"](
+                    np.logical_and(factors[0] == predictions[0], factors[1] == predictions[1]), mask[0])
                 self._metrics["LemmasTagsRaw"](
                     np.logical_and(factors[0] == predictions_raw[0], factors[1] == predictions_raw[1]), mask[0])
+
+            if predict is not None:
+                sentences = 0
+                for i in range(len(sentence_lens)):
+                    overrides = [None] * dataset.FACTORS
+                    for factor in args.factors: overrides[dataset.FACTORS_MAP[factor]] = predictions[factor][i]
+                    dataset.write_sentence(predict, sentences, overrides)
+                    sentences += 1
 
 
         metrics = {name: metric.result() for name, metric in self._metrics.items()}
@@ -485,7 +488,7 @@ if __name__ == "__main__":
 
     # Parse arguments
     parser = argparse.ArgumentParser()
-    #parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
+    # parser.add_argument("--threads", default=4, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--accu", default=1, type=int, help="accumulate batch size")
     parser.add_argument("--batch_size", default=64, type=int, help="Batch size.")
     parser.add_argument("--bert", default=None, type=str, help="Bert model for embeddings")
@@ -508,13 +511,14 @@ if __name__ == "__main__":
     parser.add_argument("--lemma_re_strip", default=r"(?<=.)(?:`|_|-[^0-9]).*$", type=str,
                         help="RE suffix to strip from lemma.")
     parser.add_argument("--lemma_rule_min", default=2, type=int, help="Minimum occurences to keep a lemma rule.")
-    #parser.add_argument("--min_epoch_batches", default=300, type=int, help="Minimum number of batches per epoch.")
+    # parser.add_argument("--min_epoch_batches", default=300, type=int, help="Minimum number of batches per epoch.")
     parser.add_argument("--predict", default=None, type=str, help="Predict using the passed model.")
     parser.add_argument("--rnn_cell", default="LSTM", type=str, help="RNN cell type.")
     parser.add_argument("--rnn_cell_dim", default=512, type=int, help="RNN cell dimension.")
     parser.add_argument("--rnn_layers", default=3, type=int, help="RNN layers.")
     parser.add_argument("--test_only", default=None, type=str, help="Only test evaluation")
-    parser.add_argument("--warmup_decay", default=None, type=str, help="Type i or c. Number of warmup steps, than will be applied inverse square root decay")
+    parser.add_argument("--warmup_decay", default=None, type=str,
+                        help="Type i or c. Number of warmup steps, than will be applied inverse square root decay")
     parser.add_argument("--we_dim", default=512, type=int, help="Word embedding dimension.")
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
     parser.add_argument("data", type=str, help="Input data")
@@ -565,7 +569,6 @@ if __name__ == "__main__":
         sys.path.append(name)
         import tokenizer.robeczech_tokenizer
 
-
     # TODO vyřešit
     # tf.config.threading.set_inter_op_parallelism_threads(args.threads)
     # tf.config.threading.set_intra_op_parallelism_threads(args.threads)
@@ -595,11 +598,7 @@ if __name__ == "__main__":
         with open("{}/options.json".format(args.logdir), mode="w") as options_file:
             json.dump(vars(args), options_file, sort_keys=True)
 
-
-
     # TODO write summaries using logdir
-
-
 
     # Load embeddings
     if args.embeddings:
@@ -646,7 +645,6 @@ if __name__ == "__main__":
         else:
             dev = None
 
-
         if os.path.exists(data_paths[2]):
             test = morpho_dataset.MorphoDataset(data_paths[2], train=train, shuffle_batches=False,
                                                 bert=model_bert
@@ -656,10 +654,10 @@ if __name__ == "__main__":
 
     print(args.bert_load)
     print("again")
-    #TODO nacitat velikost
+    # TODO nacitat velikost
     args.bert_size = 768
     if args.decay_type != None:
-        args.steps_in_epoch = math.floor(len(train.factors[1].word_strings) / (args.batch_size*args.accu))
+        args.steps_in_epoch = math.floor(len(train.factors[1].word_strings) / (args.batch_size * args.accu))
     network = Network(args=args,
                       num_words=len(train.factors[train.FORMS].words),
                       num_chars=len(train.factors[train.FORMS].alphabet),
@@ -668,7 +666,7 @@ if __name__ == "__main__":
                       model=model_bert)
     if args.debug:
         ...
-        #tf.keras.utils.plot_model(network.outer_model, "my_first_model_with_shape_info.svg", show_shapes=True)
+        # tf.keras.utils.plot_model(network.outer_model, "my_first_model_with_shape_info.svg", show_shapes=True)
 
     if args.fine_lr > 0:
         args.lr_split = len(network.outer_model.trainable_variables) - len(network.model.trainable_variables)
@@ -680,7 +678,7 @@ if __name__ == "__main__":
 
     # TODO nemame predikci !!!
     if args.predict:
-        #network.saver_inference.restore(network.session, "{}/checkpoint-inference".format(args.predict))
+        # network.saver_inference.restore(network.session, "{}/checkpoint-inference".format(args.predict))
         network.outer_model = load_model(args.predict)
         network.predict(predict, sys.stdout, args)
 
@@ -693,13 +691,11 @@ if __name__ == "__main__":
                                                if key not in ["embeddings_data", "embeddings_words"])), flush=True)
 
 
-        def test_eval():
-            metrics = network.evaluate(test, "test", args)
+        def test_eval(predict=None):
+            metrics = network.evaluate(test, "test", args, predict)
             metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
             for f in [sys.stderr, log_file]:
                 print("Test, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f, flush=True)
-
-
 
 
         for i, (epochs, learning_rate) in enumerate(args.epochs):
@@ -720,14 +716,15 @@ if __name__ == "__main__":
                 if args.cont and test:
                     test_eval()
 
-            train.save_mappings("{}/mappings.pickle".format(args.logdir)) #TODO
+            train.save_mappings("{}/mappings.pickle".format(args.logdir))  # TODO
             if args.checkp:
                 checkp = args.checkp
             else:
                 checkp = args.logdir.split("/")[1]
 
         network.outer_model.save_weights('./checkpoints/' + checkp)
-        print(args.logdir.split("/")[1])
+        output_file = args.logdir.split("/")[1]
+        print(output_file)
 
         if test:
-            test_eval()
+            test_eval(predict="output_file" + "_vysledky")
