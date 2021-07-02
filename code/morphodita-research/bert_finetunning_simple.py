@@ -291,7 +291,7 @@ class Network:
 
         return probabilities, tags_mask
 
-    def evaluate(self, dataset, dataset_name, args):
+    def evaluate(self, dataset, dataset_name, args, predict=None):
         for metric in self.metrics.values():
             metric.reset_states()
         while not dataset.epoch_finished():
@@ -311,6 +311,17 @@ class Network:
                 predictions_raw = [np.argmax(p, axis=2) for p in probabilities]
                 self.metrics["LemmasTagsRaw"](
                 np.logical_and(factors[0] == predictions_raw[0], factors[1] == predictions_raw[1]), mask)
+
+            if predict is not None:
+                sentences = 0
+                for i in range(len(sentence_lens)):
+                    overrides = [None] * dataset.FACTORS
+                    for f,factor in enumerate(args.factors):
+                        print(factor)
+                        print(dataset.FACTORS_MAP[factor])
+                        overrides[dataset.FACTORS_MAP[factor]] = predictions_raw[f][i]
+                    dataset.write_sentence(predict, sentences, overrides)
+                    sentences += 1
         metrics = {name: metric.result() for name, metric in self.metrics.items()}
         with self._writer.as_default():
             for name, value in metrics.items():
@@ -495,7 +506,8 @@ if __name__ == "__main__":
             checkp = args.logdir.split("/")[1]
 
         network.model.save_weights('./checkpoints/' + checkp)
-        print(args.logdir.split("/")[1])
+        output_file = args.logdir.split("/")[1]
+        print(output_file)
 
     if test:
-        test_eval()
+        test_eval(predict=open("./" + output_file + "_vysledky", "w"))
