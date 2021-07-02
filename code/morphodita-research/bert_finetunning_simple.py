@@ -107,9 +107,10 @@ class Network:
                     boundaries.append(b)
                     values.append(v)
                 boundaries = np.array(boundaries, dtype=np.int32) * args.steps_in_epoch
-                boudaries = boundaries.tolist()
+                boundaries = boundaries.tolist()
                 print("boundaries")
                 print(boundaries)
+                print(type(boundaries))
                 print(values)
                 values.append(values[-1])
                 learning_rate_fn = tf.keras.optimizers.schedules.PiecewiseConstantDecay(boundaries, values)
@@ -468,12 +469,12 @@ if __name__ == "__main__":
         for epoch in range(epochs):
             print("train epoch {}".format(epoch))
             #chceme vzdy jednu epochu bez berta
-            if i == 0:
-                args.freeze = 1
-                lr = 1e-3
-            else:
-                args.freeze = 0
-                lr = learning_rate
+            #if i == 0:
+            #    args.freeze = 1
+            #    lr = 1e-3
+            #else:
+            #    args.freeze = 0
+            lr = learning_rate
             network.train_epoch(dataset, args, lr)
 
             if dev:

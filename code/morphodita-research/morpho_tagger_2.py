@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 import sys
 import collections
@@ -457,7 +458,10 @@ class Network:
                 sentences = 0
                 for i in range(len(sentence_lens)):
                     overrides = [None] * dataset.FACTORS
-                    for factor in args.factors: overrides[dataset.FACTORS_MAP[factor]] = predictions[factor][i]
+                    for f,factor in enumerate(args.factors): 
+                        print(factor)
+                        print(dataset.FACTORS_MAP[factor])
+                        overrides[dataset.FACTORS_MAP[factor]] = predictions[f][i]
                     dataset.write_sentence(predict, sentences, overrides)
                     sentences += 1
 
@@ -541,6 +545,7 @@ if __name__ == "__main__":
         args.decay_type = None
 
     args.bert_load = None
+    name = None
     if args.bert or args.bert_model:
         if args.bert_model:
             print("před parsovanim")
@@ -565,7 +570,7 @@ if __name__ == "__main__":
                 args.bert = args.bert[0]
             name = args.bert
 
-    if "robeczech" in name:
+    if name is not None and "robeczech" in name:
         sys.path.append(name)
         import tokenizer.robeczech_tokenizer
 
@@ -629,6 +634,7 @@ if __name__ == "__main__":
         # Nechceme to vsechno dohromady
         if args.bert and args.bert_model:
             warnings.warn("embeddings and whole bert model training are both selected.")
+        model_bert=None
         if args.bert or args.bert_model:
             model_bert = BertModel(name, args)
 
@@ -727,4 +733,4 @@ if __name__ == "__main__":
         print(output_file)
 
         if test:
-            test_eval(predict="output_file" + "_vysledky")
+            test_eval(predict=open("./" + output_file + "_vysledky","w"))
