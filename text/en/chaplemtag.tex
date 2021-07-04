@@ -10,16 +10,16 @@ Lemmatization and \acrlong{pos} tagging tasks are often categorized as morpholog
 
 \paragraph{\textbf{Lemmatization}} \mbox{}\\
 \textit{input:} a word \\
-\textit{output:} lemma -- a base form of a given words, meaning for example nominative of singular for nouns or infinitive for verbs. In this work, lemmatization is treated as a classification problem with classes coresponding to generating rules which transform an input word into target lemma. For example of such rules see Figure \ref{fig:lemma_rules}. \\
+\textit{output:} lemma -- a base form of a given words, for example nominative of singular for nouns or infinitive for verbs. In this work, lemmatization is treated as a classification problem with classes coresponding to generating rules which transform an input word into target lemma. For example of such rules see Figure \ref{fig:lemma_rules}. \\ %TODO kolik jich je v datasetu
 
 
-Metric used for evaluation of the model is an accuracy reported separately for several options -- only tags/lemmas, accuracy of joint classification of tags and lemmas, and  also for all variants with an usage of dictionary (this option is described in more detail in \ref{sub:dataset}).
+Metric used for evaluation of the model is an accuracy reported separately for several options -- only tags/lemmas, accuracy of joint classification of tags and lemmas, and  also for all three variants with an usage of a morphological dictionary (this option is described in more detail in \ref{sub:dataset}).
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\textwidth]{../img/lemma_rules}
 \protect\caption{
-Table 1 from \citep{Straka2019b} presents 10 most common lemma generating rules in English EWT corpus. Each rule has two parts -- casing script for transforming uppercase and lowercase letters, and edit script. Edit script can transform prefix, suffix, or also a root of the word.
+Table 1 from \citep{Straka2019b} presents 10 most common lemma generating rules in English EWT corpus. Each rule has two parts -- casing script for transforming uppercase and lowercase letters, and edit script. Edit script can transform prefix, suffix, or also a root of the word. %TODO trochu rozepsat a kde se da docist vice
 }
 \label{fig:lemma_rules}
 \end{figure}
@@ -73,7 +73,7 @@ as described in table \ref{Tab:tagset}.  %TODO a ja pouzivam ty samy?
 \subsection{Dataset and Preprocessing}
 \label{sub:dataset}
 %TODO popisje v straka2019 - dopnit
-Dataset for these tasks is taken from data of Prague Dependency Treebank (PDT) \citep{PDT35}, specifically version 3.5, which is PDT version from year 2018. %Dataset is divided into three parts - train, developement and test.  %TODO jak vypadaji vstupni data - ukazka z tech dat co mam primo!!!
+Dataset for these tasks is taken from data of Prague Dependency Treebank (PDT) \citep{PDT35}, version 3.5 from year 2018. %TODO kolik tamjedat
 Data consists of sentences with lemmas and tags. For ambiguous words, data contain all possible analysis. For example, Czech word "psa" have one possible lemma ("pes") but two possible tags because it could be one of two possible grammatical cases -- genitive or accusative. Input data for such word looks as follows: \\
 \begin{center}
 psa pes NNMS2-----A---- NNMS4-----A----
@@ -83,8 +83,8 @@ Dataset was originally divided into tree parts - train, development and test, wh
 \begin{itemize}
 \item white space deletion
 \item splitting into sentences and words
-\item mapping characters and words into numbers -- mapping  words/characters which were found in train dataset into integers (from one to the number of unique words). This means, that the network has no information about words/characters which appears only in test or development dataset. All newly appeared words/characters are mapped into one same number (typically $0$) for \textit{UNK} token/character.
-\item tokenization -- Tokenizer for corresponding BERT-like model transforms input words into tokens. Each word is transformed into one or more strings, which are converted into numbers. This serves as an input into BERT part of model. To creating these input embeddings, the whole sentence for each word is needed as same words can have different representation in different contexts. More information can be found in\ref{sub:tokens}.
+\item mapping characters and words into numbers -- mapping  words/characters which were found in train dataset into integers (from one to the number of unique words). This means that the network has no information about words/characters which appears only in test or development dataset. All newly appeared words/characters are mapped into one same number (typically $0$) for \textit{UNK} token/character.
+\item tokenization -- Tokenizer for corresponding BERT-like model transforms input words into tokens. Each word is transformed into one or more strings, which are converted into numbers. This serves as an input into BERT part of model. To creating these input embeddings, the whole sentence for each word is needed as same words can have different representation in different contexts. More information can be found in \ref{sub:tokens}.
 \end{itemize}
 
 \subsection{Experiments and Architecture}
@@ -97,15 +97,15 @@ Dataset was originally divided into tree parts - train, development and test, wh
 
 %TODO popisovat vice ty pravidla?
 
-The model for lemmatization and tagging is build upon a model (and a code) for previous work on Czech NLP processing with contextual embeddings \citep{straka2019czech}. Data preprocessing is taken over from the paper as well as the structure of a lemmatizer and a tagger network which is extended by BERT-like models,hoping for improvements. Previous work \citep{Straka2019}, \citep{Straka2018} showed that training tagging and lemmatization together in one network can be mutually advantageous, soboth of these analysis are an output of one network and are trained jointly. Detailed visualisation of network architecture can aslo be found in Figure \ref{pic:lt_arch}. \par
-The architecture of network can be divided into three parts -- inputs, optional \acrshort{rnn}s, classification head.
+The model for lemmatization and tagging is build upon a model (and a code) for previous work on Czech NLP processing with contextual embedding \citep{straka2019czech}. 
+Data preprocessing is taken over from the paper as well as the structure of a lemmatizer and a tagger network which is extended by BERT-like models, hoping for improvements. Previous work \citep{Straka2019} and \citep{Straka2018} showed that training tagging and lemmatization together in one network can be mutually advantageous, so both of these analysis are an output of one network and are trained jointly. Detailed visualisation of network architecture can be found in Figure \ref{pic:lt_arch}. \par The architecture of network can be divided into three parts -- inputs, optional \acrshort{rnn}s, classification head:
 \paragraph{Inputs}
 An input of the network is formed of five types -- characters (charseqs), words (charseq ids), correct responses(word ids), pretrained embeddings and possibly precomputed bert embeddings (depends on the experiment type). Before the further processing of inputs by \acrshort{rnn} cells, there are created two other types of embeddings: character-level embeddings and another word embeddings which are, in contrast to BERT and pretrained embeddings, also trained during training process.
 
 \paragraph{RNN cells}
 Characterlevel embeddings are further processed via \acrfull{gru} and all inputs (or their embeddings) are processed by recurrent part of network (specifically by \acrfull{lstm} cells).
 
-\paragraph{Outputs}
+\paragraph{Classification head(s)}
 After the processing by recurrent neural networks, network employs two separate classification head, one for tagging and another for lemmatization. Both uses dense layer with tanh activation function to presented more non-linearity as used in \citep{2018} and a softmax function for obtaining the probability distribution over target classes. Lemmatization, however, presents one another change -- addition of character level data without RNN processing, which are used together with the rest of weights as an input into softmax following \citep{Straka2018}, because it leads to better performance of lemmatization in the case of shared network between both tasks.
 
 \begin{figure}[ht]
@@ -115,22 +115,27 @@ After the processing by recurrent neural networks, network employs two separate 
 \label{pic:lt_arch}
 \end{figure}
 
-\paragraph{Morphological Dictionary} All classification can be done with or without use of a morphological dictionary MorFlex \citep{11234/1-1834}, which can provide possible pairs (tag, lemma). If so, generated tags and lemmas are chosen just from the dictionary. So it is selected lemma and/or tag with maximal likelihood, but only one from those presented in the dictionary. 
+\paragraph{Morphological Dictionary} All classification can be done with or without use of a morphological dictionary MorFlex \citep{11234/1-1834}, which can provide possible pairs \textit{tag-lemma}. If so, generated tag and lemma is a pair with maximal likelihood, but chosen just from the dictionary. This leads to more consistent results. 
 
 \subsubsection{Experiments}
-%TODO jake modely
+This part uses all main \textbf{experiment types} as decribed in \ref{sec:expe}: \textit{base, ls, embed, fine, simple, full}. Three \textbf{BERT-like models} are used for every experiment setup:
 \begin{itemize}
-\item baseline solution -- reimplementation of \citep{Straka2019czech} without/with label smoothing,
-\item precomputed BERT embeddings are provided as as another static input of the model, 
-\item finetunning of precomputed BERT embeddings -- after perfoming
+\item multilingual BERT (mBERT) \citep{Devlin2019} 
+\item XLM-RoBERTa \citep{Conneau2019}), 
+\item RobeCzech \citep{Straka2021}.
 \end{itemize}
+XLM-RoBERTa and mBERT are trained on 100/104 different languages including Czech and RobeCzech is recently published version of RoBERTa, trained only on Czech data. %TODO nekde v diskuzi zminit i certa
+\textbf{Selection of layers} are made in two ways -- last four layers and learning of weighted sum of all layers. These experiment are made for finetunning setup only and as the weighted sum does not showed a significant benefit, mean of last four layer is the only method used for other experiments. \textbf{Learning rate} is used as usual for each type of task a and three different learning schedules were applied in each combination of hyperparameters: cosine decay \textit{(cos)}, inverted square root decay \textit{(isrd)} and a one epoch warm-up followed by a constant learning rate \textit{(warmup)}. For \textit{embed} experiments, \textit{warmup} is replaced by  a simple division of training into tow parts with different learning rates as in %TODO citace. 
+Batches has size 64, given by the compromise between the pursuit of relatively big batch size and computational resources.
 
-
-
-
+%TODO popsat jak presne to vypada nebo alespon graficky ty learning rates
+%classification head. %TODO popsat jak presne to vypada
 
 \subsection{Results}
+%Jsou vysledky lepsi nez baseline?
+%Co je nejlepší jednotlivě a celkem?
 
+%TODO tady upravit tabulka na nejlepší výsledky z kazde kategorie + baseline + porovnani
 \begin{table}[!h]
   \begin{tabular}{|l||c|c|c||c|c|c|}
   \hline
@@ -146,4 +151,42 @@ After the processing by recurrent neural networks, network employs two separate 
   Straka2019B is the best solution from \citep{Straka2019} paper. Straka2019C is a comparable solution  (BERT embeddings only), which was transformed into TF2 in this work.} 
 \end{table}
 
+
+\begin{table}[]
+\begin{tabular}{lllllllllll}
+\hline
+   & Model       & EXPE  & LRTYPE         & LR                     & LemRaw & LemDict & TagsRaw & TagsDict & LemTagRaw & LemTagDict \\ \hline
+0  & NA          & base  & simple         & 40:1e-3,20:1e-4        & 98,58  & 98,81   & 97,05   & 97,31    & 96,43     & 96,9       \\ \hline
+1  & NA          & ls    & simple         & 40:1e-3,20:1e-4        & 98,55  & 98,81   & 97,12   & 97,34    & 96,51     & 96,94      \\ \hline
+2  & mBERT       & embed & simple         & 40:1e-3,20:1e-4        & 98,69  & 98,93   & 97,83   & 97,98    & 97,17     & 97,58      \\ \hline
+3  & mBERT       & embed & cos            & 60:1e-3                & 98,74  & 98,95   & 97,91   & 98,04    & 97,28     & 97,63      \\ \hline
+4  & mBERT       & embed & isrd           & 60:1e-3                & 98,73  & 98,94   & 97,89   & 98,02    & 97,28     & 97,61      \\ \hline
+5  & xlm-Roberta & embed & simple         & 40:1e-3,20:1e-4        & 98,57  & 98,8    & 97,33   & 97,54    & 96,68     & 97,12      \\ \hline
+6  & xlm-Roberta & embed & cos            & 60:1e-3                & 98,6   & 98,83   & 97,45   & 97,62    & 96,81     & 97,21      \\ \hline
+7  & xlm-Roberta & embed & isrd           & 60:1e-3                & 98,59  & 98,83   & 97,44   & 97,61    & 96,81     & 97,2       \\ \hline
+8  & RoBECzech   & embed & simple         & 40:1e-3,20:1e-4        & 98,77  & 98,97   & 98,38   & 98,48    & 97,78     & 98,08      \\ \hline
+9  & RoBECzech   & embed & cos            & 60:1e-3                & 98,79  & 98,99   & 98,38   & 98,48    & 97,8      & 98,1       \\ \hline
+10 & RoBECzech   & embed & isrd           & 60:1e-3                & 98,78  & 98,98   & 98,4    & 98,48    & 97,8      & 98,09      \\ \hline
+11 & mBERT       & fine  & simple         & 40:1e-3,20:1e-4,2:2e-5 & 98,69  & 98,93   & 97,84   & 97,99    & 97,21     & 97,59      \\ \hline
+12 & fine        & cos   & 60:1e-3,5:3e-5 &                        & 98,72  & 98,95   & 97,97   & 98,08    & 97,33     & 97,68      \\ \hline
+13 & fine        & isrd  & 60:1e-3,5:3e-5 &                        & 98,68  & 98,9    & 97,72   & 97,86    & 97,09     & 97,46      \\ \hline
+14 & xlm-Roberta & fine  & simple         & 40:1e-3,20:1e-4,2:2e-5 & 98,62  & 98,84   & 97,72   & 97,9     & 97,07     & 97,48      \\ \hline
+15 & fine        & cos   & 60:1e-3,5:3e-5 &                        & 98,67  & 98,9    & 97,95   & 98,09    & 97,32     & 97,69      \\ \hline
+16 & fine        & isrd  & 60:1e-3,5:3e-5 &                        & 98,63  & 98,85   & 97,66   & 97,83    & 97,03     & 97,41      \\ \hline
+17 & RoBECzech   & fine  & simple         & 40:1e-3,20:1e-4,2:2e-5 & 98,78  & 98,98   & 98,46   & 98,55    & 97,86     & 98,16      \\ \hline
+18 & fine        & cos   & 60:1e-3,5:3e-5 &                        & 98,8   & 99      & 98,5    & 98,57    & 97,9      & 98,19      \\ \hline
+19 & fine        & isrd  & 60:1e-3,5:3e-5 &                        & 98,76  & 98,95   & 98,33   & 98,41    & 97,72     & 98,02      \\ \hline
+20 & mBERT       & fine  & simple         & 40:1e-3,20:1e-4,2:2e-5 & 98,67  & 98,91   & 97,76   & 97,92    & 97,13     & 97,52      \\ \hline
+21 & fine        & cos   & 60:1e-3,5:3e-5 &                        & 98,72  & 98,95   & 97,98   & 98,1     & 97,34     & 97,69      \\ \hline
+22 & fine        & isrd  & 60:1e-3,5:3e-5 &                        & 98,67  & 98,91   & 97,69   & 97,85    & 97,05     & 97,45      \\ \hline
+23 & xlm-Roberta & fine  & simple         & 40:1e-3,20:1e-4,2:2e-5 & 98,6   & 98,81   & 97,62   & 97,77    & 96,96     & 97,35      \\ \hline
+24 & fine        & cos   & 60:1e-3,5:3e-5 &                        & 98,67  & 98,89   & 97,91   & 98,06    & 97,29     & 97,66      \\ \hline
+25 & fine        & isrd  & 60:1e-3,5:3e-5 &                        & 98,65  & 98,86   & 97,65   & 97,81    & 97,03     & 97,41      \\ \hline
+26 & RoBECzech   & fine  & simple         & 40:1e-3,20:1e-4,2:2e-5 & 98,77  & 98,97   & 98,38   & 98,47    & 97,79     & 98,08      \\ \hline
+27 & fine        & cos   & 60:1e-3,5:3e-5 &                        & 98,8   & 98,99   & 98,47   & 98,54    & 97,88     & 98,16      \\ \hline
+28 & fine        & isrd  & 60:1e-3,5:3e-5 &                        & 98,77  & 98,96   & 98,33   & 98,41    & 97,72     & 98,01      \\ \hline
+\end{tabular}
+\label{tab:all_res_tl}
+\caption{This table presents complete results for tagging and lemmatizationt tasks. }
+\end{table}
 
