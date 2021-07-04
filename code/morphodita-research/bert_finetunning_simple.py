@@ -469,8 +469,8 @@ if __name__ == "__main__":
                                            if key not in ["embeddings_data", "embeddings_words"])), flush=True)
 
 
-    def test_eval():
-        metrics = network.evaluate(test, "test", args)
+    def test_eval(predict=None):
+        metrics = network.evaluate(test, "test", args, predict)
         metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
         for f in [sys.stderr, log_file]:
             print("Test, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f, flush=True)
