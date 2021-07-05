@@ -1,18 +1,12 @@
 \section{Sentiment Analysis}
 \label{chap:sent}
 \subsection{Task definition}
-\begin{itemize}
-\item POS tagging \\
-\textit{input}: a word \\
-\textit{output}: part-of-speech tags -- as noun, pronoun, punctuation mark etc.
-\item lemmatization \\
-\textit{input:} a word \\
-\textit{output:} lemma -- a base form of a given words, meaning for example nominative of singular for nouns or infinitive for verbs. 
-\item sentiment analysis \\
-\textit{input:} a sentence or a sequence of sentences \\
+\paragraph{Sentiment analysis} \mbox{}\\
+\textit{input:} sequence of sentences (a whole post or comment, depending on the source) \\
 \textit{output:} prevailing sentiment of the input from categories: neutral, positive, negative.
-\todo{doplnit diskuzi o ruzných možnostech definice}
-\end{itemize}.
+
+%TODO {doplnit diskuzi o ruzných možnostech definice}
+
 As stated in \citep{Veselovska}: "Sentiment analysis, also known as opinion mining, is an automatic detection of a positive or negative polarity, or neutrality of ... a text sequence", which is exactly as the sentiment analysis is understood in this work, although there are some other definitions consisting of e.g. opinion extraction, irony or stance \citep{Montoyo2012}. Another tasks related to sentiment analysis is a subjectivity analysis (whether the presented opinion is objective or highly subjective), which is also not included in this work, mainly because the lack of labelled data for Czech. It is possible to analyze individual expressions, sentences or whole documents \citep{Veselovska} and this work focuses on the document level classification.
 %TODO zjistit jaka jsou na to porovnavaci data This work primary tries to improve existing tasks and show the ability of contextualized embeddings to improve results, so tasks with existing data and results were selected.  %TODO why?
 \subsection{Dataset and Preprocessing}

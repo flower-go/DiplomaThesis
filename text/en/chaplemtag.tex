@@ -13,13 +13,16 @@ Lemmatization and \acrlong{pos} tagging tasks are often categorized as morpholog
 \textit{output:} lemma -- a base form of a given words, for example nominative of singular for nouns or infinitive for verbs. In this work, lemmatization is treated as a classification problem with classes coresponding to generating rules which transform an input word into target lemma. For example of such rules see Figure \ref{fig:lemma_rules}. \\ %TODO kolik jich je v datasetu
 
 
+%the longest common substring between the form and the lemma, and then compute the shortest edit script converting the prefix and suffix of the form into the prefix and suffix of the lemma using the Wagner–Fischer algorithm (Wagner and Fis- cher, 1974). Upon predicting a lemma edit script, we apply the edit operations to the word form to produce the final lemma. z kondraytuk
+
+
 Metric used for evaluation of the model is an accuracy reported separately for several options -- only tags/lemmas, accuracy of joint classification of tags and lemmas, and  also for all three variants with an usage of a morphological dictionary (this option is described in more detail in \ref{sub:dataset}).
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\textwidth]{../img/lemma_rules}
 \protect\caption{
-Table 1 from \citep{Straka2019b} presents 10 most common lemma generating rules in English EWT corpus. Each rule has two parts -- casing script for transforming uppercase and lowercase letters, and edit script. Edit script can transform prefix, suffix, or also a root of the word. %TODO trochu rozepsat a kde se da docist vice
+Table 1 from \citep{Straka2019b} presents 10 most common lemma generating rules in English EWT corpus. Each rule has two parts -- casing script for transforming uppercase and lowercase letters, and edit script. Edit script can transform prefix, suffix, or also a root of the word. It uses the Wagner–Fischer algorithm \citep{Wagner}, which finds the longest commont substring between the word and its lemma. Resulting rule is the shortest edit script converting the word into the lemma. More information can be found in \citep{Straka2019b}.
 }
 \label{fig:lemma_rules}
 \end{figure}
@@ -55,24 +58,30 @@ and in description of words uses 15-places morphological tags as described in th
 \end{table}
 
 \subsection{Related Work}
-This work aims to improve previously published SOTA results for contextualized embeddings in czech lemmatization and tagging \citep{Straka2019}. 
+This work aims to improve previously published SOTA results for contextualized embeddings in Czech lemmatization and tagging \citep{straka2019czech} and \citep{Straka2021}.
 
-as described in table \ref{Tab:tagset}.  %TODO a ja pouzivam ty samy? 
+POS tagging (for English) is dated back to 1971 with first rule-based approach on Brown Corpus \citep{greene1971automatic}, with good results after year 2000 using both classical machine learning methods like Hidden Markov Models \citep{tnt} or Support Vector Machines \citep{svmtool}, and perceptrons/neural networks  \citep{collins-2002-discriminative}. Actual \acrlong{sota} known to me is presented in Flair model \citep{Akbik2018}\footnote{More detailed overvirew can be found here: https://aclweb.org/aclwiki/}. It is necessary to note, that first papers had \acrshort{pos} tagging defined differently than it is in this work. They focused only on selecting part fo speech (noun, verb etc...), meanwhile later works (including this work) presents  complex morphological analysis. %TODO zo je zo slovo?  
+One of first automatical tagging experiments in Czech is described in \citep{Hladka}, which also offers an analysis of differences between languages with rich inflexion (as Czech) and ones with more simple morphology (for example English). Languages with complicated morphology has incomparably   Current \acrshort{sota} result is presented in \citep{Straka2021}, which uses Czech version of RoBERTa model -- RobeCzech. This is the model also used for some experiments in this work and, as expectated,  yields the best results. RobeCzech is based upon previous successful morphological analysis with contextual embeddings and BERT-like models \citep{Straka2019b}, \citep{Straka2019a}, \citep{Straka2019}, \citep{Straka2018} (all lastly mentioned models also achieved great results in lemmatization). %TODO zmnit morce, morphodita a udpipe
+Lemmatization has undergone a similar development as tagging, starting with rule-based approaches and statistical approaches \citep{Plisson}, continuing with neural networks and recently achieving good results with BERT-like models \citep{Kondratyuk2019}.
+
+%TODO ale nemely by tam ty faze byt vsechny? a trochu to rozvest?
 
 
-%\citep{Horsmann}
-%\citep{Plank}
-%\citep{Plisson}
-%\citep{Straka2019b}
-%\citep{Straka2019a}
-%\citep{Toutanova2003}
-%\citep{Wang2015}
-%\citep{Huang2015}
-%\citep{Collobert2011} ... preprocessing
+%\citep{Kondratyuk2019} - contextual embeddings a finetunnig jako já, na 75 jazycích, používá spoustu regularizace, multilingual bert model in base size same as this work,  navazuje na udpipe, má výsledky na PDT!
+%\citep{Straka2021} - sentiment,tagging i lemmatizace, t al jen embeddings a sentiment finetunning, jinakjdehlavne ocisla,je to aktualni sota,tak pouzit
+
+
+%\citep{Horsmann} - are lstms good for pos tagging?
+%\citep{Plank} - postagging with bilingual
+%\citep{Toutanova2003} - tagging obousmerny, zmineno v kodraytuk, robeczech, straka i base berticlanky
+%\citep{Wang2015} - tagging with bidirectional lstm
+%\citep{Huang2015} - bilstm for tagging
+%\citep{Collobert2011} ... preprocessing, tagging baseline
 
 \subsection{Dataset and Preprocessing}
 \label{sub:dataset}
 %TODO popisje v straka2019 - dopnit
+%TODO kolik je tam lemmat, tagů, celkem vet, pripadne tokenů - je v certovi1568
 Dataset for these tasks is taken from data of Prague Dependency Treebank (PDT) \citep{PDT35}, version 3.5 from year 2018. %TODO kolik tamjedat
 Data consists of sentences with lemmas and tags. For ambiguous words, data contain all possible analysis. For example, Czech word "psa" have one possible lemma ("pes") but two possible tags because it could be one of two possible grammatical cases -- genitive or accusative. Input data for such word looks as follows: \\
 \begin{center}
@@ -88,6 +97,8 @@ Dataset was originally divided into tree parts - train, development and test, wh
 \end{itemize}
 
 \subsection{Experiments and Architecture}
+
+%zminit udpipe a zminit kolik je tech lstm a tak,vsechny dimenze (do tabulky)
 
 %For POS tagging, we applied a straightforward model in the lines of Ling et al. (2015) – first rep- resenting each word with its embedding, contextu- alizing them with bidirectional RNNs (Graves and Schmidhuber, 2005), and finally using a softmax classifier to predict the tags. z UDpipe2
 
@@ -108,6 +119,8 @@ Characterlevel embeddings are further processed via \acrfull{gru} and all inputs
 \paragraph{Classification head(s)}
 After the processing by recurrent neural networks, network employs two separate classification head, one for tagging and another for lemmatization. Both uses dense layer with tanh activation function to presented more non-linearity as used in \citep{2018} and a softmax function for obtaining the probability distribution over target classes. Lemmatization, however, presents one another change -- addition of character level data without RNN processing, which are used together with the rest of weights as an input into softmax following \citep{Straka2018}, because it leads to better performance of lemmatization in the case of shared network between both tasks.
 
+%TODO kondraytuk bere predikci k prvnímu subwordu, jak to delam ja? 
+
 \begin{figure}[ht]
 \centering
 \includegraphics[width=1\columnwidth]{../img/taggermodel.pdf}
@@ -117,6 +130,8 @@ After the processing by recurrent neural networks, network employs two separate 
 
 \paragraph{Morphological Dictionary} All classification can be done with or without use of a morphological dictionary MorFlex \citep{11234/1-1834}, which can provide possible pairs \textit{tag-lemma}. If so, generated tag and lemma is a pair with maximal likelihood, but chosen just from the dictionary. This leads to more consistent results. 
 
+
+%TODO nekde mam taky dropouts! zminit
 \subsubsection{Experiments}
 This part uses all main \textbf{experiment types} as decribed in \ref{sec:expe}: \textit{base, ls, embed, fine, simple, full}. Three \textbf{BERT-like models} are used for every experiment setup:
 \begin{itemize}
@@ -124,24 +139,25 @@ This part uses all main \textbf{experiment types} as decribed in \ref{sec:expe}:
 \item XLM-RoBERTa \citep{Conneau2019}), 
 \item RobeCzech \citep{Straka2021}.
 \end{itemize}
-XLM-RoBERTa and mBERT are trained on 100/104 different languages including Czech and RobeCzech is recently published version of RoBERTa, trained only on Czech data. %TODO nekde v diskuzi zminit i certa
-\textbf{Selection of layers} are made in two ways -- last four layers and learning of weighted sum of all layers. These experiment are made for finetunning setup only and as the weighted sum does not showed a significant benefit, mean of last four layer is the only method used for other experiments. \textbf{Learning rate} is used as usual for each type of task a and three different learning schedules were applied in each combination of hyperparameters: cosine decay \textit{(cos)}, inverted square root decay \textit{(isrd)} and a one epoch warm-up followed by a constant learning rate \textit{(warmup)}. For \textit{embed} experiments, \textit{warmup} is replaced by  a simple division of training into tow parts with different learning rates as in %TODO citace. 
-Batches has size 64, given by the compromise between the pursuit of relatively big batch size and computational resources.
-
+XLM-RoBERTa and mBERT are trained on 100/104 different languages including Czech and RobeCzech is recently published version of RoBERTa, trained only on Czech data. %TODO nekde v diskuzi zminit i certa,aleje horší
+\textbf{Selection of layers} are made in two ways -- last four layers and learning of weighted sum of all layers. These experiment are made for finetunning setup only and as the weighted sum does not showed a significant benefit, mean of last four layer is the only method used for other experiments. %TODO je to z kondraytuk a jmenuje se to attention!
+ \textbf{Learning rate} is used as usual for each type of task a and three different learning schedules were applied in each combination of hyperparameters: cosine decay \textit{(cos)}, inverted square root decay \textit{(isrd)} and a one epoch warm-up followed by a constant learning rate \textit{(warmup)}. For \textit{embed} experiments, \textit{warmup} is replaced by  a simple division of training into tow parts with different learning rates as in %TODO citace. 
+Batches has size 64, given by the compromise between the pursuit of relatively big batch size and computational resources. %TODO learning rate ulmfit (warmup) a kondraytuk(inverse) 
 %TODO popsat jak presne to vypada nebo alespon graficky ty learning rates
 %classification head. %TODO popsat jak presne to vypada
 
 \subsection{Results}
 %Jsou vysledky lepsi nez baseline?
 %Co je nejlepší jednotlivě a celkem?
+%kompletní tabulka a tabulka best z kategorií + baseline
 
-%TODO tady upravit tabulka na nejlepší výsledky z kazde kategorie + baseline + porovnani
+%TODO tady upravit tabulka na nejlepší výsledky z kazde kategorie + baseline + porovnani co tam je + robeczech a o kolik procent je to lepší
 \begin{table}[!h]
   \begin{tabular}{|l||c|c|c||c|c|c|}
   \hline
 \multirow{2}{*}{Experiment} & \multicolumn{3}{c||}{Without Dictionary}  &
       \multicolumn{3}{c|}{With Dictionary} \\ 
-    & Tags & Lemmas & Both & Tags & Lemmas & Both \\ \hline
+    & Tags & Lemmas & Both & Tags & Lemmas & Both \\ \hline \hline
     StrakaB & 97.94\% & 98.75\% & 97.31\% & 98.05\% & 98.98\% & 97.65\% \\ \hline
     emb (lr 0.0001) &  97.80\% & 98.70\% & 97.17\% & 97.95\% & 98.93\% & 97.55\% \\ \hline
     baseline & 97.04 \% & 98.56 \% & 96.41\% &  97.31  \% & 98.83 \% & 96.90\% \\ \hline 
@@ -152,41 +168,64 @@ Batches has size 64, given by the compromise between the pursuit of relatively b
 \end{table}
 
 
-\begin{table}[]
-\begin{tabular}{lllllllllll}
+\begin{table}
+\resizebox{\columnwidth}{!}{% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+\begin{tabular}{|l|l|l|l||llllll|}
 \hline
-   & Model       & EXPE  & LRTYPE         & LR                     & LemRaw & LemDict & TagsRaw & TagsDict & LemTagRaw & LemTagDict \\ \hline
-0  & NA          & base  & simple         & 40:1e-3,20:1e-4        & 98,58  & 98,81   & 97,05   & 97,31    & 96,43     & 96,9       \\ \hline
-1  & NA          & ls    & simple         & 40:1e-3,20:1e-4        & 98,55  & 98,81   & 97,12   & 97,34    & 96,51     & 96,94      \\ \hline
-2  & mBERT       & embed & simple         & 40:1e-3,20:1e-4        & 98,69  & 98,93   & 97,83   & 97,98    & 97,17     & 97,58      \\ \hline
-3  & mBERT       & embed & cos            & 60:1e-3                & 98,74  & 98,95   & 97,91   & 98,04    & 97,28     & 97,63      \\ \hline
-4  & mBERT       & embed & isrd           & 60:1e-3                & 98,73  & 98,94   & 97,89   & 98,02    & 97,28     & 97,61      \\ \hline
-5  & xlm-Roberta & embed & simple         & 40:1e-3,20:1e-4        & 98,57  & 98,8    & 97,33   & 97,54    & 96,68     & 97,12      \\ \hline
-6  & xlm-Roberta & embed & cos            & 60:1e-3                & 98,6   & 98,83   & 97,45   & 97,62    & 96,81     & 97,21      \\ \hline
-7  & xlm-Roberta & embed & isrd           & 60:1e-3                & 98,59  & 98,83   & 97,44   & 97,61    & 96,81     & 97,2       \\ \hline
-8  & RoBECzech   & embed & simple         & 40:1e-3,20:1e-4        & 98,77  & 98,97   & 98,38   & 98,48    & 97,78     & 98,08      \\ \hline
-9  & RoBECzech   & embed & cos            & 60:1e-3                & 98,79  & 98,99   & 98,38   & 98,48    & 97,8      & 98,1       \\ \hline
-10 & RoBECzech   & embed & isrd           & 60:1e-3                & 98,78  & 98,98   & 98,4    & 98,48    & 97,8      & 98,09      \\ \hline
-11 & mBERT       & fine  & simple         & 40:1e-3,20:1e-4,2:2e-5 & 98,69  & 98,93   & 97,84   & 97,99    & 97,21     & 97,59      \\ \hline
-12 & fine        & cos   & 60:1e-3,5:3e-5 &                        & 98,72  & 98,95   & 97,97   & 98,08    & 97,33     & 97,68      \\ \hline
-13 & fine        & isrd  & 60:1e-3,5:3e-5 &                        & 98,68  & 98,9    & 97,72   & 97,86    & 97,09     & 97,46      \\ \hline
-14 & xlm-Roberta & fine  & simple         & 40:1e-3,20:1e-4,2:2e-5 & 98,62  & 98,84   & 97,72   & 97,9     & 97,07     & 97,48      \\ \hline
-15 & fine        & cos   & 60:1e-3,5:3e-5 &                        & 98,67  & 98,9    & 97,95   & 98,09    & 97,32     & 97,69      \\ \hline
-16 & fine        & isrd  & 60:1e-3,5:3e-5 &                        & 98,63  & 98,85   & 97,66   & 97,83    & 97,03     & 97,41      \\ \hline
-17 & RoBECzech   & fine  & simple         & 40:1e-3,20:1e-4,2:2e-5 & 98,78  & 98,98   & 98,46   & 98,55    & 97,86     & 98,16      \\ \hline
-18 & fine        & cos   & 60:1e-3,5:3e-5 &                        & 98,8   & 99      & 98,5    & 98,57    & 97,9      & 98,19      \\ \hline
-19 & fine        & isrd  & 60:1e-3,5:3e-5 &                        & 98,76  & 98,95   & 98,33   & 98,41    & 97,72     & 98,02      \\ \hline
-20 & mBERT       & fine  & simple         & 40:1e-3,20:1e-4,2:2e-5 & 98,67  & 98,91   & 97,76   & 97,92    & 97,13     & 97,52      \\ \hline
-21 & fine        & cos   & 60:1e-3,5:3e-5 &                        & 98,72  & 98,95   & 97,98   & 98,1     & 97,34     & 97,69      \\ \hline
-22 & fine        & isrd  & 60:1e-3,5:3e-5 &                        & 98,67  & 98,91   & 97,69   & 97,85    & 97,05     & 97,45      \\ \hline
-23 & xlm-Roberta & fine  & simple         & 40:1e-3,20:1e-4,2:2e-5 & 98,6   & 98,81   & 97,62   & 97,77    & 96,96     & 97,35      \\ \hline
-24 & fine        & cos   & 60:1e-3,5:3e-5 &                        & 98,67  & 98,89   & 97,91   & 98,06    & 97,29     & 97,66      \\ \hline
-25 & fine        & isrd  & 60:1e-3,5:3e-5 &                        & 98,65  & 98,86   & 97,65   & 97,81    & 97,03     & 97,41      \\ \hline
-26 & RoBECzech   & fine  & simple         & 40:1e-3,20:1e-4,2:2e-5 & 98,77  & 98,97   & 98,38   & 98,47    & 97,79     & 98,08      \\ \hline
-27 & fine        & cos   & 60:1e-3,5:3e-5 &                        & 98,8   & 98,99   & 98,47   & 98,54    & 97,88     & 98,16      \\ \hline
-28 & fine        & isrd  & 60:1e-3,5:3e-5 &                        & 98,77  & 98,96   & 98,33   & 98,41    & 97,72     & 98,01      \\ \hline
+\multicolumn{2}{|c|}{Model}                      & EXPE                    & LRTYPE & LemR & LemD & TagsR & TagsD & JointR & JointD \\ \hline \hline
+0  & None                           & base                    & simple & 98,58  & 98,81   & 97,05   & 97,31    & 96,43     & 96,9       \\ \hline
+1  & None                           & ls                      & simple & 98,55  & 98,81   & 97,12   & 97,34    & 96,51     & 96,94      \\ \hline
+2  & \multirow{3}{*}{mBERT} & \multirow{9}{*}{embed} & simple & 98,69 & 98,93 & 97,83 & 97,98 & 97,17 & 97,58 \\ \cline{1-1} \cline{4-10} 
+3  &                              &                         & cos    & 98,74  & 98,95   & 97,91   & 98,04    & 97,28     & 97,63      \\ \cline{1-1} \cline{4-10} 
+4  &                              &                         & isrd   & 98,73  & 98,94   & 97,89   & 98,02    & 97,28     & 97,61      \\ \cline{1-2} \cline{4-10} 
+5  & \multirow{3}{*}{xlm-Roberta} &                         & simple & 98,57  & 98,8    & 97,33   & 97,54    & 96,68     & 97,12      \\ \cline{1-1} \cline{4-10} 
+6  &                              &                         & cos    & 98,6   & 98,83   & 97,45   & 97,62    & 96,81     & 97,21      \\ \cline{1-1} \cline{4-10} 
+7  &                              &                         & isrd   & 98,59  & 98,83   & 97,44   & 97,61    & 96,81     & 97,2       \\ \cline{1-2} \cline{4-10} 
+8  & \multirow{3}{*}{RoBECzech}   &                         & simple & 98,77  & 98,97   & 98,38   & 98,48    & 97,78     & 98,08      \\ \cline{1-1} \cline{4-10} 
+9  &                              &                         & cos    & 98,79  & 98,99   & 98,38   & 98,48    & 97,8      & 98,1       \\ \cline{1-1} \cline{4-10} 
+10 &                              &                         & isrd   & 98,78  & 98,98   & 98,4    & 98,48    & 97,8      & 98,09      \\ \hline
+11 & \multirow{3}{*}{mBERT} & \multirow{18}{*}{fine} & simple & 98,69 & 98,93 & 97,84 & 97,99 & 97,21 & 97,59 \\ \cline{1-1} \cline{4-10} 
+12 &                              &                         & cos    & 98,72  & 98,95   & 97,97   & 98,08    & 97,33     & 97,68      \\ \cline{1-1} \cline{4-10} 
+13 &                              &                         & isrd   & 98,68  & 98,9    & 97,72   & 97,86    & 97,09     & 97,46      \\ \cline{1-2} \cline{4-10} 
+14 & \multirow{3}{*}{xlm-Roberta} &                         & simple & 98,62  & 98,84   & 97,72   & 97,9     & 97,07     & 97,48      \\ \cline{1-1} \cline{4-10} 
+15 &                              &                         & cos    & 98,67  & 98,9    & 97,95   & 98,09    & 97,32     & 97,69      \\ \cline{1-1} \cline{4-10} 
+16 &                              &                         & isrd   & 98,63  & 98,85   & 97,66   & 97,83    & 97,03     & 97,41      \\ \cline{1-2} \cline{4-10} 
+17 & \multirow{3}{*}{RoBECzech}   &                         & simple & 98,78  & 98,98   & 98,46   & 98,55    & 97,86     & 98,16      \\ \cline{1-1} \cline{4-10} 
+18 &                              &                         & cos    & 98,8   & 99      & 98,5    & 98,57    & 97,9      & 98,19      \\ \cline{1-1} \cline{4-10} 
+19 &                              &                         & isrd   & 98,76  & 98,95   & 98,33   & 98,41    & 97,72     & 98,02      \\ \cline{1-2} \cline{4-10} 
+20 & \multirow{3}{*}{mBERT}       &                         & simple & 98,67  & 98,91   & 97,76   & 97,92    & 97,13     & 97,52      \\ \cline{1-1} \cline{4-10} 
+21 &                              &                         & cos    & 98,72  & 98,95   & 97,98   & 98,1     & 97,34     & 97,69      \\ \cline{1-1} \cline{4-10} 
+22 &                              &                         & isrd   & 98,67  & 98,91   & 97,69   & 97,85    & 97,05     & 97,45      \\ \cline{1-2} \cline{4-10} 
+23 & \multirow{3}{*}{xlm-Roberta} &                         & simple & 98,6   & 98,81   & 97,62   & 97,77    & 96,96     & 97,35      \\ \cline{1-1} \cline{4-10} 
+24 &                              &                         & cos    & 98,67  & 98,89   & 97,91   & 98,06    & 97,29     & 97,66      \\ \cline{1-1} \cline{4-10} 
+25 &                              &                         & isrd   & 98,65  & 98,86   & 97,65   & 97,81    & 97,03     & 97,41      \\ \cline{1-2} \cline{4-10} 
+26 & \multirow{3}{*}{RoBECzech}   &                         & simple & 98,77  & 98,97   & 98,38   & 98,47    & 97,79     & 98,08      \\ \cline{1-1} \cline{4-10} 
+27 &                              &                         & cos    & 98,8   & 98,99   & 98,47   & 98,54    & 97,88     & 98,16      \\ \cline{1-1} \cline{4-10} 
+28 &                              &                         & isrd   & 98,77  & 98,96   & 98,33   & 98,41    & 97,72     & 98,01      \\ \hline
+29 & \multirow{3}{*}{mBERT}       & \multirow{9}{*}{simple} & warmup &        &         &         &          &           &            \\ \cline{1-1} \cline{4-10} 
+30 &                              &                         & cos    &        &         &         &          &           &            \\ \cline{1-1} \cline{4-10} 
+31 &                              &                         & isrd   &        &         &         &          &           &            \\ \cline{1-2} \cline{4-10} 
+32 & \multirow{3}{*}{xlm-Roberta} &                         & warmup &        &         &         &          &           &            \\ \cline{1-1} \cline{4-10} 
+33 &                              &                         & cos    &        &         &         &          &           &            \\ \cline{1-1} \cline{4-10} 
+34 &                              &                         & isrd   &        &         &         &          &           &            \\ \cline{1-2} \cline{4-10} 
+35 & \multirow{3}{*}{RoBECzech}   &                         & warmup &        &         &         &          &           &            \\ \cline{1-1} \cline{4-10} 
+36 &                              &                         & cos    &        &         &         &          &           &            \\ \cline{1-1} \cline{4-10} 
+37 &                              &                         & isrd   &        &         &         &          &           &            \\ \hline
+38 & \multirow{3}{*}{mBERT}       & \multirow{9}{*}{full}   & warmup &        &         &         &          &           &            \\ \cline{1-1} \cline{4-10} 
+39 &                              &                         & cos    &        &         &         &          &           &            \\ \cline{1-1} \cline{4-10} 
+40 &                              &                         & isrd   &        &         &         &          &           &            \\ \cline{1-2} \cline{4-10} 
+41 & \multirow{3}{*}{xlm-Roberta} &                         & warmup &        &         &         &          &           &            \\ \cline{1-1} \cline{4-10} 
+42 &                              &                         & cos    &        &         &         &          &           &            \\ \cline{1-1} \cline{4-10} 
+43 &                              &                         & isrd   &        &         &         &          &           &            \\ \cline{1-2} \cline{4-10} 
+44 & \multirow{3}{*}{RoBECzech}   &                         & warmup &        &         &         &          &           &            \\ \cline{1-1} \cline{4-10} 
+45 &                              &                         & cos    &        &         &         &          &           &            \\ \cline{1-1} \cline{4-10} 
+46 &                              &                         & isrd   &        &         &         &          &           &            \\ \hline
 \end{tabular}
+}
 \label{tab:all_res_tl}
-\caption{This table presents complete results for tagging and lemmatizationt tasks. }
+\caption{This table presents complete results for tagging and lemmatizationt tasks.  Complete hyperparameters for each experiment are in separate table in Appendix %TODO dodelat tabulku a pridat odkaz.
+}
 \end{table}
 
+%TODO mozna dat hyperparametry zvlast do tabulky - urcite ty stejne nejak zkratit. Dám vedle learning rates
