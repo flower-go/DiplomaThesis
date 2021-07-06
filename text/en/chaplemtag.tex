@@ -16,7 +16,7 @@ Lemmatization and \acrlong{pos} tagging tasks are often categorized as morpholog
 %the longest common substring between the form and the lemma, and then compute the shortest edit script converting the prefix and suffix of the form into the prefix and suffix of the lemma using the Wagner–Fischer algorithm (Wagner and Fis- cher, 1974). Upon predicting a lemma edit script, we apply the edit operations to the word form to produce the final lemma. z kondraytuk
 
 
-Metric used for evaluation of the model is an accuracy reported separately for several options -- only tags/lemmas, accuracy of joint classification of tags and lemmas, and  also for all three variants with an usage of a morphological dictionary (this option is described in more detail in \ref{sub:dataset}).
+\paragraph{Metric} used for evaluation of the model is an accuracy reported separately for several options -- only tags/lemmas, accuracy of joint classification of tags and lemmas, and  also for all three variants with an usage of a morphological dictionary (this option is described in more detail in \ref{sub:dataset}).
 
 \begin{figure}[H]
 \centering
@@ -121,7 +121,7 @@ After the processing by recurrent neural networks, network employs two separate 
 
 %TODO kondraytuk bere predikci k prvnímu subwordu, jak to delam ja? 
 
-\begin{figure}[ht]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=1\columnwidth]{../img/taggermodel.pdf}
 \protect\caption{popis? }
@@ -147,6 +147,7 @@ Batches has size 64, given by the compromise between the pursuit of relatively b
 %classification head. %TODO popsat jak presne to vypada
 
 \subsection{Results}
+%TODO jaka je baseline
 %Jsou vysledky lepsi nez baseline?
 %Co je nejlepší jednotlivě a celkem?
 %kompletní tabulka a tabulka best z kategorií + baseline
