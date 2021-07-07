@@ -456,12 +456,13 @@ class Network:
 
             if predict is not None:
                 sentences = 0
+                print("delka vet")
+                print(len(sentence_lens))
                 for i in range(len(sentence_lens)):
                     overrides = [None] * dataset.FACTORS
-                    for f,factor in enumerate(args.factors): 
-                        print(factor)
-                        print(dataset.FACTORS_MAP[factor])
+                    for f,factor in enumerate(args.factors):
                         overrides[dataset.FACTORS_MAP[factor]] = predictions[f][i]
+                        print(overrides.shape)
                     dataset.write_sentence(predict, sentences, overrides)
                     sentences += 1
 
