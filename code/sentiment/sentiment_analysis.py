@@ -399,11 +399,19 @@ if __name__ == "__main__":
             size = len(imdb_ex)
             data_result.train._data["tokens"] = imdb_ex
             data_result.train._data["labels"]= imdb_lab + 1
-            mask = data_result.test._data["labels"] != 0
+            test_labels_new = []
+            test_data_new = []
+            for i in range(len(data_result.test._data["labels"])):
+                if data_result.test._data["labels"] != 0:
+                    test_data_new.append(data_result.test._data["tokens"][i])
+                    test_labels_new.append(data_result.test._data["labels"][i])
+
+            data_result.test._data["tokens"] = test_data_new
+            data_result.test._data["labels"] = test_labels_new
+
             #print(type(data_result.test._data["labels"]))
-            
 
-
+            data_result.test._size = len(test_data_new)
             data_result.train._size = len(imdb_ex)
 
 

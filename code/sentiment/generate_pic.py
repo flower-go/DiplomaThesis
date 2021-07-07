@@ -10,7 +10,7 @@ import os
 import re
 
 import numpy as np
-import tensorflow as tf
+#import tensorflow as tf
 import transformers
 from keras import backend as b
 from sklearn.model_selection import train_test_split
@@ -18,18 +18,7 @@ from sklearn.model_selection import train_test_split
 from text_classification_dataset import TextClassificationDataset
 import tensorflow_datasets as tfds
 import pandas as pd
-
-
-# In[2]:
-
-
 import matplotlib.pyplot as plt
-
-
-# # Nové
-
-# In[59]:
-
 labels = {'n': 1, '0': 0, 'p': 2, 'b': 'BIP'}
 my_col =  ["#DC267F","#FFB000","#648FFF"]
 # obecna funkce
