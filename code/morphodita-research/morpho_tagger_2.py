@@ -462,7 +462,10 @@ class Network:
                     overrides = [None] * dataset.FACTORS
                     for f,factor in enumerate(args.factors):
                         overrides[dataset.FACTORS_MAP[factor]] = predictions[f][i]
-                        print(overrides.shape)
+                        print(overrides)
+                        
+                        print("pred")
+                        print(predictions[f][i])
                     dataset.write_sentence(predict, sentences, overrides)
                     sentences += 1
 
