@@ -381,8 +381,11 @@ class Network:
     def evaluate(self, dataset, dataset_name, args, predict=None):
         for metric in self._metrics.values():
             metric.reset_states()
+        if predict is not None:
+            sentences = 0
         while not dataset.epoch_finished():
             sentence_lens, batch = dataset.next_batch(args.batch_size)
+            print(batch)
 
             factors = []
             for f in self.factors:
@@ -455,7 +458,7 @@ class Network:
                     np.logical_and(factors[0] == predictions_raw[0], factors[1] == predictions_raw[1]), mask[0])
 
             if predict is not None:
-                sentences = 0
+
                 print("delka vet")
                 print(len(sentence_lens))
                 for i in range(len(sentence_lens)):
