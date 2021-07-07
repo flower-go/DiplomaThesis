@@ -81,6 +81,7 @@ class Network:
 
         self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
+    @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, gold_data, tvs):
         with tf.GradientTape() as tape:
 
@@ -399,7 +400,8 @@ if __name__ == "__main__":
             data_result.train._data["tokens"] = imdb_ex
             data_result.train._data["labels"]= imdb_lab + 1
             mask = data_result.test._data["labels"] != 0
-            print(type(data_result.test._data["labels"]))
+            #print(type(data_result.test._data["labels"]))
+            
 
 
             data_result.train._size = len(imdb_ex)
