@@ -693,7 +693,7 @@ if __name__ == "__main__":
 
     if args.predict:
         # Load training dataset maps from the checkpoint
-        saved = args.predict.split("/")[-1]
+        saved = args.exp_name
         train = morpho_dataset.MorphoDataset.load_mappings("{}/mappings.pickle".format(saved)) # To je ulozeno v
         # models/jmeno experimentu a checkpoints, predict bude jmneo modelu, v data bude cele jeno vcetne test.txt
         # Load input data
