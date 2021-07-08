@@ -205,7 +205,8 @@ class Network:
             self._metrics["LemmasTagsRaw"] = tf.metrics.Mean()
             self._metrics["LemmasTagsDict"] = tf.metrics.Mean()
 
-        self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
+        if args.predict is None:
+            self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
     @tf.function(experimental_relax_shapes=True)
     def train_batch(self, inputs, factors):
@@ -620,15 +621,15 @@ if __name__ == "__main__":
     args.epochs = [(int(epochs), float(lr)) for epochs, lr in
                    (epochs_lr.split(":") for epochs_lr in args.epochs.split(","))]
 
-    if args.predict is None:
-        if args.warmup_decay is not None:
-            print("decay is not none")
-            print(args.warmup_decay)
-            args.warmup_decay = args.warmup_decay.split(":")
-            args.decay_type = args.warmup_decay[0]
-            args.warmup_decay = int(args.warmup_decay[1])
-        else:
-            args.decay_type = None
+
+    if args.warmup_decay is not None:
+        print("decay is not none")  
+        print(args.warmup_decay)
+        args.warmup_decay = args.warmup_decay.split(":")
+        args.decay_type = args.warmup_decay[0]
+        args.warmup_decay = int(args.warmup_decay[1])
+    else:
+        args.decay_type = None
 
     args.bert_load = None
     name = None
@@ -665,7 +666,7 @@ if __name__ == "__main__":
     # tf.config.threading.set_intra_op_parallelism_threads(args.threads)
     # tf.config.set_soft_device_placement(True)
 
-    if args.predict is not None:
+    if args.predict is None:
         # Create logdir name
         if args.exp is None:
             args.exp = "{}-{}".format(os.path.basename(__file__), datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S"))
@@ -690,15 +691,23 @@ if __name__ == "__main__":
             args.embeddings_words = embeddings_npz["words"]
             args.embeddings_data = embeddings_npz["embeddings"]
             args.embeddings_size = args.embeddings_data.shape[1]
+            
+            
+        # Nechceme to vsechno dohromady
+    if args.bert and args.bert_model:
+        warnings.warn("embeddings and whole bert model training are both selected.")
+    model_bert=None
+    if args.bert or args.bert_model:
+        model_bert = BertModel(name, args)
 
     if args.predict:
         # Load training dataset maps from the checkpoint
-        saved = args.exp_name
-        train = morpho_dataset.MorphoDataset.load_mappings("{}/mappings.pickle".format(saved)) # To je ulozeno v
+        saved = args.exp
+        train = morpho_dataset.MorphoDataset.load_mappings("models/{}/mappings.pickle".format(saved)) # To je ulozeno v
         # models/jmeno experimentu a checkpoints, predict bude jmneo modelu, v data bude cele jeno vcetne test.txt
         # Load input data
         predict = morpho_dataset.MorphoDataset(args.data, train=train, shuffle_batches=False,
-                                               bert=args.bert)
+                                               bert=model_bert)
     else:
         # Load input data
         data_paths = [None] * 3
@@ -712,12 +721,7 @@ if __name__ == "__main__":
             data_paths[1] = "{}-dev.txt".format(args.data)
             data_paths[2] = "{}-test.txt".format(args.data)
 
-        # Nechceme to vsechno dohromady
-        if args.bert and args.bert_model:
-            warnings.warn("embeddings and whole bert model training are both selected.")
-        model_bert=None
-        if args.bert or args.bert_model:
-            model_bert = BertModel(name, args)
+
 
         train = morpho_dataset.MorphoDataset(data_paths[0],
                                              embeddings=args.embeddings_words if args.embeddings else None,
@@ -766,7 +770,7 @@ if __name__ == "__main__":
     if args.predict:
         # network.saver_inference.restore(network.session, "{}/checkpoint-inference".format(args.predict))
         network.outer_model.load_weights(args.predict)
-        network.predict(predict, args, saved + "_vystup")
+        network.predict(predict, args, open(saved + "_vystup","w"))
 
     else:
         log_file = open("{}/log".format(args.logdir), "w")
