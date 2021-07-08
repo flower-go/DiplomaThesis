@@ -329,6 +329,87 @@ class Network:
 
         return metrics
 
+    def predict(self, dataset, args, predict):
+        sentences = 0
+        #TODO musim tomu dat simpledataset ale pak koukat na .data
+        while not dataset.epoch_finished():
+            sentence_lens, batch = dataset.next_batch(args.batch_size)
+
+            factors = []
+            for f in self.factors:
+                factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
+            any_analyses = any(batch[train.FACTORS_MAP[factor]].analyses_ids for factor in self.factors)
+            inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
+            if args.embeddings:
+                embeddings = self._compute_embeddings(batch, dataset)
+                inp.append(embeddings)
+
+            if args.bert:
+                bert_embeddings = self._compute_bert(batch, dataset, sentence_lens)
+                inp.append(bert_embeddings)
+
+            if args.bert_model:
+                inp.append(batch[dataset.SEGMENTS].word_ids)
+                inp.append(batch[dataset.SUBWORDS].word_ids)
+
+            probabilities, mask = self.evaluate_batch(inp, factors)
+
+            if any_analyses:
+                predictions = [np.argmax(p, axis=2) for p in probabilities]
+
+                for i in range(len(sentence_lens)):
+                    for j in range(sentence_lens[i]):
+
+                        analysis_ids = [batch[dataset.FACTORS_MAP[factor]].analyses_ids[i][j] for factor in
+                                        self.factors]
+                        if not analysis_ids or len(analysis_ids[0]) == 0:
+                            continue
+
+                        known_analysis = any(all(analysis_ids[f][a] != dataset.UNK for f in range(len(self.factors)))
+                                             for a in range(len(analysis_ids[0])))
+                        if not known_analysis:
+                            continue
+
+                        # Compute probabilities of unknown analyses as minimum probability
+                        # of a known analysis - 1e-3.
+
+                        analysis_probs = [probabilities[factor][i, j].numpy() for factor in range(len(self.factors))]
+
+                        for f in range(len(args.factors)):
+                            min_probability = None
+                            for analysis in analysis_ids[f]:
+
+                                # TODO spatny shape, probabilities f analysis je vektor
+                                if analysis != dataset.UNK and (min_probability is None or analysis_probs[f][
+                                    analysis] - 1e-3 < min_probability):
+                                    min_probability = analysis_probs[f][analysis] - 1e-3
+
+                            analysis_probs[f][dataset.UNK] = min_probability
+                            analysis_probs[f][dataset.PAD] = min_probability
+
+                        best_index, best_prob = None, None
+                        for index in range(len(analysis_ids[0])):
+                            prob = sum(analysis_probs[f][analysis_ids[f][index]] for f in range(len(args.factors)))
+                            if best_index is None or prob > best_prob:
+                                best_index, best_prob = index, prob
+                        for f in range(len(args.factors)):
+                            predictions[f][i, j] = analysis_ids[f][best_index]
+
+            print("delka vet")
+            print(len(sentence_lens))
+            for i in range(len(sentence_lens)):
+                overrides = [None] * dataset.FACTORS
+                for f, factor in enumerate(args.factors):
+                    overrides[dataset.FACTORS_MAP[factor]] = predictions[f][i]
+                    print(overrides)
+
+                    print("pred")
+                    print(predictions[f][i])
+                dataset.write_sentence(predict, sentences, overrides)
+                sentences += 1
+
+
+
 
 if __name__ == "__main__":
     import argparse
@@ -394,16 +475,16 @@ if __name__ == "__main__":
         args.exp = "{}-{}".format(os.path.basename(__file__), datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S"))
 
     do_not_log = {"exp", "lemma_re_strip", "predict", "threads", "bert_model", "bert"} #TODO vyřešit
+    if args.predict is None:
+        args.logdir = "models/{}".format(
+            args.exp
+        )
+        if not os.path.exists("models"): os.mkdir("models")
+        if not os.path.exists(args.logdir): os.mkdir(args.logdir)
 
-    args.logdir = "models/{}".format(
-        args.exp
-    )
-    if not os.path.exists("models"): os.mkdir("models")
-    if not os.path.exists(args.logdir): os.mkdir(args.logdir)
-
-    # Dump passed options
-    with open("{}/options.json".format(args.logdir), mode="w") as options_file:
-        json.dump(vars(args), options_file, sort_keys=True)
+        # Dump passed options
+        with open("{}/options.json".format(args.logdir), mode="w") as options_file:
+            json.dump(vars(args), options_file, sort_keys=True)
 
 
     # Postprocess args
@@ -433,13 +514,22 @@ if __name__ == "__main__":
         import tokenizer.robeczech_tokenizer
     
     model_bert = BertModel(name, args)
+    if args.predict:
+        # Load training dataset maps from the checkpoint
+        # TODO jak bude vypdat predani datasetu? musim zmenit na simple dataset
+        saved = args.exp
+        train = morpho_dataset.MorphoDataset.load_mappings("models/{}/mappings.pickle".format(saved)) # To je ulozeno v
+        # models/jmeno experimentu a checkpoints, predict bude jmneo modelu, v data bude cele jeno vcetne test.txt
+        # Load input data
+        predict = mds.SimpleDataset(args.debug_mode, args.predict, "test", model_bert, train=train)
+    else:
 
 
-    dataset = mds.SimpleDataset(args.debug_mode, args.data,"train", model_bert)
+        dataset = mds.SimpleDataset(args.debug_mode, args.data,"train", model_bert)
 
-    dev = mds.SimpleDataset(args.debug_mode,args.data, "dev", model_bert, train=dataset.data)
+        dev = mds.SimpleDataset(args.debug_mode,args.data, "dev", model_bert, train=dataset.data)
 
-    test = mds.SimpleDataset(args.debug_mode, args.data, "test", model_bert, train=dataset.data)
+        test = mds.SimpleDataset(args.debug_mode, args.data, "test", model_bert, train=dataset.data)
 
     args.bert_size = 768
     #if args.warmup_decay > 0:
@@ -455,59 +545,65 @@ if __name__ == "__main__":
     network = Network(args=args,
                       model=model_bert, labels=[dataset.NUM_LEMMAS,dataset.NUM_TAGS], num_chars=dataset.num_chars)
 
-    # TODO nemame predikci !
-    # slova: batch[0].word_ids
-    # tags a lemmas: batch[dataset.FACTORS_MAP[f]].word_ids
-    # zakodovane:                 batch[dataset.SEGMENTS].word_ids
-    #              batch[dataset.SUBWORDS].word_ids
-
-    log_file = open("{}/log".format(args.logdir), "w")
-    for factor in args.factors:
-        print("{}: {}".format(factor, len(dataset.data.factors[dataset.data.FACTORS_MAP[factor]].words)), file=log_file,
-              flush=True)
-    print("Tagging with args:", "\n".join(("{}: {}".format(key, value) for key, value in sorted(vars(args).items())
-                                           if key not in ["embeddings_data", "embeddings_words"])), flush=True)
+        # TODO nemame predikci !
+        # slova: batch[0].word_ids
+        # tags a lemmas: batch[dataset.FACTORS_MAP[f]].word_ids
+        # zakodovane:                 batch[dataset.SEGMENTS].word_ids
+        #              batch[dataset.SUBWORDS].word_ids
 
 
-    def test_eval(predict=None):
-        metrics = network.evaluate(test, "test", args, predict)
-        metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
-        for f in [sys.stderr, log_file]:
-            print("Test, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f, flush=True)
+    if args.predict:
+        # network.saver_inference.restore(network.session, "{}/checkpoint-inference".format(args.predict))
+        network.outer_model.load_weights(args.predict)
+        network.predict(predict, args, open(saved + "_vystup","w"))
+    else:
+        log_file = open("{}/log".format(args.logdir), "w")
+        for factor in args.factors:
+            print("{}: {}".format(factor, len(dataset.data.factors[dataset.data.FACTORS_MAP[factor]].words)), file=log_file,
+                  flush=True)
+        print("Tagging with args:", "\n".join(("{}: {}".format(key, value) for key, value in sorted(vars(args).items())
+                                               if key not in ["embeddings_data", "embeddings_words"])), flush=True)
 
 
-    for i, (epochs, learning_rate) in enumerate(args.epochs):
-        for epoch in range(epochs):
-            print("train epoch {}".format(epoch))
-            #chceme vzdy jednu epochu bez berta
-            #if i == 0:
-            #    args.freeze = 1
-            #    lr = 1e-3
-            #else:
-            #    args.freeze = 0
-            lr = learning_rate
-            network.train_epoch(dataset, args, lr)
+        def test_eval(predict=None):
+            metrics = network.evaluate(test, "test", args, predict)
+            metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
+            for f in [sys.stderr, log_file]:
+                print("Test, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f, flush=True)
 
-            if dev:
-                print("evaluate")
-                metrics = network.evaluate(dev, "dev", args)
-                metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
-                for f in [sys.stderr, log_file]:
-                    print("Dev, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f,
-                          flush=True)
 
-            if args.cont and test:
-                test_eval()
+        for i, (epochs, learning_rate) in enumerate(args.epochs):
+            for epoch in range(epochs):
+                print("train epoch {}".format(epoch))
+                #chceme vzdy jednu epochu bez berta
+                #if i == 0:
+                #    args.freeze = 1
+                #    lr = 1e-3
+                #else:
+                #    args.freeze = 0
+                lr = learning_rate
+                network.train_epoch(dataset, args, lr)
 
-        dataset.data.save_mappings("{}/mappings.pickle".format(args.logdir))  # TODO
-        if args.checkp:
-            checkp = args.checkp
-        else:
-            checkp = args.logdir.split("/")[1]
+                if dev:
+                    print("evaluate")
+                    metrics = network.evaluate(dev, "dev", args)
+                    metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
+                    for f in [sys.stderr, log_file]:
+                        print("Dev, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f,
+                              flush=True)
 
-        network.model.save_weights('./checkpoints/' + checkp)
-        output_file = args.logdir.split("/")[1]
-        print(output_file)
+                if args.cont and test:
+                    test_eval()
 
-    if test:
-        test_eval(predict=open("./" + output_file + "_vysledky", "w"))
+            dataset.data.save_mappings("{}/mappings.pickle".format(args.logdir))
+            if args.checkp:
+                checkp = args.checkp
+            else:
+                checkp = args.logdir.split("/")[1]
+
+            network.model.save_weights('./checkpoints/' + checkp)
+            output_file = args.logdir.split("/")[1]
+            print(output_file)
+
+        if test:
+            test_eval(predict=open("./" + output_file + "_vysledky", "w"))
