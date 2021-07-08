@@ -481,6 +481,84 @@ class Network:
 
         return metrics
 
+    def predict(self, dataset, args, predict):
+        sentences = 0
+        while not dataset.epoch_finished():
+            sentence_lens, batch = dataset.next_batch(args.batch_size)
+
+            factors = []
+            for f in self.factors:
+                factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
+            any_analyses = any(batch[train.FACTORS_MAP[factor]].analyses_ids for factor in self.factors)
+            inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
+            if args.embeddings:
+                embeddings = self._compute_embeddings(batch, dataset)
+                inp.append(embeddings)
+
+            if args.bert:
+                bert_embeddings = self._compute_bert(batch, dataset, sentence_lens)
+                inp.append(bert_embeddings)
+
+            if args.bert_model:
+                inp.append(batch[dataset.SEGMENTS].word_ids)
+                inp.append(batch[dataset.SUBWORDS].word_ids)
+
+            probabilities, mask = self.evaluate_batch(inp, factors)
+
+            if any_analyses:
+                predictions = [np.argmax(p, axis=2) for p in probabilities]
+
+                for i in range(len(sentence_lens)):
+                    for j in range(sentence_lens[i]):
+
+                        analysis_ids = [batch[dataset.FACTORS_MAP[factor]].analyses_ids[i][j] for factor in
+                                        self.factors]
+                        if not analysis_ids or len(analysis_ids[0]) == 0:
+                            continue
+
+                        known_analysis = any(all(analysis_ids[f][a] != dataset.UNK for f in range(len(self.factors)))
+                                             for a in range(len(analysis_ids[0])))
+                        if not known_analysis:
+                            continue
+
+                        # Compute probabilities of unknown analyses as minimum probability
+                        # of a known analysis - 1e-3.
+
+                        analysis_probs = [probabilities[factor][i, j].numpy() for factor in range(len(self.factors))]
+
+                        for f in range(len(args.factors)):
+                            min_probability = None
+                            for analysis in analysis_ids[f]:
+
+                                # TODO spatny shape, probabilities f analysis je vektor
+                                if analysis != dataset.UNK and (min_probability is None or analysis_probs[f][
+                                    analysis] - 1e-3 < min_probability):
+                                    min_probability = analysis_probs[f][analysis] - 1e-3
+
+                            analysis_probs[f][dataset.UNK] = min_probability
+                            analysis_probs[f][dataset.PAD] = min_probability
+
+                        best_index, best_prob = None, None
+                        for index in range(len(analysis_ids[0])):
+                            prob = sum(analysis_probs[f][analysis_ids[f][index]] for f in range(len(args.factors)))
+                            if best_index is None or prob > best_prob:
+                                best_index, best_prob = index, prob
+                        for f in range(len(args.factors)):
+                            predictions[f][i, j] = analysis_ids[f][best_index]
+
+            print("delka vet")
+            print(len(sentence_lens))
+            for i in range(len(sentence_lens)):
+                overrides = [None] * dataset.FACTORS
+                for f, factor in enumerate(args.factors):
+                    overrides[dataset.FACTORS_MAP[factor]] = predictions[f][i]
+                    print(overrides)
+
+                    print("pred")
+                    print(predictions[f][i])
+                dataset.write_sentence(predict, sentences, overrides)
+                sentences += 1
+
 
 if __name__ == "__main__":
     import argparse
@@ -542,14 +620,15 @@ if __name__ == "__main__":
     args.epochs = [(int(epochs), float(lr)) for epochs, lr in
                    (epochs_lr.split(":") for epochs_lr in args.epochs.split(","))]
 
-    if args.warmup_decay is not None:
-        print("decay is not none")
-        print(args.warmup_decay)
-        args.warmup_decay = args.warmup_decay.split(":")
-        args.decay_type = args.warmup_decay[0]
-        args.warmup_decay = int(args.warmup_decay[1])
-    else:
-        args.decay_type = None
+    if args.predict is None:
+        if args.warmup_decay is not None:
+            print("decay is not none")
+            print(args.warmup_decay)
+            args.warmup_decay = args.warmup_decay.split(":")
+            args.decay_type = args.warmup_decay[0]
+            args.warmup_decay = int(args.warmup_decay[1])
+        else:
+            args.decay_type = None
 
     args.bert_load = None
     name = None
@@ -586,12 +665,7 @@ if __name__ == "__main__":
     # tf.config.threading.set_intra_op_parallelism_threads(args.threads)
     # tf.config.set_soft_device_placement(True)
 
-    if args.predict:
-        # Load saved options from the model
-        with open("{}/options.json".format(args.predict), mode="r") as options_file:
-            args = argparse.Namespace(**json.load(options_file))
-        parser.parse_args(namespace=args)
-    else:
+    if args.predict is not None:
         # Create logdir name
         if args.exp is None:
             args.exp = "{}-{}".format(os.path.basename(__file__), datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S"))
@@ -610,8 +684,6 @@ if __name__ == "__main__":
         with open("{}/options.json".format(args.logdir), mode="w") as options_file:
             json.dump(vars(args), options_file, sort_keys=True)
 
-    # TODO write summaries using logdir
-
     # Load embeddings
     if args.embeddings:
         with np.load(args.embeddings, allow_pickle=True) as embeddings_npz:
@@ -621,7 +693,9 @@ if __name__ == "__main__":
 
     if args.predict:
         # Load training dataset maps from the checkpoint
-        train = morpho_dataset.MorphoDataset.load_mappings("{}/mappings.pickle".format(args.predict))
+        saved = args.predict.split("/")[-1]
+        train = morpho_dataset.MorphoDataset.load_mappings("{}/mappings.pickle".format(saved)) # To je ulozeno v
+        # models/jmeno experimentu a checkpoints, predict bude jmneo modelu, v data bude cele jeno vcetne test.txt
         # Load input data
         predict = morpho_dataset.MorphoDataset(args.data, train=train, shuffle_batches=False,
                                                bert=args.bert)
@@ -689,11 +763,10 @@ if __name__ == "__main__":
     # print("outer model variables:")
     # print(str(network.outer_model.trainable_variables))
 
-    # TODO nemame predikci !!!
     if args.predict:
         # network.saver_inference.restore(network.session, "{}/checkpoint-inference".format(args.predict))
-        network.outer_model = load_model(args.predict)
-        network.predict(predict, sys.stdout, args)
+        network.outer_model.load_weights(args.predict)
+        network.predict(predict, args, saved + "_vystup")
 
     else:
         log_file = open("{}/log".format(args.logdir), "w")
@@ -729,7 +802,7 @@ if __name__ == "__main__":
                 if args.cont and test:
                     test_eval()
 
-            train.save_mappings("{}/mappings.pickle".format(args.logdir))  # TODO
+            train.save_mappings("{}/mappings.pickle".format(args.logdir))
             if args.checkp:
                 checkp = args.checkp
             else:
