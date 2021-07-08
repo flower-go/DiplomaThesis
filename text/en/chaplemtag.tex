@@ -64,7 +64,9 @@ POS tagging (for English) is dated back to 1971 with first rule-based approach o
 One of first automatical tagging experiments in Czech is described in \citep{Hladka}, which also offers an analysis of differences between languages with rich inflexion (as Czech) and ones with more simple morphology (for example English). Languages with complicated morphology has incomparably   Current \acrshort{sota} result is presented in \citep{Straka2021}, which uses Czech version of RoBERTa model -- RobeCzech. This is the model also used for some experiments in this work and, as expectated,  yields the best results. RobeCzech is based upon previous successful morphological analysis with contextual embeddings and BERT-like models \citep{Straka2019b}, \citep{Straka2019a}, \citep{Straka2019}, \citep{Straka2018} (all lastly mentioned models also achieved great results in lemmatization). %TODO zmnit morce, morphodita a udpipe
 Lemmatization has undergone a similar development as tagging, starting with rule-based approaches and statistical approaches \citep{Plisson}, continuing with neural networks and recently achieving good results with BERT-like models \citep{Kondratyuk2019}.
 
-%TODO ale nemely by tam ty faze byt vsechny? a trochu to rozvest?
+
+%TODO zminit ze ty lemata se dají delat ruzne - classifikace nebo sequenec to sequence, ze tohle je teoreticky horsi ale ve skutečnosti to nevadi
+%kouknout na 
 
 
 %\citep{Kondratyuk2019} - contextual embeddings a finetunnig jako já, na 75 jazycích, používá spoustu regularizace, multilingual bert model in base size same as this work,  navazuje na udpipe, má výsledky na PDT!
@@ -146,7 +148,7 @@ Batches has size 64, given by the compromise between the pursuit of relatively b
 %TODO popsat jak presne to vypada nebo alespon graficky ty learning rates
 %classification head. %TODO popsat jak presne to vypada
 
-\subsection{Results}
+\subsection{Results and Discussion}
 %TODO jaka je baseline
 %Jsou vysledky lepsi nez baseline?
 %Co je nejlepší jednotlivě a celkem?

@@ -33,7 +33,7 @@ Four main Czech datasets with sentiment annotation are available: user reviews f
      & length & labels                                                                & domain        \\ \hline \hline
 \textbf{mall}     & 145306 & \begin{tabular}[c]{@{}l@{}}positive\\ neutral\\ negative\end{tabular} & domestic appliance reviews                             \\ \hline
 \textbf{csfd} & 91304  & \begin{tabular}[c]{@{}l@{}}positive\\ neutral\\ negative\end{tabular} & movie reviews \\ \hline
-\textbf{facebook} & 9752   & \begin{tabular}[c]{@{}l@{}}positive\\ neutral\\ negative\end{tabular} & \begin{tabular}[c]{@{}l@{}}brand pages of e.g. shops \\ or mobile networks providers\end{tabular} \\ \hline
+\textbf{facebook} & 9752   & \begin{tabular}[c]{@{}l@{}}positive\\ neutral\\ negative\end{tabular} & \begin{tabular}[c]{@{}l@{}}brand pages of e.g. shops or mobile networks \\ providers\end{tabular} \\ \hline
 \textbf{imdb} & 25000  & \begin{tabular}[c]{@{}l@{}}positive\\ negative\end{tabular}           & movie reviews \\ \hline
 \end{tabular}
 \label{tab:datasets}
@@ -44,7 +44,7 @@ Four main Czech datasets with sentiment annotation are available: user reviews f
 
 %TODO je to rozdleeno se stratifikací?
 %TODO popis obrazku
-\begin{figure}[h]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=1\columnwidth]{../img/dist_all.png}
 \protect\caption{Distribution of positive/neutral/negative labels in each dataset.}
@@ -79,7 +79,7 @@ Network architecture is much simpler than in tagging and lemmatization task and 
 \label{pic:conf1}
 \end{figure}
 
-\subsection{Results}
+\subsection{Results and Discussion}
 %I tried another approach:
 %Because the facebook dataset is balanced, I pretrained the model first on facebook and after reaching a decent accuracy, i further trained the model on the join data:
 %for ten epochs with learning rate 5e-5 and an effecctive batch size 48.
