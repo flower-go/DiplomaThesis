@@ -376,11 +376,12 @@ class MorphoDataset:
 
         return batch_sentence_lens, factors
 
-    def write_sentence(self, output, index, overrides):
+    def write_sentence(self, output, index, overrides,results=None):
         print("delka vet z datasetu")
         print(self._sentence_lens[index])
         for i in range(self._sentence_lens[index]):
             fields = []
+            fields.append(results[i])
             for f in range(self.FACTORS):
                 factor = self._factors[f]
                 field = factor.word_strings[index][i]
@@ -397,6 +398,7 @@ class MorphoDataset:
                             except:
                                 field = fields[self.FORMS]
                 fields.append(field)
+
 
             # Analyses
             assert len(self._factors[self.LEMMAS].analyses_strings[index][i]) == len(

@@ -549,6 +549,7 @@ class Network:
 
             for fc in range(len(self.factors)):
                 predpoved = np.array(factors[fc] == predictions[fc])
+
                 print("predpoved")
                 print(len(predpoved))
                 print(predpoved)
@@ -560,13 +561,16 @@ class Network:
             print(len(sentence_lens))
             for i in range(len(sentence_lens)):
                 overrides = [None] * dataset.FACTORS
+                results = [None] * dataset.FACTORS
+
                 for f, factor in enumerate(args.factors):
                     overrides[dataset.FACTORS_MAP[factor]] = predictions[f][i]
+                    results[dataset.FACTORS_MAP[factor]] = np.array(factors[fc][i] == predictions[fc][i])
                     print(overrides)
 
                     print("pred")
                     print(predictions[f][i])
-                dataset.write_sentence(predict, sentences, overrides)
+                dataset.write_sentence(predict, sentences, overrides, results)
                 sentences += 1
 
 
