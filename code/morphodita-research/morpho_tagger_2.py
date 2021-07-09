@@ -547,6 +547,15 @@ class Network:
                         for f in range(len(args.factors)):
                             predictions[f][i, j] = analysis_ids[f][best_index]
 
+            for fc in range(len(self.factors)):
+                predpoved = np.array(factors[fc] == predictions[fc])
+                print("predpoved")
+                print(len(predpoved))
+                print(predpoved)
+                print("maska")
+                print(mask)
+
+
             print("delka vet")
             print(len(sentence_lens))
             for i in range(len(sentence_lens)):
