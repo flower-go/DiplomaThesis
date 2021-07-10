@@ -381,13 +381,15 @@ class MorphoDataset:
         print(self._sentence_lens[index])
         for i in range(self._sentence_lens[index]):
             fields = []
-            fields.append(results[i])
             for f in range(self.FACTORS):
+                if results[f] is not None:
+                    fields.append(results[f][i])
                 factor = self._factors[f]
                 field = factor.word_strings[index][i]
 
                 # Overrides
                 if overrides is not None and f < len(overrides) and overrides[f] is not None:
+                    
                     if overrides[f][i] < 0:
                         field = factor.analyses_strings[index][i][-overrides[f][i] - 1]
                     else:
@@ -398,6 +400,7 @@ class MorphoDataset:
                             except:
                                 field = fields[self.FORMS]
                 fields.append(field)
+                
 
 
             # Analyses

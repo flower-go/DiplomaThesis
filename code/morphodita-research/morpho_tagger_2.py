@@ -570,7 +570,7 @@ class Network:
                     print(predictions[fc][i])
                     print(factors[fc][i] == predictions[fc][i])
 
-                    results[dataset.FACTORS_MAP[factor]] = np.array(factors[fc][i] == predictions[fc][i])
+                    results[dataset.FACTORS_MAP[factor]] = np.array(factors[fc][i] == predictions[fc][i],np.str)
                     print(overrides)
 
                     print("pred")
