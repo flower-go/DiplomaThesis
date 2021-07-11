@@ -482,7 +482,7 @@ class Network:
 
         return metrics
 
-    def predict(self, dataset, args, predict):
+    def predict(self, dataset, args, predict,compare=False):
         sentences = 0
         while not dataset.epoch_finished():
             sentence_lens, batch = dataset.next_batch(args.batch_size)
@@ -569,8 +569,8 @@ class Network:
                     print(factors[fc][i])
                     print(predictions[fc][i])
                     print(factors[fc][i] == predictions[fc][i])
-
-                    results[dataset.FACTORS_MAP[factor]] = np.array(factors[fc][i] == predictions[fc][i],np.str)
+                    if compare:
+                	results[dataset.FACTORS_MAP[factor]] = np.array(factors[fc][i] == predictions[fc][i],np.str)
                     print(overrides)
 
                     print("pred")
