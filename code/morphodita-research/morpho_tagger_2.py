@@ -720,7 +720,7 @@ def main(args):
         args.train = morpho_dataset.MorphoDataset.load_mappings("models/{}/mappings.pickle".format(saved))  # To je ulozeno v
         # models/jmeno experimentu a checkpoints, predict bude jmneo modelu, v data bude cele jeno vcetne test.txt
         # Load input data
-        predict = morpho_dataset.MorphoDataset(args.data, train=train, shuffle_batches=False,
+        predict = morpho_dataset.MorphoDataset(args.data, train=args.train, shuffle_batches=False,
                                                bert=model_bert)
     else:
         # Load input data
