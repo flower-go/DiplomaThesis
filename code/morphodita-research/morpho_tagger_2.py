@@ -580,21 +580,17 @@ class Network:
                 dataset.write_sentence(predict, sentences, overrides, results)
                 sentences += 1
 
-
-if __name__ == "__main__":
+def main(args):
     import argparse
     import datetime
     import json
     import os
-    import sys
     import re
 
-    print(os.getcwd())
-    # Fix random seed
     np.random.seed(42)
     tf.random.set_seed(42)
 
-    command_line = " ".join(sys.argv[1:])
+    #command_line = " ".join(sys.argv[1:])
 
     # Parse arguments
     parser = argparse.ArgumentParser()
@@ -633,7 +629,7 @@ if __name__ == "__main__":
     parser.add_argument("--word_dropout", default=0.2, type=float, help="Word dropout")
     parser.add_argument("data", type=str, help="Input data")
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     args.debug = args.debug == 1
     args.cont = args.cont == 1
     # Postprocess args
@@ -641,9 +637,8 @@ if __name__ == "__main__":
     args.epochs = [(int(epochs), float(lr)) for epochs, lr in
                    (epochs_lr.split(":") for epochs_lr in args.epochs.split(","))]
 
-
     if args.warmup_decay is not None:
-        print("decay is not none")  
+        print("decay is not none")
         print(args.warmup_decay)
         args.warmup_decay = args.warmup_decay.split(":")
         args.decay_type = args.warmup_decay[0]
@@ -711,19 +706,18 @@ if __name__ == "__main__":
             args.embeddings_words = embeddings_npz["words"]
             args.embeddings_data = embeddings_npz["embeddings"]
             args.embeddings_size = args.embeddings_data.shape[1]
-            
-            
+
         # Nechceme to vsechno dohromady
     if args.bert and args.bert_model:
         warnings.warn("embeddings and whole bert model training are both selected.")
-    model_bert=None
+    model_bert = None
     if args.bert or args.bert_model:
         model_bert = BertModel(name, args)
 
     if args.predict:
         # Load training dataset maps from the checkpoint
         saved = args.exp
-        train = morpho_dataset.MorphoDataset.load_mappings("models/{}/mappings.pickle".format(saved)) # To je ulozeno v
+        train = morpho_dataset.MorphoDataset.load_mappings("models/{}/mappings.pickle".format(saved))  # To je ulozeno v
         # models/jmeno experimentu a checkpoints, predict bude jmneo modelu, v data bude cele jeno vcetne test.txt
         # Load input data
         predict = morpho_dataset.MorphoDataset(args.data, train=train, shuffle_batches=False,
@@ -740,8 +734,6 @@ if __name__ == "__main__":
             data_paths[0] = "{}-train.txt".format(args.data)
             data_paths[1] = "{}-dev.txt".format(args.data)
             data_paths[2] = "{}-test.txt".format(args.data)
-
-
 
         train = morpho_dataset.MorphoDataset(data_paths[0],
                                              embeddings=args.embeddings_words if args.embeddings else None,
@@ -790,7 +782,7 @@ if __name__ == "__main__":
     if args.predict:
         # network.saver_inference.restore(network.session, "{}/checkpoint-inference".format(args.predict))
         network.outer_model.load_weights(args.predict)
-        network.predict(predict, args, open(saved + "_vystup","w"))
+        network.predict(predict, args, open(saved + "_vystup", "w"))
 
     else:
         log_file = open("{}/log".format(args.logdir), "w")
@@ -800,13 +792,11 @@ if __name__ == "__main__":
         print("Tagging with args:", "\n".join(("{}: {}".format(key, value) for key, value in sorted(vars(args).items())
                                                if key not in ["embeddings_data", "embeddings_words"])), flush=True)
 
-
         def test_eval(predict=None):
             metrics = network.evaluate(test, "test", args, predict)
             metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
             for f in [sys.stderr, log_file]:
                 print("Test, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f, flush=True)
-
 
         for i, (epochs, learning_rate) in enumerate(args.epochs):
             tf.summary.experimental.set_step(0)
@@ -837,4 +827,10 @@ if __name__ == "__main__":
         print(output_file)
 
         if test:
-            test_eval(predict=open("./" + output_file + "_vysledky","w"))
+            test_eval(predict=open("./" + output_file + "_vysledky", "w"))
+
+
+if __name__ == "__main__":
+
+    import sys
+    main(sys.argv[1:])
