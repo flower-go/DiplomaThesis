@@ -482,7 +482,7 @@ class Network:
 
         return metrics
 
-    def predict(self, dataset, args, predict,compare=False):
+    def predict(self, dataset, args, predict, compare=False):
         sentences = 0
         while not dataset.epoch_finished():
             sentence_lens, batch = dataset.next_batch(args.batch_size)
@@ -490,7 +490,7 @@ class Network:
             factors = []
             for f in self.factors:
                 factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
-            any_analyses = any(batch[train.FACTORS_MAP[factor]].analyses_ids for factor in self.factors)
+            any_analyses = any(batch[args.train.FACTORS_MAP[factor]].analyses_ids for factor in self.factors)
             inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
             if args.embeddings:
                 embeddings = self._compute_embeddings(batch, dataset)
@@ -717,7 +717,7 @@ def main(args):
     if args.predict:
         # Load training dataset maps from the checkpoint
         saved = args.exp
-        train = morpho_dataset.MorphoDataset.load_mappings("models/{}/mappings.pickle".format(saved))  # To je ulozeno v
+        args.train = morpho_dataset.MorphoDataset.load_mappings("models/{}/mappings.pickle".format(saved))  # To je ulozeno v
         # models/jmeno experimentu a checkpoints, predict bude jmneo modelu, v data bude cele jeno vcetne test.txt
         # Load input data
         predict = morpho_dataset.MorphoDataset(args.data, train=train, shuffle_batches=False,
