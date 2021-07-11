@@ -209,7 +209,7 @@ class Network:
             self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
     @tf.function(experimental_relax_shapes=True)
-    def train_batch(self, inputs, factors):
+    def train_batch(self, inputs, factors, args):
         with tf.GradientTape() as tape:
             probabilities = self.outer_model(inputs, training=True)
             tvs = self.outer_model.trainable_variables
@@ -250,7 +250,7 @@ class Network:
             self._fine_optimizer.learning_rate = args.fine_lr
         num_gradients = 0
 
-        while not train.epoch_finished():
+        while not args.train.epoch_finished():
             sentence_lens, batch = dataset.next_batch(args.batch_size)
             factors = []
             for f in self.factors:
@@ -270,7 +270,7 @@ class Network:
                 inp.append(batch[dataset.SEGMENTS].word_ids)
                 inp.append(batch[dataset.SUBWORDS].word_ids)
 
-            p, tg = self.train_batch(inp, factors)
+            p, tg = self.train_batch(inp, factors, args)
 
             if args.accu < 2:
 
@@ -308,7 +308,7 @@ class Network:
                             else:
                                 g += ng.numpy()
                 num_gradients += 1
-                if num_gradients == args.accu or len(train._permutation) == 0:
+                if num_gradients == args.accu or len(args.train._permutation) == 0:
                     gradients = gradients
                     gradients = [tf.IndexedSlices(*map(np.concatenate, zip(*g))) if isinstance(g, list) else g for g in
                                  gradients]
@@ -338,7 +338,7 @@ class Network:
 
         return result
 
-    def _compute_embeddings(self, batch, dataset):
+    def _compute_embeddings(self, batch, dataset,args):
         embeddings = np.zeros([batch[dataset.EMBEDDINGS].word_ids.shape[0],
                                batch[dataset.EMBEDDINGS].word_ids.shape[1],
                                args.embeddings_size])
@@ -349,7 +349,7 @@ class Network:
         return embeddings
 
     # TODO predelat, kdyz uz to vraci rovnou embeddings
-    def _compute_bert_embeddings(self, batch, dataset):
+    def _compute_bert_embeddings(self, batch, dataset,args):
         bert_embeddings = np.zeros([batch[dataset.BERT].word_ids.shape[0],
                                     batch[dataset.BERT].word_ids.shape[1],
                                     args.bert_size])
@@ -361,7 +361,7 @@ class Network:
         return bert_embeddings
 
     @tf.function(experimental_relax_shapes=True)
-    def evaluate_batch(self, inputs, factors):
+    def evaluate_batch(self, inputs, factors,args):
         probabilities = self.outer_model(inputs, training=False)
         if len(self.factors) == 1:
             probabilities = [probabilities]
@@ -391,10 +391,10 @@ class Network:
             factors = []
             for f in self.factors:
                 factors.append(batch[dataset.FACTORS_MAP[f]].word_ids)
-            any_analyses = any(batch[train.FACTORS_MAP[factor]].analyses_ids for factor in self.factors)
+            any_analyses = any(batch[args.train.FACTORS_MAP[factor]].analyses_ids for factor in self.factors)
             inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
             if args.embeddings:
-                embeddings = self._compute_embeddings(batch, dataset)
+                embeddings = self._compute_embeddings(batch, dataset,args)
                 inp.append(embeddings)
 
             if args.bert:
@@ -405,7 +405,7 @@ class Network:
                 inp.append(batch[dataset.SEGMENTS].word_ids)
                 inp.append(batch[dataset.SUBWORDS].word_ids)
 
-            probabilities, mask = self.evaluate_batch(inp, factors)
+            probabilities, mask = self.evaluate_batch(inp, factors,args)
 
             if any_analyses:
                 predictions = [np.argmax(p, axis=2) for p in probabilities]
@@ -493,7 +493,7 @@ class Network:
             any_analyses = any(batch[args.train.FACTORS_MAP[factor]].analyses_ids for factor in self.factors)
             inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
             if args.embeddings:
-                embeddings = self._compute_embeddings(batch, dataset)
+                embeddings = self._compute_embeddings(batch, dataset,args)
                 inp.append(embeddings)
 
             if args.bert:
@@ -504,7 +504,7 @@ class Network:
                 inp.append(batch[dataset.SEGMENTS].word_ids)
                 inp.append(batch[dataset.SUBWORDS].word_ids)
 
-            probabilities, mask = self.evaluate_batch(inp, factors)
+            probabilities, mask = self.evaluate_batch(inp, factors,args)
 
             if any_analyses:
                 predictions = [np.argmax(p, axis=2) for p in probabilities]
@@ -735,25 +735,25 @@ def main(args):
             data_paths[1] = "{}-dev.txt".format(args.data)
             data_paths[2] = "{}-test.txt".format(args.data)
 
-        train = morpho_dataset.MorphoDataset(data_paths[0],
+        args.train = morpho_dataset.MorphoDataset(data_paths[0],
                                              embeddings=args.embeddings_words if args.embeddings else None,
                                              bert=model_bert,
                                              lemma_re_strip=args.lemma_re_strip,
                                              lemma_rule_min=args.lemma_rule_min)
 
         if os.path.exists(data_paths[1]):
-            dev = morpho_dataset.MorphoDataset(data_paths[1], train=train, shuffle_batches=False,
+            args.dev = morpho_dataset.MorphoDataset(data_paths[1], train=train, shuffle_batches=False,
                                                bert=model_bert
                                                )
         else:
-            dev = None
+            args.dev = None
 
         if os.path.exists(data_paths[2]):
-            test = morpho_dataset.MorphoDataset(data_paths[2], train=train, shuffle_batches=False,
+            args.test = morpho_dataset.MorphoDataset(data_paths[2], train=train, shuffle_batches=False,
                                                 bert=model_bert
                                                 )
         else:
-            test = None
+            args.test = None
 
     print(args.bert_load)
     print("again")
@@ -787,10 +787,10 @@ def main(args):
     else:
         log_file = open("{}/log".format(args.logdir), "w")
         for factor in args.factors:
-            print("{}: {}".format(factor, len(train.factors[train.FACTORS_MAP[factor]].words)), file=log_file,
+            print("{}: {}".format(factor, len(args.train.factors[args.train.FACTORS_MAP[factor]].words)), file=log_file,
                   flush=True)
         print("Tagging with args:", "\n".join(("{}: {}".format(key, value) for key, value in sorted(vars(args).items())
-                                               if key not in ["embeddings_data", "embeddings_words"])), flush=True)
+                                               if key not in ["embeddings_data", "embeddings_words","train","test","dev"])), flush=True)
 
         def test_eval(predict=None):
             metrics = network.evaluate(test, "test", args, predict)
@@ -803,11 +803,11 @@ def main(args):
             epoch = 0
             test_eval()
             for epoch in range(epochs):
-                network.train_epoch(train, args, learning_rate)
+                network.train_epoch(args.train, args, learning_rate)
 
-                if dev:
+                if args.dev:
                     print("evaluate")
-                    metrics = network.evaluate(dev, "dev", args)
+                    metrics = network.evaluate(args.dev, "dev", args)
                     metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
                     for f in [sys.stderr, log_file]:
                         print("Dev, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f,
@@ -816,7 +816,7 @@ def main(args):
                 if args.cont and test:
                     test_eval()
 
-            train.save_mappings("{}/mappings.pickle".format(args.logdir))
+            args.train.save_mappings("{}/mappings.pickle".format(args.logdir))
             if args.checkp:
                 checkp = args.checkp
             else:
@@ -826,7 +826,7 @@ def main(args):
         output_file = args.logdir.split("/")[1]
         print(output_file)
 
-        if test:
+        if args.test:
             test_eval(predict=open("./" + output_file + "_vysledky", "w"))
 
 
