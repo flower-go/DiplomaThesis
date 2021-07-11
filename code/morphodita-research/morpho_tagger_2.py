@@ -760,12 +760,12 @@ def main(args):
     # TODO nacitat velikost
     args.bert_size = 768
     if args.decay_type != None:
-        args.steps_in_epoch = math.floor(len(train.factors[1].word_strings) / (args.batch_size * args.accu))
+        args.steps_in_epoch = math.floor(len(args.train.factors[1].word_strings) / (args.batch_size * args.accu))
     network = Network(args=args,
-                      num_words=len(train.factors[train.FORMS].words),
-                      num_chars=len(train.factors[train.FORMS].alphabet),
+                      num_words=len(args.train.factors[train.FORMS].words),
+                      num_chars=len(args.train.factors[train.FORMS].alphabet),
                       factor_words=dict(
-                          (factor, len(train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors),
+                          (factor, len(args.train.factors[train.FACTORS_MAP[factor]].words)) for factor in args.factors),
                       model=model_bert)
     if args.debug:
         ...
