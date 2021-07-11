@@ -209,7 +209,7 @@ class Network:
             self._writer = tf.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
 
     @tf.function(experimental_relax_shapes=True)
-    def train_batch(self, inputs, factors, args):
+    def train_batch(self, inputs, factors):
         with tf.GradientTape() as tape:
             probabilities = self.outer_model(inputs, training=True)
             tvs = self.outer_model.trainable_variables
@@ -218,10 +218,10 @@ class Network:
                 probabilities = [probabilities]
             loss = 0.0
             for i in range(len(self.factors)):
-                if args.label_smoothing:
+                if self.args.label_smoothing:
                     loss += self._loss(
-                        tf.one_hot(factors[i], self.factor_words[self.factors[i]]) * (1 - args.label_smoothing)
-                        + args.label_smoothing / self.factor_words[self.factors[i]], probabilities[i],
+                        tf.one_hot(factors[i], self.factor_words[self.factors[i]]) * (1 - self.args.label_smoothing)
+                        + self.args.label_smoothing / self.factor_words[self.factors[i]], probabilities[i],
                         probabilities[i]._keras_mask)
                 else:
                     loss += self._loss(tf.convert_to_tensor(factors[i]), probabilities[i], probabilities[i]._keras_mask)
@@ -270,7 +270,7 @@ class Network:
                 inp.append(batch[dataset.SEGMENTS].word_ids)
                 inp.append(batch[dataset.SUBWORDS].word_ids)
 
-            p, tg = self.train_batch(inp, factors, args)
+            p, tg = self.train_batch(inp, factors)
 
             if args.accu < 2:
 
@@ -361,13 +361,13 @@ class Network:
         return bert_embeddings
 
     @tf.function(experimental_relax_shapes=True)
-    def evaluate_batch(self, inputs, factors,args):
+    def evaluate_batch(self, inputs, factors):
         probabilities = self.outer_model(inputs, training=False)
         if len(self.factors) == 1:
             probabilities = [probabilities]
         loss = 0
         for i in range(len(self.factors)):
-            if args.label_smoothing:
+            if self.args.label_smoothing:
                 loss += self._loss(tf.one_hot(factors[i], self.factor_words[self.factors[i]]), probabilities[i],
                                    probabilities[i]._keras_mask)
             else:
@@ -405,7 +405,7 @@ class Network:
                 inp.append(batch[dataset.SEGMENTS].word_ids)
                 inp.append(batch[dataset.SUBWORDS].word_ids)
 
-            probabilities, mask = self.evaluate_batch(inp, factors,args)
+            probabilities, mask = self.evaluate_batch(inp, factors)
 
             if any_analyses:
                 predictions = [np.argmax(p, axis=2) for p in probabilities]
@@ -767,6 +767,7 @@ def main(args):
                       factor_words=dict(
                           (factor, len(args.train.factors[args.train.FACTORS_MAP[factor]].words)) for factor in args.factors),
                       model=model_bert)
+
     if args.debug:
         ...
         # tf.keras.utils.plot_model(network.outer_model, "my_first_model_with_shape_info.svg", show_shapes=True)
@@ -778,7 +779,7 @@ def main(args):
     # print(str(network.model.trainable_variables))
     # print("outer model variables:")
     # print(str(network.outer_model.trainable_variables))
-
+    network.args = args
     if args.predict:
         # network.saver_inference.restore(network.session, "{}/checkpoint-inference".format(args.predict))
         network.outer_model.load_weights(args.predict)
