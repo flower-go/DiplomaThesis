@@ -12,7 +12,7 @@ import tensorflow_addons as tfa
 import morpho_dataset
 import pickle
 import warnings
-from keras.models import load_model
+
 
 from transformers import WarmUp
 
@@ -570,7 +570,7 @@ class Network:
                     print(predictions[fc][i])
                     print(factors[fc][i] == predictions[fc][i])
                     if compare:
-                	results[dataset.FACTORS_MAP[factor]] = np.array(factors[fc][i] == predictions[fc][i],np.str)
+                        results[dataset.FACTORS_MAP[factor]] = np.array(factors[fc][i] == predictions[fc][i],np.str)
                     print(overrides)
 
                     print("pred")
