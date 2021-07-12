@@ -504,7 +504,7 @@ class Network:
                 inp.append(batch[dataset.SEGMENTS].word_ids)
                 inp.append(batch[dataset.SUBWORDS].word_ids)
 
-            probabilities, mask = self.evaluate_batch(inp, factors,args)
+            probabilities, mask = self.evaluate_batch(inp, factors)
 
             if any_analyses:
                 predictions = [np.argmax(p, axis=2) for p in probabilities]
