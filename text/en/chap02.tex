@@ -3,7 +3,7 @@
 The main purpose of this chapter is to offer the technical description of the code accompanying this work for better reproducibility and possible further experiments on every of presented tasks. This chapter describes an implementation of all language models, other related code and also presents all used libraries and technologies.
 % and this chapter is concluded with a presentation of experiment types common for training of both tasks presented in following chapters.
 \par
-All code forms an attachment of this work and is also publicly available in GitHub \footnote{https://github.com/flower-go/DiplomaThesis}.
+All code forms an attachment of this work and is also publicly available in GitHub \footnote{https://github.com/flower-go/DiplomaThesis}. Experiment were performed on Artificial Intelligence Cluster (AIC) \footnote{https://aic.ufal.mff.cuni.cz/} provided by Institute of Formal and Applied Linguistics, Charles University \footnote{https://ufal.mff.cuni.cz/home-page}.
 
 \section{Code description}
 This section will describe the code -- technologies and hardware used for experiments, where to find scripts for replicating experiments and how to run them.
@@ -22,17 +22,16 @@ Numpy \citep{harris2020array} is an library which provides powerful multidimensi
 \subsubsection{Jupyter Notebook}
 Jupyter notebook \citep{jupyter} is a web application for development. In this work, jupyter notebook is used for providing the trained models for exploration. %TODO doplnit odkaz na tu kapitolu
 Jupyter suits well for this purpose because it, in addition to a possibility of running a separate parts of code in different cells, also supports visualisations and markdown formatted text and it can be useful especially for explanatory purposes.
-\subsubsection{Artificial Intelligence Cluster}
-All experiment were performed on Artificial Intelligence Cluster (AIC) \footnote{https://aic.ufal.mff.cuni.cz/} provided by Institute of Formal and Applied Linguistics, Charles University \footnote{https://ufal.mff.cuni.cz/home-page}.
+
+
 
 \subsection{Code Structure}
 Each task has code is in the separate directory as can be seen on picture %TODO udelat obrazek s adresarovou strukturou a barevne oznacit co se ma spoustet
-All code for \textbf{tagging and lemmatization} is placed in folder \texttt{morphodita\_research}. Main files are \texttt{morpho\_tagger\_2.py} and \texttt{bert\_finetunning\_simple.py}, which serves for running all experiments relating to tagging and lemmatization. Script arguments are described in more detail in tables \ref{Tab:com_args}, \ref{Tab:mt_com_args} and \ref{Tab:mt2_args}.
+All code for tagging and lemmatization is placed in folder \texttt{morphodita\_research}. Main files are \texttt{morpho\_tagger\_2.py} and \texttt{bert\_finetunning\_simple.py}, which serves for running all experiments relating to tagging and lemmatization. Script arguments are described in more detail in tables \ref{Tab:com_args}, \ref{Tab:mt_com_args} and \ref{Tab:mt2_args}.
 
 %spolecne pro vsechny:
 \begin{table}
 \centering
-\label{Tab:com_args}
 \begin{tabular}{ |p{3cm}|p{3,5cm}|p{6cm}| } 
  \hline
  Argument & Values & Description \\ 
@@ -51,12 +50,12 @@ bert & string & Name of the bert model (from huggingFace library) or path to the
  \hline
 \end{tabular}
 \caption{A list of arguments common to all scripts.} 
+\label{Tab:com_args}
 \end{table}
 
 
 \begin{table}
 \centering
-\label{Tab:mt_com_args}
 \begin{tabular}{ |p{3cm}|p{3,5cm}|p{6cm}| } 
  \hline
  Argument & Values & Description \\ 
@@ -72,12 +71,12 @@ word\_dropout & float & Probability of masking a word in the sentence during tra
 
 \end{tabular}
 \caption{A list of arguments common to both scripts for tagging and lemmatization.} 
+\label{Tab:mt_com_args}
 \end{table}
 
 
 \begin{table}
 \centering
-\label{Tab:mt2_args}
 \begin{tabular}{ |p{3cm}|p{3,5cm}|p{6cm}| } 
  \hline
  Argument & Values & Description \\ 
@@ -101,13 +100,13 @@ test\_only & string & Path to the model, which will be load and weights will be 
  \hline
 \end{tabular}
 \caption{A list of arguments specific to morpho\_tagger\_2.py, with detailed description.} 
+\label{Tab:mt2_args}
 \end{table}
 
-\textbf{Sentiment analysis} experiments can be run from \texttt{sentiment\_analysis.py} with arguments as described in tables \ref{Tab:com_args} and \ref{Tab:sent_args}.
+Sentiment analysis experiments can be run from \texttt{sentiment\_analysis.py} with arguments as described in tables \ref{Tab:com_args} and \ref{Tab:sent_args}.
 
 \begin{table}
 \centering
-\label{Tab:sent_args}
 \begin{tabular}{ |p{2cm}|p{4,5cm}|p{6cm}| } 
  \hline
  Argument & Values & Description \\ 
@@ -122,10 +121,12 @@ test\_only & string & Path to the model, which will be load and weights will be 
  \hline
 \end{tabular}
 \caption{Arguments for \texttt{sentiment\_analysis.py} script.} 
+\label{Tab:sent_args}
 \end{table}
 
-
-\section{User guide}
+\subsection{Working example}
+The best model is publicly available in the Git repository \footnote{https://github.com/flower-go/DiplomaThesis/tree/master/code/morphodita-research/models\_public} %TODO dodat sentiment model
+ and licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Licence \footnote{https://creativecommons.org/licenses/by-nc-sa/4.0/}. If you want to try the model prediction or see a working example of usage of such models, there is public Google Colaboratory \citep{colab} jupyter notebook, which downloads all necessary data and returns predictions for a given text. This notebook si available here: \url{https://colab.research.google.com/github/flower-go/DiplomaThesis/blob/master/PlayWithModels.ipynb}. 
 
 
 
