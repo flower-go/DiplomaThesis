@@ -28,6 +28,13 @@ Jupyter suits well for this purpose because it, in addition to a possibility of 
 \subsection{Code Structure}
 Each task has code is in the separate directory as can be seen on picture %TODO udelat obrazek s adresarovou strukturou a barevne oznacit co se ma spoustet
 All code for tagging and lemmatization is placed in folder \texttt{morphodita\_research}. Main files are \texttt{morpho\_tagger\_2.py} and \texttt{bert\_finetunning\_simple.py}, which serves for running all experiments relating to tagging and lemmatization. Script arguments are described in more detail in tables \ref{Tab:com_args}, \ref{Tab:mt_com_args} and \ref{Tab:mt2_args}.
+\par
+Sentiment analysis experiments can be run from \texttt{sentiment\_analysis.py} with arguments as described in tables \ref{Tab:com_args} and \ref{Tab:sent_args}.
+
+\subsection{Working example}
+The best model is publicly available in the Git repository \footnote{https://github.com/flower-go/DiplomaThesis/tree/master/code/morphodita-research/models\_public} %TODO dodat sentiment model
+ and licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Licence \footnote{https://creativecommons.org/licenses/by-nc-sa/4.0/}. If you want to try the model prediction or see a working example of usage of such models, there is public Google Colaboratory \citep{colab} jupyter notebook, which downloads all necessary data and returns predictions for a given text. This notebook si available here: \url{https://colab.research.google.com/github/flower-go/DiplomaThesis/blob/master/PlayWithModels.ipynb}. 
+
 
 %spolecne pro vsechny:
 \begin{table}
@@ -103,8 +110,6 @@ test\_only & string & Path to the model, which will be load and weights will be 
 \label{Tab:mt2_args}
 \end{table}
 
-Sentiment analysis experiments can be run from \texttt{sentiment\_analysis.py} with arguments as described in tables \ref{Tab:com_args} and \ref{Tab:sent_args}.
-
 \begin{table}
 \centering
 \begin{tabular}{ |p{2cm}|p{4,5cm}|p{6cm}| } 
@@ -123,10 +128,6 @@ Sentiment analysis experiments can be run from \texttt{sentiment\_analysis.py} w
 \caption{Arguments for \texttt{sentiment\_analysis.py} script.} 
 \label{Tab:sent_args}
 \end{table}
-
-\subsection{Working example}
-The best model is publicly available in the Git repository \footnote{https://github.com/flower-go/DiplomaThesis/tree/master/code/morphodita-research/models\_public} %TODO dodat sentiment model
- and licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Licence \footnote{https://creativecommons.org/licenses/by-nc-sa/4.0/}. If you want to try the model prediction or see a working example of usage of such models, there is public Google Colaboratory \citep{colab} jupyter notebook, which downloads all necessary data and returns predictions for a given text. This notebook si available here: \url{https://colab.research.google.com/github/flower-go/DiplomaThesis/blob/master/PlayWithModels.ipynb}. 
 
 
 

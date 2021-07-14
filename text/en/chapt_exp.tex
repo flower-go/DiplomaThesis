@@ -1,6 +1,6 @@
 \chapter{Experiments}
 \label{chap:exp}
-This chapter describes all experiments and their results. First part is dedicated to presentation of different experiement hyperparameters, which are in many cases common to all tasks, followed by the analysis of each task -- definition, related work, datasets, a description of according model and results.
+This chapter describes all experiments and their results. First part is dedicated to presentation of different experiement hyperparameters, which are in many cases common to all tasks, followed by the description of each task and a discussion of results.
 \section{A description of training hyperparameters}
 \label{sec:expe}
 \subsection{General experiment setup (EXPE)}
@@ -26,26 +26,35 @@ Most experiments are expected to perform better with some kind of learning rate 
 \begin{itemize}
 \item \textbf{simple} \textit{Simple} option indicates no more complex learning rate scheduling than setting in advance different learning rates for different epochs.
 \item \textbf{isrd} %TODO citovat 
-\textit{isrd} means inverse square root learning rate decay defined by formula: $1/\sqrt{max(n,k)}$ where $k$ is the number of so-called \textit{warmup steps} and $n$ is the current iteration. This leads to constant learning rate for first $k$ steps and decayed learning rate in rest of iterations.
+\textit{isrd} means inverse square root learning rate decay defined by formula: $$1/\sqrt{max(n,k)}$$ where $k$ is the number of so-called \textit{warmup steps} and $n$ is the current iteration. This leads to constant learning rate for first $k$ steps and decayed learning rate in rest of iterations.
 \item \textbf{cos}: Another learning rate scheduling used in this work is \textit{cosine decay} %TODO citovat
 which applies following formula: $$lr=lr_{min}^{i} + \frac{1}{2}(lr_{max}^{i} - lr_{min}^{i})(1+cos(\frac{T_{curr}}{T_i}\pi)),$$ where $lr_{min}^{i}$ and $lr_{min}^{i}$ is the range of the learning rate, $T_i$ is the number of epochs after which the learning rate is restarted, i.e. increased to the $lr_{max}^{i}$ value and $T_{curr}$ is the current epoch number.
 \end{itemize}
 
 \subsection{Model layers selected for embeddings (LAYERS)}
-As discussed in the previous chapter, is unclear how to extract best embeddings from the language model, especially which layers to take into account. By selecting the most promising ways, following two hyperparameters are used in this work:
+As discussed in the previous chapter, it is unclear how to extract best embeddings from the language model, especially which layers to take into account. By selecting the most promising ways, following two hyperparameters are used in this work:
 \begin{itemize}
-\item \textbf{four}: Last four of the model are averaged to obtain final embeddings.
-\item \textbf{att}: This setting performs weighted sum of all model layers and the weights are trained during training together with the rest of the model.
+\item \textbf{four}: Last four layers of the model are averaged to obtain final embeddings.
+\item \textbf{att}: Layer attention performs weighted sum of all model layers and the weights are trained during training together with the rest of the model.
 \end{itemize}
 Experiments are also performed with different learning rates (LR), batch size (BATCH) and a number of epochs (EPOCH). 
-Technical details needed for running scripts can be found in chapter \ref{chap:impl}.
+Technical details needed for running scripts with right arguments can be found in chapter \ref{chap:impl}.
+
+\subsection{Metrics}
+Metrics used for evaluation in this work are \textit{accuracy} and \textit{F1 score}. 
+Accuracy is a percentage of correctly classified samples out of all samples and it is basic metric for all classification tasks (not only in this thesis). Accuracy can be sometimes misleading \footnote{see: https://en.wikipedia.org/wiki/Accuracy\_paradox}. and there exists other metrics which can better reflects experimenter's goals. One of them is F1 score, which is used together with accuracy for evaluation of sentiment analysis task due to comparability of results. F1 score is defined in terms of precision and recall. Precision  
+$$precision = \frac{TP}{TP + FP}$$ express credibility of a positive result, e.g. if positive result means  a need of surgery, it is definitely unwanted to have low precision and perform many dangerous and expensive surgeries unnecessarily. Recall, defined as: $$recall = \frac{TP}{TP + FN}$$,
+on the other hand tells us how many positives are captured. For example: \textit{How likely I am to be pregnant with a negative pregnancy test?}. F1 score formula for binary classification is than defined as
+$$F1 = 2 \times \frac{precision \times recall}{precision + recall}.$$
+For multi-class classification, precision and recall needs to be redefined. F1 score can be computed per-class (for every class, binary classification of being in the class is taken). Per-class scores can be combined in one of following ways:
+\begin{itemize}
+\item macro-F1: average of per-class scores
+\item weighted-F1: average as before, but weighted by number of samples in each class.
+\item micro-F1: equals to accuracy.
+\end{itemize}
+\par
+Following part describes specific details of each task.
 \newpage
 \input{chaplemtag}
 \newpage
 \input{chapsentiment}
-
-\subsection{Metrics}
-Metrics used in this work are \textit{accuracy} and \textit{F1 score}. 
-F1 score formula is:
-$$F1 = 2 \times \frac{precision \times recall}{•precision + recall}$$, where precision is $precision = \frac{TP}{TP + FP}$ and recall is defined as $recall = \frac{TP}{TP + FN}$
-%TODO popsat czorecky na metriky 
