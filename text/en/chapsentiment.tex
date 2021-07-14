@@ -25,6 +25,16 @@ results are accuracy 84 with tfidf and about 81 with bert and they used mall dat
 \subsection{Dataset and Preprocessing}
 %TODO zjistit jaka jsou na to porovnavaci data This work primary tries to improve existing tasks and show the ability of contextualized embeddings to improve results, so tasks with existing data and results were selected.  %TODO why?
 Four main Czech datasets with sentiment annotation are available: user reviews from MALL.cz (mall), film reviews from csfd.cz (csfd), news from Aktualne.cz (aktualne) and posts from czech branch pages on facebook.cz (facebook). As \textit{aktualne} dataset turned out to be problematical because the text were ambiguous even for annotators, and its authors later used other mentioned datasets \citep{Veselovska}, this work also focuses only on the three other data sources -- \textit{mall}, \textit{csfd} and \textit{facebook} \footnote{All three datasets are all available here: http://liks.fav.zcu.cz/sentiment/}. Some experiment are also performed with in-domain training on Eglish data. For this purpose is used \textit{imdb} dataset \footnote{https://www.tensorflow.org/datasets/catalog/imdb\_reviews}, which contains movie review from the biggest movie rating website imdb.com. This leads to some problems described later in this section, because English dataset contains only binary classification (positive/negative). Table \ref{tab:datasets} summarize each dataset.
+\par
+As can be seen in figure \ref{pic:dist}, distribution of labels differs among datasets. Moreover, Figure \ref{pic:dist_all}
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.7\columnwidth]{../img/all.png}
+\protect\caption{Percentage and absolute values of labels in all three Czech datasets together.}
+\label{pic:dist_all}
+\end{figure}
+%TODO all má blbý nadpis
+shows, that the resulting dataset is highly unbalanced, which may causes divergence and stuck in training. Due to the big part of labels being positive, many learning strategies just ended with predicting only \textit{positive} class, i.e. 55\% accuracy, so unfortunately learned nothing. 
 %TODO popis tabulky
 \begin{center}
 \begin{table}[]
@@ -33,34 +43,23 @@ Four main Czech datasets with sentiment annotation are available: user reviews f
      & length & labels                                                                & domain        \\ \hline \hline
 \textbf{mall}     & 145306 & \begin{tabular}[c]{@{}l@{}}positive\\ neutral\\ negative\end{tabular} & domestic appliance reviews                             \\ \hline
 \textbf{csfd} & 91304  & \begin{tabular}[c]{@{}l@{}}positive\\ neutral\\ negative\end{tabular} & movie reviews \\ \hline
-\textbf{facebook} & 9752   & \begin{tabular}[c]{@{}l@{}}positive\\ neutral\\ negative\end{tabular} & \begin{tabular}[c]{@{}l@{}}brand pages of e.g. shops or mobile networks \\ providers\end{tabular} \\ \hline
+\textbf{facebook} & 9752   & \begin{tabular}[c]{@{}l@{}}positive\\ neutral\\ negative\end{tabular} & \begin{tabular}[c]{@{}l@{}}brand pages of e.g. shops or mobile network\\ providers\end{tabular} \\ \hline
 \textbf{imdb} & 25000  & \begin{tabular}[c]{@{}l@{}}positive\\ negative\end{tabular}           & movie reviews \\ \hline
 \end{tabular}
-\label{tab:datasets}
 \caption{Three Czech datasets (mall, facebook, csfd) and one English (imdb) are used for training in this work.}
+\label{tab:datasets}
 \end{table}
 \end{center}
 
 
 %TODO je to rozdleeno se stratifikací?
 %TODO popis obrazku
-\begin{figure}[!ht]
+\begin{figure}[!h]
 \centering
 \includegraphics[width=1\columnwidth]{../img/dist_all.png}
 \protect\caption{Distribution of positive/neutral/negative labels in each dataset.}
 \label{pic:dist}
 \end{figure}
-
-As can be seen in figure \ref{pic:dist}
-distribution of labels differs among datasets. Moreover, Figure \ref{pic:dist_all}
-\begin{figure}[!ht]
-\centering
-\includegraphics[width=0.7\columnwidth]{../img/all.png}
-\protect\caption{Percentage and absolute values of labels in all three Czech datasets together.}
-\label{pic:dist_all}
-\end{figure}
-%TODO all má blbý nadpis
-shows, that the resulting dataset is highly unbalanced, which causes divergence and stuck in training. Due to the big part of labels being positive, many learning strategies just ended with predicting only \textit{positive} class, i.e. 55\% accuracy, so unfortunately learned nothing. 
 
 %This was the the case for following experiments settings:
 %learning rate of $2e-3$ for 10 epochs. This ended with predicting only one class (positive). Some progress showed the followign approach:"2:5e-5,1:2e-5, unfreezed" for facebook data only (which are balanced). This results are above 71 for accuracy (Test accuracy: 0.726
@@ -72,56 +71,69 @@ The main division of experiments is by the input dataset -- each of Czech models
 \par
 Network architecture is much simpler than in tagging and lemmatization task and corresponds to \textit{simple} setting of these tasks -- only BERT-like model and classification head consisting of layer with softmax activation function. %TODO a neni tam nahodou jeste neco?
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=1\columnwidth]{../img/confusion_matrix}
-\protect\caption{Normalized confusion matrix}
-\label{pic:conf1}
-\end{figure}
+%\begin{figure}[h]
+%\centering
+%\includegraphics[width=1\columnwidth]{../img/confusion_matrix}
+%\protect\caption{Normalized confusion matrix}
+%\label{pic:conf1}
+%\end{figure}
 
 \subsection{Results and Discussion}
-%I tried another approach:
-%Because the facebook dataset is balanced, I pretrained the model first on facebook and after reaching a decent accuracy, i further trained the model on the join data:
-%for ten epochs with learning rate 5e-5 and an effecctive batch size 48.
-%[[ 6240 914 2783]
-%[ 1236 4447 529]
-%[ 1050 273 19020]]
-%Test accuracy: 0.814068837005371
-%F1 metrics: 0.8087903170140932
 
-%The pretraining model was obtained as:
-%without freezing, batch size 48, 2:5e-5,4:2e-5
+\begin{table}[!h]
+\centering
+  \begin{tabular}{|l||c|c|c||c|c|c|}
+  \hline
+    Model & Accuracy & F1 \\ \hline \hline
+    baseline & 82.00 & 70.00  \\ \hline
+    RobeCzech &  & 80.13 \\ \hline
+    Czert & & 78.52 \\ \hline
+    xlm-Roberta && 82.29 \\ \hline
+    best(16) & 84.04 & 84.86 \\ \hline
+  \end{tabular}
+  \caption{ Baseline model (tf-idf) and the best model for all Czech data together.} %TODO popis } 
+  \label{tab:res_czech}
+\end{table}
 
+\begin{table}[!h]
+\centering
+  \begin{tabular}{|l||c|c|c||c|c|c|}
+  \hline
+    Model & Accuracy & F1 \\ \hline \hline
+    best(43) & 81.50 & 81.37 \\ \hline
+  \end{tabular}
+  \caption{ Results for csfd dataset.} %TODO popis } 
+  \label{tab:res_csfd}
+\end{table}
+\begin{table}[!h]
+\centering
+  \begin{tabular}{|l||c|c|c||c|c|c|}
+  \hline
+    Model & Accuracy & F1 \\ \hline \hline
+    best(63) & 84.60 & 84.14 \\ \hline
+  \end{tabular}
+  \caption{Results for mall dataset.} %TODO popis } 
+  \label{tab:res_mall}
+\end{table}
+\begin{table}[!h]
+\centering
+  \begin{tabular}{|l||c|c|c||c|c|c|}
+  \hline
+    Model & Accuracy & F1 \\ \hline \hline
+    best(45) & 81.80 & 81.65 \\ \hline
+  \end{tabular}
+  \caption{ Results for facebook dataset.} %TODO popis } 
+  \label{tab:res_facebook}
+\end{table}
 
-
-%Than I trained for 3 more epochs:
-%[[ 6599 995 2343]
-%[ 1246 4520 446]
-%[ 1470 269 18604]]
-%Test accuracy: 0.8145072892688808
-%F1 metrics: 0.8119431050948791
-%TODO  \ref{pic:conf1}
-
-Baseline for this task is tf-idf method %TODO nekde je popsana v prni kapitole
-, which resulted in 
-[[ 4310   102  3015]
- [  685  1016   779]
- [  842    48 20227]]
-              precision    recall  f1-score   support
-
-           0       0.74      0.58      0.65      7427
-           1       0.87      0.41      0.56      2480
-           2       0.84      0.96      0.90     21117
-
-    accuracy                           0.82     31024
-   macro avg       0.82      0.65      0.70     31024
-weighted avg       0.82      0.82      0.81     31024
-
+%TODO crossvalidated \
+%TODO tady mam best pro ruzne datasety a neni to uplne porovnatene
 
 % Please add the following required packages to your document preamble:
 % \usepackage{multirow}
 \begin{table}[]
-\resizebox*{!}{\textheight}{\begin{tabular}{|l|l|l|l||ll|}
+\centering
+\resizebox*{!}{\textheight-2pt}{\begin{tabular}{|l|l|l|l||ll|}
 \hline
 \multicolumn{2}{|l|}{MODEL}       & EXPE                      & LRTYPE                & Acc    & F1   \\ \hline  \hline
 1  & \multirow{6}{*}{mBERT}     & czech                     & \multirow{3}{*}{Isrd} & 0,81   & 0,81 \\ \cline{1-1} \cline{3-3} \cline{5-6} 
@@ -172,12 +184,30 @@ weighted avg       0.82      0.82      0.81     31024
 74 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 0,83   & 0,83 \\ \cline{1-1} \cline{4-6} 
 75 &                            &                           & cos                   & 0,84   & 0,84 \\ \hline
 \end{tabular}}
+\caption{This table presents complete results on the sentiment task. }
+\label{tab:res_all_sent}
 \end{table}
 
 
 
 %Because BERT model was trained on multilingual data, it is naturally not so good in language minoritly presented in the Bert's training data. When transfering the learned knowledge to czech sentiment task, we actually want to improve model in two ways: teach it something more specific about given task, i.e., sentiment, and improve its knowledge about selected language (czech in this case). By using czech sentiment dataset, both thing are incorporated into training. To obtained better results and following the \citep{Putra}, I also selected english sentiment dataset. The idea behind is that BERT is quite good in english and maybe can learn faster useful knowledge about the given task from data in more familiar language.
 
+
+
+%Baseline for this task is tf-idf method %TODO nekde je popsana v prni kapitole
+%, which resulted in 
+%[[ 4310   102  3015]
+ %[  685  1016   779]
+ %[  842    48 20227]]
+ %             precision    recall  f1-score   support
+
+%           0       0.74      0.58      0.65      7427
+%           1       0.87      0.41      0.56      2480
+ %          2       0.84      0.96      0.90     21117
+%
+%    accuracy                           0.82     31024
+%   macro avg       0.82      0.65      0.70     31024
+%weighted avg       0.82      0.82      0.81     31024
 
 
 
