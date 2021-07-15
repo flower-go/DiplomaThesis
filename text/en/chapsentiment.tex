@@ -13,18 +13,35 @@ As stated in \citep{Veselovska}: "Sentiment analysis, also known as opinion mini
 citace:
 \citep{Cano2019}
 \citep{Kittask2020} .. estonian
-\citep{Lenc2016} sentiment in czech
+
 \citep{Hercig2018}
 \citep{Li}
-\citep{Libovicky} presents state-of-the art results in three czech NLP tasks including sentiment analysis. They use only CSFD dataset with resulting accuracy 80.8 .1 which is still not so good as Brychcín (81.5.3). The second mentioned paper, however, uses quite complicated method for classification incorporating the fact of which movie is reviewed. 
 
-Bachelor thesis which aplies bert on sentiment analysis in czech:
-%https://dspace.cvut.cz/bitstream/handle/10467/83127/F8-BP-2019-Langr-Lukas-thesis.pdf?sequence=-1&isAllowed=y
-results are accuracy 84 with tfidf and about 81 with bert and they used mall dataset.
+%TODO habernal vytvoril ty datasty 
+
+%TODO celkova tabulka
+There is not so many attempts to sentiment analysis in Czech in comparison to english, however some attempts were made with both neural networks and traditional machine learning - naive bayes classifiers,support vector machines, and maximum-entropy-based classifiers \citep{Veselovska}.  %TODO citace SVM Ptáček(2013), 
+For a practical use \citep{Zizka} presented automatic sentiment prediction of unlabelled text based on a small set of labelled patterns via searching similarities.  One of first attepts to apply neural networks on Czech sentiment is described in \citep{Lenc}, which evaluates besides others all three datasets used in this work on document-level sentiment analysis. 
+
+As the neural networks dominates in many NLP taks, they are also applied in sentiment analysis. \citep{kysely} performes sentiment analysis using embeddings and convolutional neural network on multidimensional embedding, which is quite unusual as CNNs are typically used for image processing. \citep{kysely} uses same three datasets, but classifies only on sentiment-level (they filtered out longer samples), which is simpler as longer texts tend to be more inconsistent about sentiment \citep{Veselovska}. \citep{Libovicky} presents state-of-the art results in three czech NLP tasks including sentiment analysis. They use only CSFD dataset with resulting accuracy 80.8\% which is comparable to previous \acrshort{sota} \citep{Brychcin2013}. The second mentioned paper uses quite complicated method for classification incorporating the fact of which movie is reviewed, while \citep{Libovicky} uses only bidirectional LSTMs with multiple attention heads following state-of-the-art results on English \citep{Lin2017}. There are four previous works know to me, which involves BERT-like models: 
+\begin{itemize}
+\item XLM-Roberta applied on all three datastets trimmed to 128 characters \footnote{http://www.janpalasek.com/sentiment-analysis-czech.html}
+\item \citep{Klouda} applies multilingual BERT on mall dataset with resulting accuracy about  81\%, which did not outperform the naive bayes classifier baseline with 84\% accuracy, 
+\item  \citep{Sido2021} presents monolingual Czech model Czert,  based on BERT and ALBERT models, and evalutes it on csfd and facebook datastets with new state-of-the-art results,
+\item \citep{Straka2021} published another monolingual model, this time based on more succesfull RoBERTa model and surpassed Czert on facebook dataset.
+
+
+\end{itemize}
+
+
+%%%%%%%BERTI
+
+
+robeczech
 
 \subsection{Dataset and Preprocessing}
 %TODO zjistit jaka jsou na to porovnavaci data This work primary tries to improve existing tasks and show the ability of contextualized embeddings to improve results, so tasks with existing data and results were selected.  %TODO why?
-Four main Czech datasets with sentiment annotation are available: user reviews from MALL.cz (mall), film reviews from csfd.cz (csfd), news from Aktualne.cz (aktualne) and posts from czech branch pages on facebook.cz (facebook). As \textit{aktualne} dataset turned out to be problematical because the text were ambiguous even for annotators, and its authors later used other mentioned datasets \citep{Veselovska}, this work also focuses only on the three other data sources -- \textit{mall}, \textit{csfd} and \textit{facebook} \footnote{All three datasets are all available here: http://liks.fav.zcu.cz/sentiment/}. Some experiment are also performed with in-domain training on Eglish data. For this purpose is used \textit{imdb} dataset \footnote{https://www.tensorflow.org/datasets/catalog/imdb\_reviews}, which contains movie review from the biggest movie rating website imdb.com. This leads to some problems described later in this section, because English dataset contains only binary classification (positive/negative). Table \ref{tab:datasets} summarize each dataset.
+Four main Czech datasets with sentiment annotation are available: user reviews from MALL.cz (mall), film reviews from csfd.cz (csfd), news from Aktualne.cz (aktualne) and posts from Czech branch pages on facebook.cz (facebook). As \textit{aktualne} dataset turned out to be problematical because the text were ambiguous even for annotators, and its authors later used other mentioned datasets \citep{Veselovska}, this work also focuses only on the three other data sources -- \textit{mall}, \textit{csfd} and \textit{facebook} \footnote{All three datasets are all available here: http://liks.fav.zcu.cz/sentiment/}. Some experiment are also performed with in-domain training on Eglish data. For this purpose is used \textit{imdb} dataset \footnote{https://www.tensorflow.org/datasets/catalog/imdb\_reviews}, which contains movie review from the biggest movie rating website imdb.com. This leads to some problems described later in this section, because English dataset contains only binary classification (positive/negative). Table \ref{tab:datasets} summarize each dataset. All dataset were randomly split into train, development and test datasets with the same labels distribution as original datasets.
 \par
 As can be seen in figure \ref{pic:dist}, distribution of labels differs among datasets. Moreover, Figure \ref{pic:dist_all}
 \begin{figure}[!h]
@@ -100,6 +117,7 @@ Network architecture is much simpler than in tagging and lemmatization task and 
   \begin{tabular}{|l||c|c|c||c|c|c|}
   \hline
     Model & Accuracy & F1 \\ \hline \hline
+    baseline & 69.07 & 69.00 \\ \hline
     best(43) & 81.50 & 81.37 \\ \hline
   \end{tabular}
   \caption{ Results for csfd dataset.} %TODO popis } 
@@ -110,6 +128,7 @@ Network architecture is much simpler than in tagging and lemmatization task and 
   \begin{tabular}{|l||c|c|c||c|c|c|}
   \hline
     Model & Accuracy & F1 \\ \hline \hline
+    baseline & 84.72& 83.00 \\ \hline
     best(63) & 84.60 & 84.14 \\ \hline
   \end{tabular}
   \caption{Results for mall dataset.} %TODO popis } 
@@ -120,6 +139,7 @@ Network architecture is much simpler than in tagging and lemmatization task and 
   \begin{tabular}{|l||c|c|c||c|c|c|}
   \hline
     Model & Accuracy & F1 \\ \hline \hline
+    baseline & 67.30 & 63.00 \\ \hline
     best(45) & 81.80 & 81.65 \\ \hline
   \end{tabular}
   \caption{ Results for facebook dataset.} %TODO popis } 
@@ -208,6 +228,21 @@ Network architecture is much simpler than in tagging and lemmatization task and 
 %    accuracy                           0.82     31024
 %   macro avg       0.82      0.65      0.70     31024
 %weighted avg       0.82      0.82      0.81     31024
+
+
+
+
+%results of zero2 without training
+[[ 2809  6986   142]
+ [ 1538  4621    53]
+ [ 4787 15202   354]]
+Test accuracy: 0.21330702619752273
+F1 metrics: 0.1467527264529802
+
+%jeste pusteno 35 to je s robeckem, jestli neni na tu cestinu prior lepsi
+
+%TODO baseline u all neni macro ale weighted
+
 
 
 

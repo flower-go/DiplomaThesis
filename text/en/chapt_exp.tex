@@ -11,7 +11,7 @@ Training is performed in one of following settings:
 \item \textbf{embed}: BERT-like language model is used only to generate static embeddings in advanced. These embeddings are not further trained.
 \item \textbf{fine}: Fine-tuning consist in dividing the training time into two parts. Firstly, rest of the model is trained with BERT layers frozen (not trained), so it is same as the \textit{embed} settings. In the second part, the whole model is trained together.
 \item \textbf{simple}: Model architecture is reduced to bert layers with a simple classification head. This is basic setting for all sentiment analysis experiments.\footnote{For tagging and lemmatization, all previously mentioned EXPE setups are performed with more sophisticated classification head than in \textit{simple} version.} 
-\item \textbf{full}: This options means training the whole model from the beginning (in contrast to \textit{fine} option), but the classification head is not simplified (in contrast \textit{simple} option).
+\item \textbf{full}: This options means training the whole model from the beginning (in contrast to \textit{fine} option), but the classification head is not simplified (in contrast to \textit{simple} option).
 \end{itemize}
 %TODO zmenit u sentimentu mít všude simple nebo full a jinej sloupec na data?
 \subsection{Training data}
@@ -42,7 +42,7 @@ Technical details needed for running scripts with right arguments can be found i
 
 \subsection{Metrics}
 Metrics used for evaluation in this work are \textit{accuracy} and \textit{F1 score}. 
-Accuracy is a percentage of correctly classified samples out of all samples and it is basic metric for all classification tasks (not only in this thesis). Accuracy can be sometimes misleading \footnote{see: https://en.wikipedia.org/wiki/Accuracy\_paradox}. and there exists other metrics which can better reflects experimenter's goals. One of them is F1 score, which is used together with accuracy for evaluation of sentiment analysis task due to comparability of results. F1 score is defined in terms of precision and recall. Precision  
+Accuracy is a percentage of correctly classified samples out of all samples and it is basic metric for all classification tasks (not only in this thesis). Accuracy can be sometimes misleading \footnote{see: https://en.wikipedia.org/wiki/Accuracy\_paradox} and there exists other metrics which can better reflects experimenter's goals. One of them is F1 score, which is used together with accuracy for evaluation of sentiment analysis task due to comparability of results. F1 score is defined in terms of precision and recall. Precision  
 $$precision = \frac{TP}{TP + FP}$$ express credibility of a positive result, e.g. if positive result means  a need of surgery, it is definitely unwanted to have low precision and perform many dangerous and expensive surgeries unnecessarily. Recall, defined as: $$recall = \frac{TP}{TP + FN}$$,
 on the other hand tells us how many positives are captured. For example: \textit{How likely I am to be pregnant with a negative pregnancy test?}. F1 score formula for binary classification is than defined as
 $$F1 = 2 \times \frac{precision \times recall}{precision + recall}.$$
