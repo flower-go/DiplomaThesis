@@ -80,16 +80,13 @@ Lemmatization (both Czech and English) has undergone a similar development as ta
 
 \subsection{Dataset and Preprocessing}
 \label{sub:dataset}
-%TODO popisje v straka2019 - dopnit
-%TODO kolik je tam lemmat, tagů, celkem vet, pripadne tokenů - je v certovi1568
-Dataset for these tasks is taken from data of Prague Dependency Treebank (PDT) \citep{PDT35}, version 3.5 from year 2018. %TODO kolik tamjedat
-Data consists of sentences with lemmas and tags. For ambiguous words, data contain all possible analysis. For example, Czech word "psa" have one possible lemma ("pes") but two possible tags because it could be one of two possible grammatical cases -- genitive or accusative. Input data for such word looks as follows: \\
+Dataset for these tasks is taken from data of Prague Dependency Treebank (PDT) \citep{PDT35}, version 3.5 from year 2018. Data consists of sentences with lemmas and tags. For ambiguous words, data contain all possible analysis. For example, Czech word "psa" have one possible lemma ("pes") but two possible tags because it could be one of two possible grammatical cases -- genitive or accusative. Input data for such word looks as follows: \\
 \begin{center}
 \texttt{psa pes NNMS2-----A---- NNMS4-----A----}.
 \end{center}
-Data contains about 1,600 unique tags and 15k different lemma rules. The number of lemmas is significantly smaller than a number of unigue lemmas -- 72K \citep{Strakova} or tags, because words with simiral morphological function have same way of creating lemma from the word, e.g. words \textit{malého} (little, accusative,  sg, m.,) and \textbf{červeného}  (red, accusative,  sg, m.,) have same lemma rule:
+Data contains about 1,600 unique tags and 15k different lemma rules. The number of lemmas is significantly smaller than a number of unigue lemmas ($72,000$) \citep{Strakova} or tags, because words with similar mor+phological function have same way of creating lemma from the word, e.g. words \textit{malého} (=little, accusative,  sg, m.,) and \textit{červeného}  (=red, accusative,  sg, m.,) have the same lemma rule:
 \begin{center}
-\texttt{$\downarrow 0;d$ \textbrokenbar ---+$\acute{y}$+-+1}.
+\texttt{$\downarrow$ 0;d\textbrokenbar ---+ý+-+1}.
 \end{center} 
 \par
 Dataset was originally divided into tree parts - train, development and test, which is also used in this work. Input sentences are preprocessed as follows:
@@ -100,30 +97,25 @@ Dataset was originally divided into tree parts - train, development and test, wh
 \item tokenization -- Tokenizer for corresponding BERT-like model transforms input words into tokens. Each word is transformed into one or more strings, which are converted into numbers. This serves as an input into BERT part of model. To creating these input embeddings, the whole sentence for each word is needed as same words can have different representation in different contexts. More information can be found in \ref{sub:tokens}.
 \end{itemize}
 
-\subsection{Experiments and Architecture}
+\subsection{Architecture and Experiments}
 \begin{figure}[!h]
 \centering
 \includegraphics[width=1\columnwidth]{../img/taggermodel.pdf}
 \protect\caption{Tagging and lemmatization joint model architecture.}
 \label{pic:lt_arch}
 \end{figure}
-%zminit udpipe a zminit kolik je tech lstm a tak,vsechny dimenze (do tabulky)
+%TODO kolik je tech lstm a tak,vsechny dimenze (do tabulky)
 
 %For POS tagging, we applied a straightforward model in the lines of Ling et al. (2015) – first rep- resenting each word with its embedding, contextu- alizing them with bidirectional RNNs (Graves and Schmidhuber, 2005), and finally using a softmax classifier to predict the tags. z UDpipe2
 
-%??? We perform tokenization, sentence segmentation and multi-word token splitting with the baseline UDPipe 1.2 approach. In a nutshell, input charac- ters are first embedded using trained embeddings, then fixed size input segments (of 50 characters) are processed by a bidirectional GRU (Cho et al., 2014), and each character is classified into three classes – a) there is a sentence break after this character, b) there is a token break after this char- acter, and c) there is no break after this character.
-
-%reprezentation: tři typy embeddings - pretrained, trained, character-level a ještě berti
-
-%TODO popisovat vice ty pravidla?
-
 The model for lemmatization and tagging is build upon a model (and a code) for previous work on Czech NLP processing with contextual embedding \citep{straka2019czech}. 
-Data preprocessing is taken over from the paper as well as the structure of a lemmatizer and a tagger network which is extended by BERT-like models, hoping for improvements. Previous work \citep{Straka2019} and \citep{Straka2018} showed that training tagging and lemmatization together in one network can be mutually advantageous, so both of these analysis are an output of one network and are trained jointly. Detailed visualisation of network architecture can be found in Figure \ref{pic:lt_arch}. \par The architecture of network can be divided into three parts -- inputs, optional \acrshort{rnn}s, classification head:
+Data preprocessing is taken over from the paper as well as the structure of a lemmatizer and a tagger network, which is extended by BERT-like models, hoping for improvements. %TODO k tomu nemam citaci
+Previous work showed that training tagging and lemmatization together in one network can be mutually advantageous, so both of these analysis are an output of one network and are trained jointly. Detailed visualisation of network architecture can be found in Figure \ref{pic:lt_arch}. \par The architecture of network can be divided into three parts -- inputs, optional \acrshort{rnn}s, classification head:
 \paragraph{Inputs}
 An input of the network is formed of five types -- characters (charseqs), words (charseq ids), correct responses(word ids), pretrained embeddings and possibly precomputed bert embeddings (depends on the experiment type). Before the further processing of inputs by \acrshort{rnn} cells, there are created two other types of embeddings: character-level embeddings and another word embeddings which are, in contrast to BERT and pretrained embeddings, also trained during training process.
 
 \paragraph{RNN cells}
-Characterlevel embeddings are further processed via \acrfull{gru} and all inputs (or their embeddings) are processed by recurrent part of network (specifically by \acrfull{lstm} cells).
+Characterlevel embeddings are further processed via 3 layers of \acrfull{gru} and all inputs (or their embeddings) are processed by recurrent part of network (specifically by \acrfull{lstm} cells).
 
 \paragraph{Classification head(s)}
 After the processing by recurrent neural networks, network employs two separate classification head, one for tagging and another for lemmatization. Both uses dense layer with tanh activation function to presented more non-linearity as used in \citep{2018} and a softmax function for obtaining the probability distribution over target classes. Lemmatization, however, presents one another change -- addition of character level data without RNN processing, which are used together with the rest of weights as an input into softmax following \citep{Straka2018}, because it leads to better performance of lemmatization in the case of shared network between both tasks.
@@ -136,18 +128,16 @@ After the processing by recurrent neural networks, network employs two separate 
 
 %TODO nekde mam taky dropouts! zminit
 \subsubsection{Experiments}
-This part uses all main \textbf{experiment types} as decribed in \ref{sec:expe}: \textit{base, ls, embed, fine, simple, full}. Three \textbf{BERT-like models} are used for every experiment setup:
+This part uses all main \textbf{experiment types} as decribed in \ref{sec:expe}: \textit{base, ls, embed, fine, simple} and \textit{full}. Three \textbf{BERT-like models} are used for experiment setup:
 \begin{itemize}
 \item multilingual BERT (mBERT) \citep{Devlin2019} 
 \item XLM-RoBERTa \citep{Conneau2019}), 
 \item RobeCzech \citep{Straka2021}.
 \end{itemize}
-XLM-RoBERTa and mBERT are trained on 100/104 different languages including Czech and RobeCzech is recently published version of RoBERTa, trained only on Czech data. %TODO nekde v diskuzi zminit i certa,aleje horší
-\textbf{Selection of layers} are made in two ways -- last four layers and learning of weighted sum of all layers. These experiment are made for finetunning setup only and as the weighted sum does not showed a significant benefit, mean of last four layer is the only method used for other experiments. %TODO je to z kondraytuk a jmenuje se to attention!
- \textbf{Learning rate} is used as usual for each type of task a and three different learning schedules were applied in each combination of hyperparameters: cosine decay \textit{(cos)}, inverted square root decay \textit{(isrd)} and a one epoch warm-up followed by a constant learning rate \textit{(warmup)}. For \textit{embed} experiments, \textit{warmup} is replaced by  a simple division of training into tow parts with different learning rates as in %TODO citace. 
-Batches has size 64, given by the compromise between the pursuit of relatively big batch size and computational resources. %TODO learning rate ulmfit (warmup) a kondraytuk(inverse) 
-%TODO popsat jak presne to vypada nebo alespon graficky ty learning rates
-%classification head. %TODO popsat jak presne to vypada
+XLM-RoBERTa and mBERT are trained on 100/104 different languages including Czech and RobeCzech is recently published version of RoBERTa, trained only on Czech data. XLM-RobERTa is used only for embedding and one version of finetunnig and this model was omitted in other experiements because of weak results and high computational complexity. There exists another monolingual Czech model, Czert \citep{Sido2021} which uses original BERT architecture and was outperformed by Robeczech \citep{Straka2021}.
+\textbf{A selection of layers} is made in both ways -- last four layers (\textit{four)} and learning of weighted sum of all layers (\textit{att}). The layer attention is made only for finetunning setup and as the weighted sum does not showed a significant benefit, mean of last four layer is the only method used for other experiments.
+ \textbf{Learning rate} is used as usual for each type of task a and three different learning rate schedules were applied in each combination of hyperparameters: cosine decay \textit{(cos)}, inverted square root decay \textit{(isrd)} and a one epoch warm-up followed by a constant learning rate \textit{(warmup)} inspired by \citep{Kondratyuk2019} and \citep{Ruder2018}. For \textit{embed} experiments, \textit{warmup} is replaced by  a simple division of training into two parts with different learning rates.
+Batches has size 64, given by the compromise between the pursuit of relatively big batch size and computational resources. Complete set of hyperparameters for each experiment are in Appendix %TODO doplnit
 
 \subsection{Results and Discussion}
 %TODO jaka je baseline
