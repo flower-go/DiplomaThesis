@@ -20,6 +20,8 @@ from transformers import WarmUp
 class BertModel:
     def __init__(self, name, args):
         self.name = name
+        sys.path.append(name)
+        import tokenizer.robeczech_tokenizer
 
         if "robeczech" in name:
             self.path = name
