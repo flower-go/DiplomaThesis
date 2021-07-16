@@ -186,7 +186,7 @@ class Network:
         if args.predict is None:
             data = dataset.data["tokens"]
         else:
-            data = dataset.data["tokens"]
+            data = dataset
         return self.model.predict(self._transform_dataset(data), batch_size=16)
 
     # def evaluate(self, dataset, name, args):
@@ -429,9 +429,6 @@ if __name__ == "__main__":
 
     else:
         num_labels = 3
-        dataset = SentimentDataset(tokenizer)
-        data = dataset.get_dataset(d, path=args.predict)
-        data_result = TextClassificationDataset().from_array([data, None, None], tokenizer.encode)
 
 
 
@@ -482,9 +479,16 @@ if __name__ == "__main__":
         #TODO do args.model dat co nacist a do predict asi teda data k predikci
         out_file = args.model.split("/")[-1] + "_vystup"
         #TODO nacist test file
-        with open(args.predict) as f:
-            test = f.readlines()
-        test = data_result
+
+        data = pd.read_csv(args.predict, sep='\n', header=None, names=['Post']).assign(Sentiment=4)
+        test = []
+        for i, row in data.iterrows():
+            text = row["Post"].rstrip("\r\n")[0:512]
+            encoded = tokenizer(text)
+            if type(encoded) is dict:
+                encoded = encoded["input_ids"]
+            test.append(encoded)
+
         with open(out_file, "w", encoding="ascii") as out_file:
             for i,label in enumerate(network.predict(test, args)):
                 label = np.argmax(label)
