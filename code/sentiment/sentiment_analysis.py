@@ -428,7 +428,7 @@ if __name__ == "__main__":
         #if args.decay_type is not None:
          #   args.warmup_decay = math.floor(len(data_result.train._data["tokens"]) / args.batch_size)
 
-    print("Delka datasetu " + str(len(data_result.train._data)))
+        print("Delka datasetu " + str(len(data_result.train._data)))
 
     if args.decay_type != None:
         args.steps_in_epoch = math.floor(len(data_result.train._data["tokens"]) / (args.batch_size*args.accu))
