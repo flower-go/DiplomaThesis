@@ -186,7 +186,7 @@ class Network:
         if args.predict is None:
             data = dataset.data["tokens"]
         else:
-            data = dataset
+            data = dataset.data["tokens"]
         return self.model.predict(self._transform_dataset(data), batch_size=16)
 
     # def evaluate(self, dataset, name, args):
@@ -423,6 +423,11 @@ if __name__ == "__main__":
 
     else:
         num_labels = 3
+        dataset = SentimentDataset(tokenizer)
+        data = dataset.get_dataset(d, path=args.predict)
+        data_result = TextClassificationDataset().from_array([data, None, None], tokenizer.encode)
+
+
 
 
         #if args.decay_type is not None:
@@ -473,6 +478,7 @@ if __name__ == "__main__":
         #TODO nacist test file
         with open(args.predict) as f:
             test = f.readlines()
+        test = data_result
         with open(out_file, "w", encoding="ascii") as out_file:
             for i,label in enumerate(network.predict(test, args)):
                 label = np.argmax(label)
