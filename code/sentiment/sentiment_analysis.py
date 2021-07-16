@@ -419,6 +419,10 @@ if __name__ == "__main__":
 
                 data_result.test._size = len(test_data_new)
                 data_result.train._size = len(imdb_ex)
+        num_labels = len(data_result.train.LABELS)
+
+    else:
+        num_labels = 3
 
 
         #if args.decay_type is not None:
@@ -429,7 +433,7 @@ if __name__ == "__main__":
     if args.decay_type != None:
         args.steps_in_epoch = math.floor(len(data_result.train._data["tokens"]) / (args.batch_size*args.accu))
     # Create the network and train
-    network = Network(args, len(data_result.train.LABELS))
+    network = Network(args, num_labels)
 
     if args.predict is None:
         network.train(data_result, args)
