@@ -218,9 +218,15 @@ class Network:
             self.metrics["F1"](f1_score(batch[1], pred, average="weighted"))
 
     def _transform_dataset(self, dataset):
+        print(len(dataset))
         max_len = max(len(a) for a in dataset)
+        print(max_len)
+        print("max")
         data = []
         for i in dataset:
+            print(i)
+            print("i")
+
             max_l = max_len - len(i)
             data.append(i + [0]*max_l)
         
@@ -428,7 +434,7 @@ if __name__ == "__main__":
         #if args.decay_type is not None:
          #   args.warmup_decay = math.floor(len(data_result.train._data["tokens"]) / args.batch_size)
 
-        print("Delka datasetu " + str(len(data_result.train._data)))
+        #print("Delka datasetu " + str(len(data_result.train._data)))
 
     if args.decay_type != None:
         args.steps_in_epoch = math.floor(len(data_result.train._data["tokens"]) / (args.batch_size*args.accu))
