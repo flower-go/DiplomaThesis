@@ -141,21 +141,18 @@ Batches has size 64, given by the compromise between the pursuit of relatively b
 
 \subsection{Results and Discussion}
 %TODO jaka je baseline
-%Jsou vysledky lepsi nez baseline?
-%Co je nejlepší jednotlivě a celkem?
-%kompletní tabulka a tabulka best z kategorií + baseline
+%Jsou vysledky lepsi nez baseline? O kolik procent? ktery model je nejlepsi a cekali jsme to? Cekali jsme jak budou ostatni slabe? (dle kategorií) Kde jsou vsechny vysledky
+%TODO udelat tabulku do příloh
 
-%TODO tady upravit tabulka na nejlepší výsledky z kazde kategorie + baseline + porovnani co tam je + robeczech a o kolik procent je to lepší
-%TODO a jeste jak to bylo udelane v robecku jinak
 \begin{table}[!h]
-  \begin{tabular}{|l||c|c|c||c|c|c|}
+  \begin{tabular}{|l||ccc||ccc|}
   \hline
 \multirow{2}{*}{Experiment} & \multicolumn{3}{c||}{Without Dictionary}  &
       \multicolumn{3}{c|}{With Dictionary} \\ 
     & Tags & Lemmas & Both & Tags & Lemmas & Both \\ \hline \hline
     StrakaB & 97.94 & 98.75 & 97.31 & 98.05 & 98.98 & 97.65 \\ \hline
     StrakaC & 97.67 & 98.63 & 97.02 & 97.91 & 98.94 & 97.51 \\ \hline
-     RobeCzech & 98.43 & 98.79  & 97.83  & 98.50 & \textbf{99.00}  & 98.11 \\ \hline
+     RobeCzech & 98.43 & 98.79  & 97.83  & 98.50 & \textbf{99.00}  & 98.11 \\ \hline \hline
       baseline & 97.04  & 98.56  & 96.41 &  97.31   & 98.83  & 96.90 \\ \hline 
     emb(12) & 98.38  &98.79  & 97.80 & 98.48  & 98.99 & 98.10 \\ \hline
     best(18) & \textbf{98.50}  & \textbf{98.80} &\textbf{ 97.90}  & \textbf{98.57}  & \textbf{99.00}  & \textbf{98.19}  \\ \hline  
@@ -218,7 +215,5 @@ Batches has size 64, given by the compromise between the pursuit of relatively b
 \label{tab:all_res_tl}
 \end{table}
 
-
-
-
-%TODO mozna dat hyperparametry zvlast do tabulky - urcite ty stejne nejak zkratit. Dám vedle learning rates
+%TODO jake chyby dela baseline a jake best model?
+%TODO jake chyby best a jake best mBERT? best mBERT je tl_3

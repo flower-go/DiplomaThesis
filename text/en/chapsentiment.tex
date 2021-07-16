@@ -1,23 +1,21 @@
 \section{Sentiment Analysis}
 \label{chap:sent}
-As stated in \citep{Veselovska}: "Sentiment analysis, also known as opinion mining, is an automatic detection of a positive or negative polarity, or neutrality of ... a text sequence", which is exactly as the sentiment analysis is understood in this work, although there are some other definitions consisting of e.g. opinion extraction, irony or stance \citep{Montoyo2012}. Another tasks related to sentiment analysis is a subjectivity analysis (whether the presented opinion is objective or highly subjective), which is also not included in this work, mainly because the lack of labelled data for Czech. It is possible to analyze individual expressions, sentences or whole documents \citep{Veselovska} and this work focuses on the document level classification.
+As stated in \citep{Veselovska}: "Sentiment analysis, also known as opinion mining, is an automatic detection of a positive or negative polarity, or neutrality of ... a text sequence", which is exactly as the sentiment analysis is understood in this work, although there are some other definitions consisting of e.g. opinion extraction, irony or stance \citep{Montoyo2012}. Another tasks related to sentiment analysis is a subjectivity analysis (whether the presented opinion is objective or highly subjective), which is also not included in this work, mainly because the lack of labelled data for Czech. It is possible to analyze individual expressions, sentences or whole documents \citep{Veselovska}. This thesis focuses on the document level classification, which has many real-life use cases and training data are available.
 \subsection{Task definition}
 \paragraph{Sentiment analysis} \mbox{}\\
 \textit{input:} sequence of sentences (a whole post or comment, depending on the source) \\
 \textit{output:} prevailing sentiment of the input from categories: neutral, positive, negative.
 \par
 
-\paragraph{Metric} For evaluating performance, two metrics are used: macro-averaged F1 score and accuracy. Both metrics are chosen for better comparability with previous work.
+\paragraph{Metric} For evaluating performance, two metrics are used: weighted-F1 score and accuracy. Accuracy is a standard metric for classification and weighted-F1 allows better comparability and also provides additional insights into models evaluation.
 
 \subsection{Related Work}
-citace:
+%TODO anglictina:
 \citep{Cano2019}
 \citep{Kittask2020} .. estonian
 
 \citep{Hercig2018}
 \citep{Li}
-
-%TODO habernal vytvoril ty datasty 
 
 %TODO celkova tabulka
 There is not so many attempts to sentiment analysis in Czech in comparison to english, however some attempts were made with both neural networks and traditional machine learning - naive bayes classifiers,support vector machines, and maximum-entropy-based classifiers \citep{Veselovska}.  %TODO citace SVM Ptáček(2013), 
@@ -40,6 +38,7 @@ As the neural networks dominates in many NLP taks, they are also applied in sent
 robeczech
 
 \subsection{Dataset and Preprocessing}
+%TODO habernal vytvoril ty datasty 
 %TODO zjistit jaka jsou na to porovnavaci data This work primary tries to improve existing tasks and show the ability of contextualized embeddings to improve results, so tasks with existing data and results were selected.  %TODO why?
 Four main Czech datasets with sentiment annotation are available: user reviews from MALL.cz (mall), film reviews from csfd.cz (csfd), news from Aktualne.cz (aktualne) and posts from Czech branch pages on facebook.cz (facebook). As \textit{aktualne} dataset turned out to be problematical because the text were ambiguous even for annotators, and its authors later used other mentioned datasets \citep{Veselovska}, this work also focuses only on the three other data sources -- \textit{mall}, \textit{csfd} and \textit{facebook} \footnote{All three datasets are all available here: http://liks.fav.zcu.cz/sentiment/}. Some experiment are also performed with in-domain training on Eglish data. For this purpose is used \textit{imdb} dataset \footnote{https://www.tensorflow.org/datasets/catalog/imdb\_reviews}, which contains movie review from the biggest movie rating website imdb.com. This leads to some problems described later in this section, because English dataset contains only binary classification (positive/negative). Table \ref{tab:datasets} summarize each dataset. All dataset were randomly split into train, development and test datasets with the same labels distribution as original datasets.
 \par
@@ -96,6 +95,7 @@ Network architecture is much simpler than in tagging and lemmatization task and 
 %\end{figure}
 
 \subsection{Results and Discussion}
+%TODO best results a baseline do jedne tabulky
 
 \begin{table}[!h]
 \centering
@@ -241,7 +241,7 @@ F1 metrics: 0.1467527264529802
 
 %jeste pusteno 35 to je s robeckem, jestli neni na tu cestinu prior lepsi
 
-%TODO baseline u all neni macro ale weighted
+%TODO kouknout se kde to dela chyby? 
 
 
 
