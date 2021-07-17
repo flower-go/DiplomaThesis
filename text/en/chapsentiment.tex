@@ -53,7 +53,7 @@ As can be seen in figure \ref{pic:dist}, distribution of labels differs among da
 shows, that the resulting dataset is highly unbalanced, which may causes divergence and stuck in training. Due to the big part of labels being positive, many learning strategies just ended with predicting only \textit{positive} class, i.e. 55\% accuracy, so unfortunately learned nothing. 
 %TODO popis tabulky
 \begin{center}
-\begin{table}[]
+\begin{table}[!h]
 \begin{tabular}{|l||lll|}
 \hline
      & length & labels                                                                & domain        \\ \hline \hline
@@ -95,7 +95,30 @@ Network architecture is much simpler than in tagging and lemmatization task and 
 %\end{figure}
 
 \subsection{Results and Discussion}
-%TODO best results a baseline do jedne tabulky
+\begin{table}[!h]
+\centering
+\begin{tabular}{|l|l||ll|}
+\hline
+dataset                    & models      & Acc   & F1    \\ \hline \hline
+\multirow{5}{*}{All Czech} & baseline    & 82.00 & 70.00 \\ \cline{2-4} 
+                           & RobeCzech   &       & 80.13 \\ \cline{2-4} 
+                           & Czert       &       & 78.52 \\ \cline{2-4} 
+                           & XLM-RoBERTa &       & 82.29 \\ \cline{2-4} 
+                           & best(16)    & \textbf{84.04} & \textbf{84.86} \\ \hline \hline
+\multirow{3}{*}{csfd}      & baseline    & 69.07 & 69.00 \\ \cline{2-4} 
+                           & best(16)    & \textbf{84.02} & \textbf{84.00} \\ \cline{2-4} 
+                           & best(43)    & 81.50 & 81.37 \\ \hline \hline
+\multirow{3}{*}{mall}      & baseline    & 84.72 & 83.00 \\ \cline{2-4} 
+                           & best(16)    & 84.40 & 84.00 \\ \cline{2-4} 
+                           & best(63)    & \textbf{84.60} & \textbf{84.14} \\ \hline \hline
+\multirow{3}{*}{facebook}  & baseline    & 67.30 & 63.00 \\ \cline{2-4} 
+                           & best(16)    & 75.00 & 74.98 \\ \cline{2-4} 
+                           & best(45)    & \textbf{81.80} & \textbf{81.65} \\ \hline
+\end{tabular}
+\caption{Best results for all datasets and a comparison to previous work. Best(16) is a best model for joint dataset and best(x) is always the best model for respective dataset.}
+\label{tab:res_sent_best}
+\end{table}
+
 
 \begin{table}[!h]
 \centering
@@ -240,8 +263,12 @@ Test accuracy: 0.21330702619752273
 F1 metrics: 0.1467527264529802
 
 %jeste pusteno 35 to je s robeckem, jestli neni na tu cestinu prior lepsi
+ Test accuracy: 0.3478296612956264
+F1 metrics: 0.3179712252536629
+ 
 
-%TODO kouknout se kde to dela chyby? 
+
+
 
 
 
