@@ -477,7 +477,7 @@ if __name__ == "__main__":
 
     else:
         #TODO do args.model dat co nacist a do predict asi teda data k predikci
-        out_file = args.model.split("/")[-1] + "_vystup"
+        out_file = args.predict + "_vystup"
         #TODO nacist test file
 
         data = pd.read_csv(args.predict, sep='\n', header=None, names=['Post']).assign(Sentiment=4)
@@ -492,14 +492,7 @@ if __name__ == "__main__":
         with open(out_file, "w") as out_file:
             for i,label in enumerate(network.predict(test, args)):
                 label = np.argmax(label)
-                print(label)
-                print(data.iloc[[i]])
-                print("jen ten ttext")
-                print(str(data.iloc[i]["Post"]))
                 line = str(label) + "\t" + data.iloc[i]["Post"]
-                print("radek")
-                print(line)
-                print(line[15])
                 print(line, file=out_file)
 
 
