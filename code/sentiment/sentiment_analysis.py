@@ -484,16 +484,23 @@ if __name__ == "__main__":
         test = []
         for i, row in data.iterrows():
             text = row["Post"].rstrip("\r\n")[0:512]
-            encoded = tokenizer(text)
+            encoded = tokenizer.encode(text)
             if type(encoded) is dict:
                 encoded = encoded["input_ids"]
             test.append(encoded)
 
-        with open(out_file, "w", encoding="ascii") as out_file:
+        with open(out_file, "w") as out_file:
             for i,label in enumerate(network.predict(test, args)):
                 label = np.argmax(label)
-                line = data_result.test.LABELS[label] + "\t" + test.text[i]
-                print(data_result.test.LABELS[label], file=out_file)
+                print(label)
+                print(data.iloc[[i]])
+                print("jen ten ttext")
+                print(str(data.iloc[i]["Post"]))
+                line = str(label) + "\t" + data.iloc[i]["Post"]
+                print("radek")
+                print(line)
+                print(line[15])
+                print(line, file=out_file)
 
 
 
