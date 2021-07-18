@@ -360,10 +360,10 @@ if __name__ == "__main__":
                     train, test = train_test_split(data_other, test_size=0.3, shuffle=True, stratify=data_other["Sentiment"])
                     dev, test = train_test_split(test, test_size=0.5, stratify=test["Sentiment"])
             #TODO docasny kod
-            with open("multitest", "w") as out_file:
-                for l in test:
-                    line = l["dataset"] + "\t" +  l["Sentiment"]+  "\t" + l["Post"]
-                    print(line, file=out_file)
+            #with open("multitest", "w") as out_file:
+            #    for index,l in test.iterrows():
+            #        line = l["dataset"] + "\t" +  str(l["Sentiment"]) +  "\t" + l["Post"]
+            #        print(line, file=out_file)
             if data_result == None:
                 data_result = TextClassificationDataset().from_array([train,dev,test], tokenizer.encode)
             elif data_other is not None:
