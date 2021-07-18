@@ -10,9 +10,9 @@ As stated in \citep{Veselovska}: "Sentiment analysis, also known as opinion mini
 \paragraph{Metric} For evaluating performance, two metrics are used: weighted-F1 score and accuracy. Accuracy is a standard metric for classification and weighted-F1 allows better comparability and also provides additional insights into models evaluation.
 
 \subsection{Related Work}
-As every languge-related tasks, sentiment analysis is best explored for English. It is possible to derive sentiment by supervised learning (typcial are Support Vector Machines or Maximum Entropy classifier) or using rule-based approach -- vocabulary of emotionally coloured words, emoticons etc \citep{Cano2019}, \citep{Veselovska}. BERT-like models were succesfully used to improve result for sentiment analysis task on English \citep{Devlin2019} and also other languages, for example Estonian \citep{Kittask2020}, Indonesian \citep{putra} or Italian \citep{pota2021effective}.
+As every languge-related task, sentiment analysis is best explored for English. It is possible to derive sentiment by supervised learning (typical are Support Vector Machines or Maximum Entropy classifier) or using rule-based approach -- vocabulary of emotionally coloured words, emoticons etc \citep{Cano2019}, \citep{Veselovska}. BERT-like models were succesfully used to improve result for sentiment analysis task on English \citep{Devlin2019} and also other languages, for example Estonian \citep{Kittask2020}, Indonesian \citep{putra} or Italian \citep{pota2021effective}.
 \par
-There is not so many attempts to sentiment analysis in Czech in comparison to english, however some attempts were made with both neural networks and traditional machine learning - naive bayes classifiers,support vector machines, and maximum-entropy-based classifiers \citep{Veselovska}.  A thorough study of supervised machine learning methods on \textit{mall} and \textit{facebook} dataset is offered in \citep{Cano2019}. For a practical use \citep{Zizka} presented automatic sentiment prediction of unlabelled text based on a small set of labelled patterns via searching similarities. As the neural networks dominates in many NLP taks, they are also applied in sentiment analysis. One of first attepts to apply neural networks on Czech sentiment is described in \citep{Lenc}, which evaluates besides others all three datasets used in this work on document-level sentiment analysis. \citep{kysely} performes sentiment analysis using embeddings and convolutional neural network on multidimensional embedding, which is quite unusual as CNNs are typically used for image processing. \citep{kysely} uses same three datasets, but classifies only on sentiment-level (they filtered out longer samples), which is simpler as longer texts tend to be more inconsistent about sentiment \citep{Veselovska}. \citep{Libovicky} presents state-of-the art results in three czech NLP tasks including sentiment analysis. They use only CSFD dataset with resulting accuracy 80.8\% which is comparable to previous \acrshort{sota} \citep{Brychcin2013}. The second mentioned paper uses quite complicated method for classification incorporating the fact of which movie is reviewed, while \citep{Libovicky} uses only bidirectional LSTMs with multiple attention heads following state-of-the-art results on English \citep{Lin2017}. There are four previous works know to me, which involves BERT-like models: 
+There are not so many attempts to sentiment analysis in Czech in comparison to English, however some attempts were made with both neural networks and traditional machine learning - naive bayes classifiers, support vector machines, and maximum-entropy-based classifiers \citep{Veselovska}.  A thorough study of supervised machine learning methods on \textit{mall} and \textit{facebook} dataset is offered in \citep{Cano2019}. For a practical use, \citep{Zizka} presented automatic sentiment prediction of unlabelled text based on a small set of labelled patterns via searching similarities. As the neural networks dominates in many NLP taks, they are also applied in sentiment analysis. One of first attepts to apply neural networks on Czech sentiment is described in \citep{Lenc}, which evaluates besides others all three datasets used in this work on document-level sentiment analysis. \citep{kysely} performes sentiment analysis using embeddings and convolutional neural network on multidimensional embedding, which is quite unusual as CNNs are typically used for image processing. \citep{kysely} uses same three datasets, but classifies only on sentence-level (they filtered out longer samples), which is simpler as longer texts tend to be more inconsistent about sentiment \citep{Veselovska}. \citep{Libovicky} presents state-of-the art results in three czech NLP tasks including sentiment analysis. They use only CSFD dataset with resulting accuracy 80.8\% which is comparable to previous \acrshort{sota} \citep{Brychcin2013}. The second mentioned paper uses quite complicated method for classification incorporating the fact of which movie is reviewed, while \citep{Libovicky} uses only bidirectional LSTMs with multiple attention heads following state-of-the-art results on English \citep{Lin2017}. There are five previous works know to me, which involves BERT-like models in Czech sentiment: 
 \begin{itemize}
 \item XLM-Roberta applied on all three datastets trimmed to 128 characters \footnote{http://www.janpalasek.com/sentiment-analysis-czech.html}
 \item \citep{Klouda} applies multilingual BERT on mall dataset with resulting accuracy about  81\%, which did not outperform the naive bayes classifier baseline with 84\% accuracy, 
@@ -23,12 +23,9 @@ There is not so many attempts to sentiment analysis in Czech in comparison to en
 \subsection{Dataset and Preprocessing}
 %TODO habernal vytvoril ty datasty 
 %TODO zjistit jaka jsou na to porovnavaci data This work primary tries to improve existing tasks and show the ability of contextualized embeddings to improve results, so tasks with existing data and results were selected.  %TODO why?
-Four main Czech datasets with sentiment annotation are available: news from Aktualne.cz (aktualne) \citep{Veselovska}, user reviews from MALL.cz (mall), film reviews from csfd.cz (csfd), and posts from Czech branch pages on facebook.cz (facebook) (last tree in \citep{Habernal.et.al.2013}). As \textit{aktualne} dataset turned out to be problematical because the text were ambiguous even for annotators, and its authors later used other mentioned datasets \citep{Veselovska}, this work also focuses only on the three other data sources -- \textit{mall}, \textit{csfd} and \textit{facebook} \footnote{All three datasets are all available here: http://liks.fav.zcu.cz/sentiment/}. Some experiment are also performed with in-domain training on Eglish data. For this purpose is used \textit{imdb} dataset \footnote{https://www.tensorflow.org/datasets/catalog/imdb\_reviews}, which contains movie review from the biggest movie rating website imdb.com. This leads to some problems described later in this section, because English dataset contains only binary classification (positive/negative). Table \ref{tab:datasets} summarize each dataset. All dataset were randomly split into train, development and test datasets with the same labels distribution as original datasets.
+Four main Czech datasets with sentiment annotation are available: news from Aktualne.cz (aktualne) \citep{Veselovska}, user reviews from MALL.cz (mall), film reviews from csfd.cz (csfd), and posts from Czech branch pages on facebook.cz (facebook) (last tree in \citep{Habernal.et.al.2013}). As \textit{aktualne} dataset turned out to be problematical because the text were ambiguous even for annotators, and its authors later used other mentioned datasets \citep{Veselovska}, this work also focuses only on the three other data sources -- \textit{mall}, \textit{csfd} and \textit{facebook} \footnote{All three datasets are all available here: http://liks.fav.zcu.cz/sentiment/}. Some experiment are also performed with in-domain training on English data. For this purpose is used \textit{imdb} dataset, \footnote{https://www.tensorflow.org/datasets/catalog/imdb\_reviews} which contains movie reviews from the biggest movie rating website imdb.com. This leads to some problems described later in this section, because English dataset contains only binary classification (positive/negative). Table \ref{tab:datasets} summarize each dataset. All dataset were randomly split into train, development and test datasets with the same labels distribution as original datasets.
 \par
-As can be seen in figure \ref{pic:dist}, distribution of labels differs among datasets. Moreover, Figure \ref{pic:dist_all}
-
-%TODO all má blbý nadpis
-shows, that the resulting dataset is highly unbalanced, which may causes divergence and stuck in training. Due to the big part of labels being positive, many learning strategies just ended with predicting only \textit{positive} class, i.e. 55\% accuracy, so unfortunately learned nothing. 
+As can be seen in figure \ref{pic:dist}, distribution of labels differs among datasets. Moreover, Figure \ref{pic:dist_all} shows, that the resulting dataset is highly unbalanced, which may causes divergence and stuck in training. Due to the big part of labels being positive, many learning strategies just ended with predicting only \textit{positive} class, i.e. 55\% accuracy, so unfortunately learned nothing. 
 %TODO popis tabulky
 \begin{center}
 \begin{table}[!h]
@@ -67,10 +64,20 @@ Network architecture is much simpler than in tagging and lemmatization task and 
 Baseline for these models is Naive Bayes Classifer (NB) with tf-idf representation. 
 
 \subsection{Results and Discussion}
-Models based upon RoBECzech not only outperformed baseline, but also achieved new state-of-the-art results in all datasets as can be seen in table \ref{tab:res_sent_best}. best model trained on the combined dataset (no.16) was also best model in evaluation on \textit{csfd} dataset, while for \textit{mall} the single-dataset model was slightly better and \textit{facebook} results with multi-data model were significantly worse. This can be caused by the a difference in distribution of labels between datasets. \textit{Facebook} dataset has the most different label distribution in comparison to all data together (mostly neutral posts vs. mostly positive).
+Models based upon RoBECzech not only outperformed baseline, but also achieved new state-of-the-art results in all datasets as can be seen in table \ref{tab:res_sent_best}. Best model trained on the combined dataset (no.16) was also best model in evaluation on \textit{csfd} dataset, while for \textit{mall} the single-dataset model was slightly better and \textit{facebook} results with multi-data model were significantly worse. This can be caused by the a difference in distribution of labels between datasets. \textit{Facebook} dataset has the most different label distribution in comparison to all data together (mostly neutral posts vs. mostly positive).
 
 
-%TODO pridat vysledky z kysely! 
+%TODO kouknout se jak to kysely evaluuje (ty obrazky) - pusteno na tech jeho vetach
+%TODO umet evaluovat i na best modelech single
+%mall: outputs/0608-2341_sent_o_63 , 'sentiment_analysis.py-2021-06-08_234151-a=12,bs=4,b=..'
+
+%facebook: 'sentiment_analysis.py-2021-06-08_172844-a=12,bs=4,b=..'
+
+%TODO confusion matrix -> jake tridy to predvpovida blbe 
+%TODO napsat proc to neni crossvalidovane a ze ty cisla tedy jsou divna
+%TODO 16 pusteno na 10 epoch - stale bezi
+%TODO habernal limity accuracy a oduvodneni v kysely
+
 
 
 \begin{table}[!h]
@@ -82,19 +89,56 @@ dataset                    & models      & Acc   & F1    \\ \hline \hline
                            & \textit{RobeCzech }  &       & \textit{80.13} \\ \cline{2-4} 
                            & \textit{Czert}       &       & \textit{78.52} \\ \cline{2-4} 
                            & \textit{XLM-RoBERTa} &       & \textit{82.29} \\ \cline{2-4} 
+                           & \textit{\citep{kysely}} & \textit{67.82} & \textit{67.00} \\ \cline{2-4}
                            & best(16)    & \textbf{84.04} & \textbf{84.86} \\ \hline \hline
 \multirow{3}{*}{csfd}      & baseline    & 69.07 & 69.00 \\ \cline{2-4} 
+& \textit{\citep{kysely}} & \textit{71.34} & \textit{71.00} \\ \cline{2-4}
                            & best(16)    & \textbf{84.02} & \textbf{84.00} \\ \cline{2-4} 
                            & best(43)    & 81.50 & 81.37 \\ \hline \hline
 \multirow{3}{*}{mall}      & baseline    & 84.72 & 83.00 \\ \cline{2-4} 
+& \textit{\citep{kysely}} & \textit{82.52} & \textit{81.00} \\ \cline{2-4}
+& \textit{\citep{Klouda}} & 81.00 & 79.00 \\ \cline{2-4}
                            & best(16)    & 84.40 & 84.00 \\ \cline{2-4} 
                            & best(63)    & \textbf{84.60} & \textbf{84.14} \\ \hline \hline
 \multirow{3}{*}{facebook}  & baseline    & 67.30 & 63.00 \\ \cline{2-4} 
+& \textit{\citep{kysely}} & \textit{71.62} & \textit{71.00} \\ \cline{2-4}
                            & best(16)    & 75.00 & 74.98 \\ \cline{2-4} 
                            & best(45)    & \textbf{81.80} & \textbf{81.65} \\ \hline
 \end{tabular}
 \caption{Best results for all datasets and a comparison to previous work. Best(16) is a best model for joint dataset and best(x) is always the best model for respective dataset.}
 \label{tab:res_sent_best}
+\end{table}
+
+Following \citep{kysely}, resulting models were evaluated on four different czech sentences to manifest the differences between models (Table \ref{tab:four_sent}).
+
+% Please add the following required packages to your document preamble:
+% \usepackage[table,xcdraw]{xcolor}
+% If you use beamer only pass "xcolor=table" option, i.e. \documentclass[xcolor=table]{beamer}
+\begin{table}[]
+\begin{tabular}{llll}
+\hline
+ &
+  joint &
+  csfd &
+  facebook \\ \hline
+\begin{tabular}[c]{@{}l@{}}Rozbila se po prvním použití, je na hovno.\\ \textit{It broke after the first use, it is shitty.}\end{tabular} &
+  \cellcolor[HTML]{648FFF}Neg &
+  \cellcolor[HTML]{648FFF}Neg &
+  \cellcolor[HTML]{648FFF}Neg \\ \hline
+\begin{tabular}[c]{@{}l@{}}Rozbila se až za rok.\\ \textit{It broke after a year of use.}\end{tabular} &
+  \cellcolor[HTML]{648FFF}Neg &
+  \cellcolor[HTML]{648FFF}Neg &
+  \cellcolor[HTML]{648FFF}Neg \\ \hline
+\begin{tabular}[c]{@{}l@{}}S manželem jsme si víkend moc užili.\\ \textit{Me and my husband enjoyed the weekend.}\end{tabular} &
+  \cellcolor[HTML]{FFB000}Pos &
+  \cellcolor[HTML]{FFB000}Pos &
+  \cellcolor[HTML]{FFB000}Pos \\ \hline
+\begin{tabular}[c]{@{}l@{}}Ok, ale nic zajímavého.\\ \textit{Ok, but nothing interesting}.\end{tabular} &
+  \cellcolor[HTML]{DC267F}Neut. &
+  \cellcolor[HTML]{648FFF}Neg &
+  \cellcolor[HTML]{648FFF}Neg \\ \hline
+\label{tab:four_sent}
+\end{tabular}
 \end{table}
 
 %TODO crossvalidated \
@@ -159,7 +203,9 @@ dataset                    & models      & Acc   & F1    \\ \hline \hline
 \label{tab:res_all_sent}
 \end{table}
 
+Complete results can be seen in table \ref{tab:res_all_sent}.
 
+%TODO vsechna cisla v all tabulce predelat s teckou!
 
 %Because BERT model was trained on multilingual data, it is naturally not so good in language minoritly presented in the Bert's training data. When transfering the learned knowledge to czech sentiment task, we actually want to improve model in two ways: teach it something more specific about given task, i.e., sentiment, and improve its knowledge about selected language (czech in this case). By using czech sentiment dataset, both thing are incorporated into training. To obtained better results and following the \citep{Putra}, I also selected english sentiment dataset. The idea behind is that BERT is quite good in english and maybe can learn faster useful knowledge about the given task from data in more familiar language.
 
