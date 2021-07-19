@@ -26,7 +26,6 @@ There are not so many attempts to sentiment analysis in Czech in comparison to E
 Four main Czech datasets with sentiment annotation are available: news from Aktualne.cz (aktualne) \citep{Veselovska}, user reviews from MALL.cz (mall), film reviews from csfd.cz (csfd), and posts from Czech branch pages on facebook.cz (facebook) (last tree in \citep{Habernal.et.al.2013}). As \textit{aktualne} dataset turned out to be problematical because the text were ambiguous even for annotators, and its authors later used other mentioned datasets \citep{Veselovska}, this work also focuses only on the three other data sources -- \textit{mall}, \textit{csfd} and \textit{facebook} \footnote{All three datasets are all available here: http://liks.fav.zcu.cz/sentiment/}. Some experiment are also performed with in-domain training on English data. For this purpose is used \textit{imdb} dataset, \footnote{https://www.tensorflow.org/datasets/catalog/imdb\_reviews} which contains movie reviews from the biggest movie rating website imdb.com. This leads to some problems described later in this section, because English dataset contains only binary classification (positive/negative). Table \ref{tab:datasets} summarize each dataset. All dataset were randomly split into train, development and test datasets with the same labels distribution as original datasets.
 \par
 As can be seen in figure \ref{pic:dist}, distribution of labels differs among datasets. Moreover, Figure \ref{pic:dist_all} shows, that the resulting dataset is highly unbalanced, which may causes divergence and stuck in training. Due to the big part of labels being positive, many learning strategies just ended with predicting only \textit{positive} class, i.e. 55\% accuracy, so unfortunately learned nothing. 
-%TODO popis tabulky
 \begin{center}
 \begin{table}[!h]
 \begin{tabular}{|l||lll|}
@@ -64,18 +63,18 @@ Network architecture is much simpler than in tagging and lemmatization task and 
 Baseline for these models is Naive Bayes Classifer (NB) with tf-idf representation. 
 
 \subsection{Results and Discussion}
-Models based upon RoBECzech not only outperformed baseline, but also achieved new state-of-the-art results in all datasets as can be seen in table \ref{tab:res_sent_best}. Best model trained on the combined dataset (no.16) was also best model in evaluation on \textit{csfd} dataset, while for \textit{mall} the single-dataset model was slightly better and \textit{facebook} results with multi-data model were significantly worse. This can be caused by the a difference in distribution of labels between datasets. \textit{Facebook} dataset has the most different label distribution in comparison to all data together (mostly neutral posts vs. mostly positive).
+Models based upon RoBECzech not only outperformed baseline, but also achieved new state-of-the-art results in all datasets as can be seen in table \ref{tab:res_sent_best}. %BLBě!! Best model trained on the combined dataset (no.16) was also best model in evaluation on \textit{csfd} dataset, while for \textit{mall} the single-dataset model was slightly better and \textit{facebook} results with multi-data model were significantly worse. This can be caused by the a difference in distribution of labels between datasets. \textit{Facebook} dataset has the most different label distribution in comparison to all data together (mostly neutral posts vs. mostly positive).
 
-
-%TODO kouknout se jak to kysely evaluuje (ty obrazky) - pusteno na tech jeho vetach
-%TODO umet evaluovat i na best modelech single
+%TODO chyba v predikci, prohozeni
 %mall: outputs/0608-2341_sent_o_63 , 'sentiment_analysis.py-2021-06-08_234151-a=12,bs=4,b=..'
-
 %facebook: 'sentiment_analysis.py-2021-06-08_172844-a=12,bs=4,b=..'
+%csfd: sentiment_analysis.py-2021-07-05_115521-a=16,bs=2,b=..
 
-%TODO confusion matrix -> jake tridy to predvpovida blbe 
-%TODO napsat proc to neni crossvalidovane a ze ty cisla tedy jsou divna
-%TODO 16 pusteno na 10 epoch - stale bezi
+%TODO dopsat do tabulky:
+super zbozi fb pozitivni, csfd neutralni, mall pozitivni
+
+%TODO napsat proc to neni crossvalidovane a ze ty cisla tedy jsou divna, pusteno s tremi ruznymi seedy tak pak udelam prumer
+%TODO 16 pusteno na 10 epoch - stale bezi, stale bezi
 %TODO habernal limity accuracy a oduvodneni v kysely
 
 
@@ -93,8 +92,8 @@ dataset                    & models      & Acc   & F1    \\ \hline \hline
                            & best(16)    & \textbf{84.04} & \textbf{84.86} \\ \hline \hline
 \multirow{3}{*}{csfd}      & baseline    & 69.07 & 69.00 \\ \cline{2-4} 
 & \textit{\citep{kysely}} & \textit{71.34} & \textit{71.00} \\ \cline{2-4}
-                           & best(16)    & \textbf{84.02} & \textbf{84.00} \\ \cline{2-4} 
-                           & best(43)    & 81.50 & 81.37 \\ \hline \hline
+                           & best(16)    & 84.02 & 84.00\\ \cline{2-4} 
+                           & best(69)    & \textbf{84.89 }& \textbf{84.87} \\ \hline \hline
 \multirow{3}{*}{mall}      & baseline    & 84.72 & 83.00 \\ \cline{2-4} 
 & \textit{\citep{kysely}} & \textit{82.52} & \textit{81.00} \\ \cline{2-4}
 & \textit{\citep{Klouda}} & 81.00 & 79.00 \\ \cline{2-4}
@@ -109,18 +108,39 @@ dataset                    & models      & Acc   & F1    \\ \hline \hline
 \label{tab:res_sent_best}
 \end{table}
 
-Following \citep{kysely}, resulting models were evaluated on four different czech sentences to manifest the differences between models (Table \ref{tab:four_sent}).
+Following \citep{kysely}, resulting models were evaluated on four different czech sentences to manifest the differences between models (Table \ref{tab:four_sent}). It can be seen that predicting neutral vs. negative is still tricky for models, which can be also seen in confusion matrix \ref{tab:conf}. %TODO co se z toho da vykoukat- spocitat per class precision treba
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{|llllll||llll|}
+\hline
+\multicolumn{5}{|c}{Combined datasets (16)}                          &  & \multicolumn{4}{c|}{mall (63)}        \\
+                             & \multicolumn{4}{c}{predicted labels} &  & \multicolumn{4}{c|}{predicted labels} \\
+\multirow{4}{*}{\rotatebox[origin=c]{90}{True labels}} &         & neut    & neg    & pos     &  &         & neut    & neg      & pos   \\
+                             & neut    & 7027    & 885    & 2025    &  & neut    & 2896    & 1696     & 199   \\
+                             & neg     & 1122    & 4783   & 307     &  & neg     & 932     & 14461    & 54    \\
+                             & pos     & 1279    & 207    & 18857   &  & pos     & 344     & 132      & 1082  \\ &&&&&&&&&\\ \hline \hline
+\multicolumn{5}{|c}{csfd (69)}                                       &  & \multicolumn{4}{c|}{facebook (45)}    \\
+\multirow{4}{*}{\rotatebox[origin=c]{90}{True labels}} &         & neut    & neg    & pos     &  &         & neut    & neg      & pos   \\
+                             & neut    & 3600    & 685    & 170     &  & neut    & 440     & 41       & 51    \\
+                             & neg     & 603     & 3769   & 241     &  & neg     & 57      & 135      & 7     \\
+                             & pos     & 146     & 225    & 4257    &  & pos     & 23      & 3        & 243  \\ &&&&&&&&& \\ \hline
+\end{tabular}
+\caption{Confusion matrices for best model in each category.}
+\label{tab:conf}
+\end{table}
 
 % Please add the following required packages to your document preamble:
 % \usepackage[table,xcdraw]{xcolor}
 % If you use beamer only pass "xcolor=table" option, i.e. \documentclass[xcolor=table]{beamer}
-\begin{table}[]
-\begin{tabular}{llll}
+\begin{table}[!h]
+\centering
+\begin{tabular}{|l||c|c|c|}
 \hline
- &
+ Input &
   joint &
-  csfd &
-  facebook \\ \hline
+  mall &
+  facebook \\ \hline \hline
 \begin{tabular}[c]{@{}l@{}}Rozbila se po prvním použití, je na hovno.\\ \textit{It broke after the first use, it is shitty.}\end{tabular} &
   \cellcolor[HTML]{648FFF}Neg &
   \cellcolor[HTML]{648FFF}Neg &
@@ -137,11 +157,11 @@ Following \citep{kysely}, resulting models were evaluated on four different czec
   \cellcolor[HTML]{DC267F}Neut. &
   \cellcolor[HTML]{648FFF}Neg &
   \cellcolor[HTML]{648FFF}Neg \\ \hline
-\label{tab:four_sent}
 \end{tabular}
+\caption{Evaluation of models on four Czech sentences. \textit{mall} model was not included as a separate option, as the best model is the joint one.}
+\label{tab:four_sent}
 \end{table}
 
-%TODO crossvalidated \
 %TODO tady mam best pro ruzne datasety a neni to uplne porovnatene
 
 % Please add the following required packages to your document preamble:
