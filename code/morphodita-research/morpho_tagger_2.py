@@ -15,13 +15,14 @@ import warnings
 
 
 from transformers import WarmUp
+sys.path.append("./robeczech/noeol-210323/")
+import tokenizer.robeczech_tokenizer
+
 
 
 class BertModel:
     def __init__(self, name, args):
         self.name = name
-        sys.path.append(name)
-        import tokenizer.robeczech_tokenizer
 
         if "robeczech" in name:
             self.path = name
@@ -261,7 +262,7 @@ class Network:
             inp = [batch[dataset.FORMS].word_ids, batch[dataset.FORMS].charseq_ids, batch[dataset.FORMS].charseqs]
             print('train epoch')
             if args.embeddings:
-                embeddings = self._compute_embeddings(batch, dataset)
+                embeddings = self._compute_embeddings(batch, dataset, args)
                 inp.append(embeddings)
 
             if args.bert:
@@ -552,12 +553,6 @@ class Network:
             for fc in range(len(self.factors)):
                 predpoved = np.array(factors[fc] == predictions[fc])
 
-                print("predpoved")
-                print(len(predpoved))
-                print(predpoved)
-                print("maska")
-                print(mask)
-
 
             print("delka vet")
             print(len(sentence_lens))
@@ -567,17 +562,8 @@ class Network:
 
                 for f, factor in enumerate(args.factors):
                     overrides[dataset.FACTORS_MAP[factor]] = predictions[f][i]
-                    print("k predickcim")
-                    print(factors[fc][i])
-                    print(predictions[fc][i])
-                    print(factors[fc][i] == predictions[fc][i])
                     if compare:
-                        results[dataset.FACTORS_MAP[factor]] = np.array(factors[fc][i] == predictions[fc][i],np.str)
-                    print(overrides)
-
-                    print("pred")
-                    print(predictions[f][i])
-                    print(results)
+                        results[dataset.FACTORS_MAP[factor]] = np.array(factors[f][i] == predictions[f][i],np.str)
                     
                 dataset.write_sentence(predict, sentences, overrides, results)
                 sentences += 1
@@ -744,14 +730,14 @@ def main(args):
                                              lemma_rule_min=args.lemma_rule_min)
 
         if os.path.exists(data_paths[1]):
-            args.dev = morpho_dataset.MorphoDataset(data_paths[1], train=train, shuffle_batches=False,
+            args.dev = morpho_dataset.MorphoDataset(data_paths[1], train=args.train, shuffle_batches=False,
                                                bert=model_bert
                                                )
         else:
             args.dev = None
 
         if os.path.exists(data_paths[2]):
-            args.test = morpho_dataset.MorphoDataset(data_paths[2], train=train, shuffle_batches=False,
+            args.test = morpho_dataset.MorphoDataset(data_paths[2], train=args.train, shuffle_batches=False,
                                                 bert=model_bert
                                                 )
         else:
@@ -785,7 +771,7 @@ def main(args):
     if args.predict:
         # network.saver_inference.restore(network.session, "{}/checkpoint-inference".format(args.predict))
         network.outer_model.load_weights(args.predict)
-        network.predict(predict, args, open(saved + "_vystup", "w"))
+        network.predict(predict, args, open(saved + "_vystup", "w"),compare=True)
 
     else:
         log_file = open("{}/log".format(args.logdir), "w")
@@ -796,7 +782,7 @@ def main(args):
                                                if key not in ["embeddings_data", "embeddings_words","train","test","dev"])), flush=True)
 
         def test_eval(predict=None):
-            metrics = network.evaluate(test, "test", args, predict)
+            metrics = network.evaluate(args.test, "test", args, predict)
             metrics_log = ", ".join(("{}: {:.2f}".format(metric, 100 * metrics[metric]) for metric in metrics))
             for f in [sys.stderr, log_file]:
                 print("Test, epoch {}, lr {}, {}".format(epoch + 1, learning_rate, metrics_log), file=f, flush=True)
