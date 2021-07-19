@@ -563,7 +563,12 @@ class Network:
                 for f, factor in enumerate(args.factors):
                     overrides[dataset.FACTORS_MAP[factor]] = predictions[f][i]
                     if compare:
+                        print("comparison")
+                        print(np.array(factors[f][i] == predictions[f][i],np.str))
+                        print(mask)
+                        print(predictions[f][i)
                         results[dataset.FACTORS_MAP[factor]] = np.array(factors[f][i] == predictions[f][i],np.str)
+
                     
                 dataset.write_sentence(predict, sentences, overrides, results)
                 sentences += 1
