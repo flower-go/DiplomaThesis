@@ -216,7 +216,118 @@ Batches has size 64, given by the compromise between the pursuit of relatively b
 \label{tab:all_res_tl}
 \end{table}
 
-%TODO jake chyby dela baseline a jake best model?
-61 lemma errors and 1046 tag error in test data were removed by best model in contrast to baseline. %TODO prilozit
-%TODO jak vypsat cele vety 
-%TODO jake chyby best a jake best mBERT? best mBERT je tl_3
+%TODO jake chyby
+Baseline is better in 421 tags and worse in 3247 tags than best model 
+to je přes 80% zlepšení
+NN:1760
+AA:733
+RR:127
+
+na trojice tedy: 
+NNF:517
+NNN:512
+NNI:431
+NNM:290
+NNX:10
+AAI:235
+AAF:230
+AAN:139
+AAM:110
+AAX:19
+RR-:127
+
+a takto pády:
+nn
+1:577
+4:557
+X:230
+2:189
+3:86
+7:57
+6:57
+5:7
+aa
+1:291
+4:243
+2:97
+3:34
+7:30
+X:19
+6:19
+rr
+4:58
+6:54
+2:11
+X:2
+7:2
+
+tagy vetsi nez 10 vyskytu:
+NNNXX-----A----:163
+NNIS1-----A----:151
+NNIS4-----A----:130
+NNNS4-----A----:122
+NNFP1-----A----:103
+NNMS1-----A----:99
+NNFP4-----A----:84
+NNNS1-----A----:83
+NNMS4-----A----:72
+AAIS4----1A----:69
+NNFS1-----A----:68
+AAFP1----1A----:64
+AAIS1----1A----:62
+NNFS4-----A----:60
+RR--4----------:58
+NNFS2-----A----:56
+RR--6----------:54
+NNNS2-----A----:48
+NNMS2-----A----:48
+VB-P---3P-AA---:47
+NNIP1-----A----:47
+AANS4----1A----:47
+Db-------------:43
+NNIP4-----A----:42
+VB-S---3P-AA---:38
+NNFS3-----A----:38
+AANS1----1A----:35
+AAFS2----1A----:35
+AAFP4----1A----:35
+AAIP1----1A----:33
+NNFS7-----A----:28
+AAMS1----1A----:27
+NNMP4-----A----:25
+NNNP1-----A----:22
+NNFS6-----A----:22
+NNFXX-----A---8:21
+NNNS6-----A----:20
+PDNS1----------:19
+J,-------------:19
+AAIP4----1A----:19
+NNNS3-----A----:18
+AAFS4----1A----:18
+AAFS1----1A----:17
+PDNS4----------:16
+NNNP4-----A----:16
+NNIS3-----A----:16
+AANP1----1A----:15
+J^-------------:14
+NNIP7-----A----:13
+NNFP2-----A----:13
+Cn-S1----------:13
+P7-X4----------:12
+NNIS2-----A----:12
+AAMP2----1A----:12
+RR--2----------:11
+NNMS3-----A----:11
+AGFP1-----A----:11
+AAXXX----1A----:11
+AAMS2----1A----:11
+AAFS3----1A----:11
+NNFXX-----A----:10
+AAMP4----1A----:10
+
+
+%TODO kolik lemmata
+
+%TODO jake chyby
+Best mbert is better in 468 tags and worse in 1703 tags than best model 
+%TODO kolik lemmata
