@@ -150,7 +150,7 @@ Batches has size 64, given by the compromise between the pursuit of relatively b
 Reimplementation of \citep{Straka2019c} without any BERT-like model incorporation serves as a baseline.
 
 \subsection{Results and Discussion}
-Best presented model (experiment no. 18) achieved same or better results than current \acrlong{sota} tagging and lemmatization results (table \ref{tab:all_prew}). Complete result are in table \ref{tab:all_res_tl}. \textit{best(18} is the version with finetunning, Czech monolingual model, RobeCzech and without layer attention, although the difference from comparable experiment \textit{with} layer attention is insignificant and can be just accidental. The dominance of the Czech model was expected and additional expert knowledge contained in the complicated architecture was also assumed to be better. Experiments also showed that finetunning approach achieves better results than full training from the beginning. This may be due to the choice of hyperparameters, especially learning rate, but  we chose the standard ones, therefore finding right parameters is at least more difficult in the case of \textit{full} and \textit{simple} variants.  %TODO a jak je to s finetuning vs full vs simple? %TODO co jeste?
+Best presented model (experiment no. 18) achieved same or better results than current \acrlong{sota} tagging and lemmatization results (table \ref{tab:all_prew}). Complete result are in table \ref{tab:all_res_tl}. \textit{tl\_18} is the version with finetunning, Czech monolingual model, RobeCzech, and without layer attention, although the difference from comparable experiment \textit{with} layer attention is insignificant and can be just accidental. The dominance of the Czech model was expected and additional expert knowledge contained in the complicated architecture was also assumed to be better. Experiments also showed that finetunning approach achieves better results than full training from the beginning. This may be due to the choice of hyperparameters, especially learning rate, but  we chose the standard ones, therefore finding right parameters is at least more difficult in the case of \textit{full} and \textit{simple} variants.Although \textit{simple} experiments presents standard approach of using pretrained BERT models, they showed to be less successful even than \textit{embed} experiments, which are faster to train and less memory intensive. 
 
 \begin{table}[!h]
 \centering
@@ -161,7 +161,7 @@ Best presented model (experiment no. 18) achieved same or better results than cu
     & Tags & Lemmas & Both & Tags & Lemmas & Both \\ \hline \hline
     \textit{StrakaB} & \textit{97.94} & \textit{98.75} & \textit{97.31} & \textit{98.05} & \textit{98.98} & \textit{97.65 }\\ \hline
    \textit{ StrakaC} & \textit{97.67} & \textit{98.63} & \textit{97.02} & \textit{97.91 }& \textit{98.94} & \textit{97.51} \\ \hline
-     \textit{RobeCzech} & \textit{98.43} & \textit{98.79}  & \textit{97.83}  & \textit{98.50} & \textbf{99.00}  & \textit{98.11} \\ \hline \hline
+     \textit{RobeCzech} & \textit{98.43} & \textit{98.79}  & \textit{97.83}  & \textit{98.50} & \textit{\textbf{99.00}}  & \textit{98.11} \\ \hline \hline
       baseline & 97.04  & 98.56  & 96.41 &  97.31   & 98.83  & 96.90 \\ \hline 
     emb(12) & 98.38  &98.79  & 97.80 & 98.48  & 98.99 & 98.10 \\ \hline
     best(18) & \textbf{98.50}  & \textbf{98.80} &\textbf{ 97.90}  & \textbf{98.57}  & \textbf{99.00}  & \textbf{98.19}  \\ \hline  
@@ -227,9 +227,6 @@ Best presented model (experiment no. 18) achieved same or better results than cu
 \label{tab:all_res_tl}
 \end{table}
 
-
-
-
 \subsubsection{Error Analysis}
 This section offers a little exploration of difference between error across models. This comparison includes three models: 
 \begin{itemize}
@@ -239,99 +236,12 @@ This section offers a little exploration of difference between error across mode
 \end{itemize} 
 
 \paragraph{best vs. baseline}
-The best model (tl\_18) improved prediciton in $3,247$ tags and was worse in 421 tag predictions. More than 80\% of newly correctly predicted tags is composed by three tags of speech: NN (noun), AA (adjective) and RR (preposition). Table %TODO udelat
-presents the number of improved tags divided by parts of speech and cases and table %TODO udelat
-presents 10 most frequent imrpoved tags. %TODO nejaky zaver z toho? tak napriklad hned druhy a treti nejcastejsi je napriklad hrad, ktery je stejny v 1 i 4 pade, prvni jsou typicky vlasntí cizí jména (místa apod., Jersey, Tenesee), totez jako hrad pro zensky rod v pluralu
-%pridavna jmena: dalsi, stinovy, okamzity zase 1 a 4 pad
-%predlozky se 4 padem na, o, pro 
-
-
-%TODO bert simple rozdil tagy a lemmata, neni tam cle, je to horsi i nez embed 
+The best model (tl\_18) improved prediciton in $3,247$ tags and was worse in 421 tag predictions. More than 80\% of newly correctly predicted tags are composed by three tags of speech: NN (noun), AA (adjective) and RR (preposition). Table \ref{att:tags1} presents improved tags with a frequency at least 10. The most frequent tag ( \texttt{NNIS1-----A----}) presents proper names of places (e.g. Jersey, Tenesee), but we can see that other frequent tags are nominatives and accusatives of masculinum, singular,  inainamate (cs: \textit{rod mužský neživotný}) or femininum, plural. These two cases have same form for mentioned categories, so they are indistinguishable without context, and that is where BERT showed to be very useful. The same situation is with adjectives, again mostly nominative or accusative of the same form, for example words \textit{další} (following) or \textit{stínový} (shadowy). As for the third category, it is prepositions connected with accusative and dative as \textit{na} (on), \textit{pro} (for) and \textit{o} (about).
 
 %TODO kolik lemmata
 
 \paragraph{mBERT vs. RobeCzech}
+Best mbert is better in 468 tags and worse in 1703 tags than best model. Most frequent tags improved by \textit{tl\_18} are similar to previous comparison. Nominative and accusative are again the most common cases improved, but the differences between these two models are not so significant. This leads into verbs appear higher in the table of most frequent tags, although the absolute value of better predictions on verbs is similar to previous comparison. In both situations, improved verbs predictions relate mostly to verbs with the same form in singular and plural of the third-person, e.g. \textit{vyváží} (exports) or \textit{stojí} (stands). Complete table of the most frequent tags is again as Appendix \ref{att:tags2}.
 
-%TODO jake chyby stejne jako predchozi porovnani?
-Best mbert is better in 468 tags and worse in 1703 tags than best model 
-NN:862
-AA:390
-VB:71
-RR:59
-PD:48
-P4:38
-AG:31
-Db:24
-PP:23
-Cn:14
-Ca:13
-Cr:12
-RV:10
-J,:10
-
-trojice
-NNF:287
-NNN:222
-NNI:213
-NNM:130
-NNX:10
-AAF:139
-AAI:115
-AAN:75
-AAM:44
-AAX:17
-
-pady:
-1:148
-4:125
-2:61
-X:17
-7:14
-3:13
-6:12
-
-tagy cele:
-NNIS1-----A----:70
-NNNS4-----A----:69
-NNIS4-----A----:55
-NNFP1-----A----:55
-NNNS1-----A----:45
-NNFS1-----A----:45
-NNMS4-----A----:38
-NNFP4-----A----:38
-AAFP1----1A----:37
-NNFS2-----A----:36
-NNFS4-----A----:34
-VB-S---3P-AA---:32
-AAIS1----1A----:30
-VB-P---3P-AA---:29
-RR--4----------:28
-NNNXX-----A----:27
-NNMS2-----A----:27
-AAIS4----1A----:27
-NNNS2-----A----:26
-AANS4----1A----:26
-NNMS1-----A----:25
-NNIP4-----A----:23
-Db-------------:23
-AAFS2----1A----:23
-RR--6----------:22
-NNIP1-----A----:22
-NNFS3-----A----:21
-AANS1----1A----:20
-AAIP1----1A----:16
-NNNS3-----A----:15
-NNFXX-----A---8:15
-NNFS7-----A----:15
-AAFP4----1A----:15
-PDNS1----------:13
-NNIS3-----A----:13
-AAIP4----1A----:13
-PDNS4----------:12
-NNNS6-----A----:11
-AAFS4----1A----:11
-NNMP4-----A----:10
-J,-------------:10
-AAXXX----1A----:10
-AAMS1----1A----:10
 %TODO kolik lemmata
+%TODO je v necem mBERT lepsi?

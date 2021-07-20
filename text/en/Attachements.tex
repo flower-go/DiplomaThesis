@@ -2,7 +2,7 @@
 \section{Learning Rate for Tagging and Lemmatization}
 \label{att:1}
 \begin{table}[!h]
-\cetnering
+\centering
 \begin{tabular}{|l|l|}
 \hline
 A & 40:1e-3,20:1e-4        \\ \hline
@@ -14,4 +14,85 @@ F & 20:2e-5                \\ \hline
 G & 20:3e-5                \\ \hline
 \end{tabular}
 \caption{Legend for table \ref{tab:all_res_tl}. }
+\end{table}
+
+\newpage
+\section{The Most Frequent Tags Improved by Best (tl\_18) model}
+\label{att:tags1}
+% Please add the following required packages to your document preamble:
+% \usepackage[table,xcdraw]{xcolor}
+% If you use beamer only pass "xcolor=table" option, i.e. \documentclass[xcolor=table]{beamer}
+\begin{table}[!h]
+\centering
+\begin{tabular}{|c|c||c|c|}
+\hline
+Freq & Tag & Freq & Tag \\ \hline \hline
+163 & \texttt{NNNXX-----A----} & 27 & \texttt{AAMS1----1A----}                         \\
+151 & \texttt{NNIS1-----A----} & 25 & \texttt{NNMP4-----A----}                         \\
+130 & \texttt{NNIS4-----A----} & 22 & \texttt{NNNP1-----A----}                         \\
+122 & \texttt{NNNS4-----A----} & 22 & \texttt{NNFS6-----A----}                         \\
+103 & \texttt{NNFP1-----A----} & 21 & \texttt{NNFXX-----A---8}                         \\
+99  & \texttt{NNMS1-----A----} & 20 & \texttt{NNNS6-----A----}                         \\
+84  & \texttt{NNFP4-----A----} & 19 & \texttt{PDNS1----------}                         \\
+83  & \texttt{NNNS1-----A----} & 19 & \texttt{J,-------------}                         \\
+72  & \texttt{NNMS4-----A----} & 19 & \texttt{AAIP4----1A----}                         \\
+69  & \texttt{AAIS4----1A----} & 18 & \texttt{NNNS3-----A----}                         \\
+68  & \texttt{NNFS1-----A----} & 18 & \texttt{AAFS4----1A----}                         \\
+64  & \texttt{AAFP1----1A----} & 17 & \texttt{AAFS1----1A----}                         \\
+62  & \texttt{AAIS1----1A----} & 16 & \texttt{PDNS4----------}                         \\
+60  & \texttt{NNFS4-----A----} & 16 & \texttt{NNNP4-----A----}                         \\
+58  & \texttt{RR--4----------} & 16 & \texttt{NNIS3-----A----}                         \\
+56  & \texttt{NNFS2-----A----} & 15 & \texttt{AANP1----1A----}                         \\
+54  & \texttt{RR--6----------} & 14 & \texttt{J\textasciicircum -------------} \\
+48  & \texttt{NNNS2-----A----} & 13 & \texttt{NNIP7-----A----}                         \\
+48  & \texttt{NNMS2-----A----} & 13 & \texttt{NNFP2-----A----}                         \\
+47  & \texttt{VB-P---3P-AA---} & 13 & \texttt{Cn-S1----------}                         \\
+47  & \texttt{NNIP1-----A----} & 12 & \texttt{P7-X4----------}                         \\
+47  & \texttt{AANS4----1A----} & 12 & \texttt{NNIS2-----A----}                         \\
+43  & \texttt{Db-------------} & 12 & \texttt{AAMP2----1A----}                         \\
+42  & \texttt{NNIP4-----A----} & 11 & \texttt{RR--2----------}                         \\
+38  & \texttt{VB-S---3P-AA---} & 11 & \texttt{NNMS3-----A----}                         \\
+38  & \texttt{NNFS3-----A----} & 11 & \texttt{AGFP1-----A----}                         \\
+35  & \texttt{AANS1----1A----} & 11 & \texttt{AAXXX----1A----}                         \\
+35  & \texttt{AAFS2----1A----} & 11 & \texttt{AAMS2----1A----}                         \\
+35  & \texttt{AAFP4----1A----} & 11 & \texttt{AAFS3----1A----}                         \\
+33  & \texttt{AAIP1----1A----} & 10 & \texttt{NNFXX-----A----}                         \\
+28  & \texttt{NNFS7-----A----} & 10 & \texttt{AAMP4----1A----}                 \\ \hline       
+\end{tabular}
+\caption{Most frequent tags, which were correctly predicted by \textit{tl\_18}, but incorrectly by \textit{tl\_1} (=baseline).}
+\end{table}
+
+\newpage
+
+\section{The most frequent tags -- best model vs mBERT }
+\label{att:tags2}
+\begin{table}[!h]
+\centering
+\begin{tabular}{|c|c||c|c|}
+\hline
+Freq & Tag & Freq & Tag \\ \hline \hline
+70 & \texttt{NNIS1-----A----} & 23 & \texttt{Db-------------}   \\
+69 & \texttt{NNNS4-----A----} & 23 & \texttt{AAFS2----1A----}   \\
+55 & \texttt{NNIS4-----A----} & 22 & \texttt{RR--6----------}  \\
+55 & \texttt{NNFP1-----A----} & 22 & \texttt{NNIP1-----A----}  \\
+45 & \texttt{NNNS1-----A----} & 21 & \texttt{NNFS3-----A----}   \\
+45 & \texttt{NNFS1-----A----} & 20 & \texttt{AANS1----1A----}   \\
+38 & \texttt{NNMS4-----A----} & 16 & \texttt{AAIP1----1A----}   \\
+38 & \texttt{NNFP4-----A----} & 15 & \texttt{NNNS3-----A----}   \\
+37 & \texttt{AAFP1----1A----} & 15 & \texttt{NNFXX-----A---8}   \\
+36 & \texttt{NNFS2-----A----} & 15 & \texttt{NNFS7-----A----}  \\
+34 & \texttt{NNFS4-----A----} & 15 & \texttt{AAFP4----1A----}   \\
+32 & \texttt{VB-S---3P-AA---} & 13 & \texttt{PDNS1----------}  \\
+30 & \texttt{AAIS1----1A----} & 13 & \texttt{NNIS3-----A----}  \\
+29 & \texttt{VB-P---3P-AA---} & 13 & \texttt{AAIP4----1A----}   \\
+28 & \texttt{RR--4----------} & 12 & \texttt{PDNS4----------}   \\
+27 & \texttt{NNNXX-----A----} & 11 & \texttt{NNNS6-----A----}   \\
+27 & \texttt{NNMS2-----A----} & 11 & \texttt{AAFS4----1A----}   \\
+27 & \texttt{AAIS4----1A----} & 10 & \texttt{NNMP4-----A----}   \\
+26 & \texttt{NNNS2-----A----} & 10 & \texttt{J,-------------}   \\
+26 & \texttt{AANS4----1A----} & 10 & \texttt{AAXXX----1A----}   \\
+25 & \texttt{NNMS1-----A----} & 10 & \texttt{AAMS1----1A----}   \\
+23 & \texttt{NNIP4-----A----} &  &   \\ \hline             
+\end{tabular}
+\caption{Most frequent tags, which were correctly predicted by \textit{tl\_18}, but incorrectly by \textit{tl\_3} (= best model with mBERT).}
 \end{table}
