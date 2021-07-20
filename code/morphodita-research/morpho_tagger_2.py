@@ -23,18 +23,20 @@ class BertModel:
         self.name = name
 
         if "robeczech" in name:
-            self.path = name
-
+            self.path = name + "tf"
             self.tokenizer = transformers.AutoTokenizer.from_pretrained("ufal/robeczech-base")
-            self.model = transformers.TFAutoModel.from_pretrained(self.path + "tf", output_hidden_states=True)
         else:
-            self.config = transformers.AutoConfig.from_pretrained(name)
-            self.config.output_hidden_states = True
+            self.path = name
             self.tokenizer = transformers.AutoTokenizer.from_pretrained(name)
-            self.model = transformers.TFAutoModel.from_pretrained(name,
-                                                                  config=self.config)
+
         self.embeddings_only = True if args.bert else False
 
+    @property
+    def model(self):
+        config = transformers.AutoConfig.from_pretrained(self.path)
+        config.output_hidden_states = True
+        self.model = transformers.TFAutoModel.from_pretrained(self.path, config=self.config)
+        return self.model
 
 class Network:
 
