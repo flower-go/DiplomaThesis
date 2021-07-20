@@ -15,8 +15,6 @@ import warnings
 
 
 from transformers import WarmUp
-sys.path.append("./robeczech/noeol-210323/")
-import tokenizer.robeczech_tokenizer
 
 
 
@@ -26,7 +24,8 @@ class BertModel:
 
         if "robeczech" in name:
             self.path = name
-            self.tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer(self.path + "tokenizer")
+
+            self.tokenizer = transformers.AutoTokenizer.from_pretrained("ufal/robeczech-base")
             self.model = transformers.TFAutoModel.from_pretrained(self.path + "tf", output_hidden_states=True)
         else:
             self.config = transformers.AutoConfig.from_pretrained(name)
@@ -665,9 +664,6 @@ def main(args):
                 args.bert = args.bert[0]
             name = args.bert
 
-    if name is not None and "robeczech" in name:
-        sys.path.append(name)
-        import tokenizer.robeczech_tokenizer
 
     # TODO vyřešit
     # tf.config.threading.set_inter_op_parallelism_threads(args.threads)
