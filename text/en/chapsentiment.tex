@@ -7,6 +7,8 @@ As stated in \citep{Veselovska}: "Sentiment analysis, also known as opinion mini
 \textit{output:} prevailing sentiment of the input from categories: neutral, positive, negative.
 \par
 
+
+%TODO zero experiments
 \paragraph{Metric} For evaluating performance, two metrics are used: weighted-F1 score and accuracy. Accuracy is a standard metric for classification and weighted-F1 allows better comparability and also provides additional insights into models evaluation.
 
 \subsection{Related Work}
@@ -25,6 +27,19 @@ There are not so many attempts to sentiment analysis in Czech in comparison to E
 %TODO zjistit jaka jsou na to porovnavaci data This work primary tries to improve existing tasks and show the ability of contextualized embeddings to improve results, so tasks with existing data and results were selected.  %TODO why?
 Four main Czech datasets with sentiment annotation are available: news from Aktualne.cz (aktualne) \citep{Veselovska}, user reviews from MALL.cz (mall), film reviews from csfd.cz (csfd), and posts from Czech branch pages on facebook.cz (facebook) (last tree in \citep{Habernal.et.al.2013}). As \textit{aktualne} dataset turned out to be problematical because the text were ambiguous even for annotators, and its authors later used other mentioned datasets \citep{Veselovska}, this work also focuses only on the three other data sources -- \textit{mall}, \textit{csfd} and \textit{facebook} \footnote{All three datasets are all available here: http://liks.fav.zcu.cz/sentiment/}. Some experiment are also performed with in-domain training on English data. For this purpose is used \textit{imdb} dataset, \footnote{https://www.tensorflow.org/datasets/catalog/imdb\_reviews} which contains movie reviews from the biggest movie rating website imdb.com. This leads to some problems described later in this section, because English dataset contains only binary classification (positive/negative). Table \ref{tab:datasets} summarize each dataset. All dataset were randomly split into train, development and test datasets with the same labels distribution as original datasets.
 \par
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.95\columnwidth]{../img/dist_all.png}
+\protect\caption{Distribution of positive/neutral/negative labels in each dataset.}
+\label{pic:dist}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.65\columnwidth]{../img/all.png}
+\protect\caption{Percentage and absolute values of labels in all three Czech datasets together.}
+\label{pic:dist_all}
+\end{figure}
 As can be seen in figure \ref{pic:dist}, distribution of labels differs among datasets. Moreover, Figure \ref{pic:dist_all} shows, that the resulting dataset is highly unbalanced, which may causes divergence and stuck in training. Due to the big part of labels being positive, many learning strategies just ended with predicting only \textit{positive} class, i.e. 55\% accuracy, so unfortunately learned nothing. 
 \begin{center}
 \begin{table}[!h]
@@ -41,37 +56,29 @@ As can be seen in figure \ref{pic:dist}, distribution of labels differs among da
 \end{table}
 \end{center}
 
-\begin{figure}[!h]
-\centering
-\includegraphics[width=1\columnwidth]{../img/dist_all.png}
-\protect\caption{Distribution of positive/neutral/negative labels in each dataset.}
-\label{pic:dist}
-\end{figure}
-
-\begin{figure}[!h]
-\centering
-\includegraphics[width=0.7\columnwidth]{../img/all.png}
-\protect\caption{Percentage and absolute values of labels in all three Czech datasets together.}
-\label{pic:dist_all}
-\end{figure}
-
 \subsection{Experiments and Architecture}
 The main division of experiments is by the input dataset -- each of Czech models separately and one joint dataset consisting of all Czech datasets, i.e. four different datasets. All variants performed both layers attention and an average of last four layers. As for the learning rate, all experiments were made with learning rate $3 \times 10^{-5}$ and there were always two types of learning rate decay -- cosine and inverse square root decay. 
 \par
 Network architecture is much simpler than in tagging and lemmatization task and corresponds to \textit{simple} setting of these tasks -- only BERT-like model and classification head consisting of layer with softmax activation function. 
 \par 
-Baseline for these models is Naive Bayes Classifer (NB) with tf-idf representation. 
+Baseline for these models is Naive Bayes Classifer (NB) with term frequency--inverse document frequency (tf--idf) representation. \textit{tf\_idf}-s for each word are defined in this way: \textit{tf} stands for a term frequency
+\[ tf = \frac{word\_occurences}{number\_of\_words\_in\_document} \]
+and this is count over the whole dataset, while \textit{idf} is inverse document frequency
+\[idf = \frac{number\_of\_documents}{number\_of\_documents\_with\_word}.\]\textit{Idf} works as an evaluation of the importance of the word. The result is then: \[tf\_idf = tf \cdot idf .\] 
+This representation serves as an input into Naive Bayes Classifier (NB). NB \citep{duda1973pattern} is a probabilistic model, which models probability of the class $k$ given the data features $x_i$: $p(C_k|x_1,...,x_n)$ and uses \textit{naive} assumption of features to be independent. 
 
 \subsection{Results and Discussion}
-Models based upon RoBECzech not only outperformed baseline, but also achieved new state-of-the-art results in all datasets as can be seen in table \ref{tab:res_sent_best}. %BLBě!! Best model trained on the combined dataset (no.16) was also best model in evaluation on \textit{csfd} dataset, while for \textit{mall} the single-dataset model was slightly better and \textit{facebook} results with multi-data model were significantly worse. This can be caused by the a difference in distribution of labels between datasets. \textit{Facebook} dataset has the most different label distribution in comparison to all data together (mostly neutral posts vs. mostly positive).
+Models based upon RoBECzech not only outperformed baseline, but also achieved new state-of-the-art results in all three datasets as can be seen in table \ref{tab:res_sent_best}. Complete results can be seen in table \ref{tab:res_all_sent}. The best model for each dataset was the one trained on that dataset, although model trained on joint datasets performed comparable to single-data model on \textit{csfd} and \textit{mall}. For \textit{facebook}, joint model was worse by 9\%. This can be caused by the a difference in distribution of labels between datasets. \textit{Facebook} dataset has the most different label distribution in comparison to \textit{all\_czech} together (mostly neutral posts vs. mostly positive, see Fig. \ref{pic:dist} and Fig. \ref{pic:dist_all}). 
+
+%TODO sjednotit jmeno spolecneho datasetu
 
 %TODO chyba v predikci, prohozeni
 %mall: outputs/0608-2341_sent_o_63 , 'sentiment_analysis.py-2021-06-08_234151-a=12,bs=4,b=..'
 %facebook: 'sentiment_analysis.py-2021-06-08_172844-a=12,bs=4,b=..'
 %csfd: sentiment_analysis.py-2021-07-05_115521-a=16,bs=2,b=..
+%bezi mi join
 
-%TODO dopsat do tabulky:
-super zbozi fb pozitivni, csfd neutralni, mall pozitivni
+%TODO pusten mall
 
 %TODO napsat proc to neni crossvalidovane a ze ty cisla tedy jsou divna, pusteno s tremi ruznymi seedy tak pak udelam prumer
 %TODO 16 pusteno na 10 epoch - stale bezi, stale bezi
@@ -85,13 +92,14 @@ super zbozi fb pozitivni, csfd neutralni, mall pozitivni
 \hline
 dataset                    & models      & Acc   & F1    \\ \hline \hline
 \multirow{5}{*}{All Czech} & baseline    & 82.00 & 70.00 \\ \cline{2-4} 
-                           & \textit{RobeCzech }  &       & \textit{80.13} \\ \cline{2-4} 
-                           & \textit{Czert}       &       & \textit{78.52} \\ \cline{2-4} 
-                           & \textit{XLM-RoBERTa} &       & \textit{82.29} \\ \cline{2-4} 
+                           
+                           
+                           
                            & \textit{\citep{kysely}} & \textit{67.82} & \textit{67.00} \\ \cline{2-4}
                            & best(16)    & \textbf{84.04} & \textbf{84.86} \\ \hline \hline
 \multirow{3}{*}{csfd}      & baseline    & 69.07 & 69.00 \\ \cline{2-4} 
-& \textit{\citep{kysely}} & \textit{71.34} & \textit{71.00} \\ \cline{2-4}
+& \textit{Czert}       &       & \textit{84.79} \\ \cline{2-4} 
+& $\textit{\citep{kysely}}\star$ & \textit{71.34} & \textit{71.00} \\ \cline{2-4}
                            & best(16)    & 84.02 & 84.00\\ \cline{2-4} 
                            & best(69)    & \textbf{84.89 }& \textbf{84.87} \\ \hline \hline
 \multirow{3}{*}{mall}      & baseline    & 84.72 & 83.00 \\ \cline{2-4} 
@@ -100,15 +108,56 @@ dataset                    & models      & Acc   & F1    \\ \hline \hline
                            & best(16)    & 84.40 & 84.00 \\ \cline{2-4} 
                            & best(63)    & \textbf{84.60} & \textbf{84.14} \\ \hline \hline
 \multirow{3}{*}{facebook}  & baseline    & 67.30 & 63.00 \\ \cline{2-4} 
+& \textit{RobeCzech }  &       & \textit{80.13} \\ \cline{2-4} 
+& \textit{XLM-RoBERTa} &       & \textit{82.29} \\ \cline{2-4} 
+& \textit{Czert}       &       & \textit{76.55} \\ \cline{2-4} 
 & \textit{\citep{kysely}} & \textit{71.62} & \textit{71.00} \\ \cline{2-4}
                            & best(16)    & 75.00 & 74.98 \\ \cline{2-4} 
                            & best(45)    & \textbf{81.80} & \textbf{81.65} \\ \hline
 \end{tabular}
-\caption{Best results for all datasets and a comparison to previous work. Best(16) is a best model for joint dataset and best(x) is always the best model for respective dataset.}
+\caption{Best results for all datasets and a comparison to previous work. Best(16) is a best model for joint dataset and best(x) is always the best model for respective dataset. Numbers in italics are from related work. \protected\\ $\star$ \citep{kysely} performs only sentence-level classification. }
 \label{tab:res_sent_best}
 \end{table}
 
-Following \citep{kysely}, resulting models were evaluated on four different czech sentences to manifest the differences between models (Table \ref{tab:four_sent}). It can be seen that predicting neutral vs. negative is still tricky for models, which can be also seen in confusion matrix \ref{tab:conf}. %TODO co se z toho da vykoukat- spocitat per class precision treba
+\begin{table}[!h]
+\centering
+\begin{tabular}{|l||c|c|c|c|}
+\hline
+ Input &
+  joint &
+  mall &
+  facebook & csfd \\ \hline \hline
+\begin{tabular}[c]{@{}l@{}}Rozbila se po prvním použití, je na hovno.\\ \textit{It broke after the first use, it is shitty.}\end{tabular} &
+  \cellcolor[HTML]{648FFF}Neg &
+  \cellcolor[HTML]{648FFF}Neg &
+  \cellcolor[HTML]{648FFF}Neg & 
+  \cellcolor[HTML]{DC267F}Neut\\ \hline
+\begin{tabular}[c]{@{}l@{}}Rozbila se až za rok.\\ \textit{It broke after a year of use.}\end{tabular} &
+  \cellcolor[HTML]{648FFF}Neg &
+  \cellcolor[HTML]{648FFF}Neg &
+  \cellcolor[HTML]{648FFF}Neg & 
+  \cellcolor[HTML]{DC267F}Neut\\ \hline
+\begin{tabular}[c]{@{}l@{}}S manželem jsme si víkend moc užili.\\ \textit{Me and my husband enjoyed the weekend.}\end{tabular} &
+  \cellcolor[HTML]{FFB000}Pos &
+  \cellcolor[HTML]{FFB000}Pos &
+  \cellcolor[HTML]{FFB000}Pos & 
+  \cellcolor[HTML]{FFB000}Pos \\ \hline
+\begin{tabular}[c]{@{}l@{}}Ok, ale nic zajímavého.\\ \textit{Ok, but nothing interesting}.\end{tabular} &
+  \cellcolor[HTML]{DC267F}Neut &
+  \cellcolor[HTML]{648FFF}Neg &
+  \cellcolor[HTML]{648FFF}Neg &
+   \cellcolor[HTML]{648FFF}Neg \\ \hline
+\begin{tabular}[c]{@{}l@{}}super zboží \\ \textit{super product}.\end{tabular} &
+  \cellcolor[HTML]{FFB000}Pos &
+  \cellcolor[HTML]{FFB000}Pos &
+  \cellcolor[HTML]{FFB000}Pos &
+  \cellcolor[HTML]{DC267F}Neut \\ \hline
+\end{tabular}
+\caption{Evaluation of models on four Czech sentences. \textit{mall} model was not included as a separate option, as the best model is the joint one.}
+\label{tab:four_sent}
+\end{table}
+%TODO oznacit sotas nejakym symbolem
+Following \citep{kysely}, resulting models were evaluated on five different czech sentences to manifest the differences between models (Table \ref{tab:four_sent}). It can be seen that predicting neutral vs. negative is still tricky for models, which can be also seen in confusion matrices \ref{tab:conf}. Confusion matrices shows, that predicting neutral is complicated in general, meanwhile models have learned to distinguish well between positive and negative sentiment.  Table \ref{tab:four_sent} also shows that \textit{csfd} model is quite different from the rest. It is probably caused by the difference in the training data nature. 
 
 \begin{table}[!h]
 \centering
@@ -116,10 +165,10 @@ Following \citep{kysely}, resulting models were evaluated on four different czec
 \hline
 \multicolumn{5}{|c}{Combined datasets (16)}                          &  & \multicolumn{4}{c|}{mall (63)}        \\
                              & \multicolumn{4}{c}{predicted labels} &  & \multicolumn{4}{c|}{predicted labels} \\
-\multirow{4}{*}{\rotatebox[origin=c]{90}{True labels}} &         & neut    & neg    & pos     &  &         & neut    & neg      & pos   \\
-                             & neut    & 7027    & 885    & 2025    &  & neut    & 2896    & 1696     & 199   \\
-                             & neg     & 1122    & 4783   & 307     &  & neg     & 932     & 14461    & 54    \\
-                             & pos     & 1279    & 207    & 18857   &  & pos     & 344     & 132      & 1082  \\ &&&&&&&&&\\ \hline \hline
+\multirow{4}{*}{\rotatebox[origin=c]{90}{True labels}} &         & neut    & neg    & pos     &  &         & neut    & neg     & pos   \\
+                             & neut    & 7027    & 885    & 2025    &  & neut    & 2896    & 199     & 1696   \\
+                             & neg     & 1122    & 4783   & 307     &  & neg    & 344     & 1082    & 132    \\
+                             & pos     & 1279    & 207    & 18857   &  & pos     & 932     & 54      & 14461  \\ &&&&&&&&&\\ \hline \hline
 \multicolumn{5}{|c}{csfd (69)}                                       &  & \multicolumn{4}{c|}{facebook (45)}    \\
 \multirow{4}{*}{\rotatebox[origin=c]{90}{True labels}} &         & neut    & neg    & pos     &  &         & neut    & neg      & pos   \\
                              & neut    & 3600    & 685    & 170     &  & neut    & 440     & 41       & 51    \\
@@ -130,40 +179,8 @@ Following \citep{kysely}, resulting models were evaluated on four different czec
 \label{tab:conf}
 \end{table}
 
-% Please add the following required packages to your document preamble:
-% \usepackage[table,xcdraw]{xcolor}
-% If you use beamer only pass "xcolor=table" option, i.e. \documentclass[xcolor=table]{beamer}
-\begin{table}[!h]
-\centering
-\begin{tabular}{|l||c|c|c|}
-\hline
- Input &
-  joint &
-  mall &
-  facebook \\ \hline \hline
-\begin{tabular}[c]{@{}l@{}}Rozbila se po prvním použití, je na hovno.\\ \textit{It broke after the first use, it is shitty.}\end{tabular} &
-  \cellcolor[HTML]{648FFF}Neg &
-  \cellcolor[HTML]{648FFF}Neg &
-  \cellcolor[HTML]{648FFF}Neg \\ \hline
-\begin{tabular}[c]{@{}l@{}}Rozbila se až za rok.\\ \textit{It broke after a year of use.}\end{tabular} &
-  \cellcolor[HTML]{648FFF}Neg &
-  \cellcolor[HTML]{648FFF}Neg &
-  \cellcolor[HTML]{648FFF}Neg \\ \hline
-\begin{tabular}[c]{@{}l@{}}S manželem jsme si víkend moc užili.\\ \textit{Me and my husband enjoyed the weekend.}\end{tabular} &
-  \cellcolor[HTML]{FFB000}Pos &
-  \cellcolor[HTML]{FFB000}Pos &
-  \cellcolor[HTML]{FFB000}Pos \\ \hline
-\begin{tabular}[c]{@{}l@{}}Ok, ale nic zajímavého.\\ \textit{Ok, but nothing interesting}.\end{tabular} &
-  \cellcolor[HTML]{DC267F}Neut. &
-  \cellcolor[HTML]{648FFF}Neg &
-  \cellcolor[HTML]{648FFF}Neg \\ \hline
-\end{tabular}
-\caption{Evaluation of models on four Czech sentences. \textit{mall} model was not included as a separate option, as the best model is the joint one.}
-\label{tab:four_sent}
-\end{table}
 
 %TODO tady mam best pro ruzne datasety a neni to uplne porovnatene
-%TODO tf_idf neni popsane v kapitole 1
 
 % Please add the following required packages to your document preamble:
 % \usepackage{multirow}
@@ -172,82 +189,59 @@ Following \citep{kysely}, resulting models were evaluated on four different czec
 \resizebox*{!}{\textheight-2pt}{\begin{tabular}{|l|l|l|l||ll|}
 \hline
 \multicolumn{2}{|l|}{MODEL}       & EXPE                      & LRTYPE                & Acc    & F1   \\ \hline  \hline
-1  & \multirow{6}{*}{mBERT}     & czech                     & \multirow{3}{*}{Isrd} & 0,81   & 0,81 \\ \cline{1-1} \cline{3-3} \cline{5-6} 
-2  &                            & zero                      &                       & 0,50   & 0,45 \\ \cline{1-1} \cline{3-3} \cline{5-6} 
-3  &                            & eng                       &                       & 0,81   & 0,81 \\ \cline{1-1} \cline{3-6} 
-4  &                            & czech                     & \multirow{3}{*}{cos}  & 0,83   & 0,82 \\ \cline{1-1} \cline{3-3} \cline{5-6} 
-5  &                            & zero                      &                       & 0,53   & 0,48 \\ \cline{1-1} \cline{3-3} \cline{5-6} 
-6  &                            & eng                       &                       & 0,83   & 0,82 \\ \hline
-13 & \multirow{4}{*}{RoBECzech} & czech                     & \multirow{2}{*}{isrd} & 0,81   & 0,81 \\ \cline{1-1} \cline{3-3} \cline{5-6} 
-14 &                            & zero                      &                       & 0,55   & 0,48 \\ \cline{1-1} \cline{3-6} 
-16 &                            & czech                     & \multirow{2}{*}{cos}  & 0,84   & 0,84 \\ \cline{1-1} \cline{3-3} \cline{5-6} 
-17 &                            & zero                      &                       & 0,58   & 0,49 \\ \hline
-19 & \multirow{6}{*}{mBERT}     & czech                     & \multirow{3}{*}{Isrd} & 0,82   & 0,81 \\ \cline{1-1} \cline{3-3} \cline{5-6} 
-20 &                            & zero                      &                       & 0,54   & 0,48 \\ \cline{1-1} \cline{3-3} \cline{5-6} 
-21 &                            & eng                       &                       & 0,82   & 0,81 \\ \cline{1-1} \cline{3-6} 
-22 &                            & czech                     & \multirow{3}{*}{cos}  & 0,83   & 0,82 \\ \cline{1-1} \cline{3-3} \cline{5-6} 
-23 &                            & zero                      &                       & 0,52   & 0,47 \\ \cline{1-1} \cline{3-3} \cline{5-6} 
-24 &                            & eng                       &                       & 0,83   & 0,82 \\ \hline
-31 & \multirow{4}{*}{RoBECzech} & czech                     & \multirow{2}{*}{isrd} & 0,83   & 0,83 \\ \cline{1-1} \cline{3-3} \cline{5-6} 
-32 &                            & zero                      &                       & 0,58   & 0,50 \\ \cline{1-1} \cline{3-6} 
-34 &                            & czech                     & \multirow{2}{*}{cos}  & 0,84   & 0,84 \\ \cline{1-1} \cline{3-3} \cline{5-6} 
-35 &                            & zero                      &                       & 0,58   & 0,51 \\ \hline
-37 & \multirow{2}{*}{mBERT}     & \multirow{7}{*}{facebook} & Isrd                  & 0,75   & 0,75 \\ \cline{1-1} \cline{4-6} 
-38 &                            &                           & cos                   & 0,76   & 0,76 \\ \cline{1-2} \cline{4-6} 
-41 & \multirow{5}{*}{RoBECzech} &                           & isrd                  & 0,80   & 0,80 \\ \cline{1-1} \cline{4-6} 
-42 &                            &                           & simple                & 0,79   & 0,79 \\ \cline{1-1} \cline{4-6} 
-43 &                            &                           & \multirow{3}{*}{cos}  & 0,82   & 0,81 \\ \cline{1-1} \cline{5-6} 
-44 &                            &                           &                       & 0,81   & 0,81 \\ \cline{1-1} \cline{5-6} 
-45 &                            &                           &                       & 0,82 & 0,82 \\ \hline
-46 & \multirow{2}{*}{mBERT}     & \multirow{4}{*}{facebook} & Isrd                  & 0,76   & 0,76 \\ \cline{1-1} \cline{4-6} 
-47 &                            &                           & cos                   & 0,77   & 0,77 \\ \cline{1-2} \cline{4-6} 
-50 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 0,80   & 0,79 \\ \cline{1-1} \cline{4-6} 
-51 &                            &                           & cos                   & 0,806  & 0,80 \\ \hline
-52 & \multirow{2}{*}{mBERT}     & \multirow{8}{*}{mall}     & Isrd                  & 0,83   & 0,83 \\ \cline{1-1} \cline{4-6} 
-53 &                            &                           & cos                   & 0,84   & 0,84 \\ \cline{1-2} \cline{4-6} 
-56 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 0,83   & 0,83 \\ \cline{1-1} \cline{4-6} 
-57 &                            &                           & cos                   & 0,85   & 0,84 \\ \cline{1-2} \cline{4-6} 
-58 & \multirow{2}{*}{mBERT}     &                           & Isrd                  & 0,83   & 0,83 \\ \cline{1-1} \cline{4-6} 
-59 &                            &                           & cos                   & 0,84   & 0,84 \\ \cline{1-2} \cline{4-6} 
-62 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 0,84   & 0,84 \\ \cline{1-1} \cline{4-6} 
-63 &                            &                           & cos                   & 0,85   & 0,84 \\ \hline
-64 & \multirow{2}{*}{mBERT}     & \multirow{8}{*}{csfd}     & Isrd                  & 0,81   & 0,81 \\ \cline{1-1} \cline{4-6} 
-65 &                            &                           & cos                   & 0,82   & 0,82 \\ \cline{1-2} \cline{4-6} 
-68 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 0,83   & 0,83 \\ \cline{1-1} \cline{4-6} 
-69 &                            &                           & cos                   & 0,85   & 0,85 \\ \cline{1-2} \cline{4-6} 
-70 & \multirow{2}{*}{mBERT}     &                           & Isrd                  & 0,82   & 0,82 \\ \cline{1-1} \cline{4-6} 
-71 &                            &                           & cos                   & 0,82   & 0,82 \\ \cline{1-2} \cline{4-6} 
-74 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 0,83   & 0,83 \\ \cline{1-1} \cline{4-6} 
-75 &                            &                           & cos                   & 0,84   & 0,84 \\ \hline
+1  & \multirow{6}{*}{mBERT}     & czech                     & \multirow{3}{*}{Isrd} & 80.89   & 80.62 \\ \cline{1-1} \cline{3-3} \cline{5-6}
+2  &                            & zero                      &                       & 49.51   & 44.67 \\ \cline{1-1} \cline{3-3} \cline{5-6}
+3  &                            & eng                       &                       & 81.17   & 80.90 \\ \cline{1-1} \cline{3-6}
+4  &                            & czech                     & \multirow{3}{*}{cos}  & 82.56   & 82.35 \\ \cline{1-1} \cline{3-3} \cline{5-6}
+5  &                            & zero                      &                       & 53.41   & 47.64 \\ \cline{1-1} \cline{3-3} \cline{5-6}
+6  &                            & eng                       &                       & 82.55   & 82.37 \\ \hline
+13 & \multirow{4}{*}{RoBECzech} & czech                     & \multirow{2}{*}{isrd} & 81.17   & 80.90 \\ \cline{1-1} \cline{3-3} \cline{5-6}
+14 &                            & zero                      &                       & 55.31   & 48.26 \\ \cline{1-1} \cline{3-6}
+16 &                            & czech                     & \multirow{2}{*}{cos}  & 84.04   & 83.86 \\ \cline{1-1} \cline{3-3} \cline{5-6}
+17 &                            & zero                      &                       & 57.64   & 48.79 \\ \hline
+19 & \multirow{6}{*}{mBERT}     & czech                     & \multirow{3}{*}{Isrd} & 81.61   & 81.43 \\ \cline{1-1} \cline{3-3} \cline{5-6}
+20 &                            & zero                      &                       & 53.92   & 47.55 \\ \cline{1-1} \cline{3-3} \cline{5-6}
+21 &                            & eng                       &                       & 81.79   & 81.32 \\ \cline{1-1} \cline{3-6}
+22 &                            & czech                     & \multirow{3}{*}{cos}  & 82.62   & 82.42 \\ \cline{1-1} \cline{3-3} \cline{5-6}
+23 &                            & zero                      &                       & 51.99   & 46.63 \\ \cline{1-1} \cline{3-3} \cline{5-6}
+24 &                            & eng                       &                       & 82.59   & 82.36 \\ \hline
+31 & \multirow{4}{*}{RoBECzech} & czech                     & \multirow{2}{*}{isrd} & 83.26   & 83.18 \\ \cline{1-1} \cline{3-3} \cline{5-6}
+32 &                            & zero                      &                       & 58.36   & 50.40 \\ \cline{1-1} \cline{3-6}
+34 &                            & czech                     & \multirow{2}{*}{cos}  & 83.88   & 83.68 \\ \cline{1-1} \cline{3-3} \cline{5-6}
+35 &                            & zero                      &                       & 58.13   & 50.89 \\ \hline
+37 & \multirow{2}{*}{mBERT}     & \multirow{7}{*}{facebook} & Isrd                  & 75.30   & 74.97 \\ \cline{1-1} \cline{4-6}
+38 &                            &                           & cos                   & 76.20   & 75.89 \\ \cline{1-2} \cline{4-6}
+41 & \multirow{5}{*}{RoBECzech} &                           & isrd                  & 80.10   & 79.87 \\ \cline{1-1} \cline{4-6}
+42 &                            &                           & simple                & 79.20   & 79.12 \\ \cline{1-1} \cline{4-6}
+43 &                            &                           & \multirow{3}{*}{cos}  & 81.50   & 81.37 \\ \cline{1-1} \cline{5-6}
+44 &                            &                           &                       & 81.00   & 80.78 \\ \cline{1-1} \cline{5-6}
+45 &                            &                           &                       & 81.80   & 81.65 \\ \hline
+46 & \multirow{2}{*}{mBERT}     & \multirow{4}{*}{facebook} & Isrd                  & 76.40   & 75.67 \\ \cline{1-1} \cline{4-6}
+47 &                            &                           & cos                   & 77.20   & 76.83 \\ \cline{1-2} \cline{4-6}
+50 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 79.60   & 79.07 \\ \cline{1-1} \cline{4-6}
+51 &                            &                           & cos                   & 80.60   & 80.38 \\ \hline
+52 & \multirow{2}{*}{mBERT}     & \multirow{8}{*}{mall}     & Isrd                  & 82.80   & 82.80 \\ \cline{1-1} \cline{4-6}
+53 &                            &                           & cos                   & 84.27   & 83.88 \\ \cline{1-2} \cline{4-6}
+56 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 83.17   & 83.37 \\ \cline{1-1} \cline{4-6}
+57 &                            &                           & cos                   & 84.73   & 84.30 \\ \cline{1-2} \cline{4-6}
+58 & \multirow{2}{*}{mBERT}     &                           & Isrd                  & 83.02   & 82.90 \\ \cline{1-1} \cline{4-6}
+59 &                            &                           & cos                   & 84.04   & 83.61 \\ \cline{1-2} \cline{4-6}
+62 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 84.08   & 83.88 \\ \cline{1-1} \cline{4-6}
+63 &                            &                           & cos                   & 84.60   & 84.14 \\ \hline
+64 & \multirow{2}{*}{mBERT}     & \multirow{8}{*}{csfd}     & Isrd                  & 80.77   & 80.83 \\ \cline{1-1} \cline{4-6}
+65 &                            &                           & cos                   & 82.04   & 82.04 \\ \cline{1-2} \cline{4-6}
+68 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 83.06   & 83.05 \\ \cline{1-1} \cline{4-6}
+69 &                            &                           & cos                   & 84.89   & 84.87 \\ \cline{1-2} \cline{4-6}
+70 & \multirow{2}{*}{mBERT}     &                           & Isrd                  & 81.63   & 81.60 \\ \cline{1-1} \cline{4-6}
+71 &                            &                           & cos                   & 82.20   & 82.19 \\ \cline{1-2} \cline{4-6}
+74 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 83.13   & 83.18 \\ \cline{1-1} \cline{4-6}
+75 &                            &                           & cos                   & 84.32   & 84.32 \\ \hline
 \end{tabular}}
 \caption{This table presents complete results on the sentiment task. }
 \label{tab:res_all_sent}
 \end{table}
 
-Complete results can be seen in table \ref{tab:res_all_sent}.
-
-%TODO vsechna cisla v all tabulce predelat s teckou!
-
-%Because BERT model was trained on multilingual data, it is naturally not so good in language minoritly presented in the Bert's training data. When transfering the learned knowledge to czech sentiment task, we actually want to improve model in two ways: teach it something more specific about given task, i.e., sentiment, and improve its knowledge about selected language (czech in this case). By using czech sentiment dataset, both thing are incorporated into training. To obtained better results and following the \citep{Putra}, I also selected english sentiment dataset. The idea behind is that BERT is quite good in english and maybe can learn faster useful knowledge about the given task from data in more familiar language.
-
-
-
-%Baseline for this task is tf-idf method %TODO nekde je popsana v prni kapitole
-%, which resulted in 
-%[[ 4310   102  3015]
- %[  685  1016   779]
- %[  842    48 20227]]
- %             precision    recall  f1-score   support
-
-%           0       0.74      0.58      0.65      7427
-%           1       0.87      0.41      0.56      2480
- %          2       0.84      0.96      0.90     21117
-%
-%    accuracy                           0.82     31024
-%   macro avg       0.82      0.65      0.70     31024
-%weighted avg       0.82      0.82      0.81     31024
-
-
+%Because BERT model was trained on multilingual data, it is naturally not so good in language minoritly presented in the Bert's training data. When transfering the learned knowledge to Czech sentiment task, we actually want to improve model in two ways: teach it something more specific about given task, i.e., sentiment, and improve its knowledge about selected language (czech in this case). By using czech sentiment dataset, both thing are incorporated into training. To obtained better results and following the \citep{Putra}, I also selected english sentiment dataset. The idea behind is that BERT is quite good in english and maybe can learn faster useful knowledge about the given task from data in more familiar language.
 
 
 %results of zero2 without training

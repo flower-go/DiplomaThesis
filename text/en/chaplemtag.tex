@@ -145,7 +145,7 @@ batch size & 64 \\ \hline
 \caption{Hyperparameters of tag and lemmatization common to all experiments (if they make sense in the context of experiments).}
 \label{tab:hyp_all}
 \end{table}
-Batches has size 64, given by the compromise between the pursuit of relatively big batch size and computational resources. Summary of hyperparameters, which not different across experiments are in the table \ref{tab:hyp_all}. Other hyperparameters for each experiment are in Appendix \ref{att:1}.
+Batches has size 64, given by the compromise between the pursuit of relatively big batch size and computational resources. Summary of hyperparameters, which not different across experiments are in the table \ref{tab:hyp_all}. Other hyperparameters for each experiment are in Table \ref{att:1}.
 \par 
 Reimplementation of \citep{Straka2019c} without any BERT-like model incorporation serves as a baseline.
 
@@ -249,7 +249,7 @@ The best model (tl\_18) improved prediciton in $3,247$ tags and was worse in 421
 %TODO kolik lemmata
 
 \paragraph{mBERT vs. RobeCzech}
-Best mbert is better in 468 tags and worse in 1703 tags than best model. Most frequent tags improved by \textit{tl\_18} are similar to previous comparison. Nominative and accusative are again the most common cases improved, but the differences between these two models are not so significant. This leads into verbs appear higher in the table of most frequent tags, although the absolute value of better predictions on verbs is similar to previous comparison. In both situations, improved verbs predictions relate mostly to verbs with the same form in singular and plural of the third-person, e.g. \textit{vyváží} (exports) or \textit{stojí} (stands). Complete table of the most frequent tags is again as Appendix \ref{att:tags2}.
+Best mbert is better in 468 tags and worse in 1703 tags than best model. Most frequent tags improved by \textit{tl\_18} are similar to previous comparison. Nominative and accusative are again the most common cases improved, but the differences between these two models are not so significant. This leads into verbs appear higher in the table of most frequent tags, although the absolute value of better predictions on verbs is similar to previous comparison. In both situations, improved verbs predictions relate mostly to verbs with the same form in singular and plural of the third-person, e.g. \textit{vyváží} (exports) or \textit{stojí} (stands). Complete table of the most frequent tags is again as \ref{att:tags2}.
 
 %TODO kolik lemmata
 %TODO je v necem mBERT lepsi?
