@@ -109,6 +109,9 @@ After the processing by recurrent neural networks, network employs two separate 
 
 \paragraph{Morphological Dictionary} All classification can be done with or without use of a morphological dictionary MorFlex \citep{11234/1-1834}, which can provide possible pairs \textit{tag-lemma}. If so, generated tag and lemma is a pair with maximal likelihood, but chosen just from the dictionary. This leads to more consistent results. 
 
+%TODO v vysledkove tabulce je RobeCzech a czert v all czech
+%TODO do tabulky dat XLM roberta base, protoze ta velka je moc dobra
+
 
 %TODO nekde mam taky dropouts! zminit
 \subsubsection{Experiments}
@@ -168,59 +171,64 @@ Best presented model (experiment no. 18) achieved same or better results than cu
 \label{tab:all_prew} 
 \end{table}
 
+%TODO vsechny Figure a table se stejnym pismenem
+%TODO tabulka results all u taggingu rozdelit nadpis lemmatizace a tagging
+
 \begin{table}[!h]
-\resizebox{\columnwidth}{!}{% Please add the following required packages to your document preamble:
-% \usepackage{multirow}
-\begin{tabular}{|l|l|l|l||llllll|}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{|l|l|l|l|l|l||llllll|}
 \hline
-\multicolumn{2}{|c|}{Model}                      & EXPE                    & LRTYPE & LemR & LemD & TagsR & TagsD & JointR & JointD \\ \hline \hline
-0  & NA                           & base                    & simple & 98.58  & 98.81   & 97.05   & 97.31    & 96.43     & 96.9       \\ \hline
-1  & NA                           & ls                      & simple & 98.55  & 98.81   & 97.12   & 97.34    & 96.51     & 96.94      \\ \hline
-2  & \multirow{3}{*}{mBERT}       & \multirow{9}{*}{embed}  & simple & 98.69  & 98.93   & 97.83   & 97.98    & 97.17     & 97.58      \\ \cline{1-1} \cline{4-10}
-3  &                              &                         & cos    & 98.74  & 98.95   & 97.91   & 98.04    & 97.28     & 97.63      \\ \cline{1-1} \cline{4-10}
-4  &                              &                         & isrd   & 98.73  & 98.94   & 97.89   & 98.02    & 97.28     & 97.61      \\ \cline{1-2} \cline{4-10}
-5  & \multirow{3}{*}{xlm-Roberta} &                         & simple & 98.57  & 98.8    & 97.33   & 97.54    & 96.68     & 97.12      \\ \cline{1-1} \cline{4-10}
-6  &                              &                         & cos    & 98.6   & 98.83   & 97.45   & 97.62    & 96.81     & 97.21      \\ \cline{1-1} \cline{4-10}
-7  &                              &                         & isrd   & 98.59  & 98.83   & 97.44   & 97.61    & 96.81     & 97.2       \\ \cline{1-2} \cline{4-10}
-8  & \multirow{3}{*}{RoBECzech}   &                         & simple & 98.77  & 98.97   & 98.38   & 98.48    & 97.78     & 98.08      \\ \cline{1-1} \cline{4-10}
-9  &                              &                         & cos    & 98.79  & 98.99   & 98.38   & 98.48    & 97.8      & 98.1       \\ \cline{1-1} \cline{4-10}
-10 &                              &                         & isrd   & 98.78  & 98.98   & 98.4    & 98.48    & 97.8      & 98.09      \\ \hline
-11 & \multirow{3}{*}{mBERT} & \multirow{9}{*}{fine} & simple & 98.69 & 98.93 & 97.84 & 97.99 & 97.21 & 97.59 \\ \cline{1-1} \cline{4-10}
-12 &                              &                         & cos    & 98.72  & 98.95   & 97.97   & 98.08    & 97.33     & 97.68      \\ \cline{1-1} \cline{4-10}
-13 &                              &                         & isrd   & 98.68  & 98.9    & 97.72   & 97.86    & 97.09     & 97.46      \\ \cline{1-2} \cline{4-10}
-14 & \multirow{3}{*}{xlm-Roberta} &                         & simple & 98.62  & 98.84   & 97.72   & 97.9     & 97.07     & 97.48      \\ \cline{1-1} \cline{4-10}
-15 &                              &                         & cos    & 98.67  & 98.9    & 97.95   & 98.09    & 97.32     & 97.69      \\ \cline{1-1} \cline{4-10}
-16 &                              &                         & isrd   & 98.63  & 98.85   & 97.66   & 97.83    & 97.03     & 97.41      \\ \cline{1-2} \cline{4-10}
-17 & \multirow{3}{*}{RoBECzech}   &                         & simple & 98.78  & 98.98   & 98.46   & 98.55    & 97.86     & 98.16      \\ \cline{1-1} \cline{4-10}
-18 &                              &                         & cos    & \textbf{98.8}   & \textbf{99 }     & \textbf{98.5}    & \textbf{98.57}    & \textbf{97.9 }     & \textbf{98.19 }     \\ \cline{1-1} \cline{4-10}
-19 &                              &                         & isrd   & 98.76  & 98.95   & 98.33   & 98.41    & 97.72     & 98.02      \\ \cline{1-2} \cline{4-10} \hline
-20 & \multirow{3}{*}{mBERT}       &      \multirow{9}{*}{fine att}                    & simple & 98.67  & 98.91   & 97.76   & 97.92    & 97.13     & 97.52      \\ \cline{1-1} \cline{4-10}
-21 &                              &                         & cos    & 98.72  & 98.95   & 97.98   & 98.1     & 97.34     & 97.69      \\ \cline{1-1} \cline{4-10}
-22 &                              &                         & isrd   & 98.67  & 98.91   & 97.69   & 97.85    & 97.05     & 97.45      \\ \cline{1-2} \cline{4-10}
-23 & \multirow{3}{*}{xlm-Roberta} &                         & simple & 98.6   & 98.81   & 97.62   & 97.77    & 96.96     & 97.35      \\ \cline{1-1} \cline{4-10}
-24 &                              &                         & cos    & 98.67  & 98.89   & 97.91   & 98.06    & 97.29     & 97.66      \\ \cline{1-1} \cline{4-10}
-25 &                              &                         & isrd   & 98.65  & 98.86   & 97.65   & 97.81    & 97.03     & 97.41      \\ \cline{1-2} \cline{4-10}
-26 & \multirow{3}{*}{RoBECzech}   &                         & simple & 98.77  & 98.97   & 98.38   & 98.47    & 97.79     & 98.08      \\ \cline{1-1} \cline{4-10}
-27 &                              &                         & cos    & \textbf{98.8}   & 98.99   & 98.47   & 98.54    & 97.88     & 98.16      \\ \cline{1-1} \cline{4-10}
-28 &                              &                         & isrd   & 98.77  & 98.96   & 98.33   & 98.41    & 97.72     & 98.01      \\ \hline
-29 & \multirow{3}{*}{mBERT}       & \multirow{9}{*}{simple} & warmup & 98.17  &         & 97.32   &          & 96.46     &            \\ \cline{1-1} \cline{4-10}
-30 &                              &                         & cos    & 98.15  &         & 97.39   &          & 96.47     &            \\ \cline{1-1} \cline{4-10}
-31 &                              &                         & isrd   & 98.13  &         & 97.12   &          & 96.29     &            \\ \cline{1-2} \cline{4-10}
-35 & \multirow{3}{*}{RoBECzech}   &                         & warmup & 98.49  &         & 98.28   &          & 97.41     &            \\ \cline{1-1} \cline{4-10}
-36 &                              &                         & cos    & 98.46  &         & 98.30   &          & 97.39     &            \\ \cline{1-1} \cline{4-10}
-37 &                              &                         & isrd   & 98.59  &         & 98.27   &          & 97.53     &            \\ \hline
-38 & \multirow{3}{*}{mBERT}       & \multirow{9}{*}{full}   & warmup & 98.16  & 98.86   & 97.35   & 97.79    & 96.46     & 97.34      \\ \cline{1-1} \cline{4-10}
-39 &                              &                         & cos    & 98.04  & 98.85   & 97.36   & 97.81    & 96.3      & 97.34      \\ \cline{1-1} \cline{4-10}
-40 &                              &                         & isrd   & 98.22  & 98.86   & 97.34   & 97.73    & 96.46     & 97.29      \\ \cline{1-2} \cline{4-10}
-44 & \multirow{3}{*}{RoBECzech}   &                         & warmup & 98.49  & 98.95   & 98.21   & 98.34    & 97.38     & 97.93      \\ \cline{1-1} \cline{4-10}
-45 &                              &                         & cos    & 98.25  & 98.95   & 98.17   & 98.33    & 97.08     & 97.89      \\ \cline{1-1} \cline{4-10}
-46 &                              &                         & isrd   & 98.55  & 98.99   & 98.19   & 98.35    & 97.39     & 97.95      \\ \hline
+\multicolumn{2}{|c|}{Model}                      & EXPE   & EP & LAYERS                 & LR & LemR & LemD & TagsR & TagsD & JointR & JointD \\ \hline \hline
+0  & NA                           & base                    & A	& NA               & simple & 98.58  & 98.81   & 97.05   & 97.31    & 96.43     & 96.9       \\ \hline
+1  & NA                           & ls                      & B	& NA               & simple & 98.55  & 98.81   & 97.12   & 97.34    & 96.51     & 96.94      \\ \hline
+2  & \multirow{3}{*}{mBERT}       & \multirow{9}{*}{embed}  & B	& four             & simple & 98.69  & 98.93   & 97.83   & 97.98    & 97.17     & 97.58      \\ \cline{1-1} \cline{4-12}
+3  &                              &                         & C	& four                     & cos    & 98.74  & 98.95   & 97.91   & 98.04    & 97.28     & 97.63      \\ \cline{1-1} \cline{4-12}
+4  &                              &                         & C	& four                     & isrd   & 98.73  & 98.94   & 97.89   & 98.02    & 97.28     & 97.61      \\ \cline{1-2} \cline{4-12}
+5  & \multirow{3}{*}{xlm-Roberta} &                         & B	& four             & simple & 98.57  & 98.8    & 97.33   & 97.54    & 96.68     & 97.12      \\ \cline{1-1} \cline{4-12}
+6  &                              &                         & C	& four                     & cos    & 98.6   & 98.83   & 97.45   & 97.62    & 96.81     & 97.21      \\ \cline{1-1} \cline{4-12}
+7  &                              &                         & C	& four                     & isrd   & 98.59  & 98.83   & 97.44   & 97.61    & 96.81     & 97.2       \\ \cline{1-2} \cline{4-12}
+8  & \multirow{3}{*}{RoBECzech}   &                         & B	& four             & simple & 98.77  & 98.97   & 98.38   & 98.48    & 97.78     & 98.08      \\ \cline{1-1} \cline{4-12}
+9  &                              &                         & C	& four                     & cos    & 98.79  & 98.99   & 98.38   & 98.48    & 97.80      & 98.10      \\ \cline{1-1} \cline{4-12}
+10 &                              &                         & C	& four                     & isrd   & 98.78  & 98.98   & 98.4    & 98.48    & 97.8      & 98.09      \\ \hline
+11 & \multirow{3}{*}{mBERT} & \multirow{9}{*}{fine}         & D	& four     & simple & 98.69 & 98.93 & 97.84 & 97.99 & 97.21 & 97.59 \\ \cline{1-1} \cline{4-12}
+12 &                              &                         & E	& four             & cos    & 98.72  & 98.95   & 97.97   & 98.08    & 97.33     & 97.68      \\ \cline{1-1} \cline{4-12}
+13 &                              &                         & E	& four             & isrd   & 98.68  & 98.9    & 97.72   & 97.86    & 97.09     & 97.46      \\ \cline{1-2} \cline{4-12}
+14 & \multirow{3}{*}{xlm-Roberta} &                         & D	& four     & simple & 98.62  & 98.84   & 97.72   & 97.9     & 97.07     & 97.48      \\ \cline{1-1} \cline{4-12}
+15 &                              &                         & E	& four             & cos    & 98.67  & 98.9    & 97.95   & 98.09    & 97.32     & 97.69      \\ \cline{1-1} \cline{4-12}
+16 &                              &                         & E	& four             & isrd   & 98.63  & 98.85   & 97.66   & 97.83    & 97.03     & 97.41      \\ \cline{1-2} \cline{4-12}
+17 & \multirow{3}{*}{RoBECzech}   &                         & D	& four     & simple & 98.78  & 98.98   & 98.46   & 98.55    & 97.86     & 98.16      \\ \cline{1-1} \cline{4-12}
+18 &                              &                         & E	& four             & cos    & \textbf{98.80}   & \textbf{99.00 }     & \textbf{98.50}    & \textbf{98.57}    & \textbf{97.90 }     & \textbf{98.19 }     \\ \cline{1-1} \cline{4-12}
+19 &                              &                         & E	& four             & isrd   & 98.76  & 98.95   & 98.33   & 98.41    & 97.72     & 98.02      \\ \cline{1-2} \cline{4-12} \hline
+20 & \multirow{3}{*}{mBERT}  &  \multirow{9}{*}{fine att}   & D	& att                       & simple & 98.67  & 98.91   & 97.76   & 97.92    & 97.13     & 97.52      \\ \cline{1-1} \cline{4-12}
+21 &                              &                         & E	& att              & cos    & 98.72  & 98.95   & 97.98   & 98.1     & 97.34     & 97.69      \\ \cline{1-1} \cline{4-12}
+22 &                              &                         & E	& att              & isrd   & 98.67  & 98.91   & 97.69   & 97.85    & 97.05     & 97.45      \\ \cline{1-2} \cline{4-12}
+23 & \multirow{3}{*}{xlm-Roberta} &                         & D	& att      & simple & 98.6   & 98.81   & 97.62   & 97.77    & 96.96     & 97.35      \\ \cline{1-1} \cline{4-12}
+24 &                              &                         & E	& att              & cos    & 98.67  & 98.89   & 97.91   & 98.06    & 97.29     & 97.66      \\ \cline{1-1} \cline{4-12}
+25 &                              &                         & E	& att              & isrd   & 98.65  & 98.86   & 97.65   & 97.81    & 97.03     & 97.41      \\ \cline{1-2} \cline{4-12}
+26 & \multirow{3}{*}{RoBECzech}   &                         & D	& att      & simple & 98.77  & 98.97   & 98.38   & 98.47    & 97.79     & 98.08      \\ \cline{1-1} \cline{4-12}
+27 &                              &                         & E	& att              & cos    & \textbf{98.8}   & 98.99   & 98.47   & 98.54    & 97.88     & 98.16      \\ \cline{1-1} \cline{4-12}
+28 &                              &                         & E	& att              & isrd   & 98.77  & 98.96   & 98.33   & 98.41    & 97.72     & 98.01      \\ \hline
+29 & \multirow{3}{*}{mBERT}       & \multirow{9}{*}{simple} & F	& four                     & warmup & 98.17  &         & 97.32   &          & 96.46     &            \\ \cline{1-1} \cline{4-12}
+30 &                              &                         & G	& four                     & cos    & 98.15  &         & 97.39   &          & 96.47     &            \\ \cline{1-1} \cline{4-12}
+31 &                              &                         & G	& four                     & isrd   & 98.13  &         & 97.12   &          & 96.29     &            \\ \cline{1-2} \cline{4-12}
+35 & \multirow{3}{*}{RoBECzech}   &                         & F	& four                     & warmup & 98.49  &         & 98.28   &          & 97.41     &            \\ \cline{1-1} \cline{4-12}
+36 &                              &                         & G	& four                     & cos    & 98.46  &         & 98.30   &          & 97.39     &            \\ \cline{1-1} \cline{4-12}
+37 &                              &                         & G	& four                     & isrd   & 98.59  &         & 98.27   &          & 97.53     &            \\ \hline
+38 & \multirow{3}{*}{mBERT}       & \multirow{9}{*}{full}   & F	& four                     & warmup & 98.16  & 98.86   & 97.35   & 97.79    & 96.46     & 97.34      \\ \cline{1-1} \cline{4-12}
+39 &                              &                         & G	& four                     & cos    & 98.04  & 98.85   & 97.36   & 97.81    & 96.3      & 97.34      \\ \cline{1-1} \cline{4-12}
+40 &                              &                         & G	& four                     & isrd   & 98.22  & 98.86   & 97.34   & 97.73    & 96.46     & 97.29      \\ \cline{1-2} \cline{4-12}
+44 & \multirow{3}{*}{RoBECzech}   &                         & G	& four                     & warmup & 98.49  & 98.95   & 98.21   & 98.34    & 97.38     & 97.93      \\ \cline{1-1} \cline{4-12}
+45 &                              &                         & G	& four                     & cos    & 98.25  & 98.95   & 98.17   & 98.33    & 97.08     & 97.89      \\ \cline{1-1} \cline{4-12}
+46 &                              &                         & G	& four                     & isrd   & 98.55  & 98.99   & 98.19   & 98.35    & 97.39     & 97.95      \\ \hline
+
 \end{tabular}
 }
-\caption{This table presents complete results for tagging and lemmatizationt tasks.  Complete hyperparameters for each experiment are in separate table in Appendix \ref{att:1}.
-}
+\caption{This table presents complete results for tagging and lemmatizationt tasks. Column EP presents number of epochs and corresponding learning rates are explained in Attachement \protect\ref{att:1} }
 \label{tab:all_res_tl}
 \end{table}
+
+
+
 
 \subsubsection{Error Analysis}
 This section offers a little exploration of difference between error across models. This comparison includes three models: 
@@ -234,121 +242,17 @@ This section offers a little exploration of difference between error across mode
 The best model (tl\_18) improved prediciton in $3,247$ tags and was worse in 421 tag predictions. More than 80\% of newly correctly predicted tags is composed by three tags of speech: NN (noun), AA (adjective) and RR (preposition). Table %TODO udelat
 presents the number of improved tags divided by parts of speech and cases and table %TODO udelat
 presents 10 most frequent imrpoved tags. %TODO nejaky zaver z toho? tak napriklad hned druhy a treti nejcastejsi je napriklad hrad, ktery je stejny v 1 i 4 pade, prvni jsou typicky vlasntí cizí jména (místa apod., Jersey, Tenesee), totez jako hrad pro zensky rod v pluralu
+%pridavna jmena: dalsi, stinovy, okamzity zase 1 a 4 pad
+%predlozky se 4 padem na, o, pro 
 
 
-%TODO NNNXX vypsat
-
-to je přes 80% zlepšení
-NN:1760
-AA:733
-RR:127
-
-na trojice tedy: 
-NNF:517
-NNN:512
-NNI:431
-NNM:290
-NNX:10
-AAI:235
-AAF:230
-AAN:139
-AAM:110
-AAX:19
-RR-:127
-
-a takto pády:
-nn
-1:577
-4:557
-X:230
-2:189
-3:86
-7:57
-6:57
-5:7
-aa
-1:291
-4:243
-2:97
-3:34
-7:30
-X:19
-6:19
-rr
-4:58
-6:54
-2:11
-X:2
-7:2
-
-tagy vetsi nez 10 vyskytu:
-NNNXX-----A----:163
-NNIS1-----A----:151
-NNIS4-----A----:130
-NNNS4-----A----:122
-NNFP1-----A----:103
-NNMS1-----A----:99
-NNFP4-----A----:84
-NNNS1-----A----:83
-NNMS4-----A----:72
-AAIS4----1A----:69
-NNFS1-----A----:68
-AAFP1----1A----:64
-AAIS1----1A----:62
-NNFS4-----A----:60
-RR--4----------:58
-NNFS2-----A----:56
-RR--6----------:54
-NNNS2-----A----:48
-NNMS2-----A----:48
-VB-P---3P-AA---:47
-NNIP1-----A----:47
-AANS4----1A----:47
-Db-------------:43
-NNIP4-----A----:42
-VB-S---3P-AA---:38
-NNFS3-----A----:38
-AANS1----1A----:35
-AAFS2----1A----:35
-AAFP4----1A----:35
-AAIP1----1A----:33
-NNFS7-----A----:28
-AAMS1----1A----:27
-NNMP4-----A----:25
-NNNP1-----A----:22
-NNFS6-----A----:22
-NNFXX-----A---8:21
-NNNS6-----A----:20
-PDNS1----------:19
-J,-------------:19
-AAIP4----1A----:19
-NNNS3-----A----:18
-AAFS4----1A----:18
-AAFS1----1A----:17
-PDNS4----------:16
-NNNP4-----A----:16
-NNIS3-----A----:16
-AANP1----1A----:15
-%J^-------------:14
-NNIP7-----A----:13
-NNFP2-----A----:13
-Cn-S1----------:13
-P7-X4----------:12
-NNIS2-----A----:12
-AAMP2----1A----:12
-RR--2----------:11
-NNMS3-----A----:11
-AGFP1-----A----:11
-AAXXX----1A----:11
-AAMS2----1A----:11
-AAFS3----1A----:11
-NNFXX-----A----:10
-AAMP4----1A----:10
-
+%TODO bert simple rozdil tagy a lemmata, neni tam cle, je to horsi i nez embed 
 
 %TODO kolik lemmata
 
-%TODO jake chyby stejne jako predchozi porovnani
+\paragraph{mBERT vs. RobeCzech}
+
+%TODO jake chyby stejne jako predchozi porovnani?
 Best mbert is better in 468 tags and worse in 1703 tags than best model 
 NN:862
 AA:390
