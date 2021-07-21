@@ -7,8 +7,6 @@ As stated in \citep{Veselovska}: "Sentiment analysis, also known as opinion mini
 \textit{output:} prevailing sentiment of the input from categories: neutral, positive, negative.
 \par
 
-
-%TODO zero experiments
 \paragraph{Metric} For evaluating performance, two metrics are used: weighted-F1 score and accuracy. Accuracy is a standard metric for classification and weighted-F1 allows better comparability and also provides additional insights into models evaluation.
 
 \subsection{Related Work}
@@ -191,7 +189,7 @@ Following \citep{kysely}, resulting models were evaluated on five different czec
 \resizebox*{!}{\textheight-2pt}{\begin{tabular}{|l|l|l|l||ll|}
 \hline
 \multicolumn{2}{|l|}{MODEL}       & EXPE                      & LRTYPE                & Acc    & F1   \\ \hline  \hline
-1  & \multirow{6}{*}{mBERT}     & czech                     & \multirow{3}{*}{Isrd} & 80.89   & 80.62 \\ \cline{1-1} \cline{3-3} \cline{5-6}
+1  & \multirow{6}{*}{mBERT}     & czech                     & \multirow{3}{*}{isrd} & 80.89   & 80.62 \\ \cline{1-1} \cline{3-3} \cline{5-6}
 2  &                            & zero                      &                       & 49.51   & 44.67 \\ \cline{1-1} \cline{3-3} \cline{5-6}
 3  &                            & eng                       &                       & 81.17   & 80.90 \\ \cline{1-1} \cline{3-6}
 4  &                            & czech                     & \multirow{3}{*}{cos}  & 82.56   & 82.35 \\ \cline{1-1} \cline{3-3} \cline{5-6}
@@ -201,7 +199,7 @@ Following \citep{kysely}, resulting models were evaluated on five different czec
 14 &                            & zero                      &                       & 55.31   & 48.26 \\ \cline{1-1} \cline{3-6}
 16 &                            & czech                     & \multirow{2}{*}{cos}  & 84.04   & 83.86 \\ \cline{1-1} \cline{3-3} \cline{5-6}
 17 &                            & zero                      &                       & 57.64   & 48.79 \\ \hline
-19 & \multirow{6}{*}{mBERT}     & czech                     & \multirow{3}{*}{Isrd} & 81.61   & 81.43 \\ \cline{1-1} \cline{3-3} \cline{5-6}
+19 & \multirow{6}{*}{mBERT}     & czech                     & \multirow{3}{*}{isrd} & 81.61   & 81.43 \\ \cline{1-1} \cline{3-3} \cline{5-6}
 20 &                            & zero                      &                       & 53.92   & 47.55 \\ \cline{1-1} \cline{3-3} \cline{5-6}
 21 &                            & eng                       &                       & 81.79   & 81.32 \\ \cline{1-1} \cline{3-6}
 22 &                            & czech                     & \multirow{3}{*}{cos}  & 82.62   & 82.42 \\ \cline{1-1} \cline{3-3} \cline{5-6}
@@ -211,30 +209,30 @@ Following \citep{kysely}, resulting models were evaluated on five different czec
 32 &                            & zero                      &                       & 58.36   & 50.40 \\ \cline{1-1} \cline{3-6}
 34 &                            & czech                     & \multirow{2}{*}{cos}  & 83.88   & 83.68 \\ \cline{1-1} \cline{3-3} \cline{5-6}
 35 &                            & zero                      &                       & 58.13   & 50.89 \\ \hline
-37 & \multirow{2}{*}{mBERT}     & \multirow{7}{*}{facebook} & Isrd                  & 75.30   & 74.97 \\ \cline{1-1} \cline{4-6}
+37 & \multirow{2}{*}{mBERT}     & \multirow{7}{*}{facebook} & isrd                  & 75.30   & 74.97 \\ \cline{1-1} \cline{4-6}
 38 &                            &                           & cos                   & 76.20   & 75.89 \\ \cline{1-2} \cline{4-6}
 41 & \multirow{5}{*}{RoBECzech} &                           & isrd                  & 80.10   & 79.87 \\ \cline{1-1} \cline{4-6}
 42 &                            &                           & simple                & 79.20   & 79.12 \\ \cline{1-1} \cline{4-6}
 43 &                            &                           & \multirow{3}{*}{cos}  & 81.50   & 81.37 \\ \cline{1-1} \cline{5-6}
 44 &                            &                           &                       & 81.00   & 80.78 \\ \cline{1-1} \cline{5-6}
 45 &                            &                           &                       & 81.80   & 81.65 \\ \hline
-46 & \multirow{2}{*}{mBERT}     & \multirow{4}{*}{facebook} & Isrd                  & 76.40   & 75.67 \\ \cline{1-1} \cline{4-6}
+46 & \multirow{2}{*}{mBERT}     & \multirow{4}{*}{facebook} & isrd                  & 76.40   & 75.67 \\ \cline{1-1} \cline{4-6}
 47 &                            &                           & cos                   & 77.20   & 76.83 \\ \cline{1-2} \cline{4-6}
 50 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 79.60   & 79.07 \\ \cline{1-1} \cline{4-6}
 51 &                            &                           & cos                   & 80.60   & 80.38 \\ \hline
-52 & \multirow{2}{*}{mBERT}     & \multirow{8}{*}{mall}     & Isrd                  & 82.80   & 82.80 \\ \cline{1-1} \cline{4-6}
+52 & \multirow{2}{*}{mBERT}     & \multirow{8}{*}{mall}     & isrd                  & 82.80   & 82.80 \\ \cline{1-1} \cline{4-6}
 53 &                            &                           & cos                   & 84.27   & 83.88 \\ \cline{1-2} \cline{4-6}
 56 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 83.17   & 83.37 \\ \cline{1-1} \cline{4-6}
 57 &                            &                           & cos                   & 84.73   & 84.30 \\ \cline{1-2} \cline{4-6}
-58 & \multirow{2}{*}{mBERT}     &                           & Isrd                  & 83.02   & 82.90 \\ \cline{1-1} \cline{4-6}
+58 & \multirow{2}{*}{mBERT}     &                           & isrd                  & 83.02   & 82.90 \\ \cline{1-1} \cline{4-6}
 59 &                            &                           & cos                   & 84.04   & 83.61 \\ \cline{1-2} \cline{4-6}
 62 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 84.08   & 83.88 \\ \cline{1-1} \cline{4-6}
 63 &                            &                           & cos                   & 84.60   & 84.14 \\ \hline
-64 & \multirow{2}{*}{mBERT}     & \multirow{8}{*}{csfd}     & Isrd                  & 80.77   & 80.83 \\ \cline{1-1} \cline{4-6}
+64 & \multirow{2}{*}{mBERT}     & \multirow{8}{*}{csfd}     & isrd                  & 80.77   & 80.83 \\ \cline{1-1} \cline{4-6}
 65 &                            &                           & cos                   & 82.04   & 82.04 \\ \cline{1-2} \cline{4-6}
 68 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 83.06   & 83.05 \\ \cline{1-1} \cline{4-6}
 69 &                            &                           & cos                   & 84.89   & 84.87 \\ \cline{1-2} \cline{4-6}
-70 & \multirow{2}{*}{mBERT}     &                           & Isrd                  & 81.63   & 81.60 \\ \cline{1-1} \cline{4-6}
+70 & \multirow{2}{*}{mBERT}     &                           & isrd                  & 81.63   & 81.60 \\ \cline{1-1} \cline{4-6}
 71 &                            &                           & cos                   & 82.20   & 82.19 \\ \cline{1-2} \cline{4-6}
 74 & \multirow{2}{*}{RoBECzech} &                           & isrd                  & 83.13   & 83.18 \\ \cline{1-1} \cline{4-6}
 75 &                            &                           & cos                   & 84.32   & 84.32 \\ \hline
@@ -244,7 +242,7 @@ Following \citep{kysely}, resulting models were evaluated on five different czec
 \end{table}
 
 \par
-Because BERT model was trained on multilingual data, it is naturally not so good in language sparsely presented in the Bert's training data. When transferring the learned knowledge to Czech sentiment task, we actually want to improve model in two ways: teach it something more specific about given task, i.e., sentiment, and improve its knowledge about selected language (Czech in this case). By using Czech sentiment dataset, both thing are incorporated into training. To obtained better results and following the \citep{Putra}, there was also selected English sentiment dataset, \textit{imdb}. The idea behind is that BERT is quite good in English and maybe can learn faster useful knowledge about the given task from data in more familiar language. In the table of results are two types -- \textit{zero} and \textit{eng}. Zero stands for zero-shot and the model is trained only on English data, but evaluated on joint Czech dataset. This, of course, does not returns results results competitive to models trained on czech data, however table \ref{tab:zero} shows that zero models actually learned useful knowledge about the task, which model could apply to Czech data. \textit{Zero(2)} improved by 40\% after training on English data only. \textit{Zero(35)} is the model with RobeCzech, therefore it has the better prior knowledge of Czech, but it can also be improved by training on Enlgish data within the task. In \citep{Putra}, authors used this approach because of the lack
+Because BERT model was trained on multilingual data, it is naturally not so good in language sparsely presented in the Bert's training data. When transferring the learned knowledge to Czech sentiment task, we actually want to improve model in two ways: teach it something more specific about given task, i.e., sentiment, and improve its knowledge about selected language (Czech in this case). By using Czech sentiment dataset, both thing are incorporated into training. To obtained better results and following the \citep{putra}, there was also selected English sentiment dataset, \textit{imdb}. The idea behind is that BERT is quite good in English and maybe can learn faster useful knowledge about the given task from data in more familiar language. In the table of results are two types -- \textit{zero} and \textit{eng}. Zero stands for zero-shot and the model is trained only on English data, but evaluated on joint Czech dataset. This, of course, does not returns results results competitive to models trained on czech data, however table \ref{tab:zero} shows that zero models actually learned useful knowledge about the task, which model could apply to Czech data. \textit{Zero(2)} improved by 40\% after training on English data only. \textit{Zero(35)} is the model with RobeCzech, therefore it has the better prior knowledge of Czech, but it can also be improved by training on English data within the task. In \citep{putra}, authors used this approach because of the lack of the data in Indonesian, so they divided training into two parts. Firstly trained models with different approach including zero-shot and then they chose the best model for fine-tuning on Indonesian data. As we have the Czech monolingual BERT-like model, we at the end did not continue by fine-tuning \textit{zero} experiments, because they did not seem prospectively.
 
 \begin{table}[!h]
 \begin{tabular}{|l|l|l|}

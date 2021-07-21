@@ -27,7 +27,7 @@ Jupyter suits well for this purpose because it, in addition to a possibility of 
 
 \subsection{Code Structure}
 Each task has code is in the separate directory as can be seen on picture %TODO udelat obrazek s adresarovou strukturou a barevne oznacit co se ma spoustet
-All code for tagging and lemmatization is placed in folder \texttt{morphodita\_research}. Main files are \texttt{morpho\_tagger\_2.py} and \texttt{bert\_finetunning\_simple.py}, which serves for running all experiments relating to tagging and lemmatization. Script arguments are described in more detail in tables \ref{Tab:com_args}, \ref{Tab:mt_com_args} and \ref{Tab:mt2_args}.
+All code for tagging and lemmatization is placed in folder \texttt{morphodita\_research}. Main files are \texttt{morpho\_tagger\_2.py} and \texttt{bert\_fine-tuning\_simple.py}, which serves for running all experiments relating to tagging and lemmatization. Script arguments are described in more detail in tables \ref{Tab:com_args}, \ref{Tab:mt_com_args} and \ref{Tab:mt2_args}.
 \par
 Sentiment analysis experiments can be run from \texttt{sentiment\_analysis.py} with arguments as described in tables \ref{Tab:com_args} and \ref{Tab:sent_args}.
 
@@ -128,3 +128,4 @@ test\_only & string & Path to the model, which will be load and weights will be 
 \label{Tab:sent_args}
 \end{table}
 
+%TODO zminit lfs
