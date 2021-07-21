@@ -1,6 +1,6 @@
 \chapter{Experiments}
 \label{chap:exp}
-This chapter describes all experiments and their results. The first part is dedicated to presentation of different experiement hyperparameters, which are in many cases common to all tasks, followed by the description of each task and a discussion of results.
+This chapter describes all experiments and their results. The first part is dedicated to presentation of different experiement hyperparameters, that are in many cases common to all tasks, followed by the description of each task and a discussion of results.
 \section{A description of training hyperparameters}
 \label{sec:expe}
 \subsection{General experiment setup (EXPE)}
@@ -8,13 +8,13 @@ Training is performed in one of the following settings:
 \begin{itemize}
 \item \textbf{base}: Baseline implementation (described separately for each task, typically without using advanced language models).
 \item \textbf{ls}: This setup uses same setting as baseline implementation but with label smoothing.
-\item \textbf{embed}: BERT-like language model is used only to generate static embeddings in advanced. These embeddings are not further trained.
-\item \textbf{fine}: Fine-tuning consist of dividing the training time into two parts. Firstly, rest of the model is trained with BERT layers frozen (not trained), so it is same as the \textit{embed} settings. In the second part, the whole model is trained together.
-\item \textbf{simple}: Model architecture is reduced to BERT layers with a simple classification head. This is a basic setting for all sentiment analysis experiments.\footnote{For tagging and lemmatization, all previously mentioned EXPE setups are performed with more sophisticated classification head than in \textit{simple} version.} 
+\item \textbf{embed}: BERT-like language model is used only to generate static embeddings in advance. Non-BERT part of the model is trained with BERT layers frozen (pre-trained, not changed during training).
 \item \textbf{full}: This options means training the whole model from the beginning (in contrast to \textit{fine} option), but the classification head is not simplified (in contrast to \textit{simple} option).
+\item \textbf{fine}: Fine-tuning consist of dividing the training time into two parts. First part of training is same to \textit{embed} setting. In the second part, the whole model is trained together (as in \textit{full}).
+\item \textbf{simple}: Model architecture is reduced to BERT layers with a simple classification head. This is a basic setting for all sentiment analysis experiments.\footnote{For tagging and lemmatization, all previously mentioned EXPE setups are performed with more sophisticated classification head than in \textit{simple} version.} 
 \end{itemize}
 \subsection{Training data}
-Tagging and lemmatization tasks use the same set of data for every experiments, so there is no need for separate description. Sentiment analysis task, however, uses three possible options as a selection of training data:
+Tagging and lemmatization tasks use the same set of data for all experiments, so there is no need for separate description. Sentiment analysis task, however, uses three possible options as a selection of training data:
 \begin{itemize}
 \item \textbf{mall|facebook|csfd}: Model is trained and evaluated on the (sub)set of Czech datasets.
 \item \textbf{zero}: Model is trained on English sentiment analysis dataset, but evaluated on Czech data.
@@ -23,11 +23,11 @@ Tagging and lemmatization tasks use the same set of data for every experiments, 
 \subsection{Learning rate scheduling type (LRTYPE)}
 Most experiments are expected to perform better with some kind of learning rate scheduling. This work implements three types of learning rate scheduling:
 \begin{itemize}
-\item \textbf{simple} \textit{Simple} option indicates no more complex learning rate scheduling than setting in advance different learning rates for different epochs.
+\item \textbf{simple} \textit{Simple} option indicates no more complex learning rate scheduling than setting different learning rates for different epochs in advance.
 \item \textbf{isrd} %TODO citovat 
 \textit{isrd} means inverse square root learning rate decay defined by formula: $$1/\sqrt{n},$$  where $n$ is the current iteration.
 \item \textbf{cos}: Another learning rate scheduling used in this work is \textit{cosine decay}, %TODO citovat
-which applies the following formula: $$lr=lr_{min}^{i} + \frac{1}{2}\bigg(lr_{max}^{i} - lr_{min}^{i}\bigg)\bigg(1+\cos\bigg(\frac{T_{curr}}{T_i}\pi\bigg)\bigg),$$ where $lr_{min}^{i}$ and $lr_{min}^{i}$ is the range of the learning rate, $T_i$ is the number of epochs after which the learning rate is restarted, i.e. increased to the $lr_{max}^{i}$ value and $T_{curr}$ is the current epoch number.
+which applies the following formula: $$lr=lr_{min}^{i} + \frac{1}{2}\bigg(lr_{max}^{i} - lr_{min}^{i}\bigg)\bigg(1+\cos\bigg(\frac{T_{curr}}{T_i}\pi\bigg)\bigg),$$ where $lr_{min}^{i}$ is the range of the learning rate, $T_{curr}$ is the current epoch number, and $T_i$ is the number of epochs after which the learning rate is restarted, i.e. increased to the $lr_{max}^{i}$ value and $T_curr$ is reset to 0.
 \end{itemize}
 Both \textit{cos} and \textit{isrd} are combined with \textit{warmup}. Learning rate is linearly increasing for first $k$ steps (one epoch in all experiments) from zero to the value in hyperparameters and than starts the decay.
 
@@ -38,14 +38,14 @@ As discussed in the previous chapter, it is unclear how to extract best embeddin
 \item \textbf{att}: Layer attention performs weighted sum of all model layers, and the weights are trained during training together with the rest of the model.
 \end{itemize}
 Experiments are also performed with different learning rates (LR), batch size (BATCH), and a number of epochs (EPOCH). 
-Technical details needed for running scripts with right arguments can be found in chapter \ref{chap:impl}.
+Technical details needed for running scripts with the right arguments can be found in chapter \ref{chap:impl}.
 
 \subsection{Metrics}
 Metrics used for evaluation in this work are \textit{accuracy} and \textit{F1 score}. 
-Accuracy is a percentage of correctly classified samples out of all samples, and it is the basic metric for all classification tasks (not only in this thesis). Accuracy can be sometimes misleading,\footnote{see: https://en.wikipedia.org/wiki/Accuracy\_paradox} and there exist other metrics which can better reflect experimenter's goals. One of them is F1 score, which is used together with accuracy for evaluation of sentiment analysis task due to comparability of results. F1 score is defined in terms of precision and recall. Precision  
-$$\mathit{precision} = \frac{TP}{TP + FP}$$ express credibility of a positive result, e.g., if positive result means  a need of surgery, it is definitely unwanted to have low precision and perform many dangerous and expensive surgeries unnecessarily. Recall, defined as: $$\mathit{recall} = \frac{TP}{TP + FN},$$,
+Accuracy is a percentage of correctly classified samples out of all samples, and it is the basic metric for all classification tasks (not only in this thesis). Accuracy can be sometimes misleading \citep{davisoriginal}, and there exist other metrics that can better reflect experimenter's goals. One of them is F1 score, which is used together with accuracy for evaluation of sentiment analysis task due to comparability of results. F1 score is defined in terms of precision and recall. Precision  
+$$\mathit{precision} = \frac{TP}{TP + FP}$$\footnote{TP stands for true positive = number of samples correctly labelled as 1, FP (=false positives) are incorrectly labelled as 1, FN (=false negatives) is defined similarly.} express credibility of a positive result, e.g., if positive result means  a need of surgery, it is definitely unwanted to have low precision and perform many dangerous and expensive surgeries unnecessarily. Recall, defined as: $$\mathit{recall} = \frac{TP}{TP + FN},$$,
 on the other hand tells us how many positives are captured. For example: \textit{How likely I am to be pregnant with a negative pregnancy test?} F1 score formula for binary classification is than defined as
-$$F1 = 2 \dot \frac{precision \dot recall}{precision + recall}.$$
+$$F1 = 2 \cdot \frac{precision \cdot recall}{precision + recall}.$$
 For multi-class classification, precision and recall needs to be redefined. F1 score can be computed per-class (for every class, binary classification of being in the class is taken). Per-class scores can be combined in one of following ways:
 \begin{itemize}
 \item macro-F1: average of per-class scores,
@@ -53,7 +53,6 @@ For multi-class classification, precision and recall needs to be redefined. F1 s
 \item micro-F1: equals to accuracy.
 \end{itemize}
 \par
-The following part describes specific details of each task.
 \newpage
 \input{chaplemtag}
 \newpage
