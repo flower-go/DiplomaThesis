@@ -1,39 +1,40 @@
 \chapter{Implementation analysis}
 \label{chap:impl}
-The main purpose of this chapter is to offer the technical description of the code accompanying this work for better reproducibility and possible further experiments on every of presented tasks. This chapter describes an implementation of all language models, other related code and also presents all used libraries and technologies.
+The main purpose of this chapter is to offer the technical description of the code accompanying this work for better reproducibility and possible further experiments on every of the presented tasks. This chapter describes an implementation of all language models, other related code, and also presents all used libraries and technologies.
 % and this chapter is concluded with a presentation of experiment types common for training of both tasks presented in following chapters.
 \par
-All code forms an attachment of this work and is also publicly available in GitHub \footnote{https://github.com/flower-go/DiplomaThesis}. Experiment were performed on Artificial Intelligence Cluster (AIC) \footnote{https://aic.ufal.mff.cuni.cz/} provided by Institute of Formal and Applied Linguistics, Charles University \footnote{https://ufal.mff.cuni.cz/home-page}.
+All code forms an attachment of this work and is also publicly available on GitHub. \footnote{\url{https://github.com/flower-go/DiplomaThesis}} Experiment were performed on the Artificial Intelligence Cluster (AIC)\footnote{\url{https://aic.ufal.mff.cuni.cz/}} provided by the Institute of Formal and Applied Linguistics, Charles University. \footnote{\url{https://ufal.mff.cuni.cz/home-page}}
 
 \section{Code description}
-This section will describe the code -- technologies and hardware used for experiments, where to find scripts for replicating experiments and how to run them.
+This section describes the code -- technologies and hardware used for experiments, where to find the scripts for replicating the experiments, and how to run them.
 \subsection{Technologies description}
-All code is implemented in Python (v3.6.9). Python is a popular language for machine learning, because of easy use and many available libraries, which allows to focus on high-level problem solving instead of technical details. All dependencies and used libraries are listed in the \texttt{/code/requirements.txt} file, but the most important libraries should be mentioned explicitly.
-\subsubsection{Tensorflow and Keras}
-The main library used for developing deep learning models in this work is Tensorflow \citep{tensorflow2015-whitepaper}. This library provides lots of tools for machine learning, especially for neural networks. Keras is a wrapper library over Tensorflow and provides easy use of the most common machine learning scenarios \citep{keras}. Tensorflow together with PyTorch \citep{NEURIPS2019_9015} is probably the most frequently used library for deep learning, both providing similar functionality. The reason behind this choice of Tensorflow is the fact, that this thesis builds on the previous work and uses the code developed in Tensorflow.
+All code is implemented in Python (v3.6.9). Python is a popular language for machine learning, because of easy use and many available libraries, which allows to focus on high-level problem solving instead of technical details. All dependencies and used libraries are listed in the \texttt{/code/requirements.txt} file, but we also mention the most important libraries explicitly.
+\subsubsection{TensorFlow and Keras}
+The main library used for developing deep learning models in this work is Tensorflow \citep{tensorflow2015-whitepaper}. This library provides lots of tools for machine learning, especially for neural networks. Keras is a wrapper library over Tensorflow and provides easy use of the most common machine learning scenarios \citep{keras}. Tensorflow together with PyTorch \citep{NEURIPS2019_9015} is probably the most frequently used library for deep learning, both providing similar functionality. The reason behind this choice of Tensorflow is the fact that this thesis builds on the previous work and uses code developed in Tensorflow.
 \subsubsection{Transformers} 
 As mentioned in other part of text, this work reuse pretrained language models based on BERT. Transformers library from Hugging Face\citep{Wolf2019HuggingFacesTS} contains many variants of pretrained BERT models and tools for their usage as tokenizers or learning rate schedulers.
 \subsubsection{Pandas}
-Pandas library \citep{reback2020pandas} serves well for data analysis as it provides data structures like DataFrame, that provides named columns, advanced data indexation, selection, merging, joining, reshaping and other functionality similar to tools provided by e.g.. SQL databases. It does not only provide a rich set of tools but they are also developed with an emphasis on performance optimization.
+Pandas library \citep{reback2020pandas} serves well for data analysis as it provides data structures like DataFrame, which provides named columns, advanced data indexation, selection, merging, joining, reshaping and other functionality similar to tools provided by e.g., SQL databases. It does not only provide a rich set of tools, but they are also developed with an emphasis on performance.
 \subsubsection{Scikit-learn}
-Scikit-learn \citep{scikit-learn}  is another useful python library specialized on machine learning. In contrast to tensorflow, scikit-learn focuses on classical machine learning, not on neural networks, providing all important variants of machine learning models as well as supporting tools for training, e.g. cross validation or various metrics.
+Scikit-learn \citep{scikit-learn}  is another useful Python library specialized on machine learning. In contrast to TensorFlow, scikit-learn focuses on classical machine learning, not on neural networks, providing all important variants of machine learning models as well as supporting tools for training, e.g., cross validation or various metrics.
 \subsubsection{Numpy}
-Numpy \citep{harris2020array} is an library which provides powerful multidimensional arrays with many predefined operations. It is fast and it is common to use it for numerical operations over number arrays.
+Numpy \citep{harris2020array} is a library providing powerful multidimensional arrays with many predefined operations. It is fast and it is a de-facto
+standard library for numerical operations over number arrays.
 \subsubsection{Jupyter Notebook}
-Jupyter notebook \citep{jupyter} is a web application for development. In this work, jupyter notebook is used for providing the trained models for exploration. %TODO doplnit odkaz na tu kapitolu
-Jupyter suits well for this purpose because it, in addition to a possibility of running a separate parts of code in different cells, also supports visualisations and markdown formatted text and it can be useful especially for explanatory purposes.
+Jupyter notebook \citep{jupyter} is a web application for development. In this work, Jupyter notebook is used for providing the trained models for exploration. %TODO doplnit odkaz na tu kapitolu
+Jupyter suits well for this purpose because it, in addition to a possibility of running a separate parts of code in different cells, also supports visualisations and Markdown formatted text and it can be useful especially for explanatory purposes.
 
 
 
 \subsection{Code Structure}
-Each task has code is in the separate directory as can be seen on picture %TODO udelat obrazek s adresarovou strukturou a barevne oznacit co se ma spoustet
-All code for tagging and lemmatization is placed in folder \texttt{morphodita\_research}. Main files are \texttt{morpho\_tagger\_2.py} and \texttt{bert\_fine-tuning\_simple.py}, which serves for running all experiments relating to tagging and lemmatization. Script arguments are described in more detail in tables \ref{Tab:com_args}, \ref{Tab:mt_com_args} and \ref{Tab:mt2_args}.
+Each task has code in a separate directory as can be seen on picture %TODO udelat obrazek s adresarovou strukturou a barevne oznacit co se ma spoustet
+All code for tagging and lemmatization is placed in the folder \texttt{morphodita\_research}. Main files are \texttt{morpho\_tagger\_2.py} and \texttt{bert\_fine-tuning\_simple.py}, which serves for running all experiments relating to tagging and lemmatization. Script arguments are described in more detail in tables \ref{Tab:com_args}, \ref{Tab:mt_com_args} and \ref{Tab:mt2_args}.
 \par
-Sentiment analysis experiments can be run from \texttt{sentiment\_analysis.py} with arguments as described in tables \ref{Tab:com_args} and \ref{Tab:sent_args}.
+Sentiment analysis experiments (in folder \texttt{sentiment}) can be run using \texttt{sentiment\_analysis.py} with arguments as described in tables \ref{Tab:com_args} and \ref{Tab:sent_args}.
 
 \subsection{Working example}
-The best model is publicly available in the Git repository \footnote{https://github.com/flower-go/DiplomaThesis/tree/master/code/morphodita-research/models\_public} %TODO dodat sentiment model
- and licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Licence \footnote{https://creativecommons.org/licenses/by-nc-sa/4.0/}. If you want to try the model prediction or see a working example of usage of such models, there is public Google Colaboratory \citep{colab} jupyter notebook, which downloads all necessary data and returns predictions for a given text. This notebook si available here: \url{https://colab.research.google.com/github/flower-go/DiplomaThesis/blob/master/PlayWithModels.ipynb}. 
+The best model is publicly available in the Git repository\footnote{\url{https://github.com/flower-go/DiplomaThesis/tree/master/code/morphodita-research/models}} %TODO dodat sentiment model %TODO spravna cesta je jinde
+ and licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Licence.\footnote{\url{https://creativecommons.org/licenses/by-nc-sa/4.0/}} If you want to try the model prediction or see a working example of usage of such models, you can use a public Google Colaboratory \citep{colab} Jupyter notebook, which downloads all necessary data and returns predictions for a given text. This notebook si available here: \url{https://colab.research.google.com/github/flower-go/DiplomaThesis/blob/master/PlayWithModels.ipynb}. 
 
 
 %spolecne pro vsechny:
@@ -42,16 +43,16 @@ The best model is publicly available in the Git repository \footnote{https://git
  \hline
  Argument & Values & Description \\ 
  \hline \hline
- accu & int & Accumulation of gradient. Effective batch size is batch\_size * accu.  \\\hline
+ accu & int & Accumulation of gradient. Effective batch size is batch\_size times accu.  \\\hline
 batch\_size & int & Batch size (without accumulation). \\ \hline
-bert & string & Name of the bert model (from huggingFace library) or path to the model.  \\ \hline
-  checkp & String & Name of the saved model weights. Saving weights is used instead of the whole model because of some technical issues.  \\ \hline
+bert & string & Name of the bert model (from the HuggingFace library) or path to the model.  \\ \hline
+  checkp & String & Name of the saved model weights. Saving weights is used instead of saving he whole model.  \\ \hline
   debug & 0/1 & Debug mode loads small debug data if available. \\ \hline
   label\_smoothing & decimal number & Coefficient for label smoothing. \\ \hline
   dropout & float &  Dropout amount applied on various places of the network.  \\ \hline
  epochs & "x:l1,y:l2"  & This will perform x epochs with learning rate l1 and y epochs with learning rate l2.   \\ \hline
- layers & None/"att" & If "att", all bert-like model layers are combined with learned weights.  \\ \hline
- warmup\_decay & None /"i:x"/"c:x" & If not None, training will incorporate inverse square root decay or cosine decay for x episodes.  \\ \hline
+ layers & None/"att" & If "att", all BERT-like model layers are combined with learned weights.  \\ \hline
+ warmup\_decay & None /"i:x"/"c:x"/"n:x" & If not None, training will incorporate inverse square root decay, cosine decay, or warm-up for x episodes.  \\ \hline
  fine\_lr & float & Different learning rate for the classification head.  \\ \hline
  \hline
 \end{tabular}
@@ -68,9 +69,8 @@ bert & string & Name of the bert model (from huggingFace library) or path to the
  \hline \hline
  beta\_2 & float & An argument for the optimizer. \\ \hline
  cle\_dim & int & Dimension of character-level embeddings.  \\ \hline
- cont & 0/1 & Evaluating on the test data every epoch.  \\ \hline
  exp & string & Name of logs files.  \\ \hline
- factors & "Lemmas,Tags" & Factors to be predicted -- Lemmas, Tags or both. \\ \hline
+ factors & "Lemmas,Tags" & Factors to be predicted -- Lemmas, Tags, or both. \\ \hline
 word\_dropout & float & Probability of masking a word in the sentence during training.  \\ \hline
 
 \hline
@@ -89,25 +89,27 @@ word\_dropout & float & Probability of masking a word in the sentence during tra
  \hline \hline
  data & string &  Input data directory. Data are supposed to be divided into train, dev and test \texttt{.txt} files. \\ \hline
  char\_dropout &  float &  Dropout for characters. \\ \hline
-embeddings & string & Path to pre-comuputed embeddings for use. \\ \hline
+embeddings & string & Path to pre-comuputed embeddings to use. \\ \hline
 factor\_layers & int & Number of dense-and-dropout blocks for each of factors.  \\ \hline
 lemma\_re\_strip &  string & Regular expression for suffix to be stripped from lemma. \\ \hline
-lemma\_rule\_min & int & Minimal occurences to keep a lemma.  \\ \hline
-predict & string & Script returns only a prediction with model from the path given in this argument.  \\ \hline
-rnn\_cell & "LSTM"/"GRU" & Type of rnn cell to use. \\ \hline
-rnn\_cell\_dim & int & Dimension for rnn cells.  \\ \hline
+lemma\_rule\_min & int & Minimal occurences to keep a lemma rule.  \\ \hline
+predict & string & Produce only a prediction with the model from the path given in this argument.  \\ \hline
+rnn\_cell & "LSTM"/"GRU" & Type of RNN cell to use. \\ \hline
+rnn\_cell\_dim & int & Dimension for RNN cells.  \\ \hline
 rnn\_layers& int & Number of recurrent cell layers.  \\ \hline
-we\_dim & int & Dimension of word embeddings.  \\ \hline  
+we\_dim & int & Dimension of trainable word embeddings.  \\ \hline  
 
 
 bert\_model & string & Trained checkpoint for loading. Training will continue from this checkpoint. \\ \hline
 
-test\_only & string & Path to the model, which will be load and weights will be printed.  \\ \hline
+test\_only & string & Path to the model, which will be loaded and weights will be printed.  \\ \hline
  \hline
 \end{tabular}
-\caption{A list of arguments specific to morpho\_tagger\_2.py, with detailed description.} 
+\caption{A list of arguments specific to \texttt{morpho\_tagger\_2.py}, with detailed description.} 
 \label{Tab:mt2_args}
 \end{table}
+
+%TODO vert vs texttt
 
 \begin{table}
 \centering
@@ -115,12 +117,12 @@ test\_only & string & Path to the model, which will be load and weights will be 
  \hline
  Argument & Values & Description \\ 
  \hline \hline
- datasets & \{mall,csfd,facebook\} &  Names of the input czech datasets, separated by comma. \\ \hline
- english & float & A percentage of result training data which should be formed by english IMDB dataset.\\ \hline
+ datasets & \{"mall,csfd,facebook"\} &  Names of the input Czech datasets, separated by comma. \\ \hline
+ english & float & A percentage training data which should be taken from the English IMDB dataset.\\ \hline
  
- freeze & {0,1} & 1 means, that bert layers will not be trained. \\ \hline
+ freeze & {0,1} & Value 1 means that BERT layers will not be trained. \\ \hline
  seed & int & Inicialization of random seed. \\ \hline
- kfold & "k:i" & Data will be splitted into k folds and i-th fold will be used for test. It serves for running k-fold cross-validation in parallel runs. \\ \hline
+ kfold & "k:i" & Data will be splitted into $k$ folds and the $i$-th fold will be used for evaluation. It serves for running $k$-fold cross-validation in parallel runs. \\ \hline
  
  \hline
 \end{tabular}
