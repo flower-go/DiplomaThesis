@@ -237,7 +237,7 @@ The transformers solve the same problem as RNNs but proposes a different archite
 Tranformers uses encoder-decoder architecture, which was simultaneously published in 2014 by \citep{Cho2014}, \citep{Sutskever2014} and \citep{Wu2016}. This architecture's basic idea is following: 
 This architecture serves to processing of variable-length sequences. Encoder and decoder are connected by a vector of fixed size (context vector), which aims to be a good representation of the input. %TODO pridat obrazek pro porovnani s transformers kde to neni, hlavni zmena v tom paperu
 The encoder reads its input and tries to learn such weights that the encoder's final representation of the input contains all important information. This context vector serves as an input into the decoder, which tries to reconstruct the best results. This architecture was first used for machine translation, so the decoder's output, in this case, is a sentence in the target language with the same meaning as an original input (see figures \ref{pic:enco_deco}  and \ref{pic:enco_deco_all}).
-\begin{figure}[H]
+\begin{figure}[!h]
 \centering
 \includegraphics[width=1\columnwidth]{../img/trans_arch}
 \protect\caption{This picture describes design of one encoder-decoder block in detail. Every encoder layer consist of self-attention and feed-forward layer supplied with normalization and residual connections. Source: http://jalammar.github.io/illustrated-transformer }
