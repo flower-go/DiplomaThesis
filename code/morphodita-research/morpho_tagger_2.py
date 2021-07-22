@@ -15,8 +15,6 @@ import warnings
 
 
 from transformers import WarmUp
-sys.path.append("./robeczech/noeol-210323/")
-import tokenizer.robeczech_tokenizer
 
 
 
@@ -25,17 +23,20 @@ class BertModel:
         self.name = name
 
         if "robeczech" in name:
-            self.path = name
-            self.tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer(self.path + "tokenizer")
-            self.model = transformers.TFAutoModel.from_pretrained(self.path + "tf", output_hidden_states=True)
+            self.path = name + "tf"
+            self.tokenizer = transformers.AutoTokenizer.from_pretrained("ufal/robeczech-base")
         else:
-            self.config = transformers.AutoConfig.from_pretrained(name)
-            self.config.output_hidden_states = True
+            self.path = name
             self.tokenizer = transformers.AutoTokenizer.from_pretrained(name)
-            self.model = transformers.TFAutoModel.from_pretrained(name,
-                                                                  config=self.config)
+
         self.embeddings_only = True if args.bert else False
 
+    @property
+    def model(self):
+        config = transformers.AutoConfig.from_pretrained(self.path)
+        config.output_hidden_states = True
+        self.model = transformers.TFAutoModel.from_pretrained(self.path, config=self.config)
+        return self.model
 
 class Network:
 
@@ -566,7 +567,7 @@ class Network:
                         print("comparison")
                         print(np.array(factors[f][i] == predictions[f][i],np.str))
                         print(mask)
-                        print(predictions[f][i)
+                        print(predictions[f][i])
                         results[dataset.FACTORS_MAP[factor]] = np.array(factors[f][i] == predictions[f][i],np.str)
 
                     
@@ -665,9 +666,6 @@ def main(args):
                 args.bert = args.bert[0]
             name = args.bert
 
-    if name is not None and "robeczech" in name:
-        sys.path.append(name)
-        import tokenizer.robeczech_tokenizer
 
     # TODO vyřešit
     # tf.config.threading.set_inter_op_parallelism_threads(args.threads)
