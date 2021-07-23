@@ -31,6 +31,8 @@ which applies the following formula: $$lr=lr_{min}^{i} + \frac{1}{2}\bigg(lr_{ma
 \end{itemize}
 Both \textit{cos} and \textit{isrd} are combined with \textit{warmup}. Learning rate is linearly increasing for first $k$ steps (one epoch in all experiments) from zero to the value in hyperparameters and than starts the decay.
 
+%TODO odstranit restarty
+
 \subsection{Model layers selected for embeddings (LAYERS)}
 As discussed in the previous chapter, it is unclear how to extract best embeddings from the language model, especially which layers to take into account. According to the results published in \citep{Devlin2019, Kondratyuk2019}, we consider the following two promising approaches:
 \begin{itemize}
