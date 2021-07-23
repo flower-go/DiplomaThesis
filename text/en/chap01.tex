@@ -38,8 +38,7 @@ A question arises as to what is the difference between a corpus and a "simple" d
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\textwidth]{../img/syntax_dependency_trees.pdf}
-\protect\caption[LoF entry]{
-An example of the syntax and dependency tree. The dependency tree, as the name indicates, describes dependencies between words. Such dependencies are of various types; for example, an elephant in the example text is a direct object of the shooting action. \par A root of such a tree is typically a predicate of the sentence. On the other hand, the syntax tree represents the sentence's syntactic structure according to the grammar. The root of the tree is \textit{sentence}, which is split into noun and verb phrase. These can be further divided into phrases compound from particular instances of parts of speech (e.g., nouns, adverbs, verbs, prepositions, etc.).
+\protect\caption[An example of the syntax and dependency tree.]{An example of the syntax and dependency tree. The dependency tree, as the name indicates, describes dependencies between words. Such dependencies are of various types; for example, an elephant in the example text is a direct object of the shooting action. \par A root of such a tree is typically a predicate of the sentence. On the other hand, the syntax tree represents the sentence's syntactic structure according to the grammar. The root of the tree is \textit{sentence}, which is split into noun and verb phrase. These can be further divided into phrases compound from particular instances of parts of speech (e.g., nouns, adverbs, verbs, prepositions, etc.).
 \newline \textit{Source: \cite{NLTKbook}}
 }
 \label{fig:trees}
@@ -47,7 +46,7 @@ An example of the syntax and dependency tree. The dependency tree, as the name i
 
 \begin{figure}
 \includegraphics[width=1\textwidth]{../img/prague_dep_treebank.png}
-\caption{
+\caption[Prague Dependency Treebank example]{
 Prague dependency treebank example \cite{PDT35} for the sentences:
 \textit{Grasshoppers are still in the larvae stadium, crawling only. At this time of the year, it is efficient to fight them using chemicals, but neither the ailing cooperatives nor private farmers can afford them.} Czech: \textit{Sarančata jsou doposud ve stadiu larev a pohybují se pouze lezením. V tomto období je účinné bojovat proti nim chemickými postřiky, ale dožívající družstva ani soukromí rolníci nemají na jejich nákup potřebné prostředky}. This treebank contains dependency trees, but is is just one of many possibilities. Prague dependency treebank offers different layers of annotations. Red strips over words \textit{chemický} and \textit{postřik} marks multiword phrase, conjunction between \textit{rolník} and \textit{družstvo} is expressed as by one type of nodes, blue lines denotes coreference etc.} Praque dependency treebank data are used for tagging and lemmatization tasks.
 \label{fig:pdt}
@@ -70,7 +69,7 @@ Perceptron, invented in 1958, is the most straightforward neural network with ju
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\columnwidth]{../img/perceptron}
-\caption{A one-layer perceptron architecture. The result is formed by the application of the activation function on a weighted sum of inputs. Weights are updated during training till it returns satisfactory results. }
+\caption[A one-layer perceptron architecture]{A one-layer perceptron architecture. The result is formed by the application of the activation function on a weighted sum of inputs. Weights are updated during training till it returns satisfactory results. }
 \label{pic:perceptron}
 \end{figure}
 
@@ -79,7 +78,7 @@ There also exists a multi-class version for general classification,  but percept
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/xor}
-\caption{This picture illustrates the XOR problem. Perceptron can find the correct solution only if the data are linearly separable. It means that they can be divided by a hyperplane. An example of such two-dimensional data can be seen in picture A). The dotted line shows a possible border for separation. Picture B) shows XOR problem. XOR is a logical operation on two boolean variables, which returns true if one variable is True (1) and the other one is False (0), and returns False otherwise. Such data cannot be separated by one hyperplane. Linearly non-separable data can be, for example, separated by an ellipse (picture C).}
+\caption[The XOR problem illustration]{This picture illustrates the XOR problem. Perceptron can find the correct solution only if the data are linearly separable. It means that they can be divided by a hyperplane. An example of such two-dimensional data can be seen in picture A). The dotted line shows a possible border for separation. Picture B) shows XOR problem. XOR is a logical operation on two boolean variables, which returns true if one variable is True (1) and the other one is False (0), and returns False otherwise. Such data cannot be separated by one hyperplane. Linearly non-separable data can be, for example, separated by an ellipse (picture C).}
 \label{pic:xor}
 \end{figure}
 
@@ -92,7 +91,7 @@ Different NN types differ by the number and the shape of layers, activation func
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/multilayer}
-\caption{Multilayer perceptron (or feed-forward neural network) is formed of an input and an output layer and a variable number of hidden layers with different sizes. In every layer, the chosen activation function is applied to a weighted sum of inputs from the previous layer. In the illustration, the output is a probability for each of both classes in binary classification.}
+\caption[A Multilayer perceptron architecture]{Multilayer perceptron (or feed-forward neural network) is formed of an input and an output layer and a variable number of hidden layers with different sizes. In every layer, the chosen activation function is applied to a weighted sum of inputs from the previous layer. In the illustration, the output is a probability for each of both classes in binary classification.}
 \label{pic:multilayer}
 \end{figure}
 \par
@@ -107,7 +106,7 @@ To be precise, supervised machine learning goal is not to predict all labels cor
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/overfitting}
-\caption{Figure A) presents overfitting scenario and Figure B) illustrates possible well-generalized solution for data with two variables. }
+\caption[Overfitting]{Figure A) presents overfitting scenario and Figure B) illustrates possible well-generalized solution for data with two variables. }
 \label{pic:overfitting}
 \end{figure}
 Another classification regularization method, which is also used in this work, is label smoothing. Label smoothing \citep{Szegedy2015} is an idea applicable to every classification problem, therefore is not limited to an \acrshort{nlp} only.
@@ -151,7 +150,7 @@ Attention mechanism \citep{Bahdanau} is widely used in \acrshort{nlp} as a tool 
 \begin{center}
 \begin{figure}[!h]
 \includegraphics[width=1\columnwidth]{../img/attention_translate}
-\caption{Figure 3 of \citep{Bahdanau} presents the use of the attention for machine translation. Axis show words of a sentences in English and French. The importance for a translation between a pair of words is represented by a lightness (lighter = more important).
+\caption[Attention for machine translation]{Figure 3 of \citep{Bahdanau} presents the use of the attention for machine translation. Axis show words of a sentences in English and French. The importance for a translation between a pair of words is represented by a lightness (lighter = more important).
 }
 \label{pic:att_trans}
 \end{figure}
@@ -171,7 +170,7 @@ Modification to an attention concept, called self-attention \citep{Cheng}, deals
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/self_attention1.pdf}
-\caption{Self-attention mechanism scheme for one selected query vector. The result is an embedding, which is improved by the context of the word. This picture illustrates the result for the embedding %TODO jak jako embedding
+\caption[Self-attention mechanism]{Self-attention mechanism scheme for one selected query vector. The result is an embedding, which is improved by the context of the word. This picture illustrates the result for the embedding %TODO jak jako embedding
 of the first word (l1) in a four-word long text. Input words are denoted as l1 to l4. Keys, values, and a query are all computed by multiplying the input embeddings by their respective weights ($W_k$, $W_v$, and $W_q$) before any other operation with them. These weights are trained during learning. Dot products between every word and every query are computed. The result is a number for every input word, so four numbers at the end. These numbers are normalized, so the sum of them is equal to 1. These numbers serve as a weight ($M_x$), which indicates the relationship between the query and every other word. The resulting better embedding for the query is then obtained as a sum of the word embeddings weighted by these obtained weights. %zdroj: 10This video series helped me a lot with an understanding of the self-attention concept: https://youtube.com/playlist?list=PL75e0qA87dlG-za8eLI6t0 Pbxafk-cxb
 }
 \label{pic:att_self}
@@ -180,7 +179,7 @@ An improvement to the self-attention -- \textit{multihead attention} \citep{Vasw
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/attention_multi1}
-\caption{Figure 2 from \citep{Vaswani2017} describes the attention mechanism used in Transformers. Scaled Dot-Product Attention, as authors call it, is basically the same architecture as described in the previous figure (\ref{pic:att_self}). The dimension of values ($d_v$) is different from query and keys dimensions ($d_k$). As the normalization serves scaling (division by the number of input dimensions) and than softmax function, which ensures the sum of all weights to be equal to one. Multi-head attention just perform Scaled Dot-Product Attention in parallel and result is then concatenated.
+\caption[Attention mechanism for the Transformers architecture]{Figure 2 from \citep{Vaswani2017} describes the attention mechanism used in Transformers. Scaled Dot-Product Attention, as authors call it, is basically the same architecture as described in the previous figure (\ref{pic:att_self}). The dimension of values ($d_v$) is different from query and keys dimensions ($d_k$). As the normalization serves scaling (division by the number of input dimensions) and than softmax function, which ensures the sum of all weights to be equal to one. Multi-head attention just perform Scaled Dot-Product Attention in parallel and result is then concatenated.
 }
 \label{pic:att_multi}
 \end{figure}
@@ -199,7 +198,7 @@ The first problem was solved by simple Recurrent Neural Networks (RNN). To repre
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/rnn}
-\protect\caption{Basic Recurrent neural network architecture is showed on the left side of the figure. It is composed by one rnn cell which recurrently uses informations from previously seen input. $X$ is the input of the cell, e.g. a word, $O$ is the output for the given word (e.g. its translation or next word prediction), $V$ is the state passed into another time step. For better illustration of working in the time, RNN can be visualised as a chain of cells connected by a result of previous cell as can be seen on the left side of the figure. Source: \textit{Picture from \url{https://medium.com/deeplearningbrasilia/deep-learning-recurrent-neural-networks-f9482a24d010}}.}
+\protect\caption[The recurrent neural network architecture]{Basic Recurrent neural network architecture is showed on the left side of the figure. It is composed by one rnn cell which recurrently uses informations from previously seen input. $X$ is the input of the cell, e.g. a word, $O$ is the output for the given word (e.g. its translation or next word prediction), $V$ is the state passed into another time step. For better illustration of working in the time, RNN can be visualised as a chain of cells connected by a result of previous cell as can be seen on the left side of the figure. Source: \textit{Picture from \url{https://medium.com/deeplearningbrasilia/deep-learning-recurrent-neural-networks-f9482a24d010}}.}
 \label{pic:rnn}
 \end{figure}
 
@@ -210,7 +209,7 @@ Both LSTM and GRU uses an idea of gating. Term \textit{gate} refers to a weight 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/rnn_lstm_gru}
-\protect\caption{Comparison of LSTM and GRU architecture. $x_t$ is the current input (current word),  Source: \url{http://dprogrammer.org/rnn-lstm-gru}.}
+\protect\caption[A comparison of LSTM and GRU architectures]{Comparison of LSTM and GRU architecture. $x_t$ is the current input (current word),  Source: \url{http://dprogrammer.org/rnn-lstm-gru}.}
 \label{pic:lstm_gru}
 \end{figure}
 \subsubsection*{LSTM} LSTM cell uses three gates: input, output and forget gate. Every gate is composed by a sigmoid function with an actual input and a previous hidden state as inputs.
@@ -218,7 +217,7 @@ Both LSTM and GRU uses an idea of gating. Term \textit{gate} refers to a weight 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/lstm_gates}
-\protect\caption{An architecture of the LSTM cell, epsecially its gating mechanism. A LSTM cell carry through the time, in addition to a hidden state, also a cell state, which serves as a long-term memory. \textit{A forget gate} is responsible for choosing the amount of cell state, therefore the information from previous inputs, to be preserved. It uses sigmoid function which returns the output between 0 and 1. \textit{An input gate} controls the addition of new information from the input to the memory. \textit{An output gate} produces the output hidden state which is passed to the next cell. }
+\protect\caption[An architecture of the LSTM cell]{An architecture of the LSTM cell, epsecially its gating mechanism. A LSTM cell carry through the time, in addition to a hidden state, also a cell state, which serves as a long-term memory. \textit{A forget gate} is responsible for choosing the amount of cell state, therefore the information from previous inputs, to be preserved. It uses sigmoid function which returns the output between 0 and 1. \textit{An input gate} controls the addition of new information from the input to the memory. \textit{An output gate} produces the output hidden state which is passed to the next cell. }
 \label{pic:lstm_gates}
 \end{figure}
 %TODO ? Source: \textit{\citep{rnn_paper}}
@@ -228,7 +227,7 @@ The \textit{reset gate} is responsible for how much of the previous state will t
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/gru_gates}
-\protect\caption{An architecture of GRU cell. \textit{An update gate (A)} computes how much of previous information should be passed to next cell based on previous hidden state and the current time input. \textit{A reset gate (B)} uses the same formula (although the input and the previous hidden state have different weights) but serves to a different purpose -- it decides which to forget. \textit{(C)} previous hidden state is weighted by the reset gate before concatenating with current input and normalized via tanh function (to be between $-1$ and $1$) Finally, \textit{new hidden state} is computed as an affine combination of previous hidden state and "normalized" hidden state from previous step.}
+\protect\caption[An architecture of the GRU cell]{An architecture of the GRU cell. \textit{An update gate (A)} computes how much of previous information should be passed to next cell based on previous hidden state and the current time input. \textit{A reset gate (B)} uses the same formula (although the input and the previous hidden state have different weights) but serves to a different purpose -- it decides which to forget. \textit{(C)} previous hidden state is weighted by the reset gate before concatenating with current input and normalized via tanh function (to be between $-1$ and $1$) Finally, \textit{new hidden state} is computed as an affine combination of previous hidden state and "normalized" hidden state from previous step.}
 \label{pic:gru_gates}
 \end{figure}
 \subsection{Transformers}
@@ -239,14 +238,14 @@ The encoder reads its input and tries to learn such weights that the encoder's f
 \begin{figure}[!h]
 \centering
 \includegraphics[width=1\columnwidth]{../img/trans_arch}
-\protect\caption{This picture describes design of one encoder-decoder block in detail. Every encoder layer consist of self-attention and feed-forward layer supplied with normalization and residual connections. Source: \url{http://jalammar.github.io/illustrated-transformer} }
+\protect\caption[The encoder-decoder block architecture in detail]{This picture describes design of one encoder-decoder block in detail. Every encoder layer consist of self-attention and feed-forward layer supplied with normalization and residual connections. Source: \url{http://jalammar.github.io/illustrated-transformer} }
 \label{pic:enco_deco}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/encoder_decoder_all}
-\protect\caption{ In transformers, encoder and decoder parts are both composed by many of block of respective types. The input goes first through a series of encoders and than the output of encoder part is put into every decoder in the decoder part. %TODO říct proč
+\protect\caption[Encoder-decoder overall architecture]{ In transformers, encoder and decoder parts are both composed by many of block of respective types. The input goes first through a series of encoders and than the output of encoder part is put into every decoder in the decoder part. %TODO říct proč
 source: \url{http://jalammar.github.io/illustrated-transformer/}  }
 \label{pic:enco_deco_all}
 \end{figure}
@@ -263,7 +262,7 @@ Following the taxonomy in figure \ref{pic:tl_taxonomy}, currently most important
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.7\columnwidth]{../img/tl_taxonomy}
-\caption{Figure from \protect\citep{Ruder2019} offers possible taxonomy for transfer learning. %TODO co je to domena, tohle predelat
+\caption[Possible taxonomy for a transfer learning]{Figure from \protect\citep{Ruder2019} offers possible taxonomy for transfer learning. %TODO co je to domena, tohle predelat
 Following definiton in \citep{Pan2009}, transfer learning's goal is to improve the performance on task $T_1$ from domain $D_1$ by learning knowledge on task $T_0$ from domain $D_0$. Domain is defined as $D = {\chi,P(X)}$, where $X \in \chi$, $\chi$ is a feature space and $P(X)$ is a marginal probability distribution over the feature space. Transfer learning allows the use of trained models on tasks with different sets of labels or different input data's nature. Input data can vary in the source they come from (wikipedia text versus a novel or a social network posts), they can learn from different features (e.g. different languages) or the distribution of classes is different than it was in the training data (so some highly presented classes in training data are rare in this new task and others are quite common but previously not seen too many times).
 }
 \label{pic:tl_taxonomy}
@@ -310,7 +309,7 @@ BERT uses the concatenation of three types of embeddings as an input representat
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/bert_embeddings}
-\protect\caption{ An input is represented using three kinds of embeddings for every input word. Every sequence is also marked off by beginning and ending markers (CLS and SEP token), which are also encoded using a combination of all three embedding stypes.
+\protect\caption[BERT embeddings]{ An input is represented using three kinds of embeddings for every input word. Every sequence is also marked off by beginning and ending markers (CLS and SEP token), which are also encoded using a combination of all three embedding stypes.
 Source: \textit{\citep{Devlin2019}}.}
 \label{pic:bert_emb}
 \end{figure}
@@ -324,7 +323,7 @@ Every word, which is not a part of the selected embedding set, is encoded in the
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{../img/bert_input}
-\protect\caption{This figure illustrates a transformation of one input sentence (from PDT3) to suit bert input expectations. The sentence is divided into words and then into tokens from wordpiece tokenizer vocabulary. Accents may be removed depending on the used model. The sentence is decorated with special CLS and SEP tokens to mark the beginning and the end of the sentence. All tokens are then converted into numbers. }
+\protect\caption[Transformation of the BERT tokenizer]{This figure illustrates a transformation of one input sentence (from PDT3) to suit BERT input expectations. The sentence is divided into words and then into tokens from WordpPiece tokenizer vocabulary. Accents may be removed depending on the used model. The sentence is decorated with special CLS and SEP tokens to mark the beginning and the end of the sentence. All tokens are then converted into numbers. }
 \label{pic:bert_inp}
 \end{figure}
 \par
@@ -340,11 +339,11 @@ BERT uses its encoder architecture for each layer, so L encoder layers are follo
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\columnwidth]{../img/bert_arch}
-\caption{A figure from \citep{Ganesh2020} describes the BERT architecture in detail.}
+\includegraphics[width=0.8\columnwidth]{../img/bert_arch.pdf}
+\caption[The BERT architecture in detail]{A figure inspired by \citep{Ganesh2020} describes the BERT architecture in detail.}
 \label{pic:bert_arch}
 \end{figure}
-%TODO rozmazane
+
 
  Original paper proposes two main architecture hyperparameters versions, \textit{base} and \textit{large} (see table \ref{Tab:base_large}), depending on the number of layers (L), the size of the hidden layer (H), and several heads in multi-head self-attention (A). Output before the classification head is a vector of size H for each of the input words. 
 
@@ -359,7 +358,7 @@ BERT uses its encoder architecture for each layer, so L encoder layers are follo
   A & 12 & 16\\ \hline
 Total Parameters & 110M & 340M \\\hline
 \end{tabular}
-\caption{Difference between base and large version of BERT model, as published in 
+\caption[The base and large BERT model comparison]{Difference between base and large version of BERT model, as published in 
 \citep{Devlin2019}.
 } 
 \label{Tab:base_large}
@@ -372,8 +371,7 @@ The input of the BERT model for this task is two sentences, A and B. In 50\% of 
 Devlin2019} showed its usefulness for text tasks as question answering. Sentence-level classification with BERT, as in the case of NSP, can be performed by using the last hidden representation of the CLS token (the first token of every input example) as an input into classification layer. Authors assumed that this token could work as a summary of the whole sentence, although later work has shown better approaches, i.e., \citep{Liu2019}. 
 \paragraph{Masked Language Modeling}
 Masked Language Modeling, or in other words Cloze task \citep{Taylor1953},
-consist of prediction of some missing words in the text. In BERT's case, its implementation follows: 15\% of tokens in each sequence are chosen. For each of these chosen tokens, there is an 80\% chance to be replaced by a MASK token, a 10\% chance to be replaced by a random token, or it will remain unchanged with a 10\% probability. This masking method ensures that the model will try to predict tokens not only in MASK token presence. For backpropagation, only predictions of the selected 15\% tokens are taken into account. Prediction is made by a softmax function %TODO u kazdeho z 15 procent nebo kde to predpovida?
- whose input is the last hidden representation of the respective token, and the softmax layer outputs a probability distribution for predicting every possible word. 
+consist of prediction of some missing words in the text. In BERT's case, its implementation follows: 15\% of tokens in each sequence are chosen. For each of these chosen tokens, there is an 80\% chance to be replaced by a MASK token, a 10\% chance to be replaced by a random token, or it will remain unchanged with a 10\% probability. This masking method ensures that the model will try to predict tokens not only in MASK token presence. For backpropagation, only predictions of the selected 15\% tokens are taken into account. Prediction is made by a softmax function, whose input is the last hidden representation of the respective token, and the softmax layer outputs a probability distribution for predicting every possible word. 
 
 \subsection{Derived models}
 After BERT, many other models built on similar architecture appeared. They all aim to improve the original BERT model in (at least) one of these three ways:
@@ -414,7 +412,7 @@ The resulting architecture is better than BERT, even trained on the same amount 
 \item knowledge distillation: involving the large model as a teacher and a smaller model (possibly with completely different architecture) as a student. Student model can learn to imitate different settings of the teacher model (i.e., encoder outputs or output logits),
 \item architecture compression: sharing some weights across the model or decreasing the vocabulary size of embeddings.
 \end{itemize}
-This study shows a possibility of reducing BERT to the quarter of the original size, while preserving performance. One of the famous smaller models is ALBERT (=A Lite BERT \citep{Lan2019}). ALBERT uses two reduction techniques -- reduces the size of the embedding matrix by approximating it with two smaller matrices, and parameters sharing across the layers. In addition, ALBERT presents a modification to the NSP objective: sentence-order prediction (SOP). %TODO zkratky, %TODO vysvetlit
+This study shows a possibility of reducing BERT to the quarter of the original size, while preserving performance. One of the famous smaller models is ALBERT (=A Lite BERT \citep{Lan2019}). ALBERT uses two reduction techniques -- reduces the size of the embedding matrix by approximating it with two smaller matrices, and parameters sharing across the layers. In addition, ALBERT presents a modification to the NSP objective: sentence-order prediction (SOP). An input into this tasks consists of two sentences and the goal is to predict, whether they are in the correct ordering.
 \subsection{How to use language models}
  \label{sub:howto}
  For using BERT-like models in new tasks, there are three possible ways \citep{Liu2020}: 
@@ -430,7 +428,7 @@ Speaking about fine-tuning, there are many decision to be made, i.e., how to cho
 \subsubsection{Sequence vs. Token Classification}
 Tasks which BERT can naturally solve fall into two categories -- sequence classification and token classification. The majority of papers seem to focus on sequence classification of sentences or larger text parts, e.g., sentiment analysis, natural language inference, question answering, sentence similarity, etc. Token classification tasks classify each input token, i.e., word, word part, or punctuation mark. The type of task influences the resulting architecture and also brings various problems.
 \subsubsection{How to get knowledge from BERT?}
-Which information from BERT should go to classification layers is the fundamental question when designing a model. From the horizontal point of view, the CLS token  is mostly used for a sequence classification, but utilizing some combination (e.g., concatenation, mean) of all sequence tokens is also possible \citep{Rogers2020}. Token classification uses an analogical approach -- taking the first token of the word or combining all word's tokens seem both to work well with little to zero impact on the result \citep{Kondratyuk2019, Kitaev2018}. As for the vertical combinations, the original BERT paper proposes taking the last layer's representation of respective token(s). Furthermore, the combination of the last four layers is also used (the best option in \citet{Sun} was the max function). Generally spoken, usage of more layers proves to be advantageous, and it is possible to let the choice of layers to be learned \citep{Yang2019b, Kondratyuk2019}. %TODO ze ruzne vrstvy vi ruzne veci
+Which information from BERT should go to classification layers is the fundamental question when designing a model. From the horizontal point of view, the CLS token  is mostly used for a sequence classification, but utilizing some combination (e.g., concatenation, mean) of all sequence tokens is also possible \citep{Rogers2020}. Token classification uses an analogical approach -- taking the first token of the word or combining all word's tokens seem both to work well with little to zero impact on the result \citep{Kondratyuk2019, Kitaev2018}. As for the vertical combinations, the original BERT paper proposes taking the last layer's representation of respective token(s). Furthermore, the combination of the last four layers is also used (the best option in \citet{Sun} was the max function). Generally spoken, usage of more layers proves to be advantageous, and it is possible to let the choice of layers to be learned \citep{Yang2019b, Kondratyuk2019}.
 \subsubsection{Learning dynamics}
 For the learning process itself, the first big question is whether to apply more pre-training, either on data for the task, domain or at least data for the same task as it showed to be beneficial \citep{Sun}. More technical details to be decided are the following:
 

@@ -5,11 +5,11 @@ Lemmatization and \acrshort{pos} tagging tasks are categorized as morphological 
 
 \paragraph{\textbf{POS tagging}} \mbox{}\\
 \textit{input}: a sequence of  words \\
-\textit{output}: tag (for each word), which contains not only part-of-speech (e.g. noun, pronoun, punctuation mark) but also other morphological analysis (case, tense, etc) corresponding to 15-places morphological tagging system by \cite{Hajic2004}. Description of each position can be found in Table \ref{Tab:tagset}.
+\textit{output}: tag (for each word), which contains not only part-of-speech (e.g. noun, pronoun, punctuation mark) but also other morphological analysis (case, tense, etc) corresponding to 15-places morphological tagging system by \cite{Hajic2004}. Description of each position can be found in table \ref{Tab:tagset}.
 
 \paragraph{\textbf{Lemmatization}} \mbox{}\\
 \textit{input:} a sequence of words \\
-\textit{output:} lemma (for each word) -- a base form of a given words, for example nominative of singular for nouns or infinitive for verbs. In this work, lemmatization is treated as a classification problem with classes coresponding to generating rules which transform an input word into target lemma. For example of such rules see Figure \ref{fig:lemma_rules}. \\
+\textit{output:} lemma (for each word) -- a base form of a given words, for example nominative of singular for nouns or infinitive for verbs. In this work, lemmatization is treated as a classification problem with classes coresponding to generating rules which transform an input word into target lemma. For example of such rules see figure \ref{fig:lemma_rules}. \\
 
 \begin{table}[!ht]
 \centering
@@ -34,7 +34,7 @@ Lemmatization and \acrshort{pos} tagging tasks are categorized as morphological 
   15 & Var & Variant, style \\ 
  \hline
 \end{tabular}
-\caption{Czech morphology developement is dated from 1989 \citep{Hajic2004} 
+\caption[Czech morphological tags]{Czech morphology developement is dated from 1989 \citep{Hajic2004} 
 and in description of words uses 15-places morphological tags as described in this table taken from \url{https://ufal.mff.cuni.cz/pdt2.0/doc/manuals/en/m-layer/html/ch02s02s01.html}. For more detailed  description or for exploration of predictions given by this work is recommended to use website of Institute of Theoretical and Computational linguistics: \url{http://utkl.ff.cuni.cz/~skoumal/morfo/?pos=11\&val=1}, although they use slightly different set with additional 16 position. }
 \label{Tab:tagset}
 \end{table}
@@ -44,7 +44,7 @@ and in description of words uses 15-places morphological tags as described in th
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=1\textwidth]{../img/lemma_rules}
-\protect\caption{
+\protect\caption[The most common lemma generating rules in English EWT corpus]{
 Table 1 from \citep{Straka2019b} presents 10 most common lemma generating rules in English EWT corpus. Each rule has two parts -- a casing script for transforming uppercase and lowercase letters, and an edit script. The edit script can transform prefix, suffix, or also a root of the word. It uses the Wagner–Fischer algorithm \citep{Wagner}, which finds the longest commont substring between the word and its lemma. Resulting rule is the shortest edit script converting the word into the lemma. More information can be found in \citep{Straka2019b}.
 }
 \label{fig:lemma_rules}
@@ -92,7 +92,7 @@ Dataset is originally divided into tree parts - train, development and test, whi
 
 The model for lemmatization and tagging is build upon a model (and a code) for previous work on Czech NLP processing with contextual embedding \citep{Straka2019}. 
 Data preprocessing is taken over from the paper as well as the structure of the lemmatizer and the tagger network, which is extended by BERT-like models, hoping for improvements. %TODO k tomu nemam citaci
-Previous work showed that training tagging and lemmatization together in one network can be mutually advantageous, so both of these analyses are an output of one network, and are trained jointly. Detailed visualisation of network architecture can be found in Figure \ref{pic:lt_arch}. \par The architecture of the network can be divided into three parts -- inputs, optional \acrshort{rnn}s, classification head:
+Previous work showed that training tagging and lemmatization together in one network can be mutually advantageous, so both of these analyses are an output of one network, and are trained jointly. Detailed visualisation of network architecture can be found in figure \ref{pic:lt_arch}. \par The architecture of the network can be divided into three parts -- inputs, optional \acrshort{rnn}s, classification head:
 \paragraph{Inputs}
 An input set of the network consists of five different input types -- characters (charseqs), words (charseq ids), correct responses (word ids), pretrained embeddings, and possibly precomputed BERT embeddings (depending on the experiment type). Two other types of embeddings are created before the further processing of inputs by \acrshort{rnn} cells: character-level embeddings and another word embeddings that are, in contrast to BERT and pretrained embeddings, also trained during the training process.
 
@@ -109,10 +109,6 @@ After the processing by recurrent neural networks, network employs two separate 
 
 %TODO maximal probability
 
-
-%TODO v ovrazku s archmam blbe zakoncenou shortcut a i navic v lstm
-%TODO v vysledkove tabulce je RobeCzech a czert v all czech
-%TODO do tabulky dat XLM roberta base, protoze ta velka je moc dobra
 
 
 %TODO nekde mam taky dropouts! zminit
@@ -144,7 +140,7 @@ we\_dim          & 512                        \\ \hline
 word\_dropout    & 0.2                        \\ \hline
 batch size & 64 \\ \hline
 \end{tabular}
-\caption{Hyperparameters of tagging and lemmatization common to all experiments (if they make sense in the context of experiments).}
+\caption[Hyperparameters of tagging and lemmatization common to all experiments]{Hyperparameters of tagging and lemmatization common to all experiments (if they make sense in the context of experiments).}
 \label{tab:hyp_all}
 \end{table}
 Batches have size 64, given by the compromise between the pursuit of relatively big batch size and computational resources. Summary of hyperparameters, which do not differ across experiments is presented in table \ref{tab:hyp_all}. Other hyperparameters for each experiment are in table \ref{att:1}.
@@ -168,15 +164,13 @@ Best presented model (experiment no. 18) achieved the same or better results tha
     emb(12) & 98.38  &98.79  & 97.80 & 98.48  & 98.99 & 98.10 \\ \hline
     best(18) & \textbf{98.50}  & \textbf{98.80} &\textbf{ 97.90}  & \textbf{98.57}  & \textbf{99.00}  & \textbf{98.19}  \\ \hline  
   \end{tabular}}
-  \caption{%TODO cite
+  \caption[Comparison of our best results and previous work]{
   \textit{Straka2019C} is a comparable solution  (BERT embeddings only) from \citep{Straka2019} to \textit{emb}, which was transformed into Tensorflow 2 in this work as a \textit{baseline}. \textit{Emb} is a solution with static BERT embeddings and \textit{best(18) is the best resulting model in this thesis (experiment id = 18). }}
 \label{tab:all_prew} 
 \end{table}
 
-%TODO vyresit citace a verze
 
 %TODO vsechny Figure a table se stejnym pismenem
-%TODO tabulka results all u taggingu rozdelit nadpis lemmatizace a tagging
 
 \begin{table}[!h]
 \resizebox{\columnwidth}{!}{
@@ -235,7 +229,7 @@ Best presented model (experiment no. 18) achieved the same or better results tha
 
 \end{tabular}
 }
-\caption{This table presents complete results for tagging and lemmatizationt tasks. Column EP presents number of epochs and corresponding learning rates are explained in Attachement \protect\ref{att:1} }
+\caption[Complete results for tagging and lemmatization]{This table presents complete results for tagging and lemmatizationt tasks. Column EP presents number of epochs and corresponding learning rates are explained in Attachement \protect\ref{att:1} }
 \label{tab:all_res_tl}
 \end{table}
 
@@ -255,6 +249,5 @@ The best model (tl\_18) improves prediction in $3,247$ tags and is worse in 421 
 
 \paragraph{mBERT vs. RobeCzech}
 Best mBERT is better in 468 tags and worse in $1,703$ tags than the best model. The most frequent tags improved by \textit{tl\_18} are similar to previous comparison. Nominative and accusative are again the most common cases improved, but the differences between these two models are not so significant. This results in verbs appearing higher in the table of most frequent tags, although the absolute value of better predictions on verbs is similar to previous comparison. In both situations, improved verbs predictions relate mostly to verbs with the same form in singular and plural of the third-person, e.g. \textit{vyváží} (exports) or \textit{stojí} (stands). The complete table of the most frequent tags is available in table \ref{att:tags2}.
-%TODO kratke popisy u tabulek a figure
 %TODO kolik lemmata
 %TODO je v necem mBERT lepsi?
