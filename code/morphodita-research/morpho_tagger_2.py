@@ -33,8 +33,8 @@ class BertModel:
 
     @property
     def model(self):
-        config = transformers.AutoConfig.from_pretrained(self.path)
-        config.output_hidden_states = True
+        self.config = transformers.AutoConfig.from_pretrained(self.path)
+        self.config.output_hidden_states = True
         self.model = transformers.TFAutoModel.from_pretrained(self.path, config=self.config)
         return self.model
 
