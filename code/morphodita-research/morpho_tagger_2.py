@@ -21,6 +21,7 @@ from transformers import WarmUp
 class BertModel:
     def __init__(self, name, args):
         self.name = name
+        self._model = None
 
         if "robeczech" in name:
             self.path = name + "tf"
@@ -30,13 +31,16 @@ class BertModel:
             self.tokenizer = transformers.AutoTokenizer.from_pretrained(name)
 
         self.embeddings_only = True if args.bert else False
-
+        
     @property
     def model(self):
-        self.config = transformers.AutoConfig.from_pretrained(self.path)
-        self.config.output_hidden_states = True
-        self.model = transformers.TFAutoModel.from_pretrained(self.path, config=self.config)
-        return self.model
+        if self._model is None:
+            config = transformers.AutoConfig.from_pretrained(self.path)
+            config.output_hidden_states = True
+            self._model =transformers.TFAutoModel.from_pretrained(self.path, config=self.config)
+        return self._model
+
+
 
 class Network:
 
