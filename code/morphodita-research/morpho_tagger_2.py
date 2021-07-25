@@ -35,8 +35,8 @@ class BertModel:
     @property
     def model(self):
         if self._model is None:
-            config = transformers.AutoConfig.from_pretrained(self.path)
-            config.output_hidden_states = True
+            self.config = transformers.AutoConfig.from_pretrained(self.path)
+            self.config.output_hidden_states = True
             self._model =transformers.TFAutoModel.from_pretrained(self.path, config=self.config)
         return self._model
 
@@ -778,7 +778,7 @@ def main(args):
     if args.predict:
         # network.saver_inference.restore(network.session, "{}/checkpoint-inference".format(args.predict))
         network.outer_model.load_weights(args.predict)
-        network.predict(predict, args, open(saved + "_vystup", "w"),compare=True)
+        network.predict(predict, args, open(saved + "_vystup", "w"),compare=False)
 
     else:
         log_file = open("{}/log".format(args.logdir), "w")
