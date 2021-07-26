@@ -10,7 +10,6 @@ import numpy as np
 import tensorflow as tf
 import transformers
 import math
-from keras import backend as b
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from transformers import WarmUp
@@ -171,7 +170,7 @@ class Network:
             if args.decay_type is None:
                 if args.accu > 1:
                     lr = lr / args.accu
-                b.set_value(self.optimizer.learning_rate, lr)
+                self.optimizer.learning_rate.assign(lr)
             for i in range(e):
                 print("epoch " + str(i))
                 network.train_epoch(data.train, args)
