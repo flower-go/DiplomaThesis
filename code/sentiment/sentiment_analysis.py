@@ -237,9 +237,7 @@ class Network:
 
 
 
-if __name__ == "__main__":
-    # Parse arguments
-
+def main(args):
     parser = argparse.ArgumentParser()
     parser.add_argument("--accu", default=1, type=int, help="accumulate batch size")
     parser.add_argument("--batch_size", default=4, type=int, help="Batch size.")
@@ -260,8 +258,9 @@ if __name__ == "__main__":
     parser.add_argument("--freeze", default=0, type=int, help="Freezing bert layers")
     parser.add_argument("--seed", default=42, type=int, help="Random seed.")
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose TF logging.")
-    parser.add_argument("--kfold", default=None, type=str, help="Number of folds for cross-validation and the index of the fold")
-    args = parser.parse_args([] if "__file__" not in globals() else None)
+    parser.add_argument("--kfold", default=None, type=str,
+                        help="Number of folds for cross-validation and the index of the fold")
+    args = parser.parse_args(args)
     args.epochs = [(int(epochs), float(lr)) for epochslr in args.epochs.split(",") for epochs, lr in
                    [epochslr.split(":")]]
 
@@ -314,14 +313,13 @@ if __name__ == "__main__":
         data_other = None
         if args.datasets != None:
             for d in args.datasets.split(","):
-                data = dataset.get_dataset(d,path="../../../datasets",debug=args.debug)
+                data = dataset.get_dataset(d, path="../../../datasets", debug=args.debug)
                 if str(type(data)) != "<class 'text_classification_dataset.TextClassificationDataset'>":
                     data["dataset"] = d
-                    data_other = pd.concat([data_other, data]) #nedostane se sem None?
+                    data_other = pd.concat([data_other, data])  # nedostane se sem None?
                 else:
 
                     data_result = data
-
 
             if args.kfold > 0:
                 len_data = 0
@@ -336,7 +334,7 @@ if __name__ == "__main__":
                     l_train = len(data_result.train._data["tokens"])
                     l_dev = len(data_result.dev._data["tokens"])
                     l_test = len(data_result.test._data["tokens"])
-                    len_r =  l_train + l_dev + l_test
+                    len_r = l_train + l_dev + l_test
                     len_data += len_r
                     all_data_tokens.append(data_result.train._data["tokens"])
                     all_data_tokens.append(data_result.dev._data["tokens"])
@@ -345,38 +343,39 @@ if __name__ == "__main__":
                     all_data_labels.append(data_result.dev._data["labels"])
                     all_data_labels.append(data_result.test._data["labels"])
                 kf = KFold(n_splits=args.kfold)
-                train, test = kf.split(np.array(range(len_data))) #TODO resit ty jednotlive iterace
+                train, test = kf.split(np.array(range(len_data)))  # TODO resit ty jednotlive iterace
                 train = train[args.fold]
                 test = test[args.fold]
 
             if data_other is not None:
-                if args.kfold >0:
+                if args.kfold > 0:
                     i_o = [i for i in train if i < len_o]
                     train = data_other[i_o]
                     i_o = [i for i in test if i < len_o]
                     test = data_other[i_o]
-                    dev = [] #TODO doresit
+                    dev = []  # TODO doresit
                 else:
-                    train, test = train_test_split(data_other, test_size=0.3, shuffle=True, stratify=data_other["Sentiment"])
+                    train, test = train_test_split(data_other, test_size=0.3, shuffle=True,
+                                                   stratify=data_other["Sentiment"])
                     dev, test = train_test_split(test, test_size=0.5, stratify=test["Sentiment"])
-            #TODO docasny kod
-            #with open("multitest", "w") as out_file:
+            # TODO docasny kod
+            # with open("multitest", "w") as out_file:
             #    for index,l in test.iterrows():
             #        line = l["dataset"] + "\t" +  str(l["Sentiment"]) +  "\t" + l["Post"]
             #        print(line, file=out_file)
             if data_result == None:
-                data_result = TextClassificationDataset().from_array([train,dev,test], tokenizer.encode)
+                data_result = TextClassificationDataset().from_array([train, dev, test], tokenizer.encode)
             elif data_other is not None:
                 data_other = TextClassificationDataset().from_array([train, dev, test], tokenizer.encode)
                 if args.kfold <= 0:
 
                     data_result.append_dataset(data_other)
                 else:
-                    i_train= [i for i in train if i < l_train]
+                    i_train = [i for i in train if i < l_train]
                     i_dev = [i for i in train if i < l_dev]
                     i_test = [i for i in train if i < l_test]
 
-                    #train
+                    # train
                     data_result.train._data["tokens"] = data_result.train._data["tokens"][i_train]
                     data_result.train._data["labels"] = data_result.train._data["labels"][i_train]
                     data_result.train._data["tokens"].append(data_result.dev._data["tokens"][i_dev])
@@ -384,8 +383,8 @@ if __name__ == "__main__":
                     data_result.train._data["tokens"].append(data_result.train._data["tokens"][i_test])
                     data_result.train._data["labels"].append(data_result.train._data["labels"][i_test])
 
-                    #test
-                    i_train= [i for i in test if i < l_train]
+                    # test
+                    i_train = [i for i in test if i < l_train]
                     i_dev = [i for i in test if i < l_dev]
                     i_test = [i for i in test if i < l_test]
 
@@ -405,17 +404,17 @@ if __name__ == "__main__":
             print(len(imdb_ex))
             if args.english < 1:
                 print("less than one")
-                size = min(len(data_result.train._data["tokens"])*args.english, len(imdb_ex))/len(imdb_ex)
+                size = min(len(data_result.train._data["tokens"]) * args.english, len(imdb_ex)) / len(imdb_ex)
                 if size < 1:
                     imdb_ex, _, imdb_lab, _, = train_test_split(imdb_ex, imdb_lab, train_size=size, shuffle=True,
-                                                            stratify=imdb_lab)
+                                                                stratify=imdb_lab)
 
                 data_result.train._data["tokens"].append(imdb_ex)
                 data_result.train._data["labels"].append(imdb_lab + 1)
-            else: #zero shot
+            else:  # zero shot
                 size = len(imdb_ex)
                 data_result.train._data["tokens"] = imdb_ex
-                data_result.train._data["labels"]= imdb_lab + 1
+                data_result.train._data["labels"] = imdb_lab + 1
                 test_labels_new = []
                 test_data_new = []
                 for i in range(len(data_result.test._data["labels"])):
@@ -426,7 +425,7 @@ if __name__ == "__main__":
                 data_result.test._data["tokens"] = test_data_new
                 data_result.test._data["labels"] = test_labels_new
 
-                #print(type(data_result.test._data["labels"]))
+                # print(type(data_result.test._data["labels"]))
 
                 data_result.test._size = len(test_data_new)
                 data_result.train._size = len(imdb_ex)
@@ -435,16 +434,13 @@ if __name__ == "__main__":
     else:
         num_labels = 3
 
+        # if args.decay_type is not None:
+        #   args.warmup_decay = math.floor(len(data_result.train._data["tokens"]) / args.batch_size)
 
-
-
-        #if args.decay_type is not None:
-         #   args.warmup_decay = math.floor(len(data_result.train._data["tokens"]) / args.batch_size)
-
-        #print("Delka datasetu " + str(len(data_result.train._data)))
+        # print("Delka datasetu " + str(len(data_result.train._data)))
 
     if args.decay_type != None:
-        args.steps_in_epoch = math.floor(len(data_result.train._data["tokens"]) / (args.batch_size*args.accu))
+        args.steps_in_epoch = math.floor(len(data_result.train._data["tokens"]) / (args.batch_size * args.accu))
     # Create the network and train
     network = Network(args, num_labels)
 
@@ -453,7 +449,7 @@ if __name__ == "__main__":
 
         # Generate test set annotations, but to allow parallel execution, create it
         # in in args.logdir if it exists.
-        #TODO vypisovani i s textem a gold label! ale jen když chci
+        # TODO vypisovani i s textem a gold label! ale jen když chci
         out_path = "sentiment_analysis_test.txt"
         test_prediction = []
         if os.path.isdir(args.logdir): out_path = os.path.join(args.logdir, out_path)
@@ -462,7 +458,7 @@ if __name__ == "__main__":
                 label = np.argmax(label)
                 test_prediction.append(label)
                 print(data_result.test.LABELS[label], file=out_file)
-        #data_result.train.save_mappings("{}/mappings.pickle".format(args.logdir))  # TODO
+        # data_result.train.save_mappings("{}/mappings.pickle".format(args.logdir))  # TODO
         if args.checkp:
             checkp = args.checkp
         else:
@@ -473,17 +469,18 @@ if __name__ == "__main__":
 
         if data_result.test.data["labels"][0] != -1:
             acc = (np.array(data_result.test.data["labels"]) == np.array(test_prediction))
-            acc = sum(acc)/len(acc)
+            acc = sum(acc) / len(acc)
             c = confusion_matrix(np.array(data_result.test.data["labels"]), np.array(test_prediction))
             print(c)
             print("Test accuracy: " + str(acc))
 
-            print("F1 metrics: " + str(f1_score(np.array(data_result.test.data["labels"]), np.array(test_prediction),average="weighted")))
+            print("F1 metrics: " + str(
+                f1_score(np.array(data_result.test.data["labels"]), np.array(test_prediction), average="weighted")))
 
     else:
-        #TODO do args.model dat co nacist a do predict asi teda data k predikci
+        # TODO do args.model dat co nacist a do predict asi teda data k predikci
         out_file = args.predict + "_vystup"
-        #TODO nacist test file
+        # TODO nacist test file
 
         data = pd.read_csv(args.predict, sep='\n', header=None, names=['Post']).assign(Sentiment=4)
         test = []
@@ -495,10 +492,15 @@ if __name__ == "__main__":
             test.append(encoded)
 
         with open(out_file, "w") as out_file:
-            for i,label in enumerate(network.predict(test, args)):
+            for i, label in enumerate(network.predict(test, args)):
                 label = np.argmax(label)
                 line = str(label) + "\t" + data.iloc[i]["Post"]
                 print(line, file=out_file)
 
 
+if __name__ == "__main__":
+    import sys
+
+    main(sys.argv[1:])
+    # Parse arguments
 
