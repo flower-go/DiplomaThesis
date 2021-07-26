@@ -669,7 +669,7 @@ def main(args):
             else:
                 args.bert = args.bert[0]
             name = args.bert
-    if predict:
+    if args.predict is not None:
         args.bert_load  = None
 
 
