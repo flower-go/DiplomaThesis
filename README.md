@@ -10,3 +10,6 @@ Best models are available in the form of checkpoints temporarily on AIC cluster:
 * facebook [index](aic.ufal.mff.cuni.cz/~doubrap1/sentiment_analysis.py-2021-06-08_172844-a=12,bs=4,b=...index) [data](aic.ufal.mff.cuni.cz/~doubrap1/sentiment_analysis.py-2021-06-08_172844-a=12,bs=4,b=...data-00000-of-00001)
 * joint [index](aic.ufal.mff.cuni.cz/~doubrap1/sentiment_analysis.py-2021-07-02_181019-a=32,bs=1,b=...index) [data](aic.ufal.mff.cuni.cz/~doubrap1/sentiment_analysis.py-2021-07-02_181019-a=32,bs=1,b=...data-00000-of-00001)
 
+
+We are sorry, but demo jupyter notebook is not available yet due to technical issues.
+
