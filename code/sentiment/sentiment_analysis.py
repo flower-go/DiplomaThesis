@@ -303,7 +303,8 @@ def main(args):
     if not "robeczech" in args.bert:
         tokenizer = transformers.AutoTokenizer.from_pretrained(args.bert)
     else:
-        tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer(args.bert + "tokenizer")
+        tokenizer = transformers.AutoTokenizer.from_pretrained("ufal/robeczech-base")
+        #tokenizer = tokenizer.robeczech_tokenizer.RobeCzechTokenizer(args.bert + "tokenizer")
 
     if args.predict is None:
 
