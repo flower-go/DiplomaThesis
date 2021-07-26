@@ -1,4 +1,5 @@
 
+
 #!/usr/bin/env python3
 import sys
 import collections
@@ -24,7 +25,7 @@ class BertModel:
         self._model = None
 
         if "robeczech" in name:
-            self.path = name + "tf"
+            self.path= "ufal/robeczech-base"
             self.tokenizer = transformers.AutoTokenizer.from_pretrained("ufal/robeczech-base")
         else:
             self.path = name
