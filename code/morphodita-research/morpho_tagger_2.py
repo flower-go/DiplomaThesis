@@ -669,6 +669,8 @@ def main(args):
             else:
                 args.bert = args.bert[0]
             name = args.bert
+    if predict:
+        args.bert_load  = None
 
 
     # TODO vyřešit
