@@ -497,6 +497,8 @@ if __name__ == "__main__":
         with open(out_file, "w") as out_file:
             for i,label in enumerate(network.predict(test, args)):
                 label = np.argmax(label)
+                print("post")
+                print(data.iloc[i]["Post"])
                 line = str(label) + "\t" + data.iloc[i]["Post"]
                 print(line, file=out_file)
 
