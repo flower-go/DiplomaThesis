@@ -30,7 +30,7 @@ class BertModel:
             self.path = name
             self.tokenizer = transformers.AutoTokenizer.from_pretrained(name)
 
-        self.embeddings_only = True if args.bert else False
+        self.embeddings_only = True if (args.bert and not args.predict) else False
         
     @property
     def model(self):
