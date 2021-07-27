@@ -31,15 +31,23 @@ class BertModel:
             self.path = name
             self.tokenizer = transformers.AutoTokenizer.from_pretrained(name)
 
+        self.config = transformers.AutoConfig.from_pretrained(self.path)
+        self.config.output_hidden_states = True
+
+        if args.predict:
+            self.model = transformers.TFAutoModel.from_config(self.config)
+        else:
+            self.model = transformers.TFAutoModel.from_pretrained(self.path, config=self.config)
+
         self.embeddings_only = True if (args.bert and not args.predict) else False
-        
-    @property
-    def model(self):
-        if self._model is None:
-            self.config = transformers.AutoConfig.from_pretrained(self.path)
-            self.config.output_hidden_states = True
-            self._model =transformers.TFAutoModel.from_pretrained(self.path, config=self.config)
-        return self._model
+
+    # @property
+    # def model(self):
+    #     if self._model is None:
+    #         self.config = transformers.AutoConfig.from_pretrained(self.path)
+    #         self.config.output_hidden_states = True
+    #         self._model =transformers.TFAutoModel.from_pretrained(self.path, config=self.config)
+    #     return self._model
 
 
 
