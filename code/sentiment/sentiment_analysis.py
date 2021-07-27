@@ -35,7 +35,11 @@ class Network:
             config.output_hidden_states = True
             self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained(args.bert, config=config)
         else:
-            self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained(args.bert + "tf", output_hidden_states=True)
+            if args.predict is not None:
+                self.bert = transformers.TFAutoModelForSequenceClassification.from_config("ufal/robeczech-base",
+                                                                                              output_hidden_states=True)
+            else:
+                self.bert = transformers.TFAutoModelForSequenceClassification.from_pretrained("ufal/robeczech-base", output_hidden_states=True)
         if args.freeze:
             self.bert.trainable = False
 
