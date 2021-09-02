@@ -14,13 +14,13 @@ Demo notebook with an example of usage of pretrained models is available for tag
 Demo for sentiment is available [here](https://github.com/flower-go/DiplomaThesis/blob/8d408e6a122d33b651dd0d37937969cc6c4f350a/sentiment_example.ipynb).
 
 If you wish to replicate training experiments, the list of scripts with hyperparameters is in [run_scripts](https://github.com/flower-go/DiplomaThesis/blob/51cce14ea3d6834c9249325016f9cf4b80af871d/run_experiments)
-Input data should be in the following format: every line contains one input word, gold lemma and gold tag (all separated by tab) as in the following example.
-Faxu	fax	NNIS3-----A----
-škodí	škodit_:T	VB-P---3P-AA---
-především	především	Db-------------
-přetížené	přetížený_^(*3it)	AAFP1----1A----
-telefonní	telefonní	AAFP1----1A----
-linky	linka	NNFP1-----A----
+Input data should be in the following format: every line contains one input word, gold lemma and gold tag (all separated by tab) as in the following example.  
+Faxu	fax	NNIS3-----A----  
+škodí	škodit_:T	VB-P---3P-AA---  
+především	především	Db-------------  
+přetížené	přetížený_^(*3it)	AAFP1----1A----  
+telefonní	telefonní	AAFP1----1A----  
+linky	linka	NNFP1-----A----  
 
 The model also needs the same embeddings as in the demo notebooks. 
 
