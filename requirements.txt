@@ -69,7 +69,7 @@ termcolor==1.1.0
 threadpoolctl==2.1.0
 tokenizers==0.10.1
 tqdm==4.43.0
-transformers==4.4.2
+transformers==4.30.0
 typeguard==2.7.1
 typing-extensions==3.7.4.3
 urllib3==1.25.8
